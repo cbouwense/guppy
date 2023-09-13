@@ -10,6 +10,7 @@
 
 void guppy_print_bool_array(bool array[], size_t length, const char* array_name);
 void guppy_print_char_array(char array[], size_t length, const char* array_name);
+void guppy_print_double_array(double array[], size_t length, const char* array_name);
 void guppy_print_float_array(float array[], size_t length, const char* array_name);
 void guppy_print_int_array(int array[], size_t length, const char* array_name);
 
@@ -35,6 +36,24 @@ void guppy_print_char_array(char array[], size_t length, const char* array_name)
     printf("%s: [", array_name);
     for (size_t i = 0; i < length; i++) {
         printf("%c", array[i]);
+        if (i < length - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
+void guppy_print_double_array(double array[], size_t length, const char* array_name) {
+    printf("%s: [", array_name);
+    for (size_t i = 0; i < length; i++) {
+        printf("%.17f", array[i]);
+        if (i < length - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
+void guppy_print_float_array(float array[], size_t length, const char* array_name) {
+    printf("%s: [", array_name);
+    for (size_t i = 0; i < length; i++) {
+        printf("%f", array[i]);
         if (i < length - 1) printf(", ");
     }
     printf("]\n");
