@@ -28,14 +28,10 @@ void guppy_print_long_array_slice(long array[], size_t start, size_t end, const 
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
-/*
- * TODO:
- * - Print arrays of arrays.
- * - DRY this up a bit perhaps. Most of this is duplication with different print formats.
- */
+// TODO: DRY this up a bit perhaps. Most of this is duplication with different print formats.
 
 //--------------------------------------------------------------------------------------------------
-// Print array
+// Print full arrays
 //--------------------------------------------------------------------------------------------------
 
 void guppy_print_bool_array(bool array[], size_t length, const char* array_name) {
@@ -98,7 +94,7 @@ void guppy_print_long_array(long array[], size_t length, const char* array_name)
 }
 
 //--------------------------------------------------------------------------------------------------
-// Print array slice
+// Print array slices
 //--------------------------------------------------------------------------------------------------
 
 void guppy_print_bool_array_slice(bool array[], size_t start, size_t end, const char* array_name) {
