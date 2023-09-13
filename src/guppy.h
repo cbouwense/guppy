@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GUPPY_H
+#define GUPPY_H
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -7,17 +8,15 @@
  ** Public API
  ****************************************************************************************************/
 
-#define guppy_print_bool_array(array) guppy_print_bool_array_internal(array, sizeof(array), #array)
-#define guppy_print_char_array(array) guppy_print_char_array_internal(array, sizeof(array), #array)
-#define guppy_print_int_array(array) guppy_print_int_array_internal(array, sizeof(array), #array)
+void guppy_print_bool_array(bool array[], size_t length, const char* array_name);
+void guppy_print_char_array(char array[], size_t length, const char* array_name);
+void guppy_print_int_array(int array[], size_t length, const char* array_name);
 
 /***************************************************************************************************
  ** Internal implementation
  ****************************************************************************************************/
 
-void guppy_print_bool_array_internal(bool array[], size_t size_of_array, const char* array_name) {
-    const size_t length = size_of_array / sizeof(bool);
-    
+void guppy_print_bool_array(bool array[], size_t length, const char* array_name) {
     printf("%s: [", array_name);
     for (size_t i = 0; i < length; i++) {
         if (array[i]) printf("true");
@@ -28,9 +27,7 @@ void guppy_print_bool_array_internal(bool array[], size_t size_of_array, const c
     printf("]\n");
 }
 
-void guppy_print_char_array_internal(char array[], size_t size_of_array, const char* array_name) {
-    const size_t length = size_of_array / sizeof(char);
-    
+void guppy_print_char_array(char array[], size_t length, const char* array_name) {
     printf("%s: [", array_name);
     for (size_t i = 0; i < length; i++) {
         printf("%c", array[i]);
@@ -39,9 +36,7 @@ void guppy_print_char_array_internal(char array[], size_t size_of_array, const c
     printf("]\n");
 }
 
-void guppy_print_int_array_internal(int array[], size_t size_of_array, const char* array_name) {
-    const size_t length = size_of_array / sizeof(int);
-    
+void guppy_print_int_array(int array[], size_t length, const char* array_name) {
     printf("%s: [", array_name);
     for (size_t i = 0; i < length; i++) {
         printf("%d", array[i]);
@@ -49,3 +44,5 @@ void guppy_print_int_array_internal(int array[], size_t size_of_array, const cha
     }
     printf("]\n");
 }
+
+#endif // GUPPY_H
