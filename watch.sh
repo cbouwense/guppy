@@ -1,1 +1,1 @@
-ls src/* test/* | entr sh -c "./run.sh"
+ls src/* test/* | entr sh -c "./clear_and_run.sh"
