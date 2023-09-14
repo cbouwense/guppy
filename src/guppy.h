@@ -28,8 +28,8 @@ void guppy_print_long_array_slice(long array[], size_t start, size_t end, const 
 
 // File operations ---------------------------------------------------------------------------------
 
-int guppy_file_read(const char *file_name, char *text_read_from_file);
-int guppy_file_write(const char *file_name, const char *text_to_write);
+char *guppy_file_read(const char *file_name);
+int   guppy_file_write(const char *file_name, const char *text_to_write);
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
@@ -159,25 +159,51 @@ void guppy_print_long_array_slice(long array[], size_t start, size_t end, const 
 
 // File operations ---------------------------------------------------------------------------------
 
-int guppy_file_read(const char *file_name, char *text_read_from_file) {
+char *guppy_file_read(const char *file_name) {
     FILE *fp;
-    
-    fp = fopen(file_name, "rb");
+    char *buffer;
+    long file_size;
+
+    fp = fopen(file_name, "r");
+    if (fp == NULL) {
+        return NULL;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    file_size = ftell(fp);
+    rewind(fp);
+
+    buffer = (char*) malloc(file_size + 1);
+    if (buffer == NULL) {
+        fclose(fp);
+        return NULL;
+    }
+
+    if (fread(buffer, sizeof(char), file_size, fp) != file_size) {
+        free(buffer);
+        fclose(fp);
+        return NULL;
+    }
+
+    buffer[file_size] = '\0';
+
+    fclose(fp);
+    return buffer;
+}
+
+int guppy_file_write(const char *file_name, const char *text_to_write) {
+    FILE *fp;
+
+    fp = fopen(file_name, "w");
     if (fp == NULL) {
         printf("Failed to open file %s\n", file_name);
         return 1;
     }
 
-    size_t bytes_read = fread(text_read_from_file, sizeof(char), 1024, fp);
-    text_read_from_file[bytes_read] = '\0';
+    fprintf(fp, "%s", text_to_write);
 
     fclose(fp);
     return 0;
-}
-
-int guppy_file_write(const char *file_name, const char *text_to_write) {
-    printf("guppy_file_write not implemented yet.\n");
-    assert(false);
 }
 
 #endif // GUPPY_H

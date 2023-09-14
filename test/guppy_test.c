@@ -4,11 +4,8 @@
 #include "../src/guppy.h"
 
 int main(void) {
-    char file_contents[1024];
-    int read_result = guppy_file_read("./test/foo.txt", file_contents);
-    printf("read result: %d\n", read_result);
-    assert(read_result == 0);
-
+    char *file_contents = guppy_file_read("./test/foo.txt");
+    assert(file_contents != NULL);
     printf("file contents:\n%s\n", file_contents);
 
     return 0;
