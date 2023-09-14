@@ -8,7 +8,7 @@
  * Public API                                                                                     *
  **************************************************************************************************/
 
-// Print full arrays.
+// Print full arrays -------------------------------------------------------------------------------
 void guppy_print_bool_array(bool array[], size_t length, const char* array_name);
 void guppy_print_char_array(char array[], size_t length, const char* array_name);
 void guppy_print_double_array(double array[], size_t length, const char* array_name);
@@ -16,13 +16,15 @@ void guppy_print_float_array(float array[], size_t length, const char* array_nam
 void guppy_print_int_array(int array[], size_t length, const char* array_name);
 void guppy_print_long_array(long array[], size_t length, const char* array_name);
 
-// Print array slices [start, end).
+// Print array slices [start, end) -----------------------------------------------------------------
 void guppy_print_bool_array_slice(bool array[], size_t start, size_t end, const char* array_name);
 void guppy_print_char_array_slice(char array[], size_t start, size_t end, const char* array_name);
 void guppy_print_double_array_slice(double array[], size_t start, size_t end, const char* array_name);
 void guppy_print_float_array_slice(float array[], size_t start, size_t end, const char* array_name);
 void guppy_print_int_array_slice(int array[], size_t start, size_t end, const char* array_name);
 void guppy_print_long_array_slice(long array[], size_t start, size_t end, const char* array_name);
+
+
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
