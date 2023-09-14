@@ -4,6 +4,18 @@
 #include "../src/guppy.h"
 
 int main(void) {
+    char file_contents[1024];
+    int read_result = guppy_file_read("./test/foo.txt", file_contents);
+    printf("read result: %d\n", read_result);
+    assert(read_result == 0);
+
+    printf("file contents:\n%s\n", file_contents);
+
+    return 0;
+}
+
+/*
+int main(void) {
     bool bool_array[] = {true, false, true};
     char char_array[] = {'a', '1', '$'};
     double double_array[] = {DBL_MIN, DBL_EPSILON, 0.123456789012345};
@@ -67,3 +79,4 @@ int main(void) {
 
     return 0;
 }
+*/
