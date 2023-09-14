@@ -30,9 +30,7 @@ void guppy_print_long_array_slice(long array[], size_t start, size_t end, const 
 
 // TODO: DRY this up a bit perhaps. Most of this is duplication with different print formats.
 
-//--------------------------------------------------------------------------------------------------
-// Print full arrays
-//--------------------------------------------------------------------------------------------------
+// Print full arrays -------------------------------------------------------------------------------
 
 void guppy_print_bool_array(bool array[], size_t length, const char* array_name) {
     printf("%s: [", array_name);
@@ -93,9 +91,7 @@ void guppy_print_long_array(long array[], size_t length, const char* array_name)
     printf("]\n");
 }
 
-//--------------------------------------------------------------------------------------------------
-// Print array slices
-//--------------------------------------------------------------------------------------------------
+// Print array slices ------------------------------------------------------------------------------
 
 void guppy_print_bool_array_slice(bool array[], size_t start, size_t end, const char* array_name) {
     printf("%s: [", array_name);
