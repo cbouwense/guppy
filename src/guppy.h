@@ -32,6 +32,7 @@ void guppy_print_array_slice_int(int array[], size_t start, size_t end, const ch
 void guppy_print_array_slice_long(long array[], size_t start, size_t end, const char *array_name);
 
 // File operations ---------------------------------------------------------------------------------
+int    guppy_file_create(const char *file_name);
 int    guppy_file_line_count(const char *file_name);
 char  *guppy_file_read(const char *file_name);
 char **guppy_file_read_lines(const char *file_name, const bool should_keep_newlines);
@@ -41,7 +42,7 @@ int    guppy_file_write(const char *file_name, const char *text_to_write);
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
-// Memory ------------------------------------------------------------------------------------------
+# pragma region // Memory --------------------------------------------------------------------------
 
 void *_guppy_malloc(size_t n, const char *file_name, int line_number) {
     void *ptr = malloc(n);
@@ -63,7 +64,9 @@ void *_guppy_malloc(size_t n, const char *file_name, int line_number) {
 #define malloc(n) _guppy_malloc(n, __FILE__, __LINE__)
 #endif
 
-// Assert ------------------------------------------------------------------------------------------
+#pragma endregion
+
+# pragma region // Assert --------------------------------------------------------------------------
 
 void _guppy_assert(bool pass_condition, const char *failure_explanation, const char *readable_pass_condition, const char *file_name, int line_number) {
     if (!pass_condition) {
@@ -76,7 +79,9 @@ void _guppy_assert(bool pass_condition, const char *failure_explanation, const c
 
 #define guppy_assert(pass_condition, failure_explanation) _guppy_assert(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
 
-// Print full arrays -------------------------------------------------------------------------------
+#pragma endregion
+
+# pragma region // Print full arrays ---------------------------------------------------------------
 
 void guppy_print_array_bool(bool array[], size_t length, const char *array_name) {
     printf("%s: [", array_name);
@@ -152,7 +157,9 @@ void guppy_print_array_string(char *array[], size_t length, const char *array_na
     printf("]\n");
 }
 
-// Print array slices ------------------------------------------------------------------------------
+#pragma endregion
+
+# pragma region // Print array slices --------------------------------------------------------------
 
 void guppy_print_array_slice_bool(bool array[], size_t start, size_t end, const char *array_name) {
     printf("%s: [", array_name);
@@ -213,7 +220,9 @@ void guppy_print_array_slice_long(long array[], size_t start, size_t end, const 
     printf("]\n");
 }
 
-// File operations ---------------------------------------------------------------------------------
+#pragma endregion
+
+# pragma region // File operations -----------------------------------------------------------------
 
 int guppy_file_line_count(const char *file_name) {
     FILE *fp;
@@ -323,5 +332,7 @@ int guppy_file_write(const char *file_name, const char *text_to_write) {
     fclose(fp);
     return 0;
 }
+
+#pragma endregion
 
 #endif // GUPPY_H
