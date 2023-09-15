@@ -18,7 +18,7 @@ void guppy_print_array_double(double array[], size_t length, const char* array_n
 void guppy_print_array_float(float array[], size_t length, const char* array_name);
 void guppy_print_array_int(int array[], size_t length, const char* array_name);
 void guppy_print_array_long(long array[], size_t length, const char* array_name);
-void guppy_print_array_string(long array[], size_t length, const char* array_name);
+void guppy_print_array_string(char *array[], size_t length, const char* array_name);
 
 // Print array slices [start, end) -----------------------------------------------------------------
 void guppy_print_array_bool_slice(bool array[], size_t start, size_t end, const char* array_name);
@@ -32,7 +32,7 @@ void guppy_print_array_long_slice(long array[], size_t start, size_t end, const 
 
 int    guppy_file_line_count(const char *file_name);
 char  *guppy_file_read(const char *file_name);
-char **guppy_file_read_lines(const char *file_name);
+char **guppy_file_read_lines(const char *file_name, const bool should_keep_newlines);
 int    guppy_file_write(const char *file_name, const char *text_to_write);
 
 /**************************************************************************************************
@@ -41,7 +41,7 @@ int    guppy_file_write(const char *file_name, const char *text_to_write);
 
 // Print full arrays -------------------------------------------------------------------------------
 
-void guppy_print_bool_array(bool array[], size_t length, const char* array_name) {
+void guppy_print_array_bool(bool array[], size_t length, const char* array_name) {
     printf("%s: [", array_name);
     for (size_t i = 0; i < length; i++) {
         if (array[i] == true) {
@@ -55,7 +55,7 @@ void guppy_print_bool_array(bool array[], size_t length, const char* array_name)
     printf("]\n");
 }
 
-void guppy_print_char_array(char array[], size_t length, const char* array_name) {
+void guppy_print_array_char(char array[], size_t length, const char* array_name) {
     printf("%s: [", array_name);
     for (size_t i = 0; i < length; i++) {
         printf("%c", array[i]);
@@ -100,9 +100,24 @@ void guppy_print_array_long(long array[], size_t length, const char* array_name)
     printf("]\n");
 }
 
+void guppy_print_array_string(char *array[], size_t length, const char* array_name) {
+    printf("%s: [", array_name);
+    for (size_t i = 0; i < length; i++) {
+        size_t j = 0;
+        printf("\"");
+        while (array[i][j] != '\0') {
+            printf("%c", array[i][j]);
+            j++;
+        }
+        printf("\"");
+        if (i < length - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
 // Print array slices ------------------------------------------------------------------------------
 
-void guppy_print_bool_array_slice(bool array[], size_t start, size_t end, const char* array_name) {
+void guppy_print_array_bool_slice(bool array[], size_t start, size_t end, const char* array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
         if (array[i] == true) {
@@ -116,7 +131,7 @@ void guppy_print_bool_array_slice(bool array[], size_t start, size_t end, const 
     printf("]\n");
 }
 
-void guppy_print_char_array_slice(char array[], size_t start, size_t end, const char* array_name) {
+void guppy_print_array_char_slice(char array[], size_t start, size_t end, const char* array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
         printf("%c", array[i]);
@@ -222,7 +237,7 @@ char *guppy_file_read(const char *file_name) {
     return buffer;
 }
 
-char **guppy_file_read_lines(const char *file_name) {
+char **guppy_file_read_lines(const char *file_name, const bool should_keep_newlines) {
     FILE *fp;
     char **lines;
     char *line;
@@ -243,8 +258,13 @@ char **guppy_file_read_lines(const char *file_name) {
         // This happens if the last line is the end of the file.
         if (read == EOF) break;
 
-        lines[i] = (char *) malloc(read * sizeof(char));
-        strcpy(lines[i], line);
+        lines[i] = (char *) malloc(read * sizeof(char) + 1);
+        if (should_keep_newlines) {
+            strncpy(lines[i], line, read);
+        } else {
+            strncpy(lines[i], line, read - 1);
+        }
+        lines[i][read] = '\0';
     }
 
     free(line);
