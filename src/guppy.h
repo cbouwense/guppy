@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "../include/scrump.h"
 
 /**************************************************************************************************
@@ -28,8 +29,10 @@ void guppy_print_long_array_slice(long array[], size_t start, size_t end, const 
 
 // File operations ---------------------------------------------------------------------------------
 
-char *guppy_file_read(const char *file_name);
-int   guppy_file_write(const char *file_name, const char *text_to_write);
+int    guppy_file_line_count(const char *file_name);
+char  *guppy_file_read(const char *file_name);
+char **guppy_file_read_lines(const char *file_name);
+int    guppy_file_write(const char *file_name, const char *text_to_write);
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
@@ -159,6 +162,33 @@ void guppy_print_long_array_slice(long array[], size_t start, size_t end, const 
 
 // File operations ---------------------------------------------------------------------------------
 
+int guppy_file_line_count(const char *file_name) {
+    FILE *fp;
+    int c, line_count = 0;
+
+    fp = fopen(file_name, "r");
+    if (fp == NULL) {
+        printf("Error opening file\n");
+        return -1;
+    }
+
+    c = fgetc(fp);
+    if (c == EOF) return 0;
+
+    // If the first character is anything other than the end of the file, then we can say there is
+    // at least one line in the file (even if it is a newline).
+    line_count++;
+
+    do {
+        if (c == '\n') {
+            line_count++;
+        }
+    } while ((c = fgetc(fp)) != EOF);
+
+    fclose(fp);
+    return line_count;
+}
+
 char *guppy_file_read(const char *file_name) {
     FILE *fp;
     char *buffer;
@@ -190,6 +220,22 @@ char *guppy_file_read(const char *file_name) {
     fclose(fp);
     return buffer;
 }
+
+/*
+char **guppy_file_read_lines(const char *file_name) {
+    FILE *fp;
+
+    for (int i = 0; i < line_count; i++) {
+        ssize_t read = getline(&line, &line_size, fp);
+        printf("Line: %s\n", line);
+        printf("read: %ld\n", read);
+    }
+
+    free(line);
+    fclose(fp);
+    return 0;
+}
+*/
 
 int guppy_file_write(const char *file_name, const char *text_to_write) {
     FILE *fp;
