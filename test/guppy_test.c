@@ -5,7 +5,7 @@
 int main(void) {
     const char *file_name = "./test/foo.txt";
 
-    printf("line count: %d\n", guppy_file_line_count(file_name));
+    char **lines = guppy_file_read_lines(file_name);
 
     return 0;
 }

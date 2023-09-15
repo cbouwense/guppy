@@ -221,21 +221,35 @@ char *guppy_file_read(const char *file_name) {
     return buffer;
 }
 
-/*
 char **guppy_file_read_lines(const char *file_name) {
     FILE *fp;
+    char **lines;
+    char *line;
+    size_t line_size = 0;
+
+    fp = fopen(file_name, "r");
+    if (fp == NULL) {
+        return NULL;
+    }
+
+    int line_count = guppy_file_line_count(file_name);
+    lines = malloc(line_count * sizeof(char *));
+    assert(lines != NULL);
 
     for (int i = 0; i < line_count; i++) {
         ssize_t read = getline(&line, &line_size, fp);
-        printf("Line: %s\n", line);
-        printf("read: %ld\n", read);
+
+        // This happens if the last line is the end of the file.
+        if (read == EOF) break;
+
+        lines[i] = (char *) malloc(read * sizeof(char));
+        strcpy(lines[i], line);
     }
 
     free(line);
     fclose(fp);
-    return 0;
+    return lines;
 }
-*/
 
 int guppy_file_write(const char *file_name, const char *text_to_write) {
     FILE *fp;
