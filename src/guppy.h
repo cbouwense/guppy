@@ -15,13 +15,13 @@
 void guppy_assert(bool pass_condition, const char *failure_explanation);
 
 // Print full arrays -------------------------------------------------------------------------------
-void guppy_print_array_bool(bool array[], size_t length, const char *array_name);
+void guppy_print_array_bool(bool array[], const char *array_name);
 void guppy_print_array_char(char array[]);
-void guppy_print_array_double(double array[], size_t length, const char *array_name);
-void guppy_print_array_float(float array[], size_t length, const char *array_name);
-void guppy_print_array_int(int array[], size_t length, const char *array_name);
-void guppy_print_array_long(long array[], size_t length, const char *array_name);
-void guppy_print_array_string(char *array[], size_t length, const char *array_name);
+void guppy_print_array_double(double array[], const char *array_name);
+void guppy_print_array_float(float array[], const char *array_name);
+void guppy_print_array_int(int array[], const char *array_name);
+void guppy_print_array_long(long array[], const char *array_name);
+void guppy_print_array_string(char *array[], const char *array_name);
 
 // Print array slices [start, end) -----------------------------------------------------------------
 void guppy_print_array_slice_bool(bool array[], size_t start, size_t end, const char *array_name);
@@ -75,26 +75,29 @@ void _guppy_assert(bool pass_condition, const char *failure_explanation, const c
         exit(1);
     }
 }
-
 #define guppy_assert(pass_condition, failure_explanation) _guppy_assert(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
 
 // Print full arrays -------------------------------------------------------------------------------
 
-void guppy_print_array_bool(bool array[], size_t length, const char *array_name) {
+void _guppy_print_array_bool(bool array[], const char *array_name) {
     printf("%s: [", array_name);
-    for (size_t i = 0; i < length; i++) {
+    for (size_t i = 0; array[i] != '\0'; i++) {
         if (array[i] == true) {
             printf("true");
         } else {
             printf("false");
         }
 
-        if (i < length - 1) printf(", ");
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
     }
     printf("]\n");
 }
+#define guppy_print_array_bool(array) _guppy_print_array_bool(array, #array)
 
 void _guppy_print_array_char(char array[], const char *array_name) {
+    printf("%s", array);
     printf("%s: [", array_name);
     for (size_t i = 0; array[i] != '\0'; i++) {
         switch (array[i]) {
@@ -141,45 +144,57 @@ void _guppy_print_array_char(char array[], const char *array_name) {
 }
 #define guppy_print_array_char(array) _guppy_print_array_char(array, #array)
 
-void guppy_print_array_double(double array[], size_t length, const char *array_name) {
+void _guppy_print_array_double(double array[], const char *array_name) {
     printf("%s: [", array_name);
-    for (size_t i = 0; i < length; i++) {
+    for (size_t i = 0; array[i] != '\0'; i++) {
         printf("%.17f", array[i]);
-        if (i < length - 1) printf(", ");
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
     }
     printf("]\n");
 }
+#define guppy_print_array_double(array) _guppy_print_array_double(array, #array)
 
-void guppy_print_array_float(float array[], size_t length, const char *array_name) {
+void _guppy_print_array_float(float array[], const char *array_name) {
     printf("%s: [", array_name);
-    for (size_t i = 0; i < length; i++) {
+    for (size_t i = 0; array[i] != '\0'; i++) {
         printf("%f", array[i]);
-        if (i < length - 1) printf(", ");
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
     }
     printf("]\n");
 }
+#define guppy_print_array_float(array) _guppy_print_array_float(array, #array)
 
-void guppy_print_array_int(int array[], size_t length, const char *array_name) {
+void _guppy_print_array_int(int array[], const char *array_name) {
     printf("%s: [", array_name);
-    for (size_t i = 0; i < length; i++) {
+    for (size_t i = 0; array[i] != '\0'; i++) {
         printf("%d", array[i]);
-        if (i < length - 1) printf(", ");
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
     }
     printf("]\n");
 }
+#define guppy_print_array_int(array) _guppy_print_array_int(array, #array)
 
-void guppy_print_array_long(long array[], size_t length, const char *array_name) {
+void _guppy_print_array_long(long array[], const char *array_name) {
     printf("%s: [", array_name);
-    for (size_t i = 0; i < length; i++) {
+    for (size_t i = 0; array[i] != '\0'; i++) {
         printf("%ld", array[i]);
-        if (i < length - 1) printf(", ");
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
     }
     printf("]\n");
 }
+#define guppy_print_array_long(array) _guppy_print_array_long(array, #array)
 
-void guppy_print_array_string(char *array[], size_t length, const char *array_name) {
+void _guppy_print_array_string(char *array[], const char *array_name) {
     printf("%s: [", array_name);
-    for (size_t i = 0; i < length; i++) {
+    for (size_t i = 0; *array[i] != '\0'; i++) {
         size_t j = 0;
         printf("\"");
         while (array[i][j] != '\0') {
@@ -187,10 +202,13 @@ void guppy_print_array_string(char *array[], size_t length, const char *array_na
             j++;
         }
         printf("\"");
-        if (i < length - 1) printf(", ");
+        if (*array[i] != '\0') {
+            printf(", ");
+        }
     }
     printf("]\n");
 }
+#define guppy_print_array_string(array) _guppy_print_array_string(array, #array)
 
 // Print array slices ------------------------------------------------------------------------------
 
@@ -308,6 +326,7 @@ char *guppy_file_read(const char *file_name) {
     }
 
     // TODO: This is not portable. Make a function.
+    // Determine how many bytes are in the file.
     fseek(fp, 0, SEEK_END);
     file_size = ftell(fp);
     rewind(fp);
@@ -374,22 +393,25 @@ char **guppy_file_read_lines_keep_newlines(const char *file_name) {
     }
 
     int line_count = guppy_file_line_count(file_name);
-    lines = malloc(line_count * sizeof(char *));
+    lines = malloc(line_count * sizeof(char *) + 1);
     assert(lines != NULL);
 
     for (int i = 0; i < line_count; i++) {
         ssize_t read = getline(&line, &line_size, fp);
 
         // This happens if the last line is the end of the file.
-        if (read == EOF) break;
+        // if (read == EOF) break;
 
         // Add an extra byte for null termination.
         lines[i] = (char *) malloc(read * sizeof(char) + 1);
         strcpy(lines[i], line);
     }
-
+    
     free(line);
     fclose(fp);
+
+    // TODO: This gets a seg fault, or somewhere around here. Can't figure out why right now.
+    lines[line_count-1][0] = NULL;
     return lines;
 }
 
