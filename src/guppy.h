@@ -12,8 +12,7 @@
  **************************************************************************************************/
 
 // Assert ------------------------------------------------------------------------------------------
-
-void guppy_assert(bool pass_condition, const char *failure_message);
+void guppy_assert(bool pass_condition, const char *failure_explanation);
 
 // Print full arrays -------------------------------------------------------------------------------
 void guppy_print_array_bool(bool array[], size_t length, const char *array_name);
@@ -33,7 +32,6 @@ void guppy_print_array_slice_int(int array[], size_t start, size_t end, const ch
 void guppy_print_array_slice_long(long array[], size_t start, size_t end, const char *array_name);
 
 // File operations ---------------------------------------------------------------------------------
-
 int    guppy_file_line_count(const char *file_name);
 char  *guppy_file_read(const char *file_name);
 char **guppy_file_read_lines(const char *file_name, const bool should_keep_newlines);
@@ -43,9 +41,40 @@ int    guppy_file_write(const char *file_name, const char *text_to_write);
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
-void guppy_assert(bool pass_condition, const char *failure_message) {
-    printf("not implemented\n");
+// Memory ------------------------------------------------------------------------------------------
+
+void *_guppy_malloc(size_t n, const char *file_name, int line_number) {
+    void *ptr = malloc(n);
+
+    if (ptr == NULL) {
+        printf("[%s:%d] ", file_name, line_number);
+        printf("Failed to allocate %zu bytes\n", n);
+        exit(1);
+    }
+
+    #ifdef GUPPY_DEBUG
+    printf("[%s:%d] Allocated %zu bytes at %p\n", file_name, line_number, n, ptr);
+    #endif
+
+    return ptr;
 }
+
+#ifdef GUPPY_DEBUG
+#define malloc(n) _guppy_malloc(n, __FILE__, __LINE__)
+#endif
+
+// Assert ------------------------------------------------------------------------------------------
+
+void _guppy_assert(bool pass_condition, const char *failure_explanation, const char *readable_pass_condition, const char *file_name, int line_number) {
+    if (!pass_condition) {
+        printf("[%s:%d] Failed assertion!\n", file_name, line_number);
+        printf("---> %s <---\n", readable_pass_condition);
+        printf("%s\n", failure_explanation);
+        exit(1);
+    }
+}
+
+#define guppy_assert(pass_condition, failure_explanation) _guppy_assert(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
 
 // Print full arrays -------------------------------------------------------------------------------
 
