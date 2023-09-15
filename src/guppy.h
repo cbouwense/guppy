@@ -25,12 +25,12 @@ void guppy_print_array_long(long array[], size_t length, const char *array_name)
 void guppy_print_array_string(char *array[], size_t length, const char *array_name);
 
 // Print array slices [start, end) -----------------------------------------------------------------
-void guppy_print_array_bool_slice(bool array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_char_slice(char array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_double_slice(double array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_float_slice(float array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_int_slice(int array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_long_slice(long array[], size_t start, size_t end, const char *array_name);
+void guppy_print_array_slice_bool(bool array[], size_t start, size_t end, const char *array_name);
+void guppy_print_array_slice_char(char array[], size_t start, size_t end, const char *array_name);
+void guppy_print_array_slice_double(double array[], size_t start, size_t end, const char *array_name);
+void guppy_print_array_slice_float(float array[], size_t start, size_t end, const char *array_name);
+void guppy_print_array_slice_int(int array[], size_t start, size_t end, const char *array_name);
+void guppy_print_array_slice_long(long array[], size_t start, size_t end, const char *array_name);
 
 // File operations ---------------------------------------------------------------------------------
 
@@ -125,7 +125,7 @@ void guppy_print_array_string(char *array[], size_t length, const char *array_na
 
 // Print array slices ------------------------------------------------------------------------------
 
-void guppy_print_array_bool_slice(bool array[], size_t start, size_t end, const char *array_name) {
+void guppy_print_array_slice_bool(bool array[], size_t start, size_t end, const char *array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
         if (array[i] == true) {
@@ -139,7 +139,7 @@ void guppy_print_array_bool_slice(bool array[], size_t start, size_t end, const 
     printf("]\n");
 }
 
-void guppy_print_array_char_slice(char array[], size_t start, size_t end, const char *array_name) {
+void guppy_print_array_slice_char(char array[], size_t start, size_t end, const char *array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
         printf("%c", array[i]);
@@ -148,7 +148,7 @@ void guppy_print_array_char_slice(char array[], size_t start, size_t end, const 
     printf("]\n");
 }
 
-void guppy_print_array_double_slice(double array[], size_t start, size_t end, const char *array_name) {
+void guppy_print_array_slice_double(double array[], size_t start, size_t end, const char *array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
         printf("%.17f", array[i]);
@@ -157,7 +157,7 @@ void guppy_print_array_double_slice(double array[], size_t start, size_t end, co
     printf("]\n");
 }
 
-void guppy_print_array_float_slice(float array[], size_t start, size_t end, const char *array_name) {
+void guppy_print_array_slice_float(float array[], size_t start, size_t end, const char *array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
         printf("%f", array[i]);
@@ -166,7 +166,7 @@ void guppy_print_array_float_slice(float array[], size_t start, size_t end, cons
     printf("]\n");
 }
 
-void guppy_print_array_int_slice(int array[], size_t start, size_t end, const char *array_name) {
+void guppy_print_array_slice_int(int array[], size_t start, size_t end, const char *array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
         printf("%d", array[i]);
@@ -175,7 +175,7 @@ void guppy_print_array_int_slice(int array[], size_t start, size_t end, const ch
     printf("]\n");
 }
 
-void guppy_print_array_long_slice(long array[], size_t start, size_t end, const char *array_name) {
+void guppy_print_array_slice_long(long array[], size_t start, size_t end, const char *array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
         printf("%ld", array[i]);
