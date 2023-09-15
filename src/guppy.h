@@ -194,7 +194,7 @@ void _guppy_print_array_long(long array[], const char *array_name) {
 
 void _guppy_print_array_string(char *array[], const char *array_name) {
     printf("%s: [", array_name);
-    for (size_t i = 0; *array[i] != '\0'; i++) {
+    for (size_t i = 0; array[i] != NULL; i++) {
         size_t j = 0;
         printf("\"");
         while (array[i][j] != '\0') {
@@ -202,7 +202,7 @@ void _guppy_print_array_string(char *array[], const char *array_name) {
             j++;
         }
         printf("\"");
-        if (*array[i] != '\0') {
+        if (array[i+1] != NULL) {
             printf(", ");
         }
     }
@@ -361,23 +361,22 @@ char **guppy_file_read_lines(const char *file_name) {
     }
 
     int line_count = guppy_file_line_count(file_name);
-    lines = malloc(line_count * sizeof(char *));
+    lines = malloc(line_count * sizeof(char *) + 1);
     assert(lines != NULL);
 
     for (int i = 0; i < line_count; i++) {
         ssize_t read = getline(&line, &line_size, fp);
 
-        // This happens if the last line is the end of the file.
-        if (read == EOF) break;
-
         // Only allocate the exact amount of memory needed for the line text excluding the newline.
         lines[i] = (char *) malloc(read * sizeof(char));
         strncpy(lines[i], line, read-1);
-        lines[i][read] = '\0';
+        lines[i][read-1] = '\0';
     }
 
     free(line);
     fclose(fp);
+
+    lines[line_count] = NULL;
     return lines;
 }
 
@@ -399,9 +398,6 @@ char **guppy_file_read_lines_keep_newlines(const char *file_name) {
     for (int i = 0; i < line_count; i++) {
         ssize_t read = getline(&line, &line_size, fp);
 
-        // This happens if the last line is the end of the file.
-        // if (read == EOF) break;
-
         // Add an extra byte for null termination.
         lines[i] = (char *) malloc(read * sizeof(char) + 1);
         strcpy(lines[i], line);
@@ -410,8 +406,7 @@ char **guppy_file_read_lines_keep_newlines(const char *file_name) {
     free(line);
     fclose(fp);
 
-    // TODO: This gets a seg fault, or somewhere around here. Can't figure out why right now.
-    lines[line_count-1][0] = NULL;
+    lines[line_count] = NULL;
     return lines;
 }
 
