@@ -4,9 +4,9 @@
 
 int main(void) {
     const char *file_name = "./test/foo.txt";
-    char **file_lines = guppy_file_read_lines(file_name, false);
-    guppy_print_array_string(file_lines, 3, "foo.txt lines");
+    
+    char **lines_in_file = guppy_file_read_lines(file_name, false);
+    guppy_print_array_string(lines_in_file, 3, "the file lines");
 
-    free(file_lines);
     return 0;
 }
