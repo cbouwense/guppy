@@ -16,7 +16,7 @@ void guppy_assert(bool pass_condition, const char *failure_explanation);
 
 // Print full arrays -------------------------------------------------------------------------------
 void guppy_print_array_bool(bool array[], size_t length, const char *array_name);
-void guppy_print_array_char(char array[], size_t length, const char *array_name);
+void guppy_print_array_char(char array[]);
 void guppy_print_array_double(double array[], size_t length, const char *array_name);
 void guppy_print_array_float(float array[], size_t length, const char *array_name);
 void guppy_print_array_int(int array[], size_t length, const char *array_name);
@@ -35,7 +35,8 @@ void guppy_print_array_slice_long(long array[], size_t start, size_t end, const 
 int    guppy_file_create(const char *file_name);
 int    guppy_file_line_count(const char *file_name);
 char  *guppy_file_read(const char *file_name);
-char **guppy_file_read_lines(const char *file_name, const bool should_keep_newlines);
+char **guppy_file_read_lines(const char *file_name);
+char **guppy_file_read_lines_keep_newlines(const char *file_name);
 int    guppy_file_write(const char *file_name, const char *text_to_write);
 
 /**************************************************************************************************
@@ -93,14 +94,52 @@ void guppy_print_array_bool(bool array[], size_t length, const char *array_name)
     printf("]\n");
 }
 
-void guppy_print_array_char(char array[], size_t length, const char *array_name) {
+void _guppy_print_array_char(char array[], const char *array_name) {
     printf("%s: [", array_name);
-    for (size_t i = 0; i < length; i++) {
-        printf("%c", array[i]);
-        if (i < length - 1) printf(", ");
+    for (size_t i = 0; array[i] != '\0'; i++) {
+        switch (array[i]) {
+            case '\n':
+                printf("'\\n'");
+                break;
+            case '\t':
+                printf("'\\t'");
+                break;
+            case '\r':
+                printf("'\\r'");
+                break;
+            case '\v':
+                printf("'\\v'");
+                break;
+            case '\b':
+                printf("'\\b'");
+                break;
+            case '\f':
+                printf("'\\f'");
+                break;
+            case '\a':
+                printf("'\\a'");
+                break;
+            case '\\':
+                printf("'\\\\'");
+                break;
+            case '\'':
+                printf("'\\''");
+                break;
+            case '\"':
+                printf("'\\\"'");
+                break;
+            default:
+                printf("'%c'", array[i]);
+                break;
+        }
+        
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
     }
     printf("]\n");
 }
+#define guppy_print_array_char(array) _guppy_print_array_char(array, #array)
 
 void guppy_print_array_double(double array[], size_t length, const char *array_name) {
     printf("%s: [", array_name);
@@ -172,7 +211,7 @@ void guppy_print_array_slice_bool(bool array[], size_t start, size_t end, const 
 void guppy_print_array_slice_char(char array[], size_t start, size_t end, const char *array_name) {
     printf("%s: [", array_name);
     for (size_t i = start; i < end; i++) {
-        printf("%c", array[i]);
+        printf("'%c'", array[i]);
         if (i < end - 1) printf(", ");
     }
     printf("]\n");
@@ -268,6 +307,7 @@ char *guppy_file_read(const char *file_name) {
         return NULL;
     }
 
+    // TODO: This is not portable. Make a function.
     fseek(fp, 0, SEEK_END);
     file_size = ftell(fp);
     rewind(fp);
@@ -290,7 +330,7 @@ char *guppy_file_read(const char *file_name) {
     return buffer;
 }
 
-char **guppy_file_read_lines(const char *file_name, const bool should_keep_newlines) {
+char **guppy_file_read_lines(const char *file_name) {
     FILE *fp;
     char **lines;
     char *line;
@@ -311,13 +351,41 @@ char **guppy_file_read_lines(const char *file_name, const bool should_keep_newli
         // This happens if the last line is the end of the file.
         if (read == EOF) break;
 
-        lines[i] = (char *) malloc(read * sizeof(char) + 1);
-        if (should_keep_newlines) {
-            strncpy(lines[i], line, read);
-        } else {
-            strncpy(lines[i], line, read - 1);
-        }
+        // Only allocate the exact amount of memory needed for the line text excluding the newline.
+        lines[i] = (char *) malloc(read * sizeof(char));
+        strncpy(lines[i], line, read-1);
         lines[i][read] = '\0';
+    }
+
+    free(line);
+    fclose(fp);
+    return lines;
+}
+
+char **guppy_file_read_lines_keep_newlines(const char *file_name) {
+    FILE *fp;
+    char **lines;
+    char *line;
+    size_t line_size = 0;
+
+    fp = fopen(file_name, "r");
+    if (fp == NULL) {
+        return NULL;
+    }
+
+    int line_count = guppy_file_line_count(file_name);
+    lines = malloc(line_count * sizeof(char *));
+    assert(lines != NULL);
+
+    for (int i = 0; i < line_count; i++) {
+        ssize_t read = getline(&line, &line_size, fp);
+
+        // This happens if the last line is the end of the file.
+        if (read == EOF) break;
+
+        // Add an extra byte for null termination.
+        lines[i] = (char *) malloc(read * sizeof(char) + 1);
+        strcpy(lines[i], line);
     }
 
     free(line);
