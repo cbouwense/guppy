@@ -14,6 +14,10 @@
 // Assert ------------------------------------------------------------------------------------------
 void guppy_assert(bool pass_condition, const char *failure_explanation);
 
+// Print -------------------------------------------------------------------------------------------
+
+void guppy_print_string(const char *string);
+
 // Print full arrays -------------------------------------------------------------------------------
 void guppy_print_array_bool(bool array[], const char *array_name);
 void guppy_print_array_char(char array[]);
@@ -34,6 +38,7 @@ void guppy_print_array_slice_long(long array[], size_t start, size_t end, const 
 // File operations ---------------------------------------------------------------------------------
 int    guppy_file_create(const char *file_name);
 char  *guppy_file_find_line_containing(const char *file_name, const char *text_to_find);
+bool   guppy_file_is_empty(const char *file_name);
 int    guppy_file_line_count(const char *file_name);
 char  *guppy_file_read(const char *file_name);
 char **guppy_file_read_lines(const char *file_name);
@@ -55,7 +60,7 @@ void *_guppy_malloc(size_t n, const char *file_name, int line_number) {
         exit(1);
     }
 
-    #ifdef GUPPY_DEBUG
+    #ifdef GUPPY_DEBUG_MEMORY
     printf("[%s:%d] Allocated %zu bytes at %p\n", file_name, line_number, n, ptr);
     #endif
 
@@ -77,6 +82,12 @@ void _guppy_assert(bool pass_condition, const char *failure_explanation, const c
     }
 }
 #define guppy_assert(pass_condition, failure_explanation) _guppy_assert(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
+
+// Print -------------------------------------------------------------------------------------------
+
+void guppy_print_string(const char *string) {
+    printf("\"%s\"\n", string);
+}
 
 // Print full arrays -------------------------------------------------------------------------------
 
@@ -201,14 +212,8 @@ void _guppy_print_array_string(char *array[], const char *array_name) {
     
     printf("%s: [", array_name);
     for (size_t i = 0; array[i] != NULL; i++) {
-        size_t j = 0;
-        printf("\"");
-        while (array[i][j] != '\0') {
-            printf("%c", array[i][j]);
-            j++;
-        }
-        printf("\"");
-        if (array[i+1] != NULL) { // <-- This does not do what I think it does
+        printf("\"%s\"", array[i]);
+        if (array[i+1] != NULL) {
             printf(", ");
         }
     }
@@ -303,18 +308,33 @@ char *guppy_file_find_line_containing(const char *file_name, const char *text_to
     return "Not implemented yet";
 }
 
+bool guppy_file_is_empty(const char *file_name) {
+    int line_count = guppy_file_line_count(file_name) == 0;
+    guppy_assert(line_count != -1, "guppy_file_line_count had an issue while trying to open the file.");
+    return line_count == 0;
+}
+
 int guppy_file_line_count(const char *file_name) {
     FILE *fp;
     int c, line_count = 0;
 
     fp = fopen(file_name, "r");
     if (fp == NULL) {
-        printf("Error opening file\n");
+        #ifdef GUPPY_DEBUG
+        printf("Error opening file %s\n", file_name);
+        #endif
+        
         return -1;
     }
 
     c = fgetc(fp);
-    if (c == EOF) return 0;
+    if (c == EOF) {
+        #ifdef GUPPY_DEBUG
+        printf("The file you're trying to open (\"%s\") is empty\n", file_name);
+        #endif
+
+        return 0;
+    }
 
     // If the first character is anything other than the end of the file, then we can say there is
     // at least one line in the file (even if it is a newline).
@@ -372,10 +392,22 @@ char **guppy_file_read_lines(const char *file_name) {
 
     fp = fopen(file_name, "r");
     if (fp == NULL) {
+        #ifdef GUPPY_DEBUG
+        printf("Failed to open file %s\n", file_name);
+        #endif
+        
         return NULL;
     }
 
     int line_count = guppy_file_line_count(file_name);
+    if (line_count == 0) {
+        #ifdef GUPPY_DEBUG
+        printf("No lines found in file %s\n", file_name);
+        #endif
+        
+        return NULL;
+    }
+
     lines = malloc(line_count * sizeof(char *) + 1);
     assert(lines != NULL);
 
@@ -405,10 +437,19 @@ char **guppy_file_read_lines_keep_newlines(const char *file_name) {
 
     fp = fopen(file_name, "r");
     if (fp == NULL) {
+        printf("Failed to open file %s\n", file_name);
         return NULL;
     }
 
     int line_count = guppy_file_line_count(file_name);
+    if (line_count == 0) {
+        #ifdef GUPPY_DEBUG
+        printf("No lines found in file %s\n", file_name);
+        #endif
+        
+        return NULL;
+    }
+
     lines = malloc(line_count * sizeof(char *) + 1);
     assert(lines != NULL);
 
