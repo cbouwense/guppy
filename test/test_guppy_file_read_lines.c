@@ -1,7 +1,3 @@
-#include <float.h>
-#include <limits.h>
-
-#define GUPPY_DEBUG
 #include "../src/guppy.h"
 
 void test_guppy_file_read_lines() {
@@ -27,24 +23,9 @@ void test_guppy_file_read_lines() {
     assert(strcmp(lines[0], "#ifndef GUPPY_H") == 0);
     guppy_print_array_string(lines);
 
+    // settings.toml
+    lines = guppy_file_read_lines("test/settings.toml");
+    guppy_print_array_string(lines);
+
     free(lines);
-}
-
-void test_guppy_print_array_string() {
-    char **array_null = NULL;
-    guppy_print_array_string(array_null);
-
-    char *array_empty[] = {NULL, NULL, NULL};
-    guppy_print_array_string(array_empty);
-
-    char *array[] = {"Hello", "World", "!", NULL};
-    guppy_print_array_string(array);
-
-    char *array_cut_short[] = {"Hello", "World", "!", NULL, "Hello", "World", "!"};
-    guppy_print_array_string(array_cut_short);
-}
-
-int main(void) {
-
-    return 0;
 }

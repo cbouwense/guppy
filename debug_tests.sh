@@ -1,3 +1,3 @@
 mkdir -p build/
-gcc -Wall -Werror --pedantic -g -o build/guppy_test test/guppy_test.c
-gdb build/guppy_test
+gcc -Wall -Werror --pedantic -g -o build/test_guppy test/test_guppy.c
+gdb build/test_guppy

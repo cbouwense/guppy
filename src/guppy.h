@@ -414,7 +414,10 @@ char **guppy_file_read_lines(const char *file_name) {
     for (int i = 0; i < line_count; i++) {
         ssize_t read = getline(&line, &line_size, fp);
 
-        if (read == EOF) break;
+        if (read == EOF) {
+            lines[i] = NULL;
+            break;
+        }
 
         // Only allocate the exact amount of memory needed for the line text excluding the newline.
         lines[i] = (char *) malloc(read * sizeof(char));
