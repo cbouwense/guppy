@@ -1,14 +1,19 @@
 #include <float.h>
 #include <limits.h>
 
-#define GUPPY_DEBUG
+// #define GUPPY_DEBUG_MEMORY
 #include "../src/guppy.h"
 
 int main(void) {
-    char *author_setting = guppy_settings_get("author");
-    guppy_print_array_char(author_setting);
+    char *title = guppy_settings_get("title");
+    char *setting = guppy_settings_get("author");
+    char *server = guppy_settings_get("server");
+    char *port = guppy_settings_get("port");
 
-    assert(strcmp(author_setting, "John Doe") == 0);
+    printf("title: %s\n", title);
+    printf("author: %s\n", setting);
+    printf("server: %s\n", server);
+    printf("port: %s\n", port);
 
     return 0;
 }

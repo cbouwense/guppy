@@ -17,7 +17,6 @@ void guppy_assert(bool pass_condition, const char *failure_explanation);
 
 // File operations ---------------------------------------------------------------------------------
 int    guppy_file_create(const char *file_name);
-char  *guppy_file_find_line_containing(const char *file_name, const char *text_to_find);
 bool   guppy_file_is_empty(const char *file_name);
 int    guppy_file_line_count(const char *file_name);
 void   guppy_file_print(const char *file_name);
@@ -78,7 +77,7 @@ void *_guppy_malloc(size_t n, const char *file_name, int line_number) {
     return ptr;
 }
 
-#ifdef GUPPY_DEBUG
+#ifdef GUPPY_DEBUG_MEMORY
 #define malloc(n) _guppy_malloc(n, __FILE__, __LINE__)
 #endif
 
@@ -111,18 +110,9 @@ int guppy_file_create(const char *file_name) {
     return 0;
 }
 
-char *guppy_file_find_line_containing(const char *file_name, const char *text_to_find) {
-    char **file_lines = guppy_file_read_lines(file_name);
-    guppy_assert(file_lines != NULL, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
-
-    guppy_print_array_string(file_lines);
-    
-    return "Not implemented yet";
-}
-
 bool guppy_file_is_empty(const char *file_name) {
-    int line_count = guppy_file_line_count(file_name) == 0;
-    guppy_assert(line_count != -1, "guppy_file_line_count had an issue while trying to open the file.");
+    int line_count = guppy_file_line_count(file_name);
+    guppy_assert(line_count != -1, "guppy_file_line_count had an issue while  to open the file.");
     return line_count == 0;
 }
 
@@ -517,12 +507,11 @@ void guppy_print_array_slice_long(long array[], size_t start, size_t end) {
 
 // Settings ----------------------------------------------------------------------------------------
 
+/*
+ * This is the default function, so it assumes the settings file is named settings.toml and is in
+ * the current directory.
+ */ 
 char *guppy_settings_get(const char *key) {
-    /*
-     * This default function assumes the settings file is named settings.toml
-     * and is in the current directory.
-     */ 
-
     int line_count = guppy_file_line_count("test/settings.toml");
     guppy_assert(line_count != -1, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
     guppy_assert(line_count != 0, "The settings file is empty. You should probably add some settings to it.");
@@ -530,18 +519,17 @@ char *guppy_settings_get(const char *key) {
     char **settings_lines = guppy_file_read_lines("test/settings.toml");
     guppy_assert(settings_lines != NULL, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
 
-    char *setting_line = NULL;
+    char *current_line = NULL;
     for (int i = 0; i < line_count; i++) {
-        setting_line = settings_lines[i];
+        current_line = settings_lines[i];
 
-        if (setting_line[0] == '#') continue; // Skip comments.
-        if (setting_line[0] == '[') continue; // Skip section headers.
+        if (current_line[0] == '#') continue; // Skip comments.
+        if (current_line[0] == '[') continue; // Skip section headers.
 
-        char *current_key = strtok(setting_line, "=");
+        char *current_key = strtok(current_line, "=");
         if (current_key == NULL) continue;
         
         char *trimmed_current_key = guppy_string_trim_whitespace(current_key);
-        printf("%d\n", strcmp(trimmed_current_key, key));
         if (strcmp(trimmed_current_key, key) != 0) continue;
 
         char *value = strtok(NULL, "=");
@@ -549,7 +537,7 @@ char *guppy_settings_get(const char *key) {
         return guppy_string_trim_double_quotes(trimmed_value);
     }
 
-    // We didn't find the line we're looking for.
+    // If we get here, we didn't find the key.
     return NULL;
 }
 
