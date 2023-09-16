@@ -50,6 +50,7 @@ void guppy_print_array_slice_long(long array[], size_t start, size_t end);
 char *guppy_settings_get(const char *key);
 
 // String utilities --------------------------------------------------------------------------------
+char *guppy_string_trim_whitespace(const char *string);
 char *guppy_string_without_whitespace(const char *string);
 
 /**************************************************************************************************
@@ -538,8 +539,10 @@ char *guppy_settings_get(const char *key) {
         char *current_key = strtok(setting_line, "=");
         if (current_key == NULL) continue;
         
-        printf("strcmp(%s, %s): %d\n", current_key, key, strcmp(current_key, key));
-        if (!strcmp(current_key, key)) continue;
+        char *trimmed_current_key = guppy_string_trim_whitespace(current_key);
+        if (!strcmp(trimmed_current_key, key)) continue;
+
+        return guppy_string_trim_whitespace(strtok(NULL, "="));
     }
 
     // We didn't find the line we're looking for.
@@ -547,6 +550,26 @@ char *guppy_settings_get(const char *key) {
 }
 
 // String utilities --------------------------------------------------------------------------------
+
+char *guppy_string_trim_whitespace(const char *string) {
+    char *str = (char *) malloc(strlen(string) * sizeof(char));
+    strcpy(str, string);
+
+    size_t len = strlen(str);
+    size_t i = 0;
+    while (i < len && isspace(str[i])) {
+        i++;
+    }
+    memmove(str, str + i, len - i + 1);
+
+    len = strlen(str);
+    while (len > 0 && isspace(str[len - 1])) {
+        len--;
+        str[len] = '\0';
+    }
+
+    return str;
+}
 
 char *guppy_string_without_whitespace(const char *string) {
     char *new_string = malloc(strlen(string) * sizeof(char));
@@ -558,7 +581,6 @@ char *guppy_string_without_whitespace(const char *string) {
 
         new_string[new_string_index] = string[i];
         new_string_index++;
-
     }
 
     new_string[new_string_index] = '\0';

@@ -6,6 +6,7 @@
 
 int main(void) {
     char *author_setting = guppy_settings_get("author");
+    guppy_print_array_char(author_setting);
 
     assert(strcmp(author_setting, "John Doe") == 0);
 
