@@ -14,27 +14,6 @@
 // Assert ------------------------------------------------------------------------------------------
 void guppy_assert(bool pass_condition, const char *failure_explanation);
 
-// Print -------------------------------------------------------------------------------------------
-
-void guppy_print_string(const char *string);
-
-// Print full arrays -------------------------------------------------------------------------------
-void guppy_print_array_bool(bool array[], const char *array_name);
-void guppy_print_array_char(char array[]);
-void guppy_print_array_double(double array[], const char *array_name);
-void guppy_print_array_float(float array[], const char *array_name);
-void guppy_print_array_int(int array[], const char *array_name);
-void guppy_print_array_long(long array[], const char *array_name);
-void guppy_print_array_string(char *array[], const char *array_name);
-
-// Print array slices [start, end) -----------------------------------------------------------------
-void guppy_print_array_slice_bool(bool array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_slice_char(char array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_slice_double(double array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_slice_float(float array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_slice_int(int array[], size_t start, size_t end, const char *array_name);
-void guppy_print_array_slice_long(long array[], size_t start, size_t end, const char *array_name);
-
 // File operations ---------------------------------------------------------------------------------
 int    guppy_file_create(const char *file_name);
 char  *guppy_file_find_line_containing(const char *file_name, const char *text_to_find);
@@ -46,9 +25,34 @@ char **guppy_file_read_lines(const char *file_name);
 char **guppy_file_read_lines_keep_newlines(const char *file_name);
 int    guppy_file_write(const char *file_name, const char *text_to_write);
 
+// Print -------------------------------------------------------------------------------------------
+void guppy_print_string(const char *string);
+
+// Print null terminated arrays -------------------------------------------------------------------------------
+void guppy_print_array_bool(bool array[]);
+void guppy_print_array_char(char array[]);
+void guppy_print_array_double(double array[]);
+void guppy_print_array_float(float array[]);
+void guppy_print_array_int(int array[]);
+void guppy_print_array_long(long array[]);
+void guppy_print_array_string(char *array[]);
+
+// Print array slices [start, end) -----------------------------------------------------------------
+void guppy_print_array_slice_bool(bool array[], size_t start, size_t end);
+void guppy_print_array_slice_char(char array[], size_t start, size_t end);
+void guppy_print_array_slice_double(double array[], size_t start, size_t end);
+void guppy_print_array_slice_float(float array[], size_t start, size_t end);
+void guppy_print_array_slice_int(int array[], size_t start, size_t end);
+void guppy_print_array_slice_long(long array[], size_t start, size_t end);
+
+// Settings ----------------------------------------------------------------------------------------
+char *guppy_settings_get(const char *key);
+
 /**************************************************************************************************
  * Internal implementation                                                                        *
  **************************************************************************************************/
+
+#define guppy_print_variable_name(variable) printf("%s: ", #variable)
 
 // Memory ------------------------------------------------------------------------------------------
 
@@ -83,205 +87,6 @@ void _guppy_assert(bool pass_condition, const char *failure_explanation, const c
     }
 }
 #define guppy_assert(pass_condition, failure_explanation) _guppy_assert(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
-
-// Print -------------------------------------------------------------------------------------------
-
-void guppy_print_string(const char *string) {
-    printf("\"%s\"\n", string);
-}
-
-// Print full arrays -------------------------------------------------------------------------------
-
-void _guppy_print_array_bool(bool array[], const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        if (array[i] == true) {
-            printf("true");
-        } else {
-            printf("false");
-        }
-
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-#define guppy_print_array_bool(array) _guppy_print_array_bool(array, #array)
-
-void _guppy_print_array_char(char array[], const char *array_name) {
-    printf("%s", array);
-    printf("%s: [", array_name);
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        switch (array[i]) {
-            case '\n':
-                printf("'\\n'");
-                break;
-            case '\t':
-                printf("'\\t'");
-                break;
-            case '\r':
-                printf("'\\r'");
-                break;
-            case '\v':
-                printf("'\\v'");
-                break;
-            case '\b':
-                printf("'\\b'");
-                break;
-            case '\f':
-                printf("'\\f'");
-                break;
-            case '\a':
-                printf("'\\a'");
-                break;
-            case '\\':
-                printf("'\\\\'");
-                break;
-            case '\'':
-                printf("'\\''");
-                break;
-            case '\"':
-                printf("'\\\"'");
-                break;
-            default:
-                printf("'%c'", array[i]);
-                break;
-        }
-        
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-#define guppy_print_array_char(array) _guppy_print_array_char(array, #array)
-
-void _guppy_print_array_double(double array[], const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        printf("%.17f", array[i]);
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-#define guppy_print_array_double(array) _guppy_print_array_double(array, #array)
-
-void _guppy_print_array_float(float array[], const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        printf("%f", array[i]);
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-#define guppy_print_array_float(array) _guppy_print_array_float(array, #array)
-
-void _guppy_print_array_int(int array[], const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        printf("%d", array[i]);
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-#define guppy_print_array_int(array) _guppy_print_array_int(array, #array)
-
-void _guppy_print_array_long(long array[], const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        printf("%ld", array[i]);
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-#define guppy_print_array_long(array) _guppy_print_array_long(array, #array)
-
-void _guppy_print_array_string(char *array[], const char *array_name) {
-    if (array == NULL) {
-        printf("%s: NULL\n", array_name);
-        return;
-    }
-    
-    printf("%s: [", array_name);
-    for (size_t i = 0; array[i] != NULL; i++) {
-        printf("\"%s\"", array[i]);
-        if (array[i+1] != NULL) {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-#define guppy_print_array_string(array) _guppy_print_array_string(array, #array)
-
-// Print array slices ------------------------------------------------------------------------------
-
-void guppy_print_array_slice_bool(bool array[], size_t start, size_t end, const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = start; i < end; i++) {
-        if (array[i] == true) {
-            printf("true");
-        } else {
-            printf("false");
-        }
-
-        if (i < end - 1) printf(", ");
-    }
-    printf("]\n");
-}
-
-void guppy_print_array_slice_char(char array[], size_t start, size_t end, const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = start; i < end; i++) {
-        printf("'%c'", array[i]);
-        if (i < end - 1) printf(", ");
-    }
-    printf("]\n");
-}
-
-void guppy_print_array_slice_double(double array[], size_t start, size_t end, const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = start; i < end; i++) {
-        printf("%.17f", array[i]);
-        if (i < end - 1) printf(", ");
-    }
-    printf("]\n");
-}
-
-void guppy_print_array_slice_float(float array[], size_t start, size_t end, const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = start; i < end; i++) {
-        printf("%f", array[i]);
-        if (i < end - 1) printf(", ");
-    }
-    printf("]\n");
-}
-
-void guppy_print_array_slice_int(int array[], size_t start, size_t end, const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = start; i < end; i++) {
-        printf("%d", array[i]);
-        if (i < end - 1) printf(", ");
-    }
-    printf("]\n");
-}
-
-void guppy_print_array_slice_long(long array[], size_t start, size_t end, const char *array_name) {
-    printf("%s: [", array_name);
-    for (size_t i = start; i < end; i++) {
-        printf("%ld", array[i]);
-        if (i < end - 1) printf(", ");
-    }
-    printf("]\n");
-}
 
 // File operations ---------------------------------------------------------------------------------
 
@@ -495,6 +300,248 @@ int guppy_file_write(const char *file_name, const char *text_to_write) {
 
     fclose(fp);
     return 0;
+}
+
+// Print -------------------------------------------------------------------------------------------
+
+void guppy_print_string(const char *string) {
+    printf("\"%s\"\n", string);
+}
+
+// Print null terminated arrays -------------------------------------------------------------------------------
+
+void guppy_print_array_bool(bool array[]) {
+    guppy_print_variable_name(array);
+    printf(": [");
+
+    for (size_t i = 0; array[i] != '\0'; i++) {
+        if (array[i] == true) {
+            printf("true");
+        } else {
+            printf("false");
+        }
+
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_char(char array[]) {
+    guppy_print_variable_name(array);
+    printf(": [");
+
+    for (size_t i = 0; array[i] != '\0'; i++) {
+        switch (array[i]) {
+            case '\n':
+                printf("'\\n'");
+                break;
+            case '\t':
+                printf("'\\t'");
+                break;
+            case '\r':
+                printf("'\\r'");
+                break;
+            case '\v':
+                printf("'\\v'");
+                break;
+            case '\b':
+                printf("'\\b'");
+                break;
+            case '\f':
+                printf("'\\f'");
+                break;
+            case '\a':
+                printf("'\\a'");
+                break;
+            case '\\':
+                printf("'\\\\'");
+                break;
+            case '\'':
+                printf("'\\''");
+                break;
+            case '\"':
+                printf("'\\\"'");
+                break;
+            default:
+                printf("'%c'", array[i]);
+                break;
+        }
+        
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_double(double array[]) {
+    guppy_print_variable_name(array);
+    printf(": [");
+
+    for (size_t i = 0; array[i] != '\0'; i++) {
+        printf("%.17f", array[i]);
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_float(float array[]) {
+    guppy_print_variable_name(array);
+    printf(": [");
+
+    for (size_t i = 0; array[i] != '\0'; i++) {
+        printf("%f", array[i]);
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_int(int array[]) {
+    guppy_print_variable_name(array);
+    printf(": [");
+
+    for (size_t i = 0; array[i] != '\0'; i++) {
+        printf("%d", array[i]);
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_long(long array[]) {
+    guppy_print_variable_name(array);
+    printf(": [");
+
+    for (size_t i = 0; array[i] != '\0'; i++) {
+        printf("%ld", array[i]);
+        if (array[i+1] != '\0') {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_string(char *array[]) {
+    guppy_assert(array != NULL, "You tried to print an array of strings, but you sent in a null ptr.");
+    
+    guppy_print_variable_name(array);
+    printf(": [");
+    for (size_t i = 0; array[i] != NULL; i++) {
+        printf("\"%s\"", array[i]);
+        if (array[i+1] != NULL) {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+// Print array slices ------------------------------------------------------------------------------
+
+void guppy_print_array_slice_bool(bool array[], size_t start, size_t end) {
+    guppy_print_variable_name(array);
+    printf(": [");
+    for (size_t i = start; i < end; i++) {
+        if (array[i] == true) {
+            printf("true");
+        } else {
+            printf("false");
+        }
+
+        if (i < end - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_slice_char(char array[], size_t start, size_t end) {
+    guppy_print_variable_name(array);
+    printf(": [");
+    for (size_t i = start; i < end; i++) {
+        printf("'%c'", array[i]);
+        if (i < end - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_slice_double(double array[], size_t start, size_t end) {
+    guppy_print_variable_name(array);
+    printf(": [");
+    for (size_t i = start; i < end; i++) {
+        printf("%.17f", array[i]);
+        if (i < end - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_slice_float(float array[], size_t start, size_t end) {
+    guppy_print_variable_name(array);
+    printf(": [");
+    for (size_t i = start; i < end; i++) {
+        printf("%f", array[i]);
+        if (i < end - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_slice_int(int array[], size_t start, size_t end) {
+    guppy_print_variable_name(array);
+    printf(": [");
+    for (size_t i = start; i < end; i++) {
+        printf("%d", array[i]);
+        if (i < end - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
+void guppy_print_array_slice_long(long array[], size_t start, size_t end) {
+    guppy_print_variable_name(array);
+    printf(": [");
+    for (size_t i = start; i < end; i++) {
+        printf("%ld", array[i]);
+        if (i < end - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
+// Settings ----------------------------------------------------------------------------------------
+
+char *guppy_settings_get(const char *key) {
+    /*
+     * This default function assumes the settings file is named settings.toml
+     * and is in the current directory.
+     */ 
+
+    int line_count = guppy_file_line_count("test/settings.toml");
+    guppy_assert(line_count != -1, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
+    guppy_assert(line_count != 0, "The settings file is empty. You should probably add some settings to it.");
+
+    char **settings_lines = guppy_file_read_lines("test/settings.toml");
+    guppy_assert(settings_lines != NULL, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
+
+    char *setting_line = NULL;
+    for (int i = 0; i < line_count; i++) {
+        setting_line = settings_lines[i];
+
+        // Skip blank lines.
+        if (setting_line[0] == '\0') continue;
+        // Skip comments.
+        if (setting_line[0] == '#') continue;
+        // Skip lines that don't have an equals sign.
+        if (strchr(setting_line, '=') == NULL) continue;
+        // Skip lines that don't have the key we're looking for.
+        if (strstr(setting_line, key) == NULL) continue;
+
+        // We found the line we're looking for.
+        break;
+    }
+
+    return setting_line;
 }
 
 #endif // GUPPY_H

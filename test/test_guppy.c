@@ -5,7 +5,10 @@
 #include "../src/guppy.h"
 
 int main(void) {
-    guppy_file_print("test/settings.toml");
+    char *author_setting = guppy_settings_get("author");
+    guppy_print_string(author_setting);
+
+    assert(strcmp(author_setting, "John Doe") == 0);
 
     return 0;
 }
