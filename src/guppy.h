@@ -40,6 +40,7 @@ int    guppy_file_create(const char *file_name);
 char  *guppy_file_find_line_containing(const char *file_name, const char *text_to_find);
 bool   guppy_file_is_empty(const char *file_name);
 int    guppy_file_line_count(const char *file_name);
+void   guppy_file_print(const char *file_name);
 char  *guppy_file_read(const char *file_name);
 char **guppy_file_read_lines(const char *file_name);
 char **guppy_file_read_lines_keep_newlines(const char *file_name);
@@ -348,6 +349,16 @@ int guppy_file_line_count(const char *file_name) {
 
     fclose(fp);
     return line_count;
+}
+
+void guppy_file_print(const char *file_name) {
+    char **file_lines = guppy_file_read_lines("test/settings.toml");
+    guppy_assert(file_lines != NULL, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
+
+    printf("[%s]\n", file_name);
+    for (size_t i = 0; file_lines[i] != NULL; i++) {
+        printf("%s\n", file_lines[i]);
+    }
 }
 
 char *guppy_file_read(const char *file_name) {
