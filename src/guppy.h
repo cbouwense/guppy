@@ -33,6 +33,7 @@ void guppy_print_array_slice_long(long array[], size_t start, size_t end, const 
 
 // File operations ---------------------------------------------------------------------------------
 int    guppy_file_create(const char *file_name);
+char  *guppy_file_find_line_containing(const char *file_name, const char *text_to_find);
 int    guppy_file_line_count(const char *file_name);
 char  *guppy_file_read(const char *file_name);
 char **guppy_file_read_lines(const char *file_name);
@@ -193,6 +194,11 @@ void _guppy_print_array_long(long array[], const char *array_name) {
 #define guppy_print_array_long(array) _guppy_print_array_long(array, #array)
 
 void _guppy_print_array_string(char *array[], const char *array_name) {
+    if (array == NULL) {
+        printf("%s: NULL\n", array_name);
+        return;
+    }
+    
     printf("%s: [", array_name);
     for (size_t i = 0; array[i] != NULL; i++) {
         size_t j = 0;
@@ -202,7 +208,7 @@ void _guppy_print_array_string(char *array[], const char *array_name) {
             j++;
         }
         printf("\"");
-        if (array[i+1] != NULL) {
+        if (array[i+1] != NULL) { // <-- This does not do what I think it does
             printf(", ");
         }
     }
@@ -286,6 +292,15 @@ int guppy_file_create(const char *file_name) {
 
     fclose(fp);
     return 0;
+}
+
+char *guppy_file_find_line_containing(const char *file_name, const char *text_to_find) {
+    char **file_lines = guppy_file_read_lines(file_name);
+    guppy_assert(file_lines != NULL, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
+
+    guppy_print_array_string(file_lines);
+    
+    return "Not implemented yet";
 }
 
 int guppy_file_line_count(const char *file_name) {

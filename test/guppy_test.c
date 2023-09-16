@@ -4,13 +4,22 @@
 // #define GUPPY_DEBUG
 #include "../src/guppy.h"
 
-int main(void) {
+void test_guppy_print_array_string() {
+    char **array_null = NULL;
+    guppy_print_array_string(array_null);
 
-    char **file_lines_wo_n = guppy_file_read_lines("./test.guppy");
-    char **file_lines_with_n = guppy_file_read_lines_keep_newlines("./test.guppy");
-    
-    guppy_print_array_string(file_lines_wo_n);
-    guppy_print_array_string(file_lines_with_n);
+    char *array_empty[] = {NULL, NULL, NULL};
+    guppy_print_array_string(array_empty);
+
+    char *array[] = {"Hello", "World", "!", NULL};
+    guppy_print_array_string(array);
+
+    char *array_cut_short[] = {"Hello", "World", "!", NULL, "Hello", "World", "!"};
+    guppy_print_array_string(array_cut_short);
+}
+
+int main(void) {
+    test_guppy_print_array_string();
 
     return 0;
 }
