@@ -50,6 +50,7 @@ void guppy_print_array_slice_long(long array[], size_t start, size_t end);
 char *guppy_settings_get(const char *key);
 
 // String utilities --------------------------------------------------------------------------------
+char *guppy_string_trim_double_quotes(const char *string);
 char *guppy_string_trim_whitespace(const char *string);
 char *guppy_string_without_whitespace(const char *string);
 
@@ -540,9 +541,12 @@ char *guppy_settings_get(const char *key) {
         if (current_key == NULL) continue;
         
         char *trimmed_current_key = guppy_string_trim_whitespace(current_key);
-        if (!strcmp(trimmed_current_key, key)) continue;
+        printf("%d\n", strcmp(trimmed_current_key, key));
+        if (strcmp(trimmed_current_key, key) != 0) continue;
 
-        return guppy_string_trim_whitespace(strtok(NULL, "="));
+        char *value = strtok(NULL, "=");
+        char *trimmed_value = guppy_string_trim_whitespace(value);
+        return guppy_string_trim_double_quotes(trimmed_value);
     }
 
     // We didn't find the line we're looking for.
@@ -550,6 +554,24 @@ char *guppy_settings_get(const char *key) {
 }
 
 // String utilities --------------------------------------------------------------------------------
+
+char *guppy_string_trim_double_quotes(const char *string) {
+    char *str = (char *) malloc(strlen(string) * sizeof(char));
+    strcpy(str, string);
+
+    size_t len = strlen(str);
+    if (str[0] == '\"') {
+        memmove(str, str + 1, len - 1);
+        len--;
+    }
+
+    if (str[len - 1] == '\"') {
+        len--;
+        str[len] = '\0';
+    }
+
+    return str;
+}
 
 char *guppy_string_trim_whitespace(const char *string) {
     char *str = (char *) malloc(strlen(string) * sizeof(char));
