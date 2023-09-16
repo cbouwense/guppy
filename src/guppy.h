@@ -2,6 +2,7 @@
 #define GUPPY_H
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -47,6 +48,9 @@ void guppy_print_array_slice_long(long array[], size_t start, size_t end);
 
 // Settings ----------------------------------------------------------------------------------------
 char *guppy_settings_get(const char *key);
+
+// String utilities --------------------------------------------------------------------------------
+char *guppy_string_without_whitespace(const char *string);
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
@@ -528,20 +532,37 @@ char *guppy_settings_get(const char *key) {
     for (int i = 0; i < line_count; i++) {
         setting_line = settings_lines[i];
 
-        // Skip blank lines.
-        if (setting_line[0] == '\0') continue;
-        // Skip comments.
-        if (setting_line[0] == '#') continue;
-        // Skip lines that don't have an equals sign.
-        if (strchr(setting_line, '=') == NULL) continue;
-        // Skip lines that don't have the key we're looking for.
-        if (strstr(setting_line, key) == NULL) continue;
+        if (setting_line[0] == '#') continue; // Skip comments.
+        if (setting_line[0] == '[') continue; // Skip section headers.
 
-        // We found the line we're looking for.
-        break;
+        char *current_key = strtok(setting_line, "=");
+        if (current_key == NULL) continue;
+        
+        printf("strcmp(%s, %s): %d\n", current_key, key, strcmp(current_key, key));
+        if (!strcmp(current_key, key)) continue;
     }
 
-    return setting_line;
+    // We didn't find the line we're looking for.
+    return NULL;
+}
+
+// String utilities --------------------------------------------------------------------------------
+
+char *guppy_string_without_whitespace(const char *string) {
+    char *new_string = malloc(strlen(string) * sizeof(char));
+    assert(new_string != NULL);
+
+    int new_string_index = 0;
+    for (size_t i = 0; string[i] != '\0'; i++) {
+        if (isspace(string[i])) continue;
+
+        new_string[new_string_index] = string[i];
+        new_string_index++;
+
+    }
+
+    new_string[new_string_index] = '\0';
+    return new_string;
 }
 
 #endif // GUPPY_H
