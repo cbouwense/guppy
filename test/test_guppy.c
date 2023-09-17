@@ -5,10 +5,13 @@
 #include "../src/guppy.h"
 
 int main(void) {
-    char *title = guppy_settings_get("title");
-    char *setting = guppy_settings_get("author");
-    char *server = guppy_settings_get("server");
-    char *port = guppy_settings_get("port");
+    char *title = gup_settings_get("title");
+    char *setting = gup_settings_get("author");
+    char *server = gup_settings_get("server");
+    char *port = gup_settings_get("port");
+
+    Gup_String_View title_sv = gup_sv_from_cstr(title);
+    printf("title_sv: "SV_Fmt"\n", SV_Arg(title_sv));
 
     printf("title: %s\n", title);
     printf("author: %s\n", setting);
