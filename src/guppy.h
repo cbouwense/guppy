@@ -58,7 +58,6 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end);
 char *gup_settings_get(const char *key);
 
 // String view -------------------------------------------------------------------------------------
-
 Gup_String_View gup_sv_from_parts(const char *data, size_t count);
 Gup_String_View gup_sv_from_cstr(const char *cstr);
 Gup_String_View gup_sv_trim_left(Gup_String_View sv);
@@ -91,24 +90,24 @@ char *gup_string_without_whitespace(const char *string);
 
 // Memory ------------------------------------------------------------------------------------------
 
-void *_gup_malloc(size_t n, const char *file_name, int line_number) {
-    void *ptr = malloc(n);
+void *_gup_malloc(size_t bytes, const char *file_name, int line_number) {
+    void *ptr = malloc(bytes);
 
     if (ptr == NULL) {
         printf("[%s:%d] ", file_name, line_number);
-        printf("Failed to allocate %zu bytes\n", n);
+        printf("Failed to allocate %zu bytes\n", bytes);
         exit(1);
     }
 
     #ifdef GUPPY_DEBUG_MEMORY
-    printf("[%s:%d] Allocated %zu bytes at %p\n", file_name, line_number, n, ptr);
+    printf("[%s:%d] Allocated %zu bytes at %p\n", file_name, line_number, bytes, ptr);
     #endif
 
     return ptr;
 }
 
 #ifdef GUPPY_DEBUG_MEMORY
-#define malloc(n) _gup_malloc(n, __FILE__, __LINE__)
+#define malloc(bytes) _gup_malloc(bytes, __FILE__, __LINE__)
 #endif
 
 // Assert ------------------------------------------------------------------------------------------
@@ -193,7 +192,7 @@ int gup_file_line_count(const char *file_name) {
             line_count++;
         }
     } while ((c = fgetc(fp)) != EOF);
-    result = line_count;
+    gup_defer_return(line_count);
 
 defer:
     fclose(fp);
@@ -245,7 +244,7 @@ char *gup_file_read(const char *file_name) {
         gup_defer_return(NULL);
     }
     buffer[file_size] = '\0';
-    result = buffer;
+    gup_defer_return(buffer);
 
 defer:
     fclose(fp);
@@ -253,12 +252,11 @@ defer:
 }
 
 char **gup_file_read_lines(const char *file_name) {
-    FILE *fp;
-    char **lines;
-    char *line;
+    char **lines = NULL;
+    char *line = NULL;
     size_t line_size = 0;
 
-    fp = fopen(file_name, "r");
+    FILE *fp = fopen(file_name, "r");
     if (fp == NULL) {
         #ifdef GUPPY_DEBUG
         printf("Failed to open file %s\n", file_name);
@@ -301,14 +299,15 @@ char **gup_file_read_lines(const char *file_name) {
 }
 
 char **gup_file_read_lines_keep_newlines(const char *file_name) {
-    char **lines, result;
-    char *line;
+    char **lines = NULL;
+    char **result = NULL;
+    char *line = NULL;
     size_t line_size = 0;
 
     FILE *fp = fopen(file_name, "r");
     if (fp == NULL) {
         printf("Failed to open file %s\n", file_name);
-        return NULL;
+        gup_defer_return(NULL);
     }
 
     int line_count = gup_file_line_count(file_name);
@@ -317,25 +316,30 @@ char **gup_file_read_lines_keep_newlines(const char *file_name) {
         printf("No lines found in file %s\n", file_name);
         #endif
         
-        return NULL;
+        gup_defer_return(NULL);
     }
 
-    lines = malloc(line_count * sizeof(char *) + 1);
+    lines = malloc(line_count * sizeof(char *));
     assert(lines != NULL);
 
     for (int i = 0; i < line_count; i++) {
         ssize_t read = getline(&line, &line_size, fp);
 
+        if (read == EOF) {
+            lines[i] = NULL;
+            gup_defer_return(lines);
+        }
+        
         // Add an extra byte for null termination.
         lines[i] = (char *) malloc(read * sizeof(char) + 1);
         strcpy(lines[i], line);
     }
     lines[line_count] = NULL;
-    result = lines;
+    gup_defer_return(lines);
 
 defer:
-    free(line);
-    fclose(fp);
+    if (line) free(line);
+    if (fp) fclose(fp);
     return result;
 }
 
