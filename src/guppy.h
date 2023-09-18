@@ -109,17 +109,18 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
  * Thanks to Eskil Steenberg for his explanation of using these custom memory macros for debugging.
  * Check out his masterclass on programming in C: https://youtu.be/443UNeGrFoM
  */
+#ifdef GUPPY_DEBUG_MEMORY
 
-static uint gup_allocation_count = 0;
-static long long gup_bytes_allocated = 0;
-static uint gup_free_count = 0;
+static uint      _gup_allocation_count = 0;
+static long long _gup_bytes_allocated = 0;
+static uint      _gup_free_count = 0;
 
 void gup_memory_print(void) {
     printf("\n============\n");
     printf("Memory usage:\n");
-    printf("Allocations: %u (%lld bytes)\n", gup_allocation_count, gup_bytes_allocated);
-    printf("Frees:       %u\n", gup_free_count);
-    printf("Leaks:       %d\n", gup_allocation_count - gup_free_count);
+    printf("Allocations: %u (%lld bytes)\n", _gup_allocation_count, _gup_bytes_allocated);
+    printf("Frees:       %u\n", _gup_free_count);
+    printf("Leaks:       %d\n", _gup_allocation_count - _gup_free_count);
     printf("============\n");
 }
 
@@ -135,7 +136,7 @@ void _gup_free(void *ptr, const char *file_name, const int line_number) {
     #endif
 
     free(ptr);
-    gup_free_count++;
+    _gup_free_count++;
 }
 
 void *_gup_malloc(size_t bytes, const char *file_name, const int line_number) {
@@ -151,15 +152,15 @@ void *_gup_malloc(size_t bytes, const char *file_name, const int line_number) {
     printf("[%s:%d] Allocated %zu bytes at %p\n", file_name, line_number, bytes, ptr);
     #endif
 
-    gup_allocation_count++;
-    gup_bytes_allocated += bytes;
+    _gup_allocation_count++;
+    _gup_bytes_allocated += bytes;
 
     return ptr;
 }
 
-#ifdef GUPPY_DEBUG_MEMORY
 #define free(ptr) _gup_free(ptr, __FILE__, __LINE__)
 #define malloc(bytes) _gup_malloc(bytes, __FILE__, __LINE__)
+
 #endif
 
 // File operations ---------------------------------------------------------------------------------
