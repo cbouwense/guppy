@@ -111,12 +111,16 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
  */
 
 static uint gup_allocation_count = 0;
+static long long gup_bytes_allocated = 0;
 static uint gup_free_count = 0;
 
 void gup_memory_print(void) {
-    printf("Allocations: %u\n", gup_allocation_count);
-    printf("Frees: %u\n", gup_free_count);
-    printf("Leaks: %d\n", gup_allocation_count - gup_free_count);
+    printf("\n============\n");
+    printf("Memory usage:\n");
+    printf("Allocations: %u (%lld bytes)\n", gup_allocation_count, gup_bytes_allocated);
+    printf("Frees:       %u\n", gup_free_count);
+    printf("Leaks:       %d\n", gup_allocation_count - gup_free_count);
+    printf("============\n");
 }
 
 void _gup_free(void *ptr, const char *file_name, const int line_number) {
@@ -148,6 +152,8 @@ void *_gup_malloc(size_t bytes, const char *file_name, const int line_number) {
     #endif
 
     gup_allocation_count++;
+    gup_bytes_allocated += bytes;
+
     return ptr;
 }
 
@@ -608,10 +614,10 @@ char *gup_settings_get(const char *key) {
         if (current_line[0] == '[') continue; // Skip section headers.
 
         char *current_key = strtok(current_line, "=");
-        if (current_key == NULL) continue;
+        if (current_key == NULL) continue; // Skip lines without an equals sign.
         
         char *trimmed_current_key = gup_string_trim_whitespace(current_key);
-        if (strcmp(trimmed_current_key, key) != 0) continue;
+        if (strcmp(trimmed_current_key, key) != 0) continue; // Skip lines that don't match the key.
 
         char *value = strtok(NULL, "=");
         char *trimmed_value = gup_string_trim_whitespace(value);
