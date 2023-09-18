@@ -20,7 +20,7 @@ void test_gup_file_read_lines() {
 
     // guppy.h
     lines = gup_file_read_lines("src/guppy.h");
-    assert(strcmp(lines[0], "#ifndef GUPPY_H") == 0);
+    assert(strcmp(lines[2], "#ifndef GUPPY_H") == 0);
     gup_print_array_string(lines);
 
     // settings.toml

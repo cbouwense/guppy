@@ -24,14 +24,15 @@ typedef struct {
 void gup_assert(bool pass_condition, const char *failure_explanation);
 
 // File operations ---------------------------------------------------------------------------------
-int    gup_file_create(const char *file_name);
+bool   gup_file_create(const char *file_name);
+bool   gup_file_delete(const char *file_name);
 bool   gup_file_is_empty(const char *file_name);
 int    gup_file_line_count(const char *file_name);
 void   gup_file_print(const char *file_name);
 char  *gup_file_read(const char *file_name);
 char **gup_file_read_lines(const char *file_name);
 char **gup_file_read_lines_keep_newlines(const char *file_name);
-int    gup_file_write(const char *file_name, const char *text_to_write);
+bool   gup_file_write(const char *file_name, const char *text_to_write);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_string(const char *string);
@@ -58,28 +59,6 @@ char *gup_settings_get(const char *key);
 
 // String view -------------------------------------------------------------------------------------
 
-/*
- * This string view code is inspired by (aka, straight-up stolen from) sv.h by Alexey Kutepov.
- * He uses the MIT license, so it's all good. Check out his repo here: https://github.com/tsoding/sv
- */
-
-#define SV(cstr_lit) sv_from_parts(cstr_lit, sizeof(cstr_lit) - 1)
-#define SV_STATIC(cstr_lit)   \
-    {                         \
-        sizeof(cstr_lit) - 1, \
-        (cstr_lit)            \
-    }
-
-#define SV_NULL sv_from_parts(NULL, 0)
-
-// printf macros for String_View
-#define SV_Fmt "%.*s"
-#define SV_Arg(sv) (int) (sv).count, (sv).data
-/* 
- * USAGE:
- *   String_View name = ...;
- *   printf("Name: "SV_Fmt"\n", SV_Arg(name));
- */
 Gup_String_View gup_sv_from_parts(const char *data, size_t count);
 Gup_String_View gup_sv_from_cstr(const char *cstr);
 Gup_String_View gup_sv_trim_left(Gup_String_View sv);
@@ -107,6 +86,7 @@ char *gup_string_without_whitespace(const char *string);
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
+#define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 #define gup_print_variable_name(variable) printf("%s: ", #variable)
 
 // Memory ------------------------------------------------------------------------------------------
@@ -145,32 +125,48 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
 
 // File operations ---------------------------------------------------------------------------------
 
-const char *GUPPY_DEFAULT_FILE_ERROR_MESSAGE = "Weird... a guppy file operation failed.\nYou should probably double check that you:\n1) spelled the file name correctly\n2) are creating the file in the directory you think you are\n3) have permissions to create a file in that directory\n";
+const char *GUP_DEFAULT_FILE_ERROR_MESSAGE = "Weird... a guppy file operation failed.\nYou should probably double check that you:\n1) spelled the file name correctly\n2) are creating the file in the directory you think you are\n3) have permissions to create a file in that directory\n";
 
-int gup_file_create(const char *file_name) {
-    FILE *fp;
-
-    fp = fopen(file_name, "w");
+bool gup_file_create(const char *file_name) {
+    bool result = true;
+    
+    FILE *fp = fopen(file_name, "w");
     if (fp == NULL) {
         printf("Failed to create file %s\n", file_name);
-        return 1;
+        gup_defer_return(false);
     }
 
+defer:
     fclose(fp);
-    return 0;
+    return result;
+}
+
+bool gup_file_delete(const char *file_name) {
+    const bool result = remove(file_name);
+
+    #ifdef GUPPY_DEBUG
+    if (!result) {    
+        printf("Failed to delete file %s\n", file_name);
+    }
+    #endif // GUPPY_DEBUG
+
+    return result;
 }
 
 bool gup_file_is_empty(const char *file_name) {
     int line_count = gup_file_line_count(file_name);
-    gup_assert(line_count != -1, "gup_file_line_count had an issue while  to open the file.");
+    // TODO: asserting here might be kinda overkill.
+    gup_assert(line_count != -1, "gup_file_line_count had an issue while opening the file.");
+
     return line_count == 0;
 }
 
 int gup_file_line_count(const char *file_name) {
-    FILE *fp;
-    int c, line_count = 0;
+    int c = 0;
+    int line_count = 0;
+    int result = 0;
 
-    fp = fopen(file_name, "r");
+    FILE *fp = fopen(file_name, "r");
     if (fp == NULL) {
         #ifdef GUPPY_DEBUG
         printf("Error opening file %s\n", file_name);
@@ -185,7 +181,7 @@ int gup_file_line_count(const char *file_name) {
         printf("The file you're trying to open (\"%s\") is empty\n", file_name);
         #endif
 
-        return 0;
+        gup_defer_return(0);
     }
 
     // If the first character is anything other than the end of the file, then we can say there is
@@ -197,14 +193,16 @@ int gup_file_line_count(const char *file_name) {
             line_count++;
         }
     } while ((c = fgetc(fp)) != EOF);
+    result = line_count;
 
+defer:
     fclose(fp);
-    return line_count;
+    return result;
 }
 
 void gup_file_print(const char *file_name) {
-    char **file_lines = gup_file_read_lines("test/settings.toml");
-    gup_assert(file_lines != NULL, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
+    char **file_lines = gup_file_read_lines(file_name);
+    gup_assert(file_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
     printf("[%s]\n", file_name);
     for (size_t i = 0; file_lines[i] != NULL; i++) {
@@ -213,12 +211,15 @@ void gup_file_print(const char *file_name) {
 }
 
 char *gup_file_read(const char *file_name) {
-    FILE *fp;
+    char *result;
     char *buffer;
     size_t file_size;
 
-    fp = fopen(file_name, "r");
+    FILE *fp = fopen(file_name, "r");
     if (fp == NULL) {
+        #ifdef GUPPY_DEBUG
+        printf("Failed to open file %s\n", file_name);
+        #endif
         return NULL;
     }
 
@@ -230,20 +231,25 @@ char *gup_file_read(const char *file_name) {
 
     buffer = (char*) malloc(file_size + 1);
     if (buffer == NULL) {
-        fclose(fp);
-        return NULL;
+        #ifdef GUPPY_DEBUG
+        printf("Failed to allocate memory for file %s\n", file_name);
+        #endif
+        gup_defer_return(NULL);
     }
 
-    if (fread(buffer, sizeof(char), file_size, fp) != file_size) {
-        free(buffer);
-        fclose(fp);
-        return NULL;
+    size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
+    if (bytes_read != file_size) {
+        #ifdef GUPPY_DEBUG
+        printf("Failed to read file %s\n", file_name);
+        #endif
+        gup_defer_return(NULL);
     }
-
     buffer[file_size] = '\0';
+    result = buffer;
 
+defer:
     fclose(fp);
-    return buffer;
+    return result;
 }
 
 char **gup_file_read_lines(const char *file_name) {
@@ -295,12 +301,11 @@ char **gup_file_read_lines(const char *file_name) {
 }
 
 char **gup_file_read_lines_keep_newlines(const char *file_name) {
-    FILE *fp;
-    char **lines;
+    char **lines, result;
     char *line;
     size_t line_size = 0;
 
-    fp = fopen(file_name, "r");
+    FILE *fp = fopen(file_name, "r");
     if (fp == NULL) {
         printf("Failed to open file %s\n", file_name);
         return NULL;
@@ -325,27 +330,29 @@ char **gup_file_read_lines_keep_newlines(const char *file_name) {
         lines[i] = (char *) malloc(read * sizeof(char) + 1);
         strcpy(lines[i], line);
     }
-    
+    lines[line_count] = NULL;
+    result = lines;
+
+defer:
     free(line);
     fclose(fp);
-
-    lines[line_count] = NULL;
-    return lines;
+    return result;
 }
 
-int gup_file_write(const char *file_name, const char *text_to_write) {
-    FILE *fp;
+bool gup_file_write(const char *file_name, const char *text_to_write) {
+    bool result = true;
 
-    fp = fopen(file_name, "w");
+    FILE *fp = fopen(file_name, "w");
     if (fp == NULL) {
         printf("Failed to open file %s\n", file_name);
-        return 1;
+        gup_defer_return(false);
     }
 
     fprintf(fp, "%s", text_to_write);
 
+defer:
     fclose(fp);
-    return 0;
+    return result;
 }
 
 // Print -------------------------------------------------------------------------------------------
@@ -357,8 +364,7 @@ void gup_print_string(const char *string) {
 // Print null terminated arrays -------------------------------------------------------------------------------
 
 void gup_print_array_bool(bool array[]) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
 
     for (size_t i = 0; array[i] != '\0'; i++) {
         if (array[i] == true) {
@@ -375,8 +381,7 @@ void gup_print_array_bool(bool array[]) {
 }
 
 void gup_print_array_char(char array[]) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
 
     for (size_t i = 0; array[i] != '\0'; i++) {
         switch (array[i]) {
@@ -423,8 +428,7 @@ void gup_print_array_char(char array[]) {
 }
 
 void gup_print_array_double(double array[]) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
 
     for (size_t i = 0; array[i] != '\0'; i++) {
         printf("%.17f", array[i]);
@@ -436,9 +440,7 @@ void gup_print_array_double(double array[]) {
 }
 
 void gup_print_array_float(float array[]) {
-    gup_print_variable_name(array);
-    printf(": [");
-
+    printf("[");
     for (size_t i = 0; array[i] != '\0'; i++) {
         printf("%f", array[i]);
         if (array[i+1] != '\0') {
@@ -449,9 +451,7 @@ void gup_print_array_float(float array[]) {
 }
 
 void gup_print_array_int(int array[]) {
-    gup_print_variable_name(array);
-    printf(": [");
-
+    printf("[");
     for (size_t i = 0; array[i] != '\0'; i++) {
         printf("%d", array[i]);
         if (array[i+1] != '\0') {
@@ -462,9 +462,7 @@ void gup_print_array_int(int array[]) {
 }
 
 void gup_print_array_long(long array[]) {
-    gup_print_variable_name(array);
-    printf(": [");
-
+    printf("[");
     for (size_t i = 0; array[i] != '\0'; i++) {
         printf("%ld", array[i]);
         if (array[i+1] != '\0') {
@@ -477,8 +475,7 @@ void gup_print_array_long(long array[]) {
 void gup_print_array_string(char *array[]) {
     gup_assert(array != NULL, "You tried to print an array of strings, but you sent in a null ptr.");
     
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
     for (size_t i = 0; array[i] != NULL; i++) {
         printf("\"%s\"", array[i]);
         if (array[i+1] != NULL) {
@@ -491,8 +488,7 @@ void gup_print_array_string(char *array[]) {
 // Print array slices ------------------------------------------------------------------------------
 
 void gup_print_array_slice_bool(bool array[], size_t start, size_t end) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
     for (size_t i = start; i < end; i++) {
         if (array[i] == true) {
             printf("true");
@@ -506,8 +502,7 @@ void gup_print_array_slice_bool(bool array[], size_t start, size_t end) {
 }
 
 void gup_print_array_slice_char(char array[], size_t start, size_t end) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
     for (size_t i = start; i < end; i++) {
         printf("'%c'", array[i]);
         if (i < end - 1) printf(", ");
@@ -516,8 +511,7 @@ void gup_print_array_slice_char(char array[], size_t start, size_t end) {
 }
 
 void gup_print_array_slice_double(double array[], size_t start, size_t end) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
     for (size_t i = start; i < end; i++) {
         printf("%.17f", array[i]);
         if (i < end - 1) printf(", ");
@@ -526,8 +520,7 @@ void gup_print_array_slice_double(double array[], size_t start, size_t end) {
 }
 
 void gup_print_array_slice_float(float array[], size_t start, size_t end) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
     for (size_t i = start; i < end; i++) {
         printf("%f", array[i]);
         if (i < end - 1) printf(", ");
@@ -536,8 +529,7 @@ void gup_print_array_slice_float(float array[], size_t start, size_t end) {
 }
 
 void gup_print_array_slice_int(int array[], size_t start, size_t end) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
     for (size_t i = start; i < end; i++) {
         printf("%d", array[i]);
         if (i < end - 1) printf(", ");
@@ -546,8 +538,7 @@ void gup_print_array_slice_int(int array[], size_t start, size_t end) {
 }
 
 void gup_print_array_slice_long(long array[], size_t start, size_t end) {
-    gup_print_variable_name(array);
-    printf(": [");
+    printf("[");
     for (size_t i = start; i < end; i++) {
         printf("%ld", array[i]);
         if (i < end - 1) printf(", ");
@@ -563,11 +554,11 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
  */ 
 char *gup_settings_get(const char *key) {
     int line_count = gup_file_line_count("test/settings.toml");
-    gup_assert(line_count != -1, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
+    gup_assert(line_count != -1, GUP_DEFAULT_FILE_ERROR_MESSAGE);
     gup_assert(line_count != 0, "The settings file is empty. You should probably add some settings to it.");
 
     char **settings_lines = gup_file_read_lines("test/settings.toml");
-    gup_assert(settings_lines != NULL, GUPPY_DEFAULT_FILE_ERROR_MESSAGE);
+    gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
     char *current_line = NULL;
     for (int i = 0; i < line_count; i++) {
@@ -592,6 +583,29 @@ char *gup_settings_get(const char *key) {
 }
 
 // String view -------------------------------------------------------------------------------------
+
+/*
+ * This string view code is inspired by (aka, straight-up stolen from) sv.h by Alexey Kutepov.
+ * He uses the MIT license, so it's all good. Check out his repo here: https://github.com/tsoding/sv
+ */
+
+#define SV(cstr_lit) sv_from_parts(cstr_lit, sizeof(cstr_lit) - 1)
+#define SV_STATIC(cstr_lit)   \
+    {                         \
+        sizeof(cstr_lit) - 1, \
+        (cstr_lit)            \
+    }
+
+#define SV_NULL sv_from_parts(NULL, 0)
+
+// printf macros for String_View
+#define SV_Fmt "%.*s"
+#define SV_Arg(sv) (int) (sv).count, (sv).data
+/* 
+ * USAGE:
+ *   String_View name = ...;
+ *   printf("Name: "SV_Fmt"\n", SV_Arg(name));
+ */
 
 Gup_String_View gup_sv_from_parts(const char *data, size_t count) {
     Gup_String_View sv;

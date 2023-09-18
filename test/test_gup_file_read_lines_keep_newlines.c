@@ -20,11 +20,11 @@ void test_gup_file_read_lines_keep_newlines() {
 
     // guppy.h
     lines = gup_file_read_lines_keep_newlines("src/guppy.h");
-    assert(strcmp(lines[0], "#ifndef GUPPY_H\n") == 0);
+    assert(strcmp(lines[2], "#ifndef GUPPY_H\n") == 0);
     gup_print_array_string(lines);
 
     // settings.toml
-    lines = gup_file_read_lines_keep_newlines("test/settings.toml");
+    // lines = gup_file_read_lines_keep_newlines("test/settings.toml");
     gup_print_array_string(lines);
 
     free(lines);

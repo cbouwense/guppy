@@ -1,22 +1,23 @@
 #include <float.h>
 #include <limits.h>
 
-// #define GUPPY_DEBUG_MEMORY
+// #define GUPPY_DEBUG
 #include "../src/guppy.h"
 
+#include "./test_gup_file_read_lines_keep_newlines.c"
+#include "./test_gup_file_read_lines.c"
+#include "./test_gup_file_line_count.c"
+#include "./test_gup_print_array_string.c"
+
+void run_all_guppy_tests(void) {
+    test_gup_file_line_count();
+    test_gup_file_read_lines();
+    test_gup_file_read_lines_keep_newlines();
+    test_gup_print_array_string();
+}
+
 int main(void) {
-    char *title = gup_settings_get("title");
-    char *setting = gup_settings_get("author");
-    char *server = gup_settings_get("server");
-    char *port = gup_settings_get("port");
-
-    Gup_String_View title_sv = gup_sv_from_cstr(title);
-    printf("title_sv: "SV_Fmt"\n", SV_Arg(title_sv));
-
-    printf("title: %s\n", title);
-    printf("author: %s\n", setting);
-    printf("server: %s\n", server);
-    printf("port: %s\n", port);
+    run_all_guppy_tests();
 
     return 0;
 }
