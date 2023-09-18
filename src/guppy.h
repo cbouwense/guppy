@@ -23,6 +23,9 @@ typedef struct {
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
 
+// Memory ------------------------------------------------------------------------------------------
+void gup_memory_print(void);
+
 // File operations ---------------------------------------------------------------------------------
 bool   gup_file_create(const char *file_name);
 bool   gup_file_delete(const char *file_name);
@@ -85,30 +88,8 @@ char *gup_string_without_whitespace(const char *string);
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
+typedef unsigned int uint;
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
-#define gup_print_variable_name(variable) printf("%s: ", #variable)
-
-// Memory ------------------------------------------------------------------------------------------
-
-void *_gup_malloc(size_t bytes, const char *file_name, int line_number) {
-    void *ptr = malloc(bytes);
-
-    if (ptr == NULL) {
-        printf("[%s:%d] ", file_name, line_number);
-        printf("Failed to allocate %zu bytes\n", bytes);
-        exit(1);
-    }
-
-    #ifdef GUPPY_DEBUG_MEMORY
-    printf("[%s:%d] Allocated %zu bytes at %p\n", file_name, line_number, bytes, ptr);
-    #endif
-
-    return ptr;
-}
-
-#ifdef GUPPY_DEBUG_MEMORY
-#define malloc(bytes) _gup_malloc(bytes, __FILE__, __LINE__)
-#endif
 
 // Assert ------------------------------------------------------------------------------------------
 
@@ -121,6 +102,59 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
     }
 }
 #define gup_assert(pass_condition, failure_explanation) _gup_assert(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
+
+// Memory ------------------------------------------------------------------------------------------
+
+/*
+ * Thanks to Eskil Steenberg for his explanation of using these custom memory macros for debugging.
+ * Check out his masterclass on programming in C: https://youtu.be/443UNeGrFoM
+ */
+
+static uint gup_allocation_count = 0;
+static uint gup_free_count = 0;
+
+void gup_memory_print(void) {
+    printf("Allocations: %u\n", gup_allocation_count);
+    printf("Frees: %u\n", gup_free_count);
+    printf("Leaks: %d\n", gup_allocation_count - gup_free_count);
+}
+
+void _gup_free(void *ptr, const char *file_name, const int line_number) {
+    if (ptr == NULL) {
+        printf("[%s:%d] ", file_name, line_number);
+        printf("Tried to free a null pointer\n");
+        exit(1);
+    }
+
+    #ifdef GUPPY_DEBUG_MEMORY
+    printf("[%s:%d] Freed memory at %p\n", file_name, line_number, ptr);
+    #endif
+
+    free(ptr);
+    gup_free_count++;
+}
+
+void *_gup_malloc(size_t bytes, const char *file_name, const int line_number) {
+    void *ptr = malloc(bytes);
+
+    if (ptr == NULL) {
+        printf("[%s:%d] ", file_name, line_number);
+        printf("Failed to allocate %zu bytes\n", bytes);
+        exit(1);
+    }
+
+    #ifdef GUPPY_DEBUG_MEMORY
+    printf("[%s:%d] Allocated %zu bytes at %p\n", file_name, line_number, bytes, ptr);
+    #endif
+
+    gup_allocation_count++;
+    return ptr;
+}
+
+#ifdef GUPPY_DEBUG_MEMORY
+#define free(ptr) _gup_free(ptr, __FILE__, __LINE__)
+#define malloc(bytes) _gup_malloc(bytes, __FILE__, __LINE__)
+#endif
 
 // File operations ---------------------------------------------------------------------------------
 
@@ -252,6 +286,7 @@ defer:
 }
 
 char **gup_file_read_lines(const char *file_name) {
+    char **result = NULL;
     char **lines = NULL;
     char *line = NULL;
     size_t line_size = 0;
@@ -262,7 +297,7 @@ char **gup_file_read_lines(const char *file_name) {
         printf("Failed to open file %s\n", file_name);
         #endif
         
-        return NULL;
+        gup_defer_return(NULL);
     }
 
     int line_count = gup_file_line_count(file_name);
@@ -271,7 +306,7 @@ char **gup_file_read_lines(const char *file_name) {
         printf("No lines found in file %s\n", file_name);
         #endif
         
-        return NULL;
+        gup_defer_return(NULL);
     }
 
     lines = malloc(line_count * sizeof(char *));
@@ -282,7 +317,7 @@ char **gup_file_read_lines(const char *file_name) {
 
         if (read == EOF) {
             lines[i] = NULL;
-            break;
+            gup_defer_return(lines);
         }
 
         // Only allocate the exact amount of memory needed for the line text excluding the newline.
@@ -290,12 +325,13 @@ char **gup_file_read_lines(const char *file_name) {
         strncpy(lines[i], line, read-1);
         lines[i][read-1] = '\0';
     }
-
-    free(line);
-    fclose(fp);
-
     lines[line_count] = NULL;
-    return lines;
+
+defer:
+    if (line) free(line);
+    if (fp) fclose(fp);
+
+    return result;
 }
 
 char **gup_file_read_lines_keep_newlines(const char *file_name) {
