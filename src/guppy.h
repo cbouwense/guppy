@@ -274,7 +274,7 @@ char **gup_file_read_lines(const char *file_name) {
         return NULL;
     }
 
-    lines = malloc(line_count * sizeof(char *) + 1);
+    lines = malloc(line_count * sizeof(char *));
     assert(lines != NULL);
 
     for (int i = 0; i < line_count; i++) {
@@ -589,7 +589,7 @@ char *gup_settings_get(const char *key) {
 // String view -------------------------------------------------------------------------------------
 
 /*
- * This string view code is inspired by (aka, straight-up stolen from) sv.h by Alexey Kutepov.
+ * This string view code is inspired by (aka, straight-up copied from) sv.h by Alexey Kutepov.
  * He uses the MIT license, so it's all good. Check out his repo here: https://github.com/tsoding/sv
  */
 

@@ -12,8 +12,8 @@
 
 void run_all_guppy_tests(void) {
     // test_gup_file_line_count();
-    // test_gup_file_read_lines();
-    test_gup_file_read_lines_keep_newlines();
+    test_gup_file_read_lines();
+    // test_gup_file_read_lines_keep_newlines();
     // test_gup_print_array_string();
 }
 
