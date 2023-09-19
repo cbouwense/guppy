@@ -1,7 +1,7 @@
 # This is a TOML file
 
-title = "My Website"
-author = "John Doe"
+title = "guppy.h"
+author = "Christian Bouwense"
 
 [database]
 server = "localhost"

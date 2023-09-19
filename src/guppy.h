@@ -59,6 +59,7 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end);
 
 // Settings ----------------------------------------------------------------------------------------
 char *gup_settings_get(const char *key);
+int   gup_settings_get_int(const char *key);
 
 // String view -------------------------------------------------------------------------------------
 Gup_String_View gup_sv_from_parts(const char *data, size_t count);
@@ -598,7 +599,7 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
 /*
  * This is the default function, so it assumes the settings file is named settings.toml and is in
  * the current directory.
- */ 
+ */
 char *gup_settings_get(const char *key) {
     int line_count = gup_file_line_count("test/settings.toml");
     gup_assert(line_count != -1, GUP_DEFAULT_FILE_ERROR_MESSAGE);
@@ -627,6 +628,24 @@ char *gup_settings_get(const char *key) {
 
     // If we get here, we didn't find the key.
     return NULL;
+}
+
+int gup_settings_get_int(const char *key) {
+    const char *value = gup_settings_get(key);
+    if (value == NULL) {
+        #ifdef GUPPY_DEBUG
+        printf("Failed to get value for key \"%s\"\n", key);
+        #endif
+        return -1;
+    }
+
+    char *endptr = NULL;
+    long result = strtol(value, &endptr, 10);
+    if (*endptr != '\0') {
+        printf("Invalid value for key \"%s\". Are you sure it's an int?\n.", key);
+    }
+    
+    return (int) result;
 }
 
 // String view -------------------------------------------------------------------------------------
