@@ -23,9 +23,6 @@ typedef struct {
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
 
-// Memory ------------------------------------------------------------------------------------------
-void gup_memory_print(void);
-
 // File operations ---------------------------------------------------------------------------------
 bool   gup_file_create(const char *file_name);
 bool   gup_file_delete(const char *file_name);
@@ -116,7 +113,7 @@ static uint      _gup_allocation_count = 0;
 static long long _gup_bytes_allocated = 0;
 static uint      _gup_free_count = 0;
 
-void gup_memory_print(void) {
+void _gup_memory_print(void) {
     printf("\n============\n");
     printf("Memory usage:\n");
     printf("Allocations: %u (%lld bytes)\n", _gup_allocation_count, _gup_bytes_allocated);
@@ -644,7 +641,7 @@ int gup_settings_get_int(const char *key) {
     if (*endptr != '\0') {
         printf("Invalid value for key \"%s\". Are you sure it's an int?\n.", key);
     }
-    
+
     return (int) result;
 }
 

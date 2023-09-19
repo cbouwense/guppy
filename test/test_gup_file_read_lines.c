@@ -32,7 +32,9 @@ void test_gup_file_read_lines() {
     { // guppy.h
         lines = gup_file_read_lines("src/guppy.h");
         assert(strcmp(lines[2], "#ifndef GUPPY_H") == 0);
+        #ifdef GUPPY_DEBUG
         gup_print_array_string(lines);
+        #endif
 
         for (int i = 0; i < gup_file_line_count("src/guppy.h") - 1; i++) {
             free(lines[i]);
@@ -41,7 +43,9 @@ void test_gup_file_read_lines() {
 
     { // settings.toml
         lines = gup_file_read_lines("test/settings.toml");
+        #ifdef GUPPY_DEBUG
         gup_print_array_string(lines);
+        #endif
 
         for (int i = 0; i < gup_file_line_count("test/settings.toml") - 1; i++) {
             free(lines[i]);
