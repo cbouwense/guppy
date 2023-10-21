@@ -610,7 +610,6 @@ char *gup_settings_get(const char *key) {
 char *gup_settings_get_from(const char *key, const char *file_path) {
     char *result = NULL;
     
-    printf("Getting value for key \"%s\" from file \"%s\"\n", key, file_path);
     int line_count = gup_file_line_count(file_path);
     gup_assert(line_count != -1, GUP_DEFAULT_FILE_ERROR_MESSAGE);
     gup_assert(line_count != 0, "The settings file is empty. You should probably add some settings to it.");
@@ -646,6 +645,7 @@ defer:
             free(settings_lines[i]);
         }
     }
+    free(settings_lines);
     return result;
 }
 
@@ -767,11 +767,11 @@ Gup_String_View gup_sv_chop_right(Gup_String_View *sv, size_t n) {
 
 int gup_sv_index_of(Gup_String_View sv, char c) {
     int i = 0;
-    while (i < sv.count && sv.data[i] != c) {
+    while (i < (int)sv.count && sv.data[i] != c) {
         i += 1;
     }
 
-    return i < sv.count ? i : -1;
+    return i < (int)sv.count ? i : -1;
 }
 
 bool gup_sv_try_chop_by_delim(Gup_String_View *sv, char delim, Gup_String_View *chunk) {
