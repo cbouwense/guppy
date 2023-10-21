@@ -1,7 +1,7 @@
 #include <float.h>
 #include <limits.h>
 
-// #define GUPPY_DEBUG
+#define GUPPY_VERBOSE
 // #define GUPPY_DEBUG_MEMORY
 #include "../src/guppy.h"
 
@@ -22,5 +22,6 @@ void run_all_guppy_tests(void) {
 int main(void) {
     run_all_guppy_tests();
 
+    printf("All tests passed!\n");
     return 0;
 }

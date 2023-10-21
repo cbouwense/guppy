@@ -24,15 +24,15 @@ typedef struct {
 void gup_assert(bool pass_condition, const char *failure_explanation);
 
 // File operations ---------------------------------------------------------------------------------
-bool   gup_file_create(const char *file_name);
-bool   gup_file_delete(const char *file_name);
-bool   gup_file_is_empty(const char *file_name);
-int    gup_file_line_count(const char *file_name);
-void   gup_file_print(const char *file_name);
-char  *gup_file_read(const char *file_name);
-char **gup_file_read_lines(const char *file_name);
-char **gup_file_read_lines_keep_newlines(const char *file_name);
-bool   gup_file_write(const char *file_name, const char *text_to_write);
+bool   gup_file_create(const char *file_path);
+bool   gup_file_delete(const char *file_path);
+bool   gup_file_is_empty(const char *file_path);
+int    gup_file_line_count(const char *file_path);
+void   gup_file_print(const char *file_path);
+char  *gup_file_read(const char *file_path);
+char **gup_file_read_lines(const char *file_path);
+char **gup_file_read_lines_keep_newlines(const char *file_path);
+bool   gup_file_write(const char *file_path, const char *text_to_write);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_string(const char *string);
@@ -56,6 +56,7 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end);
 
 // Settings ----------------------------------------------------------------------------------------
 char *gup_settings_get(const char *key);
+char *gup_settings_get_from(const char *key, const char *file_path);
 int   gup_settings_get_int(const char *key);
 
 // String view -------------------------------------------------------------------------------------
@@ -91,9 +92,9 @@ typedef unsigned int uint;
 
 // Assert ------------------------------------------------------------------------------------------
 
-void _gup_assert(bool pass_condition, const char *failure_explanation, const char *readable_pass_condition, const char *file_name, int line_number) {
+void _gup_assert(bool pass_condition, const char *failure_explanation, const char *readable_pass_condition, const char *file_path, int line_number) {
     if (!pass_condition) {
-        printf("[%s:%d] Failed assertion!\n", file_name, line_number);
+        printf("[%s:%d] Failed assertion!\n", file_path, line_number);
         printf("---> %s <---\n", readable_pass_condition);
         printf("%s\n", failure_explanation);
         exit(1);
@@ -122,32 +123,32 @@ void _gup_memory_print(void) {
     printf("============\n");
 }
 
-void _gup_free(void *ptr, const char *file_name, const int line_number) {
+void _gup_free(void *ptr, const char *file_path, const int line_number) {
     if (ptr == NULL) {
-        printf("[%s:%d] ", file_name, line_number);
+        printf("[%s:%d] ", file_path, line_number);
         printf("Tried to free a null pointer\n");
         exit(1);
     }
 
     #ifdef GUPPY_DEBUG_MEMORY
-    printf("[%s:%d] Freed memory at %p\n", file_name, line_number, ptr);
+    printf("[%s:%d] Freed memory at %p\n", file_path, line_number, ptr);
     #endif
 
     free(ptr);
     _gup_free_count++;
 }
 
-void *_gup_malloc(size_t bytes, const char *file_name, const int line_number) {
+void *_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
     void *ptr = malloc(bytes);
 
     if (ptr == NULL) {
-        printf("[%s:%d] ", file_name, line_number);
+        printf("[%s:%d] ", file_path, line_number);
         printf("Failed to allocate %zu bytes\n", bytes);
         exit(1);
     }
 
     #ifdef GUPPY_DEBUG_MEMORY
-    printf("[%s:%d] Allocated %zu bytes at %p\n", file_name, line_number, bytes, ptr);
+    printf("[%s:%d] Allocated %zu bytes at %p\n", file_path, line_number, bytes, ptr);
     #endif
 
     _gup_allocation_count++;
@@ -165,12 +166,12 @@ void *_gup_malloc(size_t bytes, const char *file_name, const int line_number) {
 
 const char *GUP_DEFAULT_FILE_ERROR_MESSAGE = "Weird... a guppy file operation failed.\nYou should probably double check that you:\n1) spelled the file name correctly\n2) are creating the file in the directory you think you are\n3) have permissions to create a file in that directory\n";
 
-bool gup_file_create(const char *file_name) {
+bool gup_file_create(const char *file_path) {
     bool result = true;
     
-    FILE *fp = fopen(file_name, "w");
+    FILE *fp = fopen(file_path, "w");
     if (fp == NULL) {
-        printf("Failed to create file %s\n", file_name);
+        printf("Failed to create file %s\n", file_path);
         gup_defer_return(false);
     }
 
@@ -179,35 +180,35 @@ defer:
     return result;
 }
 
-bool gup_file_delete(const char *file_name) {
-    const bool result = remove(file_name);
+bool gup_file_delete(const char *file_path) {
+    const bool result = remove(file_path);
 
-    #ifdef GUPPY_DEBUG
+    #ifdef GUPPY_VERBOSE
     if (!result) {    
-        printf("Failed to delete file %s\n", file_name);
+        printf("Failed to delete file %s\n", file_path);
     }
-    #endif // GUPPY_DEBUG
+    #endif // GUPPY_VERBOSE
 
     return result;
 }
 
-bool gup_file_is_empty(const char *file_name) {
-    int line_count = gup_file_line_count(file_name);
+bool gup_file_is_empty(const char *file_path) {
+    int line_count = gup_file_line_count(file_path);
     // TODO: asserting here might be kinda overkill.
     gup_assert(line_count != -1, "gup_file_line_count had an issue while opening the file.");
 
     return line_count == 0;
 }
 
-int gup_file_line_count(const char *file_name) {
+int gup_file_line_count(const char *file_path) {
     int c = 0;
     int line_count = 0;
     int result = 0;
 
-    FILE *fp = fopen(file_name, "r");
+    FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
-        #ifdef GUPPY_DEBUG
-        printf("Error opening file %s\n", file_name);
+        #ifdef GUPPY_VERBOSE
+        printf("Error opening file %s\n", file_path);
         #endif
         
         return -1;
@@ -215,8 +216,8 @@ int gup_file_line_count(const char *file_name) {
 
     c = fgetc(fp);
     if (c == EOF) {
-        #ifdef GUPPY_DEBUG
-        printf("The file you're trying to open (\"%s\") is empty\n", file_name);
+        #ifdef GUPPY_VERBOSE
+        printf("The file you're trying to open (\"%s\") is empty\n", file_path);
         #endif
 
         gup_defer_return(0);
@@ -238,25 +239,25 @@ defer:
     return result;
 }
 
-void gup_file_print(const char *file_name) {
-    char **file_lines = gup_file_read_lines(file_name);
+void gup_file_print(const char *file_path) {
+    char **file_lines = gup_file_read_lines(file_path);
     gup_assert(file_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
-    printf("[%s]\n", file_name);
+    printf("[%s]\n", file_path);
     for (size_t i = 0; file_lines[i] != NULL; i++) {
         printf("%s\n", file_lines[i]);
     }
 }
 
-char *gup_file_read(const char *file_name) {
+char *gup_file_read(const char *file_path) {
     char *result;
     char *buffer;
     size_t file_size;
 
-    FILE *fp = fopen(file_name, "r");
+    FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
-        #ifdef GUPPY_DEBUG
-        printf("Failed to open file %s\n", file_name);
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to open file %s\n", file_path);
         #endif
         return NULL;
     }
@@ -269,16 +270,16 @@ char *gup_file_read(const char *file_name) {
 
     buffer = (char*) malloc(file_size + 1);
     if (buffer == NULL) {
-        #ifdef GUPPY_DEBUG
-        printf("Failed to allocate memory for file %s\n", file_name);
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to allocate memory for file %s\n", file_path);
         #endif
         gup_defer_return(NULL);
     }
 
     size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
     if (bytes_read != file_size) {
-        #ifdef GUPPY_DEBUG
-        printf("Failed to read file %s\n", file_name);
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to read file %s\n", file_path);
         #endif
         gup_defer_return(NULL);
     }
@@ -290,25 +291,25 @@ defer:
     return result;
 }
 
-char **gup_file_read_lines(const char *file_name) {
+char **gup_file_read_lines(const char *file_path) {
     char **result = NULL;
     char **lines = NULL;
     char *line = NULL;
     size_t line_size = 0;
 
-    FILE *fp = fopen(file_name, "r");
+    FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
-        #ifdef GUPPY_DEBUG
-        printf("Failed to open file %s\n", file_name);
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to open file %s\n", file_path);
         #endif
         
         gup_defer_return(NULL);
     }
 
-    int line_count = gup_file_line_count(file_name);
+    int line_count = gup_file_line_count(file_path);
     if (line_count == 0) {
-        #ifdef GUPPY_DEBUG
-        printf("No lines found in file %s\n", file_name);
+        #ifdef GUPPY_VERBOSE
+        printf("No lines found in file %s\n", file_path);
         #endif
         
         gup_defer_return(NULL);
@@ -339,22 +340,23 @@ defer:
     return result;
 }
 
-char **gup_file_read_lines_keep_newlines(const char *file_name) {
+char **gup_file_read_lines_keep_newlines(const char *file_path) {
     char **lines = NULL;
     char **result = NULL;
     char *line = NULL;
     size_t line_size = 0;
 
-    FILE *fp = fopen(file_name, "r");
+    FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
-        printf("Failed to open file %s\n", file_name);
+        printf("Failed to open file %s\n", file_path);
         gup_defer_return(NULL);
     }
 
-    int line_count = gup_file_line_count(file_name);
+    int line_count = gup_file_line_count(file_path);
     if (line_count == 0) {
-        #ifdef GUPPY_DEBUG
-        printf("No lines found in file %s\n", file_name);
+        #ifdef GUPPY_VERBOSE
+
+        printf("No lines found in file %s\n", file_path);
         #endif
         
         gup_defer_return(NULL);
@@ -384,12 +386,12 @@ defer:
     return result;
 }
 
-bool gup_file_write(const char *file_name, const char *text_to_write) {
+bool gup_file_write(const char *file_path, const char *text_to_write) {
     bool result = true;
 
-    FILE *fp = fopen(file_name, "w");
+    FILE *fp = fopen(file_path, "w");
     if (fp == NULL) {
-        printf("Failed to open file %s\n", file_name);
+        printf("Failed to open file %s\n", file_path);
         gup_defer_return(false);
     }
 
@@ -593,16 +595,18 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
 
 // Settings ----------------------------------------------------------------------------------------
 
-/*
- * This is the default function, so it assumes the settings file is named settings.toml and is in
- * the current directory.
- */
+const char *GUP_DEFAULT_SETTINGS_FILE_PATH = "./resources/settings.toml";
+
 char *gup_settings_get(const char *key) {
-    int line_count = gup_file_line_count("test/settings.toml");
+    return gup_settings_get_from(key, GUP_DEFAULT_SETTINGS_FILE_PATH);
+}
+
+char *gup_settings_get_from(const char *key, const char *file_path) {
+    int line_count = gup_file_line_count(file_path);
     gup_assert(line_count != -1, GUP_DEFAULT_FILE_ERROR_MESSAGE);
     gup_assert(line_count != 0, "The settings file is empty. You should probably add some settings to it.");
 
-    char **settings_lines = gup_file_read_lines("test/settings.toml");
+    char **settings_lines = gup_file_read_lines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
     char *current_line = NULL;
@@ -627,10 +631,11 @@ char *gup_settings_get(const char *key) {
     return NULL;
 }
 
+
 int gup_settings_get_int(const char *key) {
     const char *value = gup_settings_get(key);
     if (value == NULL) {
-        #ifdef GUPPY_DEBUG
+        #ifdef GUPPY_VERBOSE
         printf("Failed to get value for key \"%s\"\n", key);
         #endif
         return -1;
