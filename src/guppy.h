@@ -60,26 +60,27 @@ char *gup_settings_get_from(const char *key, const char *file_path);
 int   gup_settings_get_int(const char *key);
 
 // String view -------------------------------------------------------------------------------------
-Gup_String_View gup_sv();
-Gup_String_View gup_sv_from_parts(const char *data, size_t count);
-Gup_String_View gup_sv_from_cstr(const char *cstr);
-Gup_String_View gup_sv_trim_left(Gup_String_View sv);
-Gup_String_View gup_sv_trim_right(Gup_String_View sv);
-Gup_String_View gup_sv_trim(Gup_String_View sv);
-Gup_String_View gup_sv_take_left_while(Gup_String_View sv, bool (*predicate)(char x));
-Gup_String_View gup_sv_chop_by_delim(Gup_String_View *sv, char delim);
-Gup_String_View gup_sv_chop_by_sv(Gup_String_View *sv, Gup_String_View thicc_delim);
-bool            gup_sv_try_chop_by_delim(Gup_String_View *sv, char delim, Gup_String_View *chunk);
-Gup_String_View gup_sv_chop_left(Gup_String_View *sv, size_t n);
-Gup_String_View gup_sv_chop_right(Gup_String_View *sv, size_t n);
-Gup_String_View gup_sv_chop_left_while(Gup_String_View *sv, bool (*predicate)(char x));
-int             gup_sv_index_of(Gup_String_View sv, char c);
-bool            gup_sv_eq(Gup_String_View a, Gup_String_View b);
-bool            gup_sv_eq_ignorecase(Gup_String_View a, Gup_String_View b);
-bool            gup_sv_eq_cstr(Gup_String_View sv, const char *cstr);
-bool            gup_sv_starts_with(Gup_String_View sv, Gup_String_View prefix);
-bool            gup_sv_ends_with(Gup_String_View sv, Gup_String_View suffix);
-bool            gup_sv_is_empty(Gup_String_View sv);
+Gup_String_View  gup_sv();
+Gup_String_View  gup_sv_from_parts(const char *data, size_t count);
+Gup_String_View  gup_sv_from_cstr(const char *cstr);
+char            *gup_sv_to_cstr(Gup_String_View sv);
+Gup_String_View  gup_sv_trim_left(Gup_String_View sv);
+Gup_String_View  gup_sv_trim_right(Gup_String_View sv);
+Gup_String_View  gup_sv_trim(Gup_String_View sv);
+Gup_String_View  gup_sv_take_left_while(Gup_String_View sv, bool (*predicate)(char x));
+Gup_String_View  gup_sv_chop_by_delim(Gup_String_View *sv, char delim);
+Gup_String_View  gup_sv_chop_by_sv(Gup_String_View *sv, Gup_String_View thicc_delim);
+bool             gup_sv_try_chop_by_delim(Gup_String_View *sv, char delim, Gup_String_View *chunk);
+Gup_String_View  gup_sv_chop_left(Gup_String_View *sv, size_t n);
+Gup_String_View  gup_sv_chop_right(Gup_String_View *sv, size_t n);
+Gup_String_View  gup_sv_chop_left_while(Gup_String_View *sv, bool (*predicate)(char x));
+int              gup_sv_index_of(Gup_String_View sv, char c);
+bool             gup_sv_eq(Gup_String_View a, Gup_String_View b);
+bool             gup_sv_eq_ignorecase(Gup_String_View a, Gup_String_View b);
+bool             gup_sv_eq_cstr(Gup_String_View sv, const char *cstr);
+bool             gup_sv_starts_with(Gup_String_View sv, Gup_String_View prefix);
+bool             gup_sv_ends_with(Gup_String_View sv, Gup_String_View suffix);
+bool             gup_sv_is_empty(Gup_String_View sv);
 
 // C-string utilities --------------------------------------------------------------------------------
 char *gup_string_trim_double_quotes(const char *string);
@@ -625,17 +626,17 @@ char *gup_settings_get_from(const char *key, const char *file_path) {
         // Skip section headers.
         if (gup_sv_index_of(current_line, '[') != -1) continue;
 
-        Gup_String_View current_key;
-        const bool current_line_has_an_equals_sign = gup_sv_try_chop_by_delim(&current_line, '=', &current_key);
+        Gup_String_View current_line_key;
+        const bool current_line_has_an_equals_sign = gup_sv_try_chop_by_delim(&current_line, '=', &current_line_key);
         // Skip lines without an equals sign.
         if (!current_line_has_an_equals_sign) continue; 
         
-        Gup_String_View trimmed_current_key = gup_sv_trim(current_key);
-        if (!gup_sv_eq(trimmed_current_key, gup_sv_from_cstr(key))) continue; // Skip lines that don't match the key.
+        current_line_key = gup_sv_trim(current_line_key);
+        // Skip lines that don't match the key.
+        if (!gup_sv_eq(current_line_key, gup_sv_trim(gup_sv_from_cstr(key)))) continue; 
 
-        // Gup_String_View value = gup_sv_trimmed_current_key
-        // char *trimmed_value = gup_string_trim_whitespace(value);
-        // gup_defer_return(gup_string_trim_double_quotes(trimmed_value));
+        char *value_cstr = gup_sv_to_cstr(gup_sv_trim(current_line));
+        gup_defer_return(gup_string_trim_double_quotes(value_cstr));
     }
 
     // If we get here, we didn't find the key.
@@ -708,6 +709,13 @@ Gup_String_View gup_sv_from_parts(const char *data, size_t count) {
 
 Gup_String_View gup_sv_from_cstr(const char *cstr) {
     return gup_sv_from_parts(cstr, strlen(cstr));
+}
+
+char *gup_sv_to_cstr(Gup_String_View sv) {
+    char *cstr = malloc(sv.count + 1);
+    memcpy(cstr, sv.data, sv.count);
+    cstr[sv.count] = '\0';
+    return cstr;
 }
 
 Gup_String_View gup_sv_trim_left(Gup_String_View sv) {

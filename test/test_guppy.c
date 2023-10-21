@@ -2,7 +2,7 @@
 #include <limits.h>
 
 #define GUPPY_VERBOSE
-#define GUPPY_DEBUG_MEMORY
+// #define GUPPY_DEBUG_MEMORY
 #include "../src/guppy.h"
 
 #include "./test_gup_file_read_lines.c"
@@ -24,9 +24,7 @@ void run_all_guppy_tests(void) {
 }
 
 int main(void) {
-    test_gup_sv();
-
-    _gup_memory_print();
+    run_all_guppy_tests();
 
     printf("All tests passed!\n");
     return 0;
