@@ -198,8 +198,7 @@ bool gup_file_delete(const char *file_path) {
 
 bool gup_file_is_empty(const char *file_path) {
     int line_count = gup_file_line_count(file_path);
-    // TODO: asserting here might be kinda overkill.
-    gup_assert(line_count != -1, "gup_file_line_count had an issue while opening the file.");
+    gup_assert(line_count == -1, "gup_file_line_count had an issue while opening the file.");
 
     return line_count == 0;
 }
@@ -648,7 +647,6 @@ defer:
     free(settings_lines);
     return result;
 }
-
 
 int gup_settings_get_int(const char *key) {
     const char *value = gup_settings_get(key);
