@@ -60,6 +60,7 @@ char *gup_settings_get_from(const char *key, const char *file_path);
 int   gup_settings_get_int(const char *key);
 
 // String view -------------------------------------------------------------------------------------
+Gup_String_View gup_sv();
 Gup_String_View gup_sv_from_parts(const char *data, size_t count);
 Gup_String_View gup_sv_from_cstr(const char *cstr);
 Gup_String_View gup_sv_trim_left(Gup_String_View sv);
@@ -75,8 +76,10 @@ Gup_String_View gup_sv_chop_left_while(Gup_String_View *sv, bool (*predicate)(ch
 bool            gup_sv_index_of(Gup_String_View sv, char c, size_t *index);
 bool            gup_sv_eq(Gup_String_View a, Gup_String_View b);
 bool            gup_sv_eq_ignorecase(Gup_String_View a, Gup_String_View b);
+bool            gup_sv_eq_cstr(Gup_String_View sv, const char *cstr);
 bool            gup_sv_starts_with(Gup_String_View sv, Gup_String_View prefix);
 bool            gup_sv_ends_with(Gup_String_View sv, Gup_String_View suffix);
+bool            gup_sv_is_empty(Gup_String_View sv);
 
 // C-string utilities --------------------------------------------------------------------------------
 char *gup_string_trim_double_quotes(const char *string);
@@ -247,6 +250,8 @@ void gup_file_print(const char *file_path) {
     for (size_t i = 0; file_lines[i] != NULL; i++) {
         printf("%s\n", file_lines[i]);
     }
+
+    free(file_lines);
 }
 
 char *gup_file_read(const char *file_path) {
@@ -602,6 +607,9 @@ char *gup_settings_get(const char *key) {
 }
 
 char *gup_settings_get_from(const char *key, const char *file_path) {
+    char *result = NULL;
+    
+    printf("Getting value for key \"%s\" from file \"%s\"\n", key, file_path);
     int line_count = gup_file_line_count(file_path);
     gup_assert(line_count != -1, GUP_DEFAULT_FILE_ERROR_MESSAGE);
     gup_assert(line_count != 0, "The settings file is empty. You should probably add some settings to it.");
@@ -609,26 +617,35 @@ char *gup_settings_get_from(const char *key, const char *file_path) {
     char **settings_lines = gup_file_read_lines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
-    char *current_line = NULL;
-    for (int i = 0; i < line_count; i++) {
-        current_line = settings_lines[i];
+    // for (int i = 0; i < line_count; i++) {
+    //     Gup_String_View current_line = gup_sv_from_cstr(settings_lines[i]);
 
-        if (current_line[0] == '#') continue; // Skip comments.
-        if (current_line[0] == '[') continue; // Skip section headers.
+    //     // Skip comments.
+    //     if (gup_sv_index_of(current_line, '#', 0)) continue;
+    //     // Skip section headers.
+    //     if (gup_sv_index_of(current_line, '[', 0)) continue;
 
-        char *current_key = strtok(current_line, "=");
-        if (current_key == NULL) continue; // Skip lines without an equals sign.
+    //     Gup_String_View current_key;
+    //     const bool current_line_has_an_equals_sign = gup_sv_try_chop_by_delim(&current_line, '=', &current_key);
+    //     // Skip lines without an equals sign.
+    //     if (!current_line_has_an_equals_sign) continue; 
         
-        char *trimmed_current_key = gup_string_trim_whitespace(current_key);
-        if (strcmp(trimmed_current_key, key) != 0) continue; // Skip lines that don't match the key.
+    //     Gup_String_View trimmed_current_key = gup_sv_trim(current_key);
+    //     if (!gup_sv_eq(trimmed_current_key, gup_sv_from_cstr(key))) continue; // Skip lines that don't match the key.
 
-        char *value = strtok(NULL, "=");
-        char *trimmed_value = gup_string_trim_whitespace(value);
-        return gup_string_trim_double_quotes(trimmed_value);
-    }
+    //     Gup_String_View value = gup_sv_trimmed_current_key
+    //     char *trimmed_value = gup_string_trim_whitespace(value);
+    //     gup_defer_return(gup_string_trim_double_quotes(trimmed_value));
+    // }
 
     // If we get here, we didn't find the key.
-    return NULL;
+defer:
+    for (int i = 0; i < line_count; i++) {
+        if (settings_lines[i]) {
+            free(settings_lines[i]);
+        }
+    }
+    return result;
 }
 
 
@@ -674,6 +691,13 @@ int gup_settings_get_int(const char *key) {
  *   String_View name = ...;
  *   printf("Name: "SV_Fmt"\n", SV_Arg(name));
  */
+
+Gup_String_View gup_sv() {
+    Gup_String_View sv;
+    sv.count = 0;
+    sv.data = NULL;
+    return sv;
+}
 
 Gup_String_View gup_sv_from_parts(const char *data, size_t count) {
     Gup_String_View sv;
@@ -831,6 +855,10 @@ bool gup_sv_ends_with(Gup_String_View sv, Gup_String_View expected_suffix) {
     return false;
 }
 
+bool gup_sv_is_empty(Gup_String_View sv) {
+    return sv.count == 0;
+}
+
 bool gup_sv_eq(Gup_String_View a, Gup_String_View b) {
     if (a.count != b.count) {
         return false;
@@ -857,6 +885,10 @@ bool gup_sv_eq_ignorecase(Gup_String_View a, Gup_String_View b) {
         if (x != y) return false;
     }
     return true;
+}
+
+bool gup_sv_eq_cstr(Gup_String_View sv, const char *cstr) {
+    return gup_sv_eq(sv, gup_sv_from_cstr(cstr));
 }
 
 Gup_String_View gup_sv_chop_left_while(Gup_String_View *sv, bool (*predicate)(char x)) {

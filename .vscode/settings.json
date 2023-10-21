@@ -2,6 +2,7 @@
   "files.associations": {
     "limits.h": "c",
     "stdio.h": "c",
-    "guppy.h": "c"
+    "guppy.h": "c",
+    "stdlib.h": "c"
   }
 }
