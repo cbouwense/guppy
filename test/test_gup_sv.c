@@ -148,4 +148,18 @@ void test_gup_sv(void) {
             assert(gup_sv_eq_cstr(sv, "Hello, world!"));
         }
     }
+
+    { // gup_sv_index_of
+        {
+            Gup_String_View sv = gup_sv_from_cstr("Hello, world!");
+
+            assert(gup_sv_index_of(sv, 'o') == 4);
+        }
+
+        {
+            Gup_String_View sv = gup_sv_from_cstr("Hello, world!");
+
+            assert(gup_sv_index_of(sv, 'z') == -1);
+        }
+    }
 }

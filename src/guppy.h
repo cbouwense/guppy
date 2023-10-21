@@ -73,7 +73,7 @@ bool            gup_sv_try_chop_by_delim(Gup_String_View *sv, char delim, Gup_St
 Gup_String_View gup_sv_chop_left(Gup_String_View *sv, size_t n);
 Gup_String_View gup_sv_chop_right(Gup_String_View *sv, size_t n);
 Gup_String_View gup_sv_chop_left_while(Gup_String_View *sv, bool (*predicate)(char x));
-bool            gup_sv_index_of(Gup_String_View sv, char c, size_t *index);
+int             gup_sv_index_of(Gup_String_View sv, char c);
 bool            gup_sv_eq(Gup_String_View a, Gup_String_View b);
 bool            gup_sv_eq_ignorecase(Gup_String_View a, Gup_String_View b);
 bool            gup_sv_eq_cstr(Gup_String_View sv, const char *cstr);
@@ -617,26 +617,26 @@ char *gup_settings_get_from(const char *key, const char *file_path) {
     char **settings_lines = gup_file_read_lines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
-    // for (int i = 0; i < line_count; i++) {
-    //     Gup_String_View current_line = gup_sv_from_cstr(settings_lines[i]);
+    for (int i = 0; i < line_count; i++) {
+        Gup_String_View current_line = gup_sv_from_cstr(settings_lines[i]);
 
-    //     // Skip comments.
-    //     if (gup_sv_index_of(current_line, '#', 0)) continue;
-    //     // Skip section headers.
-    //     if (gup_sv_index_of(current_line, '[', 0)) continue;
+        // Skip comments.
+        if (gup_sv_index_of(current_line, '#') != -1) continue;
+        // Skip section headers.
+        if (gup_sv_index_of(current_line, '[') != -1) continue;
 
-    //     Gup_String_View current_key;
-    //     const bool current_line_has_an_equals_sign = gup_sv_try_chop_by_delim(&current_line, '=', &current_key);
-    //     // Skip lines without an equals sign.
-    //     if (!current_line_has_an_equals_sign) continue; 
+        Gup_String_View current_key;
+        const bool current_line_has_an_equals_sign = gup_sv_try_chop_by_delim(&current_line, '=', &current_key);
+        // Skip lines without an equals sign.
+        if (!current_line_has_an_equals_sign) continue; 
         
-    //     Gup_String_View trimmed_current_key = gup_sv_trim(current_key);
-    //     if (!gup_sv_eq(trimmed_current_key, gup_sv_from_cstr(key))) continue; // Skip lines that don't match the key.
+        Gup_String_View trimmed_current_key = gup_sv_trim(current_key);
+        if (!gup_sv_eq(trimmed_current_key, gup_sv_from_cstr(key))) continue; // Skip lines that don't match the key.
 
-    //     Gup_String_View value = gup_sv_trimmed_current_key
-    //     char *trimmed_value = gup_string_trim_whitespace(value);
-    //     gup_defer_return(gup_string_trim_double_quotes(trimmed_value));
-    // }
+        // Gup_String_View value = gup_sv_trimmed_current_key
+        // char *trimmed_value = gup_string_trim_whitespace(value);
+        // gup_defer_return(gup_string_trim_double_quotes(trimmed_value));
+    }
 
     // If we get here, we didn't find the key.
 defer:
@@ -757,20 +757,13 @@ Gup_String_View gup_sv_chop_right(Gup_String_View *sv, size_t n) {
     return result;
 }
 
-bool gup_sv_index_of(Gup_String_View sv, char c, size_t *index) {
-    size_t i = 0;
+int gup_sv_index_of(Gup_String_View sv, char c) {
+    int i = 0;
     while (i < sv.count && sv.data[i] != c) {
         i += 1;
     }
 
-    if (i < sv.count) {
-        if (index) {
-            *index = i;
-        }
-        return true;
-    } else {
-        return false;
-    }
+    return i < sv.count ? i : -1;
 }
 
 bool gup_sv_try_chop_by_delim(Gup_String_View *sv, char delim, Gup_String_View *chunk) {
@@ -888,6 +881,8 @@ bool gup_sv_eq_ignorecase(Gup_String_View a, Gup_String_View b) {
 }
 
 bool gup_sv_eq_cstr(Gup_String_View sv, const char *cstr) {
+    if (cstr == NULL) return false;
+
     return gup_sv_eq(sv, gup_sv_from_cstr(cstr));
 }
 
