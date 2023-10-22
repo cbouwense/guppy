@@ -1,11 +1,17 @@
 #include "../src/guppy.h"
 
 void test_gup_sv_from_cstr(void) {
-    {
+    { // NULL gives empty string view
         Gup_String_View sv = gup_sv_from_cstr(NULL);
 
+        assert(gup_cstr_eq(sv.data, ""));
+    }
+
+    { // Empty string gives empty string view
+        Gup_String_View sv = gup_sv_from_cstr("");
+
         assert(sv.length == 0);
-        assert(sv.data == NULL);
+        assert(gup_cstr_eq(sv.data, ""));
     }
 
     {
@@ -190,6 +196,33 @@ void test_gup_sv_index_of(void) {
     }
 }
 
+void test_gup_sv_trim_left_while(void) {
+    { // String with no double quotes on left
+        Gup_String_View sv = gup_sv_from_cstr("Hello, world!\"");
+        Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_cstr_eq(trimmed.data, "Hello, world!\""));
+    }
+
+    { // String with double quotes on left
+        Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!\"");
+        Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_cstr_eq(trimmed.data, "Hello, world!\""));
+    }
+
+    { // Empty string
+        Gup_String_View sv = gup_sv();
+        Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_cstr_eq(trimmed.data, ""));
+    }
+}
+
+void test_gup_sv_trim_right_while(void) {
+    
+}
+
 void test_gup_sv(void) {
     test_gup_sv_from_cstr();
     test_gup_sv_trim_left();
@@ -198,4 +231,6 @@ void test_gup_sv(void) {
     test_gup_sv_chop_by_delim();
     test_gup_sv_try_chop_by_delim();
     test_gup_sv_index_of();
+    test_gup_sv_trim_left_while();
+    test_gup_sv_trim_right_while();
 }

@@ -27,13 +27,13 @@ void _reset_settings_file(void) {
 
 int main(void) {
     _reset_settings_file();
-    test_gup_settings();
-    _reset_settings_file();  
+    run_all_guppy_tests();
 
     #ifdef GUPPY_DEBUG_MEMORY
     _gup_memory_print();
     #endif
 
+    _reset_settings_file();
     printf("All tests passed!\n");
     return 0;
 }

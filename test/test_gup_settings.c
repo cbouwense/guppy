@@ -1,5 +1,49 @@
 #include "../src/guppy.h"
 
+void test_gup_does_setting_file_line_contain_key(void) {
+    {
+        Gup_String_View line = SV_STATIC("title = \"guppy.h\"");
+        Gup_String_View key  = SV_STATIC("title");
+
+        assert(true == _gup_does_setting_file_line_contain_key(line, key));
+    }
+
+    {
+        Gup_String_View line = SV_STATIC("title = \"guppy.h\"");
+        Gup_String_View key  = SV_STATIC("author");
+
+        assert(false == _gup_does_setting_file_line_contain_key(line, key));
+    }
+
+    { // Comments always return false
+        Gup_String_View line = SV_STATIC("# Comment");
+        Gup_String_View key  = SV_STATIC("title");
+
+        assert(false == _gup_does_setting_file_line_contain_key(line, key));
+    }
+
+    { // Section headers always return false
+        Gup_String_View line = SV_STATIC("[Section header]");
+        Gup_String_View key  = SV_STATIC("title");
+
+        assert(false == _gup_does_setting_file_line_contain_key(line, key));
+    }
+
+    { // Empty lines always return false
+        Gup_String_View line = SV_STATIC("");
+        Gup_String_View key  = SV_STATIC("title");
+
+        assert(false == _gup_does_setting_file_line_contain_key(line, key));
+    }
+
+    { // Lines without equals signs always return false
+        Gup_String_View line = SV_STATIC("title is guppy.h");
+        Gup_String_View key  = SV_STATIC("title");
+
+        assert(false == _gup_does_setting_file_line_contain_key(line, key));
+    }
+}
+
 void test_gup_settings_get(void) {
     char *title          = gup_settings_get("title");
     char *author         = gup_settings_get("author");
@@ -7,9 +51,9 @@ void test_gup_settings_get(void) {
     int port             = gup_settings_get_int("port");
     char *does_not_exist = gup_settings_get("does_not_exist");
 
-    assert(strcmp(title, "guppy.h") == 0);
-    assert(strcmp(author, "Christian Bouwense") == 0);
-    assert(strcmp(server, "localhost") == 0);
+    assert(gup_cstr_eq(title, "guppy.h"));
+    assert(gup_cstr_eq(author, "Christian Bouwense"));
+    assert(gup_cstr_eq(server, "localhost"));
     assert(port == 5432);
     assert(does_not_exist == NULL);
 
@@ -25,14 +69,14 @@ void test_gup_settings_get_from_file(void) {
     char *server         = gup_settings_get_from_file("server", filename);
     char *does_not_exist = gup_settings_get_from_file("does_not_exist", filename);
 
-    assert(strcmp(title, "guppy.h") == 0);
-    assert(strcmp(author, "Christian Bouwense") == 0);
-    assert(strcmp(server, "localhost") == 0);
+    assert(gup_cstr_eq(title, "guppy.h"));
+    assert(gup_cstr_eq(author, "Christian Bouwense"));
+    assert(gup_cstr_eq(server, "localhost"));
     assert(does_not_exist == NULL);
 
-    assert(strcmp(title, "guppy.h") == 0);
-    assert(strcmp(author, "Christian Bouwense") == 0);
-    assert(strcmp(server, "localhost") == 0);
+    assert(gup_cstr_eq(title, "guppy.h"));
+    assert(gup_cstr_eq(author, "Christian Bouwense"));
+    assert(gup_cstr_eq(server, "localhost"));
 
     free(title);
     free(author);
@@ -43,18 +87,19 @@ void test_gup_settings_set(void) {
     { // Setting that exists
         gup_settings_set("title", "asdf.h");
 
-        assert(strcmp(gup_settings_get("title"), "asdf.h") == 0);
+        assert(gup_cstr_eq(gup_settings_get("title"), "asdf.h"));
     }
 
     { // Setting that doesn't exist
         gup_settings_set("does_not_exist", "should still show up though");
 
         assert(gup_settings_get("does_not_exist") != NULL);
-        assert(strcmp(gup_settings_get("does_not_exist"), "should still show up though") == 0);
+        assert(gup_cstr_eq(gup_settings_get("does_not_exist"), "should still show up though"));
     }
 }
 
 void test_gup_settings(void) {
+    test_gup_does_setting_file_line_contain_key();
     test_gup_settings_get();
     test_gup_settings_get_from_file();
     test_gup_settings_set();
