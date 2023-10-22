@@ -18,7 +18,7 @@ void run_all_guppy_tests(void) {
 }
 
 int main(void) {
-    test_gup_settings_set();
+    test_gup_file();
 
     _gup_memory_print();
 

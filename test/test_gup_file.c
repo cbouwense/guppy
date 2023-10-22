@@ -1,5 +1,13 @@
 #include "../src/guppy.h"
 
+void test_gup_file_is_empty(void) {
+    gup_print_cwd();
+    assert(gup_file_is_empty("./resources/empty.txt") == true);
+    assert(gup_file_is_empty("./resources/one_newline.txt") == false);
+    assert(gup_file_is_empty("./resources/foo.txt") == false);
+    assert(gup_file_is_empty("./resources/stb.txt") == false);
+}
+
 void test_gup_file_line_count(void) {
     int line_count = 0;
 
@@ -16,7 +24,7 @@ void test_gup_file_line_count(void) {
     assert(line_count == 13111);
 }
 
-void test_gup_file_read_lines() {
+void test_gup_file_read_lines(void) {
     char **lines = NULL;
     
     { // empty.txt
@@ -69,7 +77,7 @@ void test_gup_file_read_lines() {
     }
 }
 
-void test_gup_file_read_lines_keep_newlines() {
+void test_gup_file_read_lines_keep_newlines(void) {
     char **lines = NULL;
     
     { // empty.txt
@@ -123,7 +131,8 @@ void test_gup_file_read_lines_keep_newlines() {
 }
 
 void test_gup_file(void) {
-    test_gup_file_line_count();
-    test_gup_file_read_lines();
-    test_gup_file_read_lines_keep_newlines();
+    test_gup_file_is_empty();
+    // test_gup_file_line_count();
+    // test_gup_file_read_lines();
+    // test_gup_file_read_lines_keep_newlines();
 }

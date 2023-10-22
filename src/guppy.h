@@ -35,6 +35,7 @@ char **gup_file_read_lines_keep_newlines(const char *file_path);
 bool   gup_file_write(const char *file_path, const char *text_to_write);
 
 // Print -------------------------------------------------------------------------------------------
+void gup_print_cwd(void);
 void gup_print_string(const char *string);
 
 // Print null terminated arrays -------------------------------------------------------------------------------
@@ -201,7 +202,8 @@ bool gup_file_delete(const char *file_path) {
 
 bool gup_file_is_empty(const char *file_path) {
     int line_count = gup_file_line_count(file_path);
-    gup_assert(line_count == -1, "gup_file_line_count had an issue while opening the file.");
+    printf("line_count: %d\n", line_count);
+    gup_assert(line_count != -1, "gup_file_line_count had an issue while opening the file.");
 
     return line_count == 0;
 }
@@ -216,7 +218,7 @@ int gup_file_line_count(const char *file_path) {
         #ifdef GUPPY_VERBOSE
         printf("Error opening file %s\n", file_path);
         #endif
-        
+
         return -1;
     }
 
@@ -411,6 +413,12 @@ defer:
 }
 
 // Print -------------------------------------------------------------------------------------------
+
+void gup_print_cwd(void) {
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    printf("Current working dir: %s\n", cwd);
+}
 
 void gup_print_string(const char *string) {
     printf("\"%s\"\n", string);
