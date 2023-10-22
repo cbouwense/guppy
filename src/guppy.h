@@ -676,6 +676,7 @@ bool gup_settings_set(const char *key, const char *value) {
 // First, we read the file into memory. Then, we iterate through the lines, looking for the key.
 // If we find the key, we replace the value. If we don't find the key, we append the key-value pair
 // to the end of the file.
+/*
 bool gup_settings_set_to(const char *key, const char *value, const char *file_path) {
     bool result = true;
     bool found = false;
@@ -763,7 +764,14 @@ defer:
 
     return result;
 }
-
+*/
+bool gup_settings_set_to(const char *key, const char *value, const char *file_path) {
+    printf("gup_settings_set_to is not implemented yet.\n");
+    printf("key: %s\n", key);
+    printf("value: %s\n", value);
+    printf("file_path: %s\n", file_path);
+    return false;
+}
 // String view -------------------------------------------------------------------------------------
 
 /*
