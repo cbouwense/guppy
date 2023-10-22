@@ -3,7 +3,7 @@
 void test_gup_string_array_flatten(void) {
     { // Empty array
         char *array[] = {NULL};
-        char *string = gup_string_array_flatten(array, 0);
+        char *string = gup_string_array_flatten(array);
 
         assert(strcmp(string, "") == 0);
 
@@ -12,7 +12,7 @@ void test_gup_string_array_flatten(void) {
 
     { // One element
         char *array[] = {"one", NULL};
-        char *string = gup_string_array_flatten(array, 1);
+        char *string = gup_string_array_flatten(array);
 
         assert(strcmp(string, "one") == 0);
 
@@ -21,7 +21,7 @@ void test_gup_string_array_flatten(void) {
 
     { // Multiple elements
         char *array[] = {"one", "two", "three", NULL};
-        char *string = gup_string_array_flatten(array, 3);
+        char *string = gup_string_array_flatten(array);
 
         assert(strcmp(string, "onetwothree") == 0);
 

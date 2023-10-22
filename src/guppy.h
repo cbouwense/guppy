@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 typedef struct {
-    size_t count;
+    size_t length;
     const char *data;
 } Gup_String_View;
 
@@ -90,7 +90,7 @@ bool             gup_sv_is_empty(Gup_String_View sv);
 char *gup_string_trim_double_quotes(const char *string);
 char *gup_string_trim_whitespace(const char *string);
 char *gup_string_without_whitespace(const char *string);
-char *gup_string_array_flatten(char **strings, int count);
+char *gup_string_array_flatten(char **strings);
 /**************************************************************************************************
  * Internal implementation                                                                        *
  **************************************************************************************************/
@@ -202,7 +202,6 @@ bool gup_file_delete(const char *file_path) {
 
 bool gup_file_is_empty(const char *file_path) {
     int line_count = gup_file_line_count(file_path);
-    printf("line_count: %d\n", line_count);
     gup_assert(line_count != -1, "gup_file_line_count had an issue while opening the file.");
 
     return line_count == 0;
@@ -255,14 +254,20 @@ defer:
     return result;
 }
 
+// TODO: for some reason this cuts off the final character of the final line.
 void gup_file_print(const char *file_path) {
     char **file_lines = gup_file_read_lines(file_path);
     gup_assert(file_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
     printf("[%s]\n", file_path);
-    for (size_t i = 0; file_lines[i] != NULL; i++) {
-        printf("%ld %s\n", i+1, file_lines[i]);
-        free(file_lines[i]);
+    const int line_count = gup_file_line_count(file_path);
+    for (size_t i = 0; i < line_count; i++) {
+        if (file_lines[i] != NULL) {
+            printf("%ld %s\n", i+1, file_lines[i]);
+            free(file_lines[i]);
+        } else {
+            printf("%ld\n", i+1);
+        }
     }
     printf("\n");
 }
@@ -350,6 +355,7 @@ char **gup_file_read_lines(const char *file_path) {
         lines[i][read-1] = '\0';
     }
     lines[line_count] = NULL;
+    gup_defer_return(lines);
 
 defer:
     if (line) free(line);
@@ -366,14 +372,16 @@ char **gup_file_read_lines_keep_newlines(const char *file_path) {
 
     FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
+        #ifdef GUPPY_VERBOSE
         printf("Failed to open file %s\n", file_path);
+        #endif
+
         gup_defer_return(NULL);
     }
 
     int line_count = gup_file_line_count(file_path);
     if (line_count == 0) {
         #ifdef GUPPY_VERBOSE
-
         printf("No lines found in file %s\n", file_path);
         #endif
         
@@ -658,12 +666,10 @@ char *gup_settings_get_from(const char *key, const char *file_path) {
 
     // If we get here, we didn't find the key.
 defer:
+    printf("result = %s\n", result);
     for (int i = 0; i < line_count; i++) {
-        if (settings_lines[i]) {
-            free(settings_lines[i]);
-        }
+        if (settings_lines[i]) free(settings_lines[i]);
     }
-    free(settings_lines);
     return result;
 }
 
@@ -693,13 +699,15 @@ bool gup_settings_set_to(const char *key, const char *value, const char *file_pa
     // Read the file into memory
     char **settings_lines = gup_file_read_lines_keep_newlines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
-    gup_print_array_string(settings_lines);
 
     // Flatten the lines into a single string
     const int line_count = gup_file_line_count(file_path);
-    char *settings_text = gup_string_array_flatten(settings_lines, line_count);
-}
+    char *settings_text = gup_string_array_flatten(settings_lines);
+    printf("settings_text:\n%s\n", settings_text);
 
+    // Write to the file
+    gup_file_write(file_path, settings_text);
+}
 
 // String view -------------------------------------------------------------------------------------
 
@@ -719,7 +727,7 @@ bool gup_settings_set_to(const char *key, const char *value, const char *file_pa
 
 // printf macros for String_View
 #define SV_Fmt "%.*s"
-#define SV_Arg(sv) (int) (sv).count, (sv).data
+#define SV_Arg(sv) (int) (sv).length, (sv).data
 /* 
  * USAGE:
  *   String_View name = ...;
@@ -728,45 +736,47 @@ bool gup_settings_set_to(const char *key, const char *value, const char *file_pa
 
 Gup_String_View gup_sv() {
     Gup_String_View sv;
-    sv.count = 0;
+    sv.length = 0;
     sv.data = NULL;
     return sv;
 }
 
 Gup_String_View gup_sv_from_parts(const char *data, size_t count) {
     Gup_String_View sv;
-    sv.count = count;
+    sv.length = count;
     sv.data = data;
     return sv;
 }
 
 Gup_String_View gup_sv_from_cstr(const char *cstr) {
+    if (cstr == NULL) return gup_sv();
+    
     return gup_sv_from_parts(cstr, strlen(cstr));
 }
 
 char *gup_sv_to_cstr(Gup_String_View sv) {
-    char *cstr = malloc(sv.count + 1);
-    memcpy(cstr, sv.data, sv.count);
-    cstr[sv.count] = '\0';
+    char *cstr = malloc(sv.length + 1);
+    memcpy(cstr, sv.data, sv.length);
+    cstr[sv.length] = '\0';
     return cstr;
 }
 
 Gup_String_View gup_sv_trim_left(Gup_String_View sv) {
     size_t i = 0;
-    while (i < sv.count && isspace(sv.data[i])) {
+    while (i < sv.length && isspace(sv.data[i])) {
         i += 1;
     }
 
-    return gup_sv_from_parts(sv.data + i, sv.count - i);
+    return gup_sv_from_parts(sv.data + i, sv.length - i);
 }
 
 Gup_String_View gup_sv_trim_right(Gup_String_View sv) {
     size_t i = 0;
-    while (i < sv.count && isspace(sv.data[sv.count - 1 - i])) {
+    while (i < sv.length && isspace(sv.data[sv.length - 1 - i])) {
         i += 1;
     }
 
-    return gup_sv_from_parts(sv.data, sv.count - i);
+    return gup_sv_from_parts(sv.data, sv.length - i);
 }
 
 Gup_String_View gup_sv_trim(Gup_String_View sv) {
@@ -774,49 +784,49 @@ Gup_String_View gup_sv_trim(Gup_String_View sv) {
 }
 
 Gup_String_View gup_sv_chop_left(Gup_String_View *sv, size_t n) {
-    if (n > sv->count) {
-        n = sv->count;
+    if (n > sv->length) {
+        n = sv->length;
     }
 
     Gup_String_View result = gup_sv_from_parts(sv->data, n);
 
     sv->data  += n;
-    sv->count -= n;
+    sv->length -= n;
 
     return result;
 }
 
 Gup_String_View gup_sv_chop_right(Gup_String_View *sv, size_t n) {
-    if (n > sv->count) {
-        n = sv->count;
+    if (n > sv->length) {
+        n = sv->length;
     }
 
-    Gup_String_View result = gup_sv_from_parts(sv->data + sv->count - n, n);
+    Gup_String_View result = gup_sv_from_parts(sv->data + sv->length - n, n);
 
-    sv->count -= n;
+    sv->length -= n;
 
     return result;
 }
 
 int gup_sv_index_of(Gup_String_View sv, char c) {
     int i = 0;
-    while (i < (int)sv.count && sv.data[i] != c) {
+    while (i < (int)sv.length && sv.data[i] != c) {
         i += 1;
     }
 
-    return i < (int)sv.count ? i : -1;
+    return i < (int)sv.length ? i : -1;
 }
 
 bool gup_sv_try_chop_by_delim(Gup_String_View *sv, char delim, Gup_String_View *chunk) {
     size_t i = 0;
-    while (i < sv->count && sv->data[i] != delim) {
+    while (i < sv->length && sv->data[i] != delim) {
         i += 1;
     }
 
     Gup_String_View result = gup_sv_from_parts(sv->data, i);
 
-    if (i < sv->count) {
-        sv->count -= i + 1;
+    if (i < sv->length) {
+        sv->length -= i + 1;
         sv->data  += i + 1;
         if (chunk) {
             *chunk = result;
@@ -829,17 +839,17 @@ bool gup_sv_try_chop_by_delim(Gup_String_View *sv, char delim, Gup_String_View *
 
 Gup_String_View gup_sv_chop_by_delim(Gup_String_View *sv, char delim) {
     size_t i = 0;
-    while (i < sv->count && sv->data[i] != delim) {
+    while (i < sv->length && sv->data[i] != delim) {
         i += 1;
     }
 
     Gup_String_View result = gup_sv_from_parts(sv->data, i);
 
-    if (i < sv->count) {
-        sv->count -= i + 1;
+    if (i < sv->length) {
+        sv->length -= i + 1;
         sv->data  += i + 1;
     } else {
-        sv->count -= i;
+        sv->length -= i;
         sv->data  += i;
     }
 
@@ -847,9 +857,9 @@ Gup_String_View gup_sv_chop_by_delim(Gup_String_View *sv, char delim) {
 }
 
 Gup_String_View gup_sv_chop_by_sv(Gup_String_View *sv, Gup_String_View thicc_delim) {
-    Gup_String_View window = gup_sv_from_parts(sv->data, thicc_delim.count);
+    Gup_String_View window = gup_sv_from_parts(sv->data, thicc_delim.length);
     size_t i = 0;
-    while (i + thicc_delim.count < sv->count
+    while (i + thicc_delim.length < sv->length
         && !(gup_sv_eq(window, thicc_delim)))
     {
         i++;
@@ -858,22 +868,22 @@ Gup_String_View gup_sv_chop_by_sv(Gup_String_View *sv, Gup_String_View thicc_del
 
     Gup_String_View result = gup_sv_from_parts(sv->data, i);
 
-    if (i + thicc_delim.count == sv->count) {
-        // include last <thicc_delim.count> characters if they aren't
+    if (i + thicc_delim.length == sv->length) {
+        // include last <thicc_delim.length> characters if they aren't
         //  equal to thicc_delim
-        result.count += thicc_delim.count;
+        result.length += thicc_delim.length;
     }
 
     // Chop!
-    sv->data  += i + thicc_delim.count;
-    sv->count -= i + thicc_delim.count;
+    sv->data  += i + thicc_delim.length;
+    sv->length -= i + thicc_delim.length;
 
     return result;
 }
 
 bool gup_sv_starts_with(Gup_String_View sv, Gup_String_View expected_prefix) {
-    if (expected_prefix.count <= sv.count) {
-        Gup_String_View actual_prefix = gup_sv_from_parts(sv.data, expected_prefix.count);
+    if (expected_prefix.length <= sv.length) {
+        Gup_String_View actual_prefix = gup_sv_from_parts(sv.data, expected_prefix.length);
         return gup_sv_eq(expected_prefix, actual_prefix);
     }
 
@@ -881,8 +891,8 @@ bool gup_sv_starts_with(Gup_String_View sv, Gup_String_View expected_prefix) {
 }
 
 bool gup_sv_ends_with(Gup_String_View sv, Gup_String_View expected_suffix) {
-    if (expected_suffix.count <= sv.count) {
-        Gup_String_View actual_suffix = gup_sv_from_parts(sv.data + sv.count - expected_suffix.count, expected_suffix.count);
+    if (expected_suffix.length <= sv.length) {
+        Gup_String_View actual_suffix = gup_sv_from_parts(sv.data + sv.length - expected_suffix.length, expected_suffix.length);
         return gup_sv_eq(expected_suffix, actual_suffix);
     }
 
@@ -890,24 +900,24 @@ bool gup_sv_ends_with(Gup_String_View sv, Gup_String_View expected_suffix) {
 }
 
 bool gup_sv_is_empty(Gup_String_View sv) {
-    return sv.count == 0;
+    return sv.length == 0;
 }
 
 bool gup_sv_eq(Gup_String_View a, Gup_String_View b) {
-    if (a.count != b.count) {
+    if (a.length != b.length) {
         return false;
     } else {
-        return memcmp(a.data, b.data, a.count) == 0;
+        return memcmp(a.data, b.data, a.length) == 0;
     }
 }
 
 bool gup_sv_eq_ignorecase(Gup_String_View a, Gup_String_View b) {
-    if (a.count != b.count) {
+    if (a.length != b.length) {
         return false;
     }
 
     char x, y;
-    for (size_t i = 0; i < a.count; i++) {
+    for (size_t i = 0; i < a.length; i++) {
         x = 'A' <= a.data[i] && a.data[i] <= 'Z'
               ? a.data[i] + 32
               : a.data[i];
@@ -929,7 +939,7 @@ bool gup_sv_eq_cstr(Gup_String_View sv, const char *cstr) {
 
 Gup_String_View gup_sv_chop_left_while(Gup_String_View *sv, bool (*predicate)(char x)) {
     size_t i = 0;
-    while (i < sv->count && predicate(sv->data[i])) {
+    while (i < sv->length && predicate(sv->data[i])) {
         i += 1;
     }
     return gup_sv_chop_left(sv, i);
@@ -937,7 +947,7 @@ Gup_String_View gup_sv_chop_left_while(Gup_String_View *sv, bool (*predicate)(ch
 
 Gup_String_View gup_sv_take_left_while(Gup_String_View sv, bool (*predicate)(char x)) {
     size_t i = 0;
-    while (i < sv.count && predicate(sv.data[i])) {
+    while (i < sv.length && predicate(sv.data[i])) {
         i += 1;
     }
     return gup_sv_from_parts(sv.data, i);
@@ -999,10 +1009,11 @@ char *gup_string_without_whitespace(const char *string) {
     return new_string;
 }
 
-char *gup_string_array_flatten(char **strings, int count) {
+// Assumes a null terminated array of strings.
+char *gup_string_array_flatten(char **strings) {
     // Calculate the total length of all the strings.
     int total_length = 0;
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; strings[i] != NULL; i++) {
         total_length += strlen(strings[i]);
     }
 
@@ -1012,7 +1023,7 @@ char *gup_string_array_flatten(char **strings, int count) {
 
     // Copy each string into the buffer.
     int offset = 0;
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; strings[i] != NULL; i++) {
         strcpy(result + offset, strings[i]);
         offset += strlen(strings[i]);
     }

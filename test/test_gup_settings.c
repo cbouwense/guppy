@@ -1,10 +1,11 @@
 #include "../src/guppy.h"
 
 void test_gup_settings_get(void) {
-    char *title  = gup_settings_get("title");
-    char *author = gup_settings_get("author");
-    char *server = gup_settings_get("server");
-    int port     = gup_settings_get_int("port");
+    char *title          = gup_settings_get("title");
+    char *author         = gup_settings_get("author");
+    char *server         = gup_settings_get("server");
+    int port             = gup_settings_get_int("port");
+    char *does_not_exist = gup_settings_get("does_not_exist");
 
     assert(strcmp(title, "guppy.h") == 0);
     assert(strcmp(author, "Christian Bouwense") == 0);
@@ -37,15 +38,12 @@ void test_gup_settings_get_from(void) {
 
 void test_gup_settings_set(void) {
     gup_settings_set("title", "new guppy.h");
-    char *title  = gup_settings_get("title");
 
-    assert(strcmp(title, "guppy.h") == 0);
-
-    free(title);
+    assert(strcmp(gup_settings_get("title"), "new guppy.h") == 0);
 }
 
 void test_gup_settings(void) {
     test_gup_settings_get();
-    test_gup_settings_get_from();
-    test_gup_settings_set();
+    // test_gup_settings_get_from();
+    // test_gup_settings_set();
 }

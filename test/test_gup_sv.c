@@ -1,5 +1,33 @@
 #include "../src/guppy.h"
 
+void test_gup_sv_from_cstr(void) {
+    {
+        Gup_String_View sv = gup_sv_from_cstr(NULL);
+
+        assert(sv.length == 0);
+        assert(sv.data == NULL);
+    }
+
+    {
+        Gup_String_View sv = gup_sv_from_cstr("Hello, world!");
+
+        assert(sv.length == 13);
+        assert(sv.data[0] == 'H');
+        assert(sv.data[1] == 'e');
+        assert(sv.data[2] == 'l');
+        assert(sv.data[3] == 'l');
+        assert(sv.data[4] == 'o');
+        assert(sv.data[5] == ',');
+        assert(sv.data[6] == ' ');
+        assert(sv.data[7] == 'w');
+        assert(sv.data[8] == 'o');
+        assert(sv.data[9] == 'r');
+        assert(sv.data[10] == 'l');
+        assert(sv.data[11] == 'd');
+        assert(sv.data[12] == '!');
+    }
+}
+
 void test_gup_sv_trim_left(void) {
     {
         Gup_String_View sv = gup_sv_from_cstr("  Hello, world!  ");
@@ -163,6 +191,7 @@ void test_gup_sv_index_of(void) {
 }
 
 void test_gup_sv(void) {
+    test_gup_sv_from_cstr();
     test_gup_sv_trim_left();
     test_gup_sv_trim_right();
     test_gup_sv_trim();
