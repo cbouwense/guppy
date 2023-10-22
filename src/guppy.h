@@ -666,7 +666,6 @@ char *gup_settings_get_from(const char *key, const char *file_path) {
 
     // If we get here, we didn't find the key.
 defer:
-    printf("result = %s\n", result);
     for (int i = 0; i < line_count; i++) {
         if (settings_lines[i]) free(settings_lines[i]);
     }
@@ -700,10 +699,34 @@ bool gup_settings_set_to(const char *key, const char *value, const char *file_pa
     char **settings_lines = gup_file_read_lines_keep_newlines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
-    // Flatten the lines into a single string
+    // TODO: This block of code is duplicated a couple times. Make a function.
+    // Find the line with the key
     const int line_count = gup_file_line_count(file_path);
+    for (int i = 0; i < line_count; i++) {
+        Gup_String_View line = gup_sv_from_cstr(settings_lines[i]);
+
+        // Skip comments.
+        if (gup_sv_index_of(line, '#') != -1) continue;
+        // Skip section headers.
+        if (gup_sv_index_of(line, '[') != -1) continue;
+
+        Gup_String_View line_key;
+        const bool line_has_an_equals_sign = gup_sv_try_chop_by_delim(&line, '=', &line_key);
+        // Skip lines without an equals sign.
+        if (!line_has_an_equals_sign) continue; 
+        
+        line_key = gup_sv_trim(line_key);
+        // Skip lines that don't match the key.
+        if (!gup_sv_eq(line_key, gup_sv_trim(gup_sv_from_cstr(key)))) continue; 
+
+        // Replace the line with the key with the new value
+        char *new_line = malloc(strlen(key) + strlen(value) + 3);
+        sprintf(new_line, "%s = \"%s\"\n", key, value);
+        settings_lines[i] = new_line;
+    }
+
+    // Flatten the lines into a single string
     char *settings_text = gup_string_array_flatten(settings_lines);
-    printf("settings_text:\n%s\n", settings_text);
 
     // Write to the file
     gup_file_write(file_path, settings_text);

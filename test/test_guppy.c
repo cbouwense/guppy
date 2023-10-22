@@ -20,7 +20,7 @@ void run_all_guppy_tests(void) {
 }
 
 int main(void) {
-    test_gup_sv();
+    test_gup_settings();
 
     #ifdef GUPPY_DEBUG_MEMORY
     _gup_memory_print();
