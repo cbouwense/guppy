@@ -19,7 +19,14 @@ void run_all_guppy_tests(void) {
     test_gup_sv();
 }
 
+void _reset_settings_file(void) {
+    const bool result = gup_file_write("# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n", "./resources/settings.toml");
+
+    gup_assert(result, "Encountered an error while resetting the settings file.\n");
+}
+
 int main(void) {
+    _reset_settings_file();    
     run_all_guppy_tests();
 
     #ifdef GUPPY_DEBUG_MEMORY

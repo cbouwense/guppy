@@ -32,7 +32,7 @@ void   gup_file_print(const char *file_path);
 char  *gup_file_read(const char *file_path);
 char **gup_file_read_lines(const char *file_path);
 char **gup_file_read_lines_keep_newlines(const char *file_path);
-bool   gup_file_write(const char *file_path, const char *text_to_write);
+bool   gup_file_write(const char *text_to_write, const char *file_path);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -60,7 +60,7 @@ char *gup_settings_get(const char *key);
 char *gup_settings_get_from_file(const char *key, const char *file_path);
 int   gup_settings_get_int(const char *key);
 bool  gup_settings_set(const char *key, const char *value);
-bool  gup_settings_set_to_fileo(const char *key, const char *value, const char *file_path);
+bool  gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
 bool  gup_settings_set_int(const char *key, int value);
 
 // String view -------------------------------------------------------------------------------------
@@ -412,7 +412,7 @@ defer:
     return result;
 }
 
-bool gup_file_write(const char *file_path, const char *text_to_write) {
+bool gup_file_write(const char *text_to_write, const char *file_path) {
     bool result = true;
 
     FILE *fp = fopen(file_path, "w");
@@ -691,10 +691,10 @@ int gup_settings_get_int(const char *key) {
 }
 
 bool gup_settings_set(const char *key, const char *value) {
-    return gup_settings_set_to_fileo(key, value, GUP_DEFAULT_SETTINGS_FILE_PATH);
+    return gup_settings_set_to_file(key, value, GUP_DEFAULT_SETTINGS_FILE_PATH);
 }
 
-bool gup_settings_set_to_fileo(const char *key, const char *value, const char *file_path) {
+bool gup_settings_set_to_file(const char *key, const char *value, const char *file_path) {
     // Read the file into memory
     char **settings_lines = gup_file_read_lines_keep_newlines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
@@ -729,7 +729,7 @@ bool gup_settings_set_to_fileo(const char *key, const char *value, const char *f
     char *settings_text = gup_string_array_flatten(settings_lines);
 
     // Write to the file
-    gup_file_write(file_path, settings_text);
+    gup_file_write(settings_text, file_path);
 }
 
 // String view -------------------------------------------------------------------------------------

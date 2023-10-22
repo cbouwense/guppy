@@ -42,10 +42,6 @@ void test_gup_settings_get_from_file(void) {
 void test_gup_settings_set(void) {
     gup_settings_set("title", "asdf.h");
     assert(strcmp(gup_settings_get("title"), "asdf.h") == 0);
-
-    // Reset for other tests
-    gup_settings_set("title", "guppy.h");
-    assert(strcmp(gup_settings_get("title"), "guppy.h") == 0);
 }
 
 void test_gup_settings(void) {
