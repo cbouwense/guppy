@@ -40,8 +40,18 @@ void test_gup_settings_get_from_file(void) {
 }
 
 void test_gup_settings_set(void) {
-    gup_settings_set("title", "asdf.h");
-    assert(strcmp(gup_settings_get("title"), "asdf.h") == 0);
+    { // Setting that exists
+        gup_settings_set("title", "asdf.h");
+
+        assert(strcmp(gup_settings_get("title"), "asdf.h") == 0);
+    }
+
+    { // Setting that doesn't exist
+        gup_settings_set("does_not_exist", "should still show up though");
+
+        assert(gup_settings_get("does_not_exist") != NULL);
+        assert(strcmp(gup_settings_get("does_not_exist"), "should still show up though") == 0);
+    }
 }
 
 void test_gup_settings(void) {

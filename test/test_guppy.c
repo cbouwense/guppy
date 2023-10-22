@@ -26,8 +26,9 @@ void _reset_settings_file(void) {
 }
 
 int main(void) {
-    _reset_settings_file();    
-    run_all_guppy_tests();
+    _reset_settings_file();
+    test_gup_settings();
+    _reset_settings_file();  
 
     #ifdef GUPPY_DEBUG_MEMORY
     _gup_memory_print();

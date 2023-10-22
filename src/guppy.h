@@ -91,6 +91,7 @@ char *gup_string_trim_double_quotes(const char *string);
 char *gup_string_trim_whitespace(const char *string);
 char *gup_string_without_whitespace(const char *string);
 char *gup_string_array_flatten(char **strings);
+
 /**************************************************************************************************
  * Internal implementation                                                                        *
  **************************************************************************************************/
@@ -260,7 +261,7 @@ void gup_file_print(const char *file_path) {
     gup_assert(file_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
     printf("[%s]\n", file_path);
-    const int line_count = gup_file_line_count(file_path);
+    const size_t line_count = (size_t)gup_file_line_count(file_path);
     for (size_t i = 0; i < line_count; i++) {
         if (file_lines[i] != NULL) {
             printf("%ld %s\n", i+1, file_lines[i]);
@@ -695,12 +696,15 @@ bool gup_settings_set(const char *key, const char *value) {
 }
 
 bool gup_settings_set_to_file(const char *key, const char *value, const char *file_path) {
+    bool result = false;
+
     // Read the file into memory
     char **settings_lines = gup_file_read_lines_keep_newlines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
 
     // TODO: This block of code is duplicated a couple times. Make a function.
     // Find the line with the key
+    bool found = false;
     const int line_count = gup_file_line_count(file_path);
     for (int i = 0; i < line_count; i++) {
         Gup_String_View line = gup_sv_from_cstr(settings_lines[i]);
@@ -723,6 +727,34 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
         char *new_line = malloc(strlen(key) + strlen(value) + 3);
         sprintf(new_line, "%s = \"%s\"\n", key, value);
         settings_lines[i] = new_line;
+        found = true;
+    }
+
+    // If we didn't find the key, increase the memory allocated for the array and add the new key
+    // value pair to the end.
+    if (!found) {
+        char **new_settings_lines = malloc((line_count + 2) * sizeof(char *));
+        for (int i = 0; i < line_count; i++) {
+            printf("Copying line %d\n", i);
+            new_settings_lines[i] = settings_lines[i];
+        }
+
+        char *new_line = malloc(strlen(key) + strlen(value) + 3);
+        sprintf(new_line, "%s = \"%s\"\n", key, value);
+        printf("Adding new line: %s\n", new_line);
+        
+        new_settings_lines[line_count-1] = new_line;
+        new_settings_lines[line_count] = NULL;
+
+        gup_print_array_string(new_settings_lines);
+
+        // Flatten the lines into a single string
+        char *new_settings_text = gup_string_array_flatten(new_settings_lines);
+
+        // Write to the file
+        gup_file_write(new_settings_text, file_path);
+
+        gup_defer_return(true);
     }
 
     // Flatten the lines into a single string
@@ -730,6 +762,16 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
 
     // Write to the file
     gup_file_write(settings_text, file_path);
+    
+    free(settings_text);
+
+defer:
+    for (int i = 0; i < line_count; i++) {
+        if (settings_lines[i]) free(settings_lines[i]);
+    }
+    free(settings_lines);
+
+    return result;
 }
 
 // String view -------------------------------------------------------------------------------------
