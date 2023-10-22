@@ -208,6 +208,12 @@ bool gup_file_is_empty(const char *file_path) {
     return line_count == 0;
 }
 
+/*
+ * This will basically tell you what number you would see in a text editor on the last line.
+ * So, if you have a file with 5 lines, the line count will be 5.
+ * If you have a file with 5 lines, but the last line is empty, the line count will be 6.
+ * If you have an absolutely empty file, the line count will be 0.
+ */
 int gup_file_line_count(const char *file_path) {
     int c = 0;
     int line_count = 0;
@@ -222,6 +228,8 @@ int gup_file_line_count(const char *file_path) {
         return -1;
     }
 
+    // If the very first character of the file is the end of the file, then we can say the line
+    // count is 0.
     c = fgetc(fp);
     if (c == EOF) {
         #ifdef GUPPY_VERBOSE
@@ -253,10 +261,10 @@ void gup_file_print(const char *file_path) {
 
     printf("[%s]\n", file_path);
     for (size_t i = 0; file_lines[i] != NULL; i++) {
-        printf("%s\n", file_lines[i]);
+        printf("%ld %s\n", i+1, file_lines[i]);
+        free(file_lines[i]);
     }
-
-    free(file_lines);
+    printf("\n");
 }
 
 char *gup_file_read(const char *file_path) {

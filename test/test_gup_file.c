@@ -1,7 +1,6 @@
 #include "../src/guppy.h"
 
 void test_gup_file_is_empty(void) {
-    gup_print_cwd();
     assert(gup_file_is_empty("./resources/empty.txt") == true);
     assert(gup_file_is_empty("./resources/one_newline.txt") == false);
     assert(gup_file_is_empty("./resources/foo.txt") == false);
@@ -41,6 +40,7 @@ void test_gup_file_read_lines(void) {
     }
 
     { // foo.txt
+        gup_file_print("./resources/foo.txt");
         lines = gup_file_read_lines("./resources/foo.txt");
         assert(strcmp(lines[0], "one") == 0);
         assert(strcmp(lines[1], "twotwo") == 0);
@@ -51,12 +51,14 @@ void test_gup_file_read_lines(void) {
         for (int i = 0; i < gup_file_line_count("./resources/foo.txt") - 1; i++) {
             free(lines[i]);
         }
+        gup_file_print("./resources/foo.txt");
+        gup_file_print("./resources/foo.txt");
     }
 
     { // guppy.h
         lines = gup_file_read_lines("./src/guppy.h");
         assert(strcmp(lines[2], "#ifndef GUPPY_H") == 0);
-        #ifdef GUPPY_DEBUG
+        #ifdef GUPPY_VERBOSE
         gup_print_array_string(lines);
         #endif
 
@@ -67,7 +69,7 @@ void test_gup_file_read_lines(void) {
 
     { // settings.toml
         lines = gup_file_read_lines("./resources/settings.toml");
-        #ifdef GUPPY_DEBUG
+        #ifdef GUPPY_VERBOSE
         gup_print_array_string(lines);
         #endif
 
@@ -131,8 +133,8 @@ void test_gup_file_read_lines_keep_newlines(void) {
 }
 
 void test_gup_file(void) {
-    test_gup_file_is_empty();
+    // test_gup_file_is_empty();
     // test_gup_file_line_count();
-    // test_gup_file_read_lines();
+    test_gup_file_read_lines();
     // test_gup_file_read_lines_keep_newlines();
 }
