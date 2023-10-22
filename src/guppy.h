@@ -57,10 +57,10 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end);
 
 // Settings ----------------------------------------------------------------------------------------
 char *gup_settings_get(const char *key);
-char *gup_settings_get_from(const char *key, const char *file_path);
+char *gup_settings_get_from_file(const char *key, const char *file_path);
 int   gup_settings_get_int(const char *key);
 bool  gup_settings_set(const char *key, const char *value);
-bool  gup_settings_set_to(const char *key, const char *value, const char *file_path);
+bool  gup_settings_set_to_fileo(const char *key, const char *value, const char *file_path);
 bool  gup_settings_set_int(const char *key, int value);
 
 // String view -------------------------------------------------------------------------------------
@@ -630,10 +630,10 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
 const char *GUP_DEFAULT_SETTINGS_FILE_PATH = "./resources/settings.toml";
 
 char *gup_settings_get(const char *key) {
-    return gup_settings_get_from(key, GUP_DEFAULT_SETTINGS_FILE_PATH);
+    return gup_settings_get_from_file(key, GUP_DEFAULT_SETTINGS_FILE_PATH);
 }
 
-char *gup_settings_get_from(const char *key, const char *file_path) {
+char *gup_settings_get_from_file(const char *key, const char *file_path) {
     char *result = NULL;
     
     int line_count = gup_file_line_count(file_path);
@@ -691,10 +691,10 @@ int gup_settings_get_int(const char *key) {
 }
 
 bool gup_settings_set(const char *key, const char *value) {
-    return gup_settings_set_to(key, value, GUP_DEFAULT_SETTINGS_FILE_PATH);
+    return gup_settings_set_to_fileo(key, value, GUP_DEFAULT_SETTINGS_FILE_PATH);
 }
 
-bool gup_settings_set_to(const char *key, const char *value, const char *file_path) {
+bool gup_settings_set_to_fileo(const char *key, const char *value, const char *file_path) {
     // Read the file into memory
     char **settings_lines = gup_file_read_lines_keep_newlines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
