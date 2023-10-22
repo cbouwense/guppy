@@ -669,8 +669,6 @@ char *gup_settings_get_from_file(const char *key, const char *file_path) {
             line_value = gup_sv_trim_left_while(&line_value, &_gup_char_is_doublequote);
             line_value = gup_sv_trim_right_while(&line_value, &_gup_char_is_doublequote);
 
-            printf("Found key \"%s\" with value %s\n", key, gup_sv_to_cstr(line_value));
-
             gup_defer_return(gup_sv_to_cstr(line_value));
         }
     }
@@ -746,18 +744,14 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
     if (!found) {
         char **new_settings_lines = malloc((line_count + 2) * sizeof(char *));
         for (int i = 0; i < line_count; i++) {
-            printf("Copying line %d\n", i);
             new_settings_lines[i] = settings_lines[i];
         }
 
         char *new_line = malloc(strlen(key) + strlen(value) + 3);
         sprintf(new_line, "%s = \"%s\"\n", key, value);
-        printf("Adding new line: %s\n", new_line);
         
         new_settings_lines[line_count-1] = new_line;
         new_settings_lines[line_count] = NULL;
-
-        gup_print_array_string(new_settings_lines);
 
         // Flatten the lines into a single string
         char *new_settings_text = gup_string_array_flatten(new_settings_lines);
@@ -858,6 +852,36 @@ Gup_String_View gup_sv_trim_right(Gup_String_View sv) {
 Gup_String_View gup_sv_trim(Gup_String_View sv) {
     return gup_sv_trim_right(gup_sv_trim_left(sv));
 }
+
+Gup_String_View gup_sv_trim_left_while(Gup_String_View *sv, bool (*predicate)(char x)) {
+    if (sv->length == 0) return *sv;
+    
+    size_t i = 0;
+    // Increment i until we find a character that doesn't match the predicate.
+    while (i < sv->length && predicate(sv->data[i])) i++;
+
+    sv->data += i;
+    sv->length -= i;
+    return *sv;
+}
+
+Gup_String_View gup_sv_trim_right_while(Gup_String_View *sv, bool (*predicate)(char x)) {
+    size_t i = sv->length;
+
+    // Decrement i until we find a character that doesn't match the predicate.
+    while (i > 0 && predicate(sv->data[i-1])) i--;
+
+    sv->length = i;
+    return *sv;
+}
+
+Gup_String_View gup_sv_trim_while(Gup_String_View *sv, bool (*predicate)(char x)) {
+    *sv = gup_sv_trim_left_while(sv, predicate);
+    *sv = gup_sv_trim_right_while(sv, predicate);
+
+    return *sv;
+}
+
 
 Gup_String_View gup_sv_chop_left(Gup_String_View *sv, size_t n) {
     if (n > sv->length) {
@@ -1013,36 +1037,6 @@ bool gup_sv_eq_cstr(Gup_String_View sv, const char *cstr) {
     return gup_sv_eq(sv, gup_sv_from_cstr(cstr));
 }
 
-Gup_String_View gup_sv_trim_left_while(Gup_String_View *sv, bool (*predicate)(char x)) {
-    if (sv->length == 0) return *sv;
-    
-    size_t i = 0;
-    while (i < sv->length && predicate(sv->data[i])) {
-        i++;
-    }
-    
-    sv->data  += i;
-    sv->length -= i;
-    return *sv;
-}
-
-Gup_String_View gup_sv_trim_right_while(Gup_String_View *sv, bool (*predicate)(char x)) {
-    size_t i = sv->length;
-    while (i > 0 && predicate(sv->data[i-1])) {
-        i--;
-    }
-
-    sv->length = i;
-    return *sv;
-}
-
-Gup_String_View gup_sv_trim_while(Gup_String_View *sv, bool (*predicate)(char x)) {
-    *sv = gup_sv_trim_left_while(sv, predicate);
-    *sv = gup_sv_trim_right_while(sv, predicate);
-
-    return *sv;
-}
-
 Gup_String_View gup_sv_take_left_while(Gup_String_View sv, bool (*predicate)(char x)) {
     size_t i = 0;
     while (i < sv.length && predicate(sv.data[i])) {
@@ -1132,11 +1126,10 @@ char *gup_string_array_flatten(char **strings) {
     return result;
 }
 
-// I can't stand strcmp, its API is exactly backwards as far as I'm concerned.
+// I can't stand strcmp. Its API is exactly backwards as far as I'm concerned.
 char gup_cstr_eq(const char *a, const char *b) {
     return strcmp(a, b) == 0;
 }
-
 
 #endif // GUPPY_H
 

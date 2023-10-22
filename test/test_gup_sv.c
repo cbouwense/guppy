@@ -201,27 +201,105 @@ void test_gup_sv_trim_left_while(void) {
         Gup_String_View sv = gup_sv_from_cstr("Hello, world!\"");
         Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
 
-        assert(gup_cstr_eq(trimmed.data, "Hello, world!\""));
+        assert(gup_sv_eq_cstr(trimmed, "Hello, world!\""));
     }
 
-    { // String with double quotes on left
-        Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!\"");
+    { // String with one double quote on left
+        Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!");
         Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
 
-        assert(gup_cstr_eq(trimmed.data, "Hello, world!\""));
+        assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
+    }
+
+    { // String with many double quotes on left
+        Gup_String_View sv = gup_sv_from_cstr("\"\"\"Hello, world!\"");
+        Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "Hello, world!\""));
     }
 
     { // Empty string
         Gup_String_View sv = gup_sv();
         Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
 
-        assert(gup_cstr_eq(trimmed.data, ""));
+        assert(gup_sv_eq_cstr(trimmed, ""));
     }
 }
 
 void test_gup_sv_trim_right_while(void) {
-    
+    { // String with no double quotes on right
+        Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!");
+        Gup_String_View trimmed = gup_sv_trim_right_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "\"Hello, world!"));
+    }
+
+    { // String with one double quote on right
+        Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!\"");
+        Gup_String_View trimmed = gup_sv_trim_right_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "\"Hello, world!"));
+    }
+
+    { // String with many double quotes on right
+        Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!\"\"\"\"");
+        Gup_String_View trimmed = gup_sv_trim_right_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "\"Hello, world!"));
+    }
+
+    { // Empty string
+        Gup_String_View sv = gup_sv();
+        Gup_String_View trimmed = gup_sv_trim_right_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, ""));
+    }
 }
+
+void test_gup_sv_trim_while(void) {
+    { // String with no double quotes
+        Gup_String_View sv = gup_sv_from_cstr("Hello, world!");
+        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
+    }
+
+    { // String with one double quote on left
+        Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!");
+        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
+    }
+
+    { // String with one double quote on left
+        Gup_String_View sv = gup_sv_from_cstr("Hello, world!\"");
+        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
+    }
+
+    { // String with many double quotes on left
+        Gup_String_View sv = gup_sv_from_cstr("\"\"\"Hello, world!\"");
+        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
+    }
+
+    { // String with many double quotes
+        Gup_String_View sv = gup_sv_from_cstr("\"\"\"Hello \" world!\"\"\"\"");
+        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, "Hello \" world!"));
+    }
+
+    { // Empty string
+        Gup_String_View sv = gup_sv();
+        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+
+        assert(gup_sv_eq_cstr(trimmed, ""));
+    }
+}
+
 
 void test_gup_sv(void) {
     test_gup_sv_from_cstr();
@@ -233,4 +311,5 @@ void test_gup_sv(void) {
     test_gup_sv_index_of();
     test_gup_sv_trim_left_while();
     test_gup_sv_trim_right_while();
+    test_gup_sv_trim_while();
 }
