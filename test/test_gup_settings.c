@@ -37,26 +37,15 @@ void test_gup_settings_get_from(void) {
 
 void test_gup_settings_set(void) {
     gup_settings_set("title", "new guppy.h");
-    // gup_settings_set("author", "Christian Bouwense");
-    // gup_settings_set("server", "localhost");
-    // gup_settings_set("port", "5432");
-
     char *title  = gup_settings_get("title");
-    // char *author = gup_settings_get("author");
-    // char *server = gup_settings_get("server");
-    // int port     = gup_settings_get_int("port");
 
     assert(strcmp(title, "guppy.h") == 0);
-    // assert(strcmp(author, "Christian Bouwense") == 0);
-    // assert(strcmp(server, "localhost") == 0);
-    // assert(port == 5432);
 
     free(title);
-    // free(author);
-    // free(server);
 }
 
 void test_gup_settings(void) {
     test_gup_settings_get();
     test_gup_settings_get_from();
+    test_gup_settings_set();
 }

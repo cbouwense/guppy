@@ -90,7 +90,7 @@ bool             gup_sv_is_empty(Gup_String_View sv);
 char *gup_string_trim_double_quotes(const char *string);
 char *gup_string_trim_whitespace(const char *string);
 char *gup_string_without_whitespace(const char *string);
-char *gup_flatten_strings(char **strings, int count);
+char *gup_string_array_flatten(char **strings, int count);
 /**************************************************************************************************
  * Internal implementation                                                                        *
  **************************************************************************************************/
@@ -689,105 +689,18 @@ bool gup_settings_set(const char *key, const char *value) {
     return gup_settings_set_to(key, value, GUP_DEFAULT_SETTINGS_FILE_PATH);
 }
 
-// First, we read the file into memory. Then, we iterate through the lines, looking for the key.
-// If we find the key, we replace the value. If we don't find the key, we append the key-value pair
-// to the end of the file.
-/*
 bool gup_settings_set_to(const char *key, const char *value, const char *file_path) {
-    bool result = true;
-    bool found = false;
-    
-    int line_count = gup_file_line_count(file_path);
-    gup_assert(line_count != -1, GUP_DEFAULT_FILE_ERROR_MESSAGE);
-    gup_assert(line_count != 0, "The settings file is empty. You should probably add some settings to it.");
-
-    char **settings_lines = gup_file_read_lines(file_path);
+    // Read the file into memory
+    char **settings_lines = gup_file_read_lines_keep_newlines(file_path);
     gup_assert(settings_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
+    gup_print_array_string(settings_lines);
 
-    char **new_settings_lines = malloc((line_count + 1) * sizeof(char *));
-
-    for (int i = 0; i < line_count; i++) {
-        if (settings_lines[i] == NULL) continue;
-
-        Gup_String_View line = gup_sv_from_cstr(settings_lines[i]);
-
-        // Skip comments.
-        if (gup_sv_index_of(line, '#') != -1) {
-            new_settings_lines[i] = malloc(strlen(settings_lines[i]) + 1);
-            strcpy(new_settings_lines[i], settings_lines[i]);
-            continue;
-        }
-        // Skip section headers.
-        if (gup_sv_index_of(line, '[') != -1) {
-            new_settings_lines[i] = malloc(strlen(settings_lines[i]) + 1);
-            strcpy(new_settings_lines[i], settings_lines[i]);
-            continue;
-        }
-
-        Gup_String_View line_key;
-        const bool line_has_an_equals_sign = gup_sv_try_chop_by_delim(&line, '=', &line_key);
-        // Skip lines without an equals sign.
-        if (!line_has_an_equals_sign) {
-            new_settings_lines[i] = malloc(strlen(settings_lines[i]) + 1);
-            strcpy(new_settings_lines[i], settings_lines[i]);
-            continue;
-        }
-        
-        line_key = gup_sv_trim(line_key);
-        // Skip lines that don't match the key.
-        if (!gup_sv_eq(line_key, gup_sv_trim(gup_sv_from_cstr(key)))) {
-            new_settings_lines[i] = malloc(strlen(settings_lines[i]) + 1);
-            strcpy(new_settings_lines[i], settings_lines[i]);
-            continue;
-        } 
-
-        // If we get here, we found the key. Replace the value.
-        found = true;
-        char *new_line = malloc(strlen(key) + strlen(value) + 3);
-        sprintf(new_line, "%s = \"%s\"", key, value);
-        strcpy(new_settings_lines[i], new_line);
-    }
-
-    char *new_settings;
-    if (!found) {
-        char *new_line = malloc(strlen(key) + strlen(value) + 3);
-        sprintf(new_line, "%s = \"%s\"", key, value);
-        // Allocate room for one more line in the settings lines with realloc
-        // TODO: with realloc?
-        new_settings_lines = malloc((line_count + 2) * sizeof(char *));
-
-        strcpy(new_settings_lines[line_count], new_line);
-        new_settings_lines[line_count + 1] = NULL;
-
-        new_settings = gup_flatten_strings(new_settings_lines, line_count + 1);
-    } else {
-        new_settings_lines[line_count] = NULL;
-
-        new_settings = gup_flatten_strings(new_settings_lines, line_count);
-    }
-
-    // Write the new settings lines to the file.
-    
-    gup_file_write(file_path, new_settings);
-
-defer:
-    for (int i = 0; i < line_count; i++) {
-        if (settings_lines[i]) {
-            free(settings_lines[i]);
-        }
-    }
-    free(settings_lines);
-
-    return result;
+    // Flatten the lines into a single string
+    const int line_count = gup_file_line_count(file_path);
+    char *settings_text = gup_string_array_flatten(settings_lines, line_count);
 }
-*/
-bool gup_settings_set_to(const char *key, const char *value, const char *file_path) {
-    printf("gup_settings_set_to is not implemented yet.\n");
-    printf("key: %s\n", key);
-    printf("value: %s\n", value);
-    printf("file_path: %s\n", file_path);
-    return false;
-}
+
+
 // String view -------------------------------------------------------------------------------------
 
 /*
@@ -1086,7 +999,7 @@ char *gup_string_without_whitespace(const char *string) {
     return new_string;
 }
 
-char *gup_flatten_strings(char **strings, int count) {
+char *gup_string_array_flatten(char **strings, int count) {
     // Calculate the total length of all the strings.
     int total_length = 0;
     for (int i = 0; i < count; i++) {
@@ -1095,9 +1008,7 @@ char *gup_flatten_strings(char **strings, int count) {
 
     // Allocate a new buffer to hold the flattened string.
     char *result = malloc(total_length + 1);
-    if (result == NULL) {
-        return NULL;
-    }
+    if (result == NULL) return NULL;
 
     // Copy each string into the buffer.
     int offset = 0;
