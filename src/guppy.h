@@ -71,9 +71,9 @@ char            *gup_sv_to_cstr(Gup_String_View sv);
 Gup_String_View  gup_sv_trim_left(Gup_String_View sv);
 Gup_String_View  gup_sv_trim_right(Gup_String_View sv);
 Gup_String_View  gup_sv_trim(Gup_String_View sv);
-Gup_String_View  gup_sv_trim_left_while(Gup_String_View *sv, bool (*predicate)(char x));
-Gup_String_View  gup_sv_trim_right_while(Gup_String_View *sv, bool (*predicate)(char x));
-Gup_String_View  gup_sv_trim_while(Gup_String_View *sv, bool (*predicate)(char x));
+Gup_String_View  gup_sv_trim_char_left(Gup_String_View *sv, char c);
+Gup_String_View  gup_sv_trim_char_right(Gup_String_View *sv, char c);
+Gup_String_View  gup_sv_trim_char(Gup_String_View *sv, char c);
 Gup_String_View  gup_sv_take_left_while(Gup_String_View sv, bool (*predicate)(char x));
 Gup_String_View  gup_sv_chop_by_delim(Gup_String_View *sv, char delim);
 Gup_String_View  gup_sv_chop_by_sv(Gup_String_View *sv, Gup_String_View thicc_delim);
@@ -664,10 +664,12 @@ char *gup_settings_get_from_file(const char *key, const char *file_path) {
         const char* line = settings_lines[i];
         if (_gup_does_setting_file_line_contain_key(gup_sv_from_cstr(line), gup_sv_from_cstr(key))) {
             Gup_String_View line = gup_sv_from_cstr(settings_lines[i]);
+
             gup_sv_chop_by_delim(&line, '='); // Chop off the key.
+
             Gup_String_View line_value = gup_sv_trim(line);
-            line_value = gup_sv_trim_left_while(&line_value, &_gup_char_is_doublequote);
-            line_value = gup_sv_trim_right_while(&line_value, &_gup_char_is_doublequote);
+
+            line_value = gup_sv_trim_char(&line_value, '"');
 
             gup_defer_return(gup_sv_to_cstr(line_value));
         }
@@ -853,31 +855,31 @@ Gup_String_View gup_sv_trim(Gup_String_View sv) {
     return gup_sv_trim_right(gup_sv_trim_left(sv));
 }
 
-Gup_String_View gup_sv_trim_left_while(Gup_String_View *sv, bool (*predicate)(char x)) {
+Gup_String_View gup_sv_trim_char_left(Gup_String_View *sv, char c) {
     if (sv->length == 0) return *sv;
     
     size_t i = 0;
     // Increment i until we find a character that doesn't match the predicate.
-    while (i < sv->length && predicate(sv->data[i])) i++;
+    while (i < sv->length && sv->data[i] == c) i++;
 
     sv->data += i;
     sv->length -= i;
     return *sv;
 }
 
-Gup_String_View gup_sv_trim_right_while(Gup_String_View *sv, bool (*predicate)(char x)) {
+Gup_String_View gup_sv_trim_char_right(Gup_String_View *sv, char c) {
     size_t i = sv->length;
 
     // Decrement i until we find a character that doesn't match the predicate.
-    while (i > 0 && predicate(sv->data[i-1])) i--;
+    while (i > 0 && sv->data[i-1] == c) i--;
 
     sv->length = i;
     return *sv;
 }
 
-Gup_String_View gup_sv_trim_while(Gup_String_View *sv, bool (*predicate)(char x)) {
-    *sv = gup_sv_trim_left_while(sv, predicate);
-    *sv = gup_sv_trim_right_while(sv, predicate);
+Gup_String_View gup_sv_trim_char(Gup_String_View *sv, char c) {
+    *sv = gup_sv_trim_char_left(sv, c);
+    *sv = gup_sv_trim_char_right(sv, c);
 
     return *sv;
 }

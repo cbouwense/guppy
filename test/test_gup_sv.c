@@ -196,105 +196,105 @@ void test_gup_sv_index_of(void) {
     }
 }
 
-void test_gup_sv_trim_left_while(void) {
+void test_gup_sv_trim_char_left(void) {
     { // String with no double quotes on left
         Gup_String_View sv = gup_sv_from_cstr("Hello, world!\"");
-        Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char_left(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "Hello, world!\""));
     }
 
     { // String with one double quote on left
         Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!");
-        Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char_left(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
     }
 
     { // String with many double quotes on left
         Gup_String_View sv = gup_sv_from_cstr("\"\"\"Hello, world!\"");
-        Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char_left(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "Hello, world!\""));
     }
 
     { // Empty string
         Gup_String_View sv = gup_sv();
-        Gup_String_View trimmed = gup_sv_trim_left_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char_left(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, ""));
     }
 }
 
-void test_gup_sv_trim_right_while(void) {
+void test_gup_sv_trim_char_right(void) {
     { // String with no double quotes on right
         Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!");
-        Gup_String_View trimmed = gup_sv_trim_right_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char_right(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "\"Hello, world!"));
     }
 
     { // String with one double quote on right
         Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!\"");
-        Gup_String_View trimmed = gup_sv_trim_right_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char_right(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "\"Hello, world!"));
     }
 
     { // String with many double quotes on right
         Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!\"\"\"\"");
-        Gup_String_View trimmed = gup_sv_trim_right_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char_right(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "\"Hello, world!"));
     }
 
     { // Empty string
         Gup_String_View sv = gup_sv();
-        Gup_String_View trimmed = gup_sv_trim_right_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char_right(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, ""));
     }
 }
 
-void test_gup_sv_trim_while(void) {
+void test_gup_sv_trim_char(void) {
     { // String with no double quotes
         Gup_String_View sv = gup_sv_from_cstr("Hello, world!");
-        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
     }
 
     { // String with one double quote on left
         Gup_String_View sv = gup_sv_from_cstr("\"Hello, world!");
-        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
     }
 
     { // String with one double quote on left
         Gup_String_View sv = gup_sv_from_cstr("Hello, world!\"");
-        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
     }
 
     { // String with many double quotes on left
         Gup_String_View sv = gup_sv_from_cstr("\"\"\"Hello, world!\"");
-        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "Hello, world!"));
     }
 
     { // String with many double quotes
         Gup_String_View sv = gup_sv_from_cstr("\"\"\"Hello \" world!\"\"\"\"");
-        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, "Hello \" world!"));
     }
 
     { // Empty string
         Gup_String_View sv = gup_sv();
-        Gup_String_View trimmed = gup_sv_trim_while(&sv, _gup_char_is_doublequote);
+        Gup_String_View trimmed = gup_sv_trim_char(&sv, '"');
 
         assert(gup_sv_eq_cstr(trimmed, ""));
     }
@@ -309,7 +309,7 @@ void test_gup_sv(void) {
     test_gup_sv_chop_by_delim();
     test_gup_sv_try_chop_by_delim();
     test_gup_sv_index_of();
-    test_gup_sv_trim_left_while();
-    test_gup_sv_trim_right_while();
-    test_gup_sv_trim_while();
+    test_gup_sv_trim_char_left();
+    test_gup_sv_trim_char_right();
+    test_gup_sv_trim_char();
 }
