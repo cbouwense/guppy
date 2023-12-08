@@ -185,6 +185,7 @@ void test_gup_file_write(void) {
     bool result = true;
     char* file_contents;
 
+    gup_file_delete("./resources/empty_write.txt");
     gup_file_delete("./resources/hello.txt");
     gup_file_delete("./resources/hello_world.txt");
 
@@ -210,6 +211,39 @@ void test_gup_file_write(void) {
     }
 }
 
+void test_gup_file_write_lines(void) {
+    bool result = true;
+    char *file_contents;
+
+    gup_file_delete("./resources/empty_write_lines.txt");
+    gup_file_delete("./resources/hello_lines.txt");
+    gup_file_delete("./resources/hello_world_lines.txt");
+
+    { // No lines write
+        const char *lines[] = {0};
+        result = gup_file_write_lines(lines, 0, "./resources/empty_write_lines.txt");
+        file_contents = gup_file_read("./resources/empty_write_lines.txt");
+        assert(result);
+        assert(strcmp("", file_contents) == 0);
+    }
+
+    { // Single line write
+        const char *lines[] = {"Hello"};
+        result = gup_file_write_lines(lines, 1, "./resources/hello_lines.txt");
+        file_contents = gup_file_read("./resources/hello_lines.txt");
+        assert(result);
+        assert(strcmp("Hello\n", file_contents) == 0);
+    }
+
+    { // Multi line write
+        const char *lines[] = {"Hello", "World", ""};
+        result = gup_file_write_lines(lines, 3, "./resources/hello_world_lines.txt");
+        file_contents = gup_file_read("./resources/hello_world_lines.txt");
+        assert(result);
+        assert(strcmp("Hello\nWorld\n\n", file_contents) == 0);
+    }
+}
+
 void test_gup_file(void) {
     test_gup_file_is_empty();
     test_gup_file_line_count();
@@ -217,4 +251,5 @@ void test_gup_file(void) {
     test_gup_file_read_lines();
     test_gup_file_read_lines_keep_newlines();
     test_gup_file_write();
+    test_gup_file_write_lines();
 }
