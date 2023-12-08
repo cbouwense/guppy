@@ -260,42 +260,43 @@ defer:
     return result;
 }
 
-// TODO: for some reason this cuts off the final character of the final line.
 void gup_file_print(const char *file_path) {
-    char **file_lines = gup_file_read_lines(file_path);
-    gup_assert(file_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
-
     printf("[%s]\n", file_path);
+    char **file_lines = gup_file_read_lines(file_path);
+    if (file_lines == NULL) return;
+
     const int line_count = gup_file_line_count(file_path);
     for (int i = 0; i < line_count; i++) {
         if (file_lines[i] != NULL) {
             printf("%s\n", file_lines[i]);
             free(file_lines[i]);
         } else {
-            printf("%d\n", i+1);
+            // if there is an empty last line
+            printf("\n");
         }
     }
-    printf("\n");
 }
 
-// TODO: for some reason this cuts off the final character of the final line.
 void gup_file_print_lines(const char *file_path) {
+     printf("[%s]\n", file_path);
     char **file_lines = gup_file_read_lines(file_path);
-    gup_assert(file_lines != NULL, GUP_DEFAULT_FILE_ERROR_MESSAGE);
+    if (file_lines == NULL) return;
 
-    printf("[%s]\n", file_path);
     const int line_count = gup_file_line_count(file_path);
     for (int i = 0; i < line_count; i++) {
-        if (file_lines[i] != NULL) {
+        if (file_lines[i] != NULL) { // 
             printf("%d %s\n", i+1, file_lines[i]);
             free(file_lines[i]);
         } else {
-            printf("%d\n", i+1);
+            // if there is an empty last line
+            printf("%d", i+1);
         }
     }
     printf("\n");
 }
 
+// TODO: Do I actually just want to return a result code for each function?
+// I should maybe research some other libraries to see what they do.
 char *gup_file_read(const char *file_path) {
     char *result;
     char *buffer;

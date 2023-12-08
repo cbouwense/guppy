@@ -1,3 +1,4 @@
+// #define GUPPY_VERBOSE
 #include "../src/guppy.h"
 
 void test_gup_file_is_empty(void) {
@@ -244,6 +245,22 @@ void test_gup_file_write_lines(void) {
     }
 }
 
+void test_gup_file_print(void) {
+    gup_file_print("./resources/doesnotexist.txt");
+    gup_file_print("./resources/empty.txt");
+    gup_file_print("./resources/one_newline.txt");
+    gup_file_print("./resources/foo.txt");
+    gup_file_print("./resources/settings.toml");
+}
+
+void test_gup_file_print_lines(void) {
+    gup_file_print_lines("./resources/doesnotexist.txt");
+    gup_file_print_lines("./resources/empty.txt");
+    gup_file_print_lines("./resources/one_newline.txt");
+    gup_file_print_lines("./resources/foo.txt");
+    gup_file_print_lines("./resources/settings.toml");
+}
+
 void test_gup_file(void) {
     test_gup_file_is_empty();
     test_gup_file_line_count();
@@ -252,4 +269,8 @@ void test_gup_file(void) {
     test_gup_file_read_lines_keep_newlines();
     test_gup_file_write();
     test_gup_file_write_lines();
+    #ifdef GUPPY_VERBOSE
+    test_gup_file_print();
+    test_gup_file_print_lines();
+    #endif // GUPPY_VERBOSE
 }
