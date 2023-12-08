@@ -23,6 +23,42 @@ void test_gup_file_line_count(void) {
     assert(line_count == 13111);
 }
 
+void test_gup_file_read(void) {
+    char *file_contents = NULL;
+    
+    { // File that does not exist should return NULL
+        file_contents = gup_file_read("./resources/doesnotexist.txt");
+        assert(file_contents == NULL);
+    }
+
+    { // empty.txt
+        file_contents = gup_file_read("./resources/empty.txt");
+        assert(strcmp(file_contents, "") == 0);
+    }
+
+    { // one_newline.txt
+        file_contents = gup_file_read("./resources/one_newline.txt");
+        assert(strcmp(file_contents, "\n") == 0);
+
+        free(file_contents);
+    }
+
+    { // foo.txt
+        file_contents = gup_file_read("./resources/foo.txt");
+        assert(strcmp(file_contents, "one\ntwotwo\nthree three three\n\n") == 0);
+
+        free(file_contents);
+    }
+
+    { // settings.toml
+        file_contents = gup_file_read("./resources/settings.toml");
+        
+        assert(strcmp(file_contents, "# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n") == 0);
+
+        free(file_contents);
+    }
+}
+
 void test_gup_file_read_lines(void) {
     char **lines = NULL;
     
@@ -145,9 +181,40 @@ void test_gup_file_read_lines_keep_newlines(void) {
     }
 }
 
+void test_gup_file_write(void) {
+    bool result = true;
+    char* file_contents;
+
+    gup_file_delete("./resources/hello.txt");
+    gup_file_delete("./resources/hello_world.txt");
+
+    { // Empty line write
+        result = gup_file_write("", "./resources/empty_write.txt");
+        file_contents = gup_file_read("./resources/empty_write.txt");
+        assert(result);
+        assert(strcmp("", file_contents) == 0);
+    }
+
+    { // Single line write
+        result = gup_file_write("Hello", "./resources/hello.txt");
+        file_contents = gup_file_read("./resources/hello.txt");
+        assert(result);
+        assert(strcmp("Hello", file_contents) == 0);
+    }
+
+    { // Multi line write
+        result = gup_file_write("Hello\nWorld\n", "./resources/hello_world.txt");
+        file_contents = gup_file_read("./resources/hello_world.txt");
+        assert(result);
+        assert(strcmp("Hello\nWorld\n", file_contents) == 0);
+    }
+}
+
 void test_gup_file(void) {
     test_gup_file_is_empty();
     test_gup_file_line_count();
+    test_gup_file_read();
     test_gup_file_read_lines();
     test_gup_file_read_lines_keep_newlines();
+    test_gup_file_write();
 }

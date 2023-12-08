@@ -33,6 +33,7 @@ char  *gup_file_read(const char *file_path);
 char **gup_file_read_lines(const char *file_path);
 char **gup_file_read_lines_keep_newlines(const char *file_path);
 bool   gup_file_write(const char *text_to_write, const char *file_path);
+bool   gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -296,12 +297,6 @@ char *gup_file_read(const char *file_path) {
     rewind(fp);
 
     buffer = (char*) malloc(file_size + 1);
-    if (buffer == NULL) {
-        #ifdef GUPPY_VERBOSE
-        printf("Failed to allocate memory for file %s\n", file_path);
-        #endif
-        gup_defer_return(NULL);
-    }
 
     size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
     if (bytes_read != file_size) {
@@ -426,6 +421,28 @@ bool gup_file_write(const char *text_to_write, const char *file_path) {
     }
 
     fprintf(fp, "%s", text_to_write);
+
+defer:
+    fclose(fp);
+    return result;
+}
+
+bool gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path) {
+    bool result = true;
+
+    if (!gup_file_delete(file_path)) {
+        return false;
+    }
+    
+    FILE *fp = fopen(file_path, "a");
+    if (fp == NULL) {
+        printf("Failed to open file %s\n", file_path);
+        gup_defer_return(false);
+    }
+
+    for (int i = 0; i < line_count; i++) {
+        fputs(lines_to_write[i], fp);
+    }
 
 defer:
     fclose(fp);
