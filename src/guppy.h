@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,9 +17,20 @@ typedef struct {
     const char *data;
 } Gup_String_View;
 
+typedef struct {
+    int  capacity;
+    int  length;
+    int *data;
+} Gup_Array_Int;
+
 /**************************************************************************************************
  * Public API                                                                                     *
  **************************************************************************************************/
+
+// Dynamic arrays ----------------------------------------------------------------------------------
+Gup_Array_Int *gup_array_int();
+void           gup_array_int_append(Gup_Array_Int *xs, int i);
+Gup_Array_Int *gup_array_int_from(const int xs[], const int size);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -103,6 +115,42 @@ char  gup_cstr_eq(const char *a, const char *b);
 
 typedef unsigned int uint;
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
+
+// Dynamic Arrays ----------------------------------------------------------------------------------
+
+Gup_Array_Int *gup_array_int() {
+    Gup_Array_Int *ints = malloc(sizeof(Gup_Array_Int));
+    
+    ints->capacity = 0;
+    ints->length = 0;
+    ints->data = NULL;
+
+    return ints;
+}
+
+void gup_array_int_append(Gup_Array_Int *xs, int i) {
+    if (xs->length == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(int));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->length] = i;
+    xs->length++;
+}
+
+Gup_Array_Int *gup_array_int_from(const int xs[], const int size)  {
+    Gup_Array_Int *ints = malloc(sizeof(Gup_Array_Int));
+    ints->data = malloc(size * sizeof(int));
+
+    ints->capacity = size;
+    ints->length = size;
+    for (int i = 0; i < size; i++) {
+        ints->data[i] = xs[i];
+    }
+
+    return ints;
+}
 
 // Assert ------------------------------------------------------------------------------------------
 

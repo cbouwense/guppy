@@ -5,6 +5,7 @@
 // #define GUPPY_DEBUG_MEMORY
 #include "../src/guppy.h"
 
+#include "./test_gup_array.c"
 #include "./test_gup_file.c"
 #include "./test_gup_print_array_string.c"
 #include "./test_gup_settings.c"
@@ -20,6 +21,7 @@ void _reset_settings_file(void) {
 void run_all_guppy_tests(void) {
     _reset_settings_file();
     
+    test_gup_array();
     test_gup_file();
     // test_gup_print_array_string();
     test_gup_settings();
@@ -30,12 +32,14 @@ void run_all_guppy_tests(void) {
     #ifdef GUPPY_DEBUG_MEMORY
     _gup_memory_print();
     #endif
-
+    
     printf("All tests passed!\n");
 }
 
 int main(void) {
-    run_all_guppy_tests();
+    // run_all_guppy_tests();
+
+    test_gup_array();
 
     return 0;
 }
