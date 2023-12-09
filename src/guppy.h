@@ -18,6 +18,12 @@ typedef struct {
 } Gup_String_View;
 
 typedef struct {
+    int   capacity;
+    int   count;
+    bool *data;
+} Gup_Array_Bool;
+
+typedef struct {
     int    capacity;
     int    count;
     float *data;
@@ -34,15 +40,20 @@ typedef struct {
  **************************************************************************************************/
 
 // Dynamic arrays ----------------------------------------------------------------------------------
+Gup_Array_Bool  *gup_array_bool();
+Gup_Array_Bool  *gup_array_bool_from(const bool xs[], const int size);
+void             gup_array_bool_append(Gup_Array_Bool *xs, bool x);
+void             gup_array_bool_prepend(Gup_Array_Bool *xs, bool x);
+
 Gup_Array_Float *gup_array_float();
 Gup_Array_Float *gup_array_float_from(const float xs[], const int size);
 void             gup_array_float_append(Gup_Array_Float *xs, float x);
 void             gup_array_float_prepend(Gup_Array_Float *xs, float x);
 
-Gup_Array_Int *gup_array_int();
-Gup_Array_Int *gup_array_int_from(const int xs[], const int size);
-void           gup_array_int_append(Gup_Array_Int *xs, int i);
-void           gup_array_int_prepend(Gup_Array_Int *xs, int i);
+Gup_Array_Int   *gup_array_int();
+Gup_Array_Int   *gup_array_int_from(const int xs[], const int size);
+void             gup_array_int_append(Gup_Array_Int *xs, int i);
+void             gup_array_int_prepend(Gup_Array_Int *xs, int i);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -129,6 +140,54 @@ typedef unsigned int uint;
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 
 // Dynamic Arrays ----------------------------------------------------------------------------------
+
+Gup_Array_Bool *gup_array_bool() {
+    Gup_Array_Bool *xs = malloc(sizeof(Gup_Array_Bool));
+    
+    xs->capacity = 0;
+    xs->count = 0;
+    xs->data = NULL;
+
+    return xs;
+}
+
+Gup_Array_Bool *gup_array_bool_from(const bool xs[], const int size)  {
+    Gup_Array_Bool *bools = gup_array_bool();
+    bools->data = malloc(size * sizeof(bool));
+
+    bools->capacity = size;
+    bools->count = size;
+    for (int i = 0; i < size; i++) {
+        bools->data[i] = xs[i];
+    }
+
+    return bools;
+}
+
+void gup_array_bool_append(Gup_Array_Bool *xs, bool x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(bool));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_bool_prepend(Gup_Array_Bool *xs, bool x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(bool));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
 
 Gup_Array_Float *gup_array_float() {
     Gup_Array_Float *xs = malloc(sizeof(Gup_Array_Float));

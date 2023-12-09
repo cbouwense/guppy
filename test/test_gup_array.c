@@ -1,81 +1,81 @@
 #include "../src/guppy.h"
 
-void test_gup_array_int(void) {
-    Gup_Array_Int *ints;
+void test_gup_array_bool(void) {
+    Gup_Array_Bool *bools;
 
     { // Empty
-        ints = gup_array_int();
+        bools = gup_array_bool();
 
-        assert(ints->capacity == 0);
-        assert(ints->count == 0);
-        assert(ints->data == NULL);
+        assert(bools->capacity == 0);
+        assert(bools->count == 0);
+        assert(bools->data == NULL);
     }
 
     { // From a few elements
-        const int xs[] = {1, 2, 3};
-        ints = gup_array_int_from(xs, sizeof(xs) / sizeof(int));
+        const bool xs[] = {true, false, true};
+        bools = gup_array_bool_from(xs, sizeof(xs) / sizeof(bool));
 
-        assert(ints->capacity == 3);
-        assert(ints->count == 3);
-        assert(ints->data[0] == 1);
-        assert(ints->data[1] == 2);
-        assert(ints->data[2] == 3);
+        assert(bools->capacity == 3);
+        assert(bools->count == 3);
+        assert(bools->data[0] == true);
+        assert(bools->data[1] == false);
+        assert(bools->data[2] == true);
     }
 
     { // Append
-        ints = gup_array_int();
-        gup_array_int_append(ints, 42);
+        bools = gup_array_bool();
+        gup_array_bool_append(bools, true);
         
-        assert(ints->capacity == 1);
-        assert(ints->count == 1);
-        assert(ints->data[0] == 42);
+        assert(bools->capacity == 1);
+        assert(bools->count == 1);
+        assert(bools->data[0] == true);
 
-        gup_array_int_append(ints, 17);
-        gup_array_int_append(ints, 38);
-        gup_array_int_append(ints, 1);
-        gup_array_int_append(ints, 3);
-        gup_array_int_append(ints, 3);
-        gup_array_int_append(ints, 7);
+        gup_array_bool_append(bools, true);
+        gup_array_bool_append(bools, false);
+        gup_array_bool_append(bools, true);
+        gup_array_bool_append(bools, true);
+        gup_array_bool_append(bools, false);
+        gup_array_bool_append(bools, false);
 
-        assert(ints->capacity == 8);
-        assert(ints->count == 7);
-        assert(ints->data[0] == 42);
-        assert(ints->data[1] == 17);
-        assert(ints->data[2] == 38);
-        assert(ints->data[3] == 1);
-        assert(ints->data[4] == 3);
-        assert(ints->data[5] == 3);
-        assert(ints->data[6] == 7);
+        assert(bools->capacity == 8);
+        assert(bools->count == 7);
+        assert(bools->data[0] == true);
+        assert(bools->data[1] == true);
+        assert(bools->data[2] == false);
+        assert(bools->data[3] == true);
+        assert(bools->data[4] == true);
+        assert(bools->data[5] == false);
+        assert(bools->data[6] == false);
     }
 
     { // Prepend
-        ints = gup_array_int();
-        gup_array_int_prepend(ints, 42);
+        bools = gup_array_bool();
+        gup_array_bool_prepend(bools, true);
         
-        assert(ints->capacity == 1);
-        assert(ints->count == 1);
-        assert(ints->data[0] == 42);
+        assert(bools->capacity == 1);
+        assert(bools->count == 1);
+        assert(bools->data[0] == true);
 
-        gup_array_int_prepend(ints, 17);
-        gup_array_int_prepend(ints, 38);
-        gup_array_int_prepend(ints, 1);
-        gup_array_int_prepend(ints, 3);
-        gup_array_int_prepend(ints, 3);
-        gup_array_int_prepend(ints, 7);
+        gup_array_bool_prepend(bools, true);
+        gup_array_bool_prepend(bools, false);
+        gup_array_bool_prepend(bools, true);
+        gup_array_bool_prepend(bools, true);
+        gup_array_bool_prepend(bools, false);
+        gup_array_bool_prepend(bools, false);
 
-        assert(ints->capacity == 8);
-        assert(ints->count == 7);
-        assert(ints->data[0] == 7);
-        assert(ints->data[1] == 3);
-        assert(ints->data[2] == 3);
-        assert(ints->data[3] == 1);
-        assert(ints->data[4] == 38);
-        assert(ints->data[5] == 17);
-        assert(ints->data[6] == 42);
+        assert(bools->capacity == 8);
+        assert(bools->count == 7);
+        assert(bools->data[0] == false);
+        assert(bools->data[1] == false);
+        assert(bools->data[2] == true);
+        assert(bools->data[3] == true);
+        assert(bools->data[4] == false);
+        assert(bools->data[5] == true);
+        assert(bools->data[6] == true);
     }
 
-    free(ints->data);
-    free(ints);
+    free(bools->data);
+    free(bools);
 }
 
 void test_gup_array_float(void) {
@@ -156,9 +156,88 @@ void test_gup_array_float(void) {
     free(floats);
 }
 
+void test_gup_array_int(void) {
+    Gup_Array_Int *ints;
+
+    { // Empty
+        ints = gup_array_int();
+
+        assert(ints->capacity == 0);
+        assert(ints->count == 0);
+        assert(ints->data == NULL);
+    }
+
+    { // From a few elements
+        const int xs[] = {1, 2, 3};
+        ints = gup_array_int_from(xs, sizeof(xs) / sizeof(int));
+
+        assert(ints->capacity == 3);
+        assert(ints->count == 3);
+        assert(ints->data[0] == 1);
+        assert(ints->data[1] == 2);
+        assert(ints->data[2] == 3);
+    }
+
+    { // Append
+        ints = gup_array_int();
+        gup_array_int_append(ints, 42);
+        
+        assert(ints->capacity == 1);
+        assert(ints->count == 1);
+        assert(ints->data[0] == 42);
+
+        gup_array_int_append(ints, 17);
+        gup_array_int_append(ints, 38);
+        gup_array_int_append(ints, 1);
+        gup_array_int_append(ints, 3);
+        gup_array_int_append(ints, 3);
+        gup_array_int_append(ints, 7);
+
+        assert(ints->capacity == 8);
+        assert(ints->count == 7);
+        assert(ints->data[0] == 42);
+        assert(ints->data[1] == 17);
+        assert(ints->data[2] == 38);
+        assert(ints->data[3] == 1);
+        assert(ints->data[4] == 3);
+        assert(ints->data[5] == 3);
+        assert(ints->data[6] == 7);
+    }
+
+    { // Prepend
+        ints = gup_array_int();
+        gup_array_int_prepend(ints, 42);
+        
+        assert(ints->capacity == 1);
+        assert(ints->count == 1);
+        assert(ints->data[0] == 42);
+
+        gup_array_int_prepend(ints, 17);
+        gup_array_int_prepend(ints, 38);
+        gup_array_int_prepend(ints, 1);
+        gup_array_int_prepend(ints, 3);
+        gup_array_int_prepend(ints, 3);
+        gup_array_int_prepend(ints, 7);
+
+        assert(ints->capacity == 8);
+        assert(ints->count == 7);
+        assert(ints->data[0] == 7);
+        assert(ints->data[1] == 3);
+        assert(ints->data[2] == 3);
+        assert(ints->data[3] == 1);
+        assert(ints->data[4] == 38);
+        assert(ints->data[5] == 17);
+        assert(ints->data[6] == 42);
+    }
+
+    free(ints->data);
+    free(ints);
+}
+
 void test_gup_array(void) {
-    test_gup_array_int();
+    test_gup_array_bool();
     test_gup_array_float();
+    test_gup_array_int();
 
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");
