@@ -23,7 +23,7 @@ void test_gup_array_int(void) {
         assert(ints->data[2] == 3);
     }
 
-    { // Push
+    { // Append
         ints = gup_array_int();
         gup_array_int_append(ints, 42);
         
@@ -43,10 +43,36 @@ void test_gup_array_int(void) {
         assert(ints->data[0] == 42);
         assert(ints->data[1] == 17);
         assert(ints->data[2] == 38);
+        assert(ints->data[3] == 1);
+        assert(ints->data[4] == 3);
+        assert(ints->data[5] == 3);
+        assert(ints->data[6] == 7);
     }
 
-    { // 
+    { // Prepend
+        ints = gup_array_int();
+        gup_array_int_prepend(ints, 42);
+        
+        assert(ints->capacity == 1);
+        assert(ints->length == 1);
+        assert(ints->data[0] == 42);
 
+        gup_array_int_prepend(ints, 17);
+        gup_array_int_prepend(ints, 38);
+        gup_array_int_prepend(ints, 1);
+        gup_array_int_prepend(ints, 3);
+        gup_array_int_prepend(ints, 3);
+        gup_array_int_prepend(ints, 7);
+
+        assert(ints->capacity == 8);
+        assert(ints->length == 7);
+        assert(ints->data[0] == 7);
+        assert(ints->data[1] == 3);
+        assert(ints->data[2] == 3);
+        assert(ints->data[3] == 1);
+        assert(ints->data[4] == 38);
+        assert(ints->data[5] == 17);
+        assert(ints->data[6] == 42);
     }
 
     free(ints->data);

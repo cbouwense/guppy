@@ -29,8 +29,9 @@ typedef struct {
 
 // Dynamic arrays ----------------------------------------------------------------------------------
 Gup_Array_Int *gup_array_int();
-void           gup_array_int_append(Gup_Array_Int *xs, int i);
 Gup_Array_Int *gup_array_int_from(const int xs[], const int size);
+void           gup_array_int_append(Gup_Array_Int *xs, int i);
+void           gup_array_int_prepend(Gup_Array_Int *xs, int i);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -128,14 +129,29 @@ Gup_Array_Int *gup_array_int() {
     return ints;
 }
 
-void gup_array_int_append(Gup_Array_Int *xs, int i) {
+void gup_array_int_append(Gup_Array_Int *xs, int x) {
     if (xs->length == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(int));
         xs->capacity = new_capacity;
     }
 
-    xs->data[xs->length] = i;
+    xs->data[xs->length] = x;
+    xs->length++;
+}
+
+void gup_array_int_prepend(Gup_Array_Int *xs, int x) {
+    if (xs->length == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(int));
+        xs->capacity = new_capacity;
+    }
+
+    // CS Majors literally shaking and crying over the O(n) time complexity.
+    for (int i = xs->length; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
     xs->length++;
 }
 
