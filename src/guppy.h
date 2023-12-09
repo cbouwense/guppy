@@ -24,6 +24,12 @@ typedef struct {
 } Gup_Array_Bool;
 
 typedef struct {
+    int   capacity;
+    int   count;
+    char *data;
+} Gup_Array_Char;
+
+typedef struct {
     int    capacity;
     int    count;
     float *data;
@@ -41,18 +47,20 @@ typedef struct {
 
 // Dynamic arrays ----------------------------------------------------------------------------------
 Gup_Array_Bool  *gup_array_bool();
-Gup_Array_Bool  *gup_array_bool_from(const bool xs[], const int size);
 void             gup_array_bool_append(Gup_Array_Bool *xs, bool x);
+Gup_Array_Bool  *gup_array_bool_from(const bool xs[], const int size);
 void             gup_array_bool_prepend(Gup_Array_Bool *xs, bool x);
-
+Gup_Array_Char  *gup_array_char();
+void             gup_array_char_append(Gup_Array_Char *xs, char x);
+Gup_Array_Char  *gup_array_char_from(const char xs[], const int size);
+void             gup_array_char_prepend(Gup_Array_Char *xs, char x);
 Gup_Array_Float *gup_array_float();
-Gup_Array_Float *gup_array_float_from(const float xs[], const int size);
 void             gup_array_float_append(Gup_Array_Float *xs, float x);
+Gup_Array_Float *gup_array_float_from(const float xs[], const int size);
 void             gup_array_float_prepend(Gup_Array_Float *xs, float x);
-
 Gup_Array_Int   *gup_array_int();
-Gup_Array_Int   *gup_array_int_from(const int xs[], const int size);
 void             gup_array_int_append(Gup_Array_Int *xs, int i);
+Gup_Array_Int   *gup_array_int_from(const int xs[], const int size);
 void             gup_array_int_prepend(Gup_Array_Int *xs, int i);
 
 // Assert ------------------------------------------------------------------------------------------
@@ -179,6 +187,54 @@ void gup_array_bool_prepend(Gup_Array_Bool *xs, bool x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(bool));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+Gup_Array_Char *gup_array_char() {
+    Gup_Array_Char *xs = malloc(sizeof(Gup_Array_Char));
+    
+    xs->capacity = 0;
+    xs->count = 0;
+    xs->data = NULL;
+
+    return xs;
+}
+
+Gup_Array_Char *gup_array_char_from(const char xs[], const int size)  {
+    Gup_Array_Char *chars = gup_array_char();
+    chars->data = malloc(size * sizeof(char));
+
+    chars->capacity = size;
+    chars->count = size;
+    for (int i = 0; i < size; i++) {
+        chars->data[i] = xs[i];
+    }
+
+    return chars;
+}
+
+void gup_array_char_append(Gup_Array_Char *xs, char x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(char));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_char_prepend(Gup_Array_Char *xs, char x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(char));
         xs->capacity = new_capacity;
     }
 

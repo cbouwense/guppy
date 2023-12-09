@@ -78,6 +78,84 @@ void test_gup_array_bool(void) {
     free(bools);
 }
 
+void test_gup_array_char(void) {
+    Gup_Array_Char *chars;
+
+    { // Empty
+        chars = gup_array_char();
+
+        assert(chars->capacity == 0);
+        assert(chars->count == 0);
+        assert(chars->data == NULL);
+    }
+
+    { // From a few elements
+        const char xs[] = {'a', 'b', 'c'};
+        chars = gup_array_char_from(xs, sizeof(xs) / sizeof(char));
+
+        assert(chars->capacity == 3);
+        assert(chars->count == 3);
+        assert(chars->data[0] == 'a');
+        assert(chars->data[1] == 'b');
+        assert(chars->data[2] == 'c');
+    }
+
+    { // Append
+        chars = gup_array_char();
+        gup_array_char_append(chars, 'a');
+        
+        assert(chars->capacity == 1);
+        assert(chars->count == 1);
+        assert(chars->data[0] == 'a');
+
+        gup_array_char_append(chars, 'a');
+        gup_array_char_append(chars, 'b');
+        gup_array_char_append(chars, 'a');
+        gup_array_char_append(chars, 'a');
+        gup_array_char_append(chars, 'b');
+        gup_array_char_append(chars, 'b');
+
+        assert(chars->capacity == 8);
+        assert(chars->count == 7);
+        assert(chars->data[0] == 'a');
+        assert(chars->data[1] == 'a');
+        assert(chars->data[2] == 'b');
+        assert(chars->data[3] == 'a');
+        assert(chars->data[4] == 'a');
+        assert(chars->data[5] == 'b');
+        assert(chars->data[6] == 'b');
+    }
+
+    { // Prepend
+        chars = gup_array_char();
+        gup_array_char_prepend(chars, 'a');
+        
+        assert(chars->capacity == 1);
+        assert(chars->count == 1);
+        assert(chars->data[0] == 'a');
+
+        gup_array_char_prepend(chars, 'a');
+        gup_array_char_prepend(chars, 'b');
+        gup_array_char_prepend(chars, 'a');
+        gup_array_char_prepend(chars, 'a');
+        gup_array_char_prepend(chars, 'b');
+        gup_array_char_prepend(chars, 'b');
+
+        assert(chars->capacity == 8);
+        assert(chars->count == 7);
+        assert(chars->data[0] == 'b');
+        assert(chars->data[1] == 'b');
+        assert(chars->data[2] == 'a');
+        assert(chars->data[3] == 'a');
+        assert(chars->data[4] == 'b');
+        assert(chars->data[5] == 'a');
+        assert(chars->data[6] == 'a');
+    }
+
+    free(chars->data);
+    free(chars);
+}
+
 void test_gup_array_float(void) {
     Gup_Array_Float *floats;
 
@@ -236,6 +314,7 @@ void test_gup_array_int(void) {
 
 void test_gup_array(void) {
     test_gup_array_bool();
+    test_gup_array_char();
     test_gup_array_float();
     test_gup_array_int();
 
