@@ -37,9 +37,7 @@ void run_all_guppy_tests(void) {
 }
 
 int main(void) {
-    // run_all_guppy_tests();
-
-    test_gup_array();
+    run_all_guppy_tests();
 
     return 0;
 }

@@ -18,8 +18,14 @@ typedef struct {
 } Gup_String_View;
 
 typedef struct {
+    int    capacity;
+    int    count;
+    float *data;
+} Gup_Array_Float;
+
+typedef struct {
     int  capacity;
-    int  length;
+    int  count;
     int *data;
 } Gup_Array_Int;
 
@@ -28,6 +34,11 @@ typedef struct {
  **************************************************************************************************/
 
 // Dynamic arrays ----------------------------------------------------------------------------------
+Gup_Array_Float *gup_array_float();
+Gup_Array_Float *gup_array_float_from(const float xs[], const int size);
+void             gup_array_float_append(Gup_Array_Float *xs, float x);
+void             gup_array_float_prepend(Gup_Array_Float *xs, float x);
+
 Gup_Array_Int *gup_array_int();
 Gup_Array_Int *gup_array_int_from(const int xs[], const int size);
 void           gup_array_int_append(Gup_Array_Int *xs, int i);
@@ -119,40 +130,62 @@ typedef unsigned int uint;
 
 // Dynamic Arrays ----------------------------------------------------------------------------------
 
+Gup_Array_Float *gup_array_float() {
+    Gup_Array_Float *xs = malloc(sizeof(Gup_Array_Float));
+    
+    xs->capacity = 0;
+    xs->count = 0;
+    xs->data = NULL;
+
+    return xs;
+}
+
+Gup_Array_Float *gup_array_float_from(const float xs[], const int size)  {
+    Gup_Array_Float *floats = gup_array_float();
+    floats->data = malloc(size * sizeof(float));
+
+    floats->capacity = size;
+    floats->count = size;
+    for (int i = 0; i < size; i++) {
+        floats->data[i] = xs[i];
+    }
+
+    return floats;
+}
+
+void gup_array_float_append(Gup_Array_Float *xs, float x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(float));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_float_prepend(Gup_Array_Float *xs, float x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(float));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
 Gup_Array_Int *gup_array_int() {
     Gup_Array_Int *ints = malloc(sizeof(Gup_Array_Int));
     
     ints->capacity = 0;
-    ints->length = 0;
+    ints->count = 0;
     ints->data = NULL;
 
     return ints;
-}
-
-void gup_array_int_append(Gup_Array_Int *xs, int x) {
-    if (xs->length == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(int));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->length] = x;
-    xs->length++;
-}
-
-void gup_array_int_prepend(Gup_Array_Int *xs, int x) {
-    if (xs->length == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(int));
-        xs->capacity = new_capacity;
-    }
-
-    // CS Majors literally shaking and crying over the O(n) time complexity.
-    for (int i = xs->length; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[0] = x;
-    xs->length++;
 }
 
 Gup_Array_Int *gup_array_int_from(const int xs[], const int size)  {
@@ -160,12 +193,37 @@ Gup_Array_Int *gup_array_int_from(const int xs[], const int size)  {
     ints->data = malloc(size * sizeof(int));
 
     ints->capacity = size;
-    ints->length = size;
+    ints->count = size;
     for (int i = 0; i < size; i++) {
         ints->data[i] = xs[i];
     }
 
     return ints;
+}
+
+void gup_array_int_append(Gup_Array_Int *xs, int x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(int));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_int_prepend(Gup_Array_Int *xs, int x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(int));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
 }
 
 // Assert ------------------------------------------------------------------------------------------
@@ -242,7 +300,7 @@ void *_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
 
 // File operations ---------------------------------------------------------------------------------
 
-const char *GUP_DEFAULT_FILE_ERROR_MESSAGE = "Weird... a guppy file operation failed.\nYou should probably double check that you:\n1) spelled the file name correctly\n2) are creating the file in the directory you think you are\n3) have permissions to create a file in that directory\n";
+const char *GUP_DEFAULT_FILE_ERROR_MESSAGE = "File operation failed.\nYou should probably double check that you:\n1) spelled the file name correctly\n2) are creating the file in the directory you think you are\n3) have permissions to create a file in that directory\n";
 
 bool gup_file_create(const char *file_path) {
     bool result = true;

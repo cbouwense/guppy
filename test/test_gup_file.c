@@ -1,4 +1,3 @@
-// #define GUPPY_VERBOSE
 #include "../src/guppy.h"
 
 void test_gup_file_is_empty(void) {
