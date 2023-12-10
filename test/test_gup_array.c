@@ -254,6 +254,9 @@ void test_gup_array_int(void) {
         assert(ints->data[0] == 1);
         assert(ints->data[1] == 2);
         assert(ints->data[2] == 3);
+
+        free(ints->data);
+        free(ints);
     }
 
     { // Append
@@ -280,6 +283,9 @@ void test_gup_array_int(void) {
         assert(ints->data[4] == 3);
         assert(ints->data[5] == 3);
         assert(ints->data[6] == 7);
+
+        free(ints->data);
+        free(ints);
     }
 
     { // Prepend
@@ -306,10 +312,36 @@ void test_gup_array_int(void) {
         assert(ints->data[4] == 38);
         assert(ints->data[5] == 17);
         assert(ints->data[6] == 42);
+    
+        free(ints->data);
+        free(ints);
     }
 
-    free(ints->data);
-    free(ints);
+    { // Remove all
+        int found_count;
+        ints = gup_array_int();
+        gup_array_int_append(ints, 1);
+        
+        found_count = gup_array_int_remove_all(ints, 0);
+
+        assert(found_count == 0);
+        assert(ints->capacity == 1);
+        assert(ints->count == 1);
+        assert(ints->data[0] == 1);
+
+        for (int i = 0; i < 1234; i++) {
+            gup_array_int_append(ints, 2);
+        }
+        gup_array_int_append(ints, 3);
+
+        found_count = gup_array_int_remove_all(ints, 2);
+
+        assert(found_count == 1234);
+        assert(ints->capacity == 2);
+        assert(ints->count == 2);
+        assert(ints->data[0] == 1);
+        assert(ints->data[1] == 3);
+    }
 }
 
 void test_gup_array(void) {

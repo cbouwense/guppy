@@ -70,6 +70,9 @@ void             gup_array_int_append(Gup_Array_Int *xs, int i);
 Gup_Array_Int   *gup_array_int_from(const int xs[], const int size);
 void             gup_array_int_prepend(Gup_Array_Int *xs, int i);
 void             gup_array_int_print(Gup_Array_Int *xs);
+int              gup_array_int_remove_all(Gup_Array_Int *xs, int x);
+bool             gup_array_int_remove_first(Gup_Array_Int *xs, int x);
+bool             gup_array_int_remove_last(Gup_Array_Int *xs, int x);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -158,6 +161,74 @@ double gup_operation_seconds(void (*fn)());
 typedef unsigned int uint;
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 
+static long long      _gup_bytes_allocated = 0;
+static Gup_Array_Int *_gup_allocation_sites = NULL;
+
+void gup_memory_init(void) {
+    _gup_allocation_sites = gup_array_int();
+}
+
+void gup_memory_print(void) {
+    #ifdef GUPPY_DEBUG_MEMORY
+        printf("\n============\n");
+        printf("Memory usage:\n");
+        for (int i = 0; i < _gup_allocation_sites->count; i++) {
+            printf("%d, ", _gup_allocation_sites->data[i]);
+        }
+        printf("\n============\n");
+    #else
+        printf("GUPPY_DEBUG_MEMORY not enabled!\n");
+    #endif // GUPPY_DEBUG_MEMORY
+}
+
+void _gup_free(void *ptr, const char *file_path, const int line_number) {
+    if (ptr == NULL) {
+        printf("[%s:%d] ", file_path, line_number);
+        printf("Tried to free a null pointer\n");
+        exit(1);
+    }
+
+    #ifdef GUPPY_VERBOSE
+    printf("[%s:%d] Freed memory at %p\n", file_path, line_number, ptr);
+    #endif
+
+    free(ptr);
+    
+    // gup_array_int_remove(_gup_allocation_sites, line_number);
+}
+
+void *_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
+    void *ptr = malloc(bytes);
+
+    if (ptr == NULL) {
+        printf("[%s:%d] ", file_path, line_number);
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to allocate %zu bytes\n", bytes);
+        #endif // GUPPY_VERBOSE
+        exit(1);
+    }
+
+    #ifdef GUPPY_VERBOSE
+    printf("[%s:%d] Allocated %zu bytes at %p\n", file_path, line_number, bytes, ptr);
+    #endif // GUPPY_VERBOSE
+
+    _gup_bytes_allocated += bytes;
+    // TODO: filepath : line number
+    // char file_path_as_chars[] = gup_string 
+    if (_gup_allocation_sites != NULL) {
+        gup_array_int_append(_gup_allocation_sites, line_number);
+    }
+
+    return ptr;
+}
+
+#ifdef GUPPY_DEBUG_MEMORY
+
+#define free(ptr) _gup_free(ptr, __FILE__, __LINE__)
+#define malloc(bytes) _gup_malloc(bytes, __FILE__, __LINE__)
+
+#endif // GUPPY_DEBUG_MEMORY
+
 // Dynamic Arrays ----------------------------------------------------------------------------------
 
 Gup_Array_Bool *gup_array_bool() {
@@ -208,6 +279,7 @@ void gup_array_bool_prepend(Gup_Array_Bool *xs, bool x) {
     xs->count++;
 }
 
+#define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
 void _gup_array_bool_print(Gup_Array_Bool *xs, const char *xs_name) {
     printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
@@ -218,8 +290,6 @@ void _gup_array_bool_print(Gup_Array_Bool *xs, const char *xs_name) {
     }
     printf("]\n"); 
 }
-
-#define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
 
 Gup_Array_Char *gup_array_char() {
     Gup_Array_Char *xs = malloc(sizeof(Gup_Array_Char));
@@ -269,6 +339,7 @@ void gup_array_char_prepend(Gup_Array_Char *xs, char x) {
     xs->count++;
 }
 
+#define gup_array_char_print(xs) _gup_array_char_print(xs, #xs)
 void _gup_array_char_print(Gup_Array_Char *xs, const char *xs_name) {
     printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
@@ -277,8 +348,6 @@ void _gup_array_char_print(Gup_Array_Char *xs, const char *xs_name) {
     }
     printf("]\n"); 
 }
-
-#define gup_array_char_print(xs) _gup_array_char_print(xs, #xs)
 
 Gup_Array_Float *gup_array_float() {
     Gup_Array_Float *xs = malloc(sizeof(Gup_Array_Float));
@@ -328,6 +397,7 @@ void gup_array_float_prepend(Gup_Array_Float *xs, float x) {
     xs->count++;
 }
 
+#define gup_array_float_print(xs) _gup_array_float_print(xs, #xs)
 void _gup_array_float_print(Gup_Array_Float *xs, const char *xs_name) {
     printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
@@ -336,8 +406,6 @@ void _gup_array_float_print(Gup_Array_Float *xs, const char *xs_name) {
     }
     printf("]\n"); 
 }
-
-#define gup_array_float_print(xs) _gup_array_float_print(xs, #xs)
 
 Gup_Array_Int *gup_array_int() {
     Gup_Array_Int *ints = malloc(sizeof(Gup_Array_Int));
@@ -387,6 +455,7 @@ void gup_array_int_prepend(Gup_Array_Int *xs, int x) {
     xs->count++;
 }
 
+#define gup_array_int_print(xs) _gup_array_int_print(xs, #xs)
 void _gup_array_int_print(Gup_Array_Int *xs, const char *xs_name) {
     printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
@@ -396,8 +465,34 @@ void _gup_array_int_print(Gup_Array_Int *xs, const char *xs_name) {
     printf("]\n"); 
 }
 
-#define gup_array_int_print(xs) _gup_array_int_print(xs, #xs)
+int gup_array_int_remove_all(Gup_Array_Int *xs, int x) {
+    int remaining = 0;
+    int original_count = xs->count;
+    int *new_xs_data = malloc(xs->count * sizeof(int));
 
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != x) {
+            new_xs_data[remaining] = xs->data[i];
+            remaining++;
+        }
+    }
+
+    free(xs->data);
+    xs->data = new_xs_data;
+    xs->data = realloc(xs->data, remaining * sizeof(int));
+    xs->capacity = remaining;
+    xs->count = remaining;
+
+    return original_count - remaining;
+}
+
+// bool gup_array_int_remove_first(Gup_Array_Int *xs, int x) {
+//     return false;
+// }
+
+// bool gup_array_int_remove_last(Gup_Array_Int *xs, int x) {
+//     return false;
+// }
 
 // Assert ------------------------------------------------------------------------------------------
 
@@ -417,59 +512,8 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
  * Thanks to Eskil Steenberg for his explanation of using these custom memory macros for debugging.
  * Check out his masterclass on programming in C: https://youtu.be/443UNeGrFoM
  */
-#ifdef GUPPY_DEBUG_MEMORY
 
-static uint      _gup_allocation_count = 0;
-static long long _gup_bytes_allocated = 0;
-static uint      _gup_free_count = 0;
 
-void _gup_memory_print(void) {
-    printf("\n============\n");
-    printf("Memory usage:\n");
-    printf("Allocations: %u (%lld bytes)\n", _gup_allocation_count, _gup_bytes_allocated);
-    printf("Frees:       %u\n", _gup_free_count);
-    printf("Leaks:       %d\n", _gup_allocation_count - _gup_free_count);
-    printf("============\n");
-}
-
-void _gup_free(void *ptr, const char *file_path, const int line_number) {
-    if (ptr == NULL) {
-        printf("[%s:%d] ", file_path, line_number);
-        printf("Tried to free a null pointer\n");
-        exit(1);
-    }
-
-    #ifdef GUPPY_DEBUG_MEMORY
-    printf("[%s:%d] Freed memory at %p\n", file_path, line_number, ptr);
-    #endif
-
-    free(ptr);
-    _gup_free_count++;
-}
-
-void *_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
-    void *ptr = malloc(bytes);
-
-    if (ptr == NULL) {
-        printf("[%s:%d] ", file_path, line_number);
-        printf("Failed to allocate %zu bytes\n", bytes);
-        exit(1);
-    }
-
-    #ifdef GUPPY_DEBUG_MEMORY
-    printf("[%s:%d] Allocated %zu bytes at %p\n", file_path, line_number, bytes, ptr);
-    #endif
-
-    _gup_allocation_count++;
-    _gup_bytes_allocated += bytes;
-
-    return ptr;
-}
-
-#define free(ptr) _gup_free(ptr, __FILE__, __LINE__)
-#define malloc(bytes) _gup_malloc(bytes, __FILE__, __LINE__)
-
-#endif
 
 // File operations ---------------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 #include <limits.h>
 
 // #define GUPPY_VERBOSE
-#define GUPPY_DEBUG_MEMORY
+// #define GUPPY_DEBUG_MEMORY
 #include "../src/guppy.h"
 
 #include "./test_gup_array.c"
@@ -28,9 +28,8 @@ void run_all_guppy_tests(void) {
     test_gup_string();
     test_gup_sv();
 
-    _reset_settings_file();
     #ifdef GUPPY_DEBUG_MEMORY
-    _gup_memory_print();
+    gup_memory_print();
     #endif
     
     printf("All tests passed!\n");
@@ -38,6 +37,14 @@ void run_all_guppy_tests(void) {
 
 int main(void) {
     gup_operation_seconds_verbose(run_all_guppy_tests);
+    // gup_memory_init();
+
+    // int * ints;
+    // ints = malloc(3 * sizeof(int));
+    // ints = realloc(ints, 4 * sizeof(int));
+    // free(ints);
+
+    // gup_memory_print();
 
     return 0;
 }
