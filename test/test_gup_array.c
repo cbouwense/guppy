@@ -236,6 +236,7 @@ void test_gup_array_float(void) {
 
 void test_gup_array_int(void) {
     Gup_Array_Int *ints;
+    bool found;
 
     { // Empty
         ints = gup_array_int();
@@ -341,6 +342,71 @@ void test_gup_array_int(void) {
         assert(ints->count == 2);
         assert(ints->data[0] == 1);
         assert(ints->data[1] == 3);
+    }
+
+    { // Remove first
+        bool found;
+        ints = gup_array_int();
+        gup_array_int_append(ints, 1);
+        
+        found = gup_array_int_remove_first(ints, 0);
+
+        assert(found == false);
+        assert(ints->capacity == 1);
+        assert(ints->count == 1);
+        assert(ints->data[0] == 1);
+
+        gup_array_int_append(ints, 2);
+        gup_array_int_append(ints, 2);
+        gup_array_int_append(ints, 2);
+        gup_array_int_append(ints, 3);
+
+        found = gup_array_int_remove_first(ints, 2);
+
+        assert(found == true);
+        assert(ints->capacity == 4);
+        assert(ints->count == 4);
+        assert(ints->data[0] == 1);
+        assert(ints->data[1] == 2);
+        assert(ints->data[2] == 2);
+        assert(ints->data[3] == 3);
+    }
+
+    { // Remove last no occurrence
+        Gup_Array_Int * ints = gup_array_int();
+        gup_array_int_append(ints, 1);
+        
+        found = gup_array_int_remove_last(ints, 0);
+
+        assert(found == false);
+        assert(ints->capacity == 1);
+        assert(ints->count == 1);
+        assert(ints->data[0] == 1);
+
+        free(ints->data);
+        free(ints);
+    }
+
+    { // Remove last with occurrence
+        int xs[] = {1, 2, 3, 2, 4, 2, 5};
+        ints = gup_array_int_from(xs, sizeof(xs)/sizeof(int));
+
+        found = gup_array_int_remove_last(ints, 2);
+
+        // [1, 2, 3, 2, 4, 2, 5] ->
+        // [1, 2, 3, 2, 4, 5]
+        assert(found == true);
+        assert(ints->capacity == 6);
+        assert(ints->count == 6);
+        assert(ints->data[0] == 1);
+        assert(ints->data[1] == 2);
+        assert(ints->data[2] == 3);
+        assert(ints->data[3] == 2);
+        assert(ints->data[4] == 4);
+        assert(ints->data[5] == 5);
+
+        free(ints->data);
+        free(ints);
     }
 }
 

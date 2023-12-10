@@ -486,13 +486,61 @@ int gup_array_int_remove_all(Gup_Array_Int *xs, int x) {
     return original_count - remaining;
 }
 
-// bool gup_array_int_remove_first(Gup_Array_Int *xs, int x) {
-//     return false;
-// }
+bool gup_array_int_remove_first(Gup_Array_Int *xs, int x) {
+    bool found = false;
 
-// bool gup_array_int_remove_last(Gup_Array_Int *xs, int x) {
-//     return false;
-// }
+    for (int i = 0; i < xs->count; i++) {
+        if (found) {
+            xs->data[i] = xs->data[i+1];
+            if (i == xs->count - 2) break;
+        } else {
+            if (xs->data[i] == x) {
+                found = true;
+            }
+        }
+    }
+
+    if (found) {
+        xs->count--;
+        xs->capacity = xs->count;
+        xs->data = realloc(xs->data, xs->capacity * sizeof(int));
+    }
+
+    return found;
+}
+
+bool gup_array_int_remove_last(Gup_Array_Int *xs, int x) {
+    bool found = false;
+
+    for (int i = xs->count-1; i > 0; i--) {
+        if (found) {
+            xs->data[i] = xs->data[i-1];
+            if (i == 1) break;
+        } else {
+            if (xs->data[i] == x) {
+                found = true;
+                xs->data[i] = xs->data[i-1];
+            }
+        }
+    }
+
+    if (found) {
+        xs->count--;
+        xs->capacity = xs->count;
+        // If we found and removed an element, then we will need to move each
+        // element of the array to the left. The first element will be garbage.
+        // e.g. 
+        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
+        // [1, 1, 2, 3, 2, 4, 5] ->
+        //    [1, 2, 3, 2, 4, 5]
+        for (int i = 0; i < xs->count; i++) {
+            xs->data[i] = xs->data[i+1];
+        }
+        xs->data = realloc(xs->data, xs->count * sizeof(int));
+    }
+
+    return found;
+}
 
 // Assert ------------------------------------------------------------------------------------------
 
