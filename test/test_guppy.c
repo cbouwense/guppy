@@ -2,7 +2,7 @@
 #include <limits.h>
 
 // #define GUPPY_VERBOSE
-// #define GUPPY_DEBUG_MEMORY
+#define GUPPY_DEBUG_MEMORY
 #include "../src/guppy.h"
 
 #include "./test_gup_array.c"
@@ -23,7 +23,7 @@ void run_all_guppy_tests(void) {
     
     test_gup_array();
     test_gup_file();
-    // test_gup_print_array_string();
+    test_gup_print_array_string();
     test_gup_settings();
     test_gup_string();
     test_gup_sv();
@@ -37,7 +37,7 @@ void run_all_guppy_tests(void) {
 }
 
 int main(void) {
-    run_all_guppy_tests();
+    gup_operation_seconds_verbose(run_all_guppy_tests);
 
     return 0;
 }

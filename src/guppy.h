@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 typedef struct {
@@ -50,18 +51,25 @@ Gup_Array_Bool  *gup_array_bool();
 void             gup_array_bool_append(Gup_Array_Bool *xs, bool x);
 Gup_Array_Bool  *gup_array_bool_from(const bool xs[], const int size);
 void             gup_array_bool_prepend(Gup_Array_Bool *xs, bool x);
+void             gup_array_bool_print(Gup_Array_Bool *xs);
+
 Gup_Array_Char  *gup_array_char();
 void             gup_array_char_append(Gup_Array_Char *xs, char x);
 Gup_Array_Char  *gup_array_char_from(const char xs[], const int size);
 void             gup_array_char_prepend(Gup_Array_Char *xs, char x);
+void             gup_array_char_print(Gup_Array_Char *xs);
+
 Gup_Array_Float *gup_array_float();
 void             gup_array_float_append(Gup_Array_Float *xs, float x);
 Gup_Array_Float *gup_array_float_from(const float xs[], const int size);
 void             gup_array_float_prepend(Gup_Array_Float *xs, float x);
+void             gup_array_float_print(Gup_Array_Float *xs);
+
 Gup_Array_Int   *gup_array_int();
 void             gup_array_int_append(Gup_Array_Int *xs, int i);
 Gup_Array_Int   *gup_array_int_from(const int xs[], const int size);
 void             gup_array_int_prepend(Gup_Array_Int *xs, int i);
+void             gup_array_int_print(Gup_Array_Int *xs);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -83,7 +91,7 @@ bool   gup_file_write_lines(const char **lines_to_write, const int line_count, c
 void gup_print_cwd(void);
 void gup_print_string(const char *string);
 
-// Print null terminated arrays -------------------------------------------------------------------------------
+// Print null terminated arrays --------------------------------------------------------------------
 void gup_print_array_bool(bool array[]);
 void gup_print_array_char(char array[]);
 void gup_print_array_double(double array[]);
@@ -133,12 +141,15 @@ bool             gup_sv_starts_with(Gup_String_View sv, Gup_String_View prefix);
 bool             gup_sv_ends_with(Gup_String_View sv, Gup_String_View suffix);
 bool             gup_sv_is_empty(Gup_String_View sv);
 
-// C-string utilities --------------------------------------------------------------------------------
+// C-string utilities ------------------------------------------------------------------------------
 char *gup_string_trim_double_quotes(const char *string);
 char *gup_string_trim_whitespace(const char *string);
 char *gup_string_without_whitespace(const char *string);
 char *gup_string_array_flatten(char **strings);
 char  gup_cstr_eq(const char *a, const char *b);
+
+// Miscellaneous
+double gup_operation_seconds(void (*fn)());
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
@@ -197,6 +208,19 @@ void gup_array_bool_prepend(Gup_Array_Bool *xs, bool x) {
     xs->count++;
 }
 
+void _gup_array_bool_print(Gup_Array_Bool *xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == true) printf("true");
+        else printf("false");
+
+        if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
+
 Gup_Array_Char *gup_array_char() {
     Gup_Array_Char *xs = malloc(sizeof(Gup_Array_Char));
     
@@ -244,6 +268,17 @@ void gup_array_char_prepend(Gup_Array_Char *xs, char x) {
     xs->data[0] = x;
     xs->count++;
 }
+
+void _gup_array_char_print(Gup_Array_Char *xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs->count; i++) {
+        printf("'%c'", xs->data[i]);
+        if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_char_print(xs) _gup_array_char_print(xs, #xs)
 
 Gup_Array_Float *gup_array_float() {
     Gup_Array_Float *xs = malloc(sizeof(Gup_Array_Float));
@@ -293,6 +328,17 @@ void gup_array_float_prepend(Gup_Array_Float *xs, float x) {
     xs->count++;
 }
 
+void _gup_array_float_print(Gup_Array_Float *xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs->count; i++) {
+        printf("%f", xs->data[i]);
+        if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_float_print(xs) _gup_array_float_print(xs, #xs)
+
 Gup_Array_Int *gup_array_int() {
     Gup_Array_Int *ints = malloc(sizeof(Gup_Array_Int));
     
@@ -340,6 +386,18 @@ void gup_array_int_prepend(Gup_Array_Int *xs, int x) {
     xs->data[0] = x;
     xs->count++;
 }
+
+void _gup_array_int_print(Gup_Array_Int *xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs->count; i++) {
+        printf("%d", xs->data[i]);
+        if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_int_print(xs) _gup_array_int_print(xs, #xs)
+
 
 // Assert ------------------------------------------------------------------------------------------
 
@@ -719,7 +777,7 @@ void gup_print_string(const char *string) {
     printf("\"%s\"\n", string);
 }
 
-// Print null terminated arrays -------------------------------------------------------------------------------
+// Print null terminated arrays --------------------------------------------------------------------
 
 void gup_print_array_bool(bool array[]) {
     printf("[");
@@ -1322,7 +1380,7 @@ Gup_String_View gup_sv_take_left_while(Gup_String_View sv, bool (*predicate)(cha
     return gup_sv_from_parts(sv.data, i);
 }
 
-// C-string utilities --------------------------------------------------------------------------------
+// C-string utilities ------------------------------------------------------------------------------
 
 char *gup_string_trim_double_quotes(const char *string) {
     char *str = (char *) malloc(strlen(string) * sizeof(char));
@@ -1406,6 +1464,35 @@ char *gup_string_array_flatten(char **strings) {
 // I can't stand strcmp. Its API is exactly backwards as far as I'm concerned.
 char gup_cstr_eq(const char *a, const char *b) {
     return strcmp(a, b) == 0;
+}
+
+
+// Miscellaneous -----------------------------------------------------------------------------------
+
+double gup_operation_seconds(void (*fn)()) {
+    clock_t start, end;
+    double cpu_seconds_used;
+
+    start = clock();
+
+    fn();
+
+    end = clock();
+    
+    cpu_seconds_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    #ifdef GUPPY_VERBOSE
+    printf("The operation took %f seconds to execute.\n", cpu_seconds_used);
+    #endif // GUPPY_VERBOSE
+
+    return cpu_seconds_used;
+}
+
+double gup_operation_seconds_verbose(void (*fn)()) {
+    double result = gup_operation_seconds(fn);
+    printf("The operation took %f seconds to execute.\n", result);
+
+    return result;
 }
 
 #endif // GUPPY_H
