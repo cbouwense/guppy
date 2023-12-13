@@ -2,6 +2,7 @@
 
 void test_gup_array_bool(void) {
     Gup_Array_Bool *bools;
+    bool found;
 
     { // Empty
         bools = gup_array_bool();
@@ -9,6 +10,8 @@ void test_gup_array_bool(void) {
         assert(bools->capacity == 0);
         assert(bools->count == 0);
         assert(bools->data == NULL);
+
+        free(bools);
     }
 
     { // From a few elements
@@ -20,6 +23,9 @@ void test_gup_array_bool(void) {
         assert(bools->data[0] == true);
         assert(bools->data[1] == false);
         assert(bools->data[2] == true);
+
+        free(bools->data);
+        free(bools);
     }
 
     { // Append
@@ -46,6 +52,9 @@ void test_gup_array_bool(void) {
         assert(bools->data[4] == true);
         assert(bools->data[5] == false);
         assert(bools->data[6] == false);
+
+        free(bools->data);
+        free(bools);
     }
 
     { // Prepend
@@ -72,14 +81,81 @@ void test_gup_array_bool(void) {
         assert(bools->data[4] == false);
         assert(bools->data[5] == true);
         assert(bools->data[6] == true);
+
+        free(bools->data);
+        free(bools);
     }
 
-    free(bools->data);
-    free(bools);
+    { // Remove first
+        bools = gup_array_bool();
+        gup_array_bool_append(bools, true);
+        
+        found = gup_array_bool_remove_first(bools, false);
+
+        assert(found == false);
+        assert(bools->capacity == 1);
+        assert(bools->count == 1);
+        assert(bools->data[0] == true);
+
+        gup_array_bool_append(bools, false);
+        gup_array_bool_append(bools, false);
+        gup_array_bool_append(bools, false);
+        gup_array_bool_append(bools, true);
+
+        found = gup_array_bool_remove_first(bools, false);
+
+        assert(found == true);
+        assert(bools->capacity == 4);
+        assert(bools->count == 4);
+        assert(bools->data[0] == true);
+        assert(bools->data[1] == false);
+        assert(bools->data[2] == false);
+        assert(bools->data[3] == true);
+
+        free(bools->data);
+        free(bools);
+    }
+
+    { // Remove last no occurrence
+        Gup_Array_Bool * bools = gup_array_bool();
+        gup_array_bool_append(bools, true);
+        
+        found = gup_array_bool_remove_last(bools, false);
+
+        assert(found == false);
+        assert(bools->capacity == 1);
+        assert(bools->count == 1);
+        assert(bools->data[0] == true);
+
+        free(bools->data);
+        free(bools);
+    }
+
+    { // Remove last with occurrence
+        bool xs[] = {true, false, true, false, true, false, false};
+        bools = gup_array_bool_from(xs, sizeof(xs)/sizeof(bool));
+
+        found = gup_array_bool_remove_last(bools, false);
+
+        assert(found == true);
+        assert(bools->capacity == 6);
+        assert(bools->count == 6);
+        assert(bools->data[0] == true);
+        assert(bools->data[1] == false);
+        assert(bools->data[2] == true);
+        assert(bools->data[3] == false);
+        assert(bools->data[4] == true);
+        assert(bools->data[5] == false);
+
+        free(bools->data);
+        free(bools);
+    }
+
 }
 
 void test_gup_array_char(void) {
     Gup_Array_Char *chars;
+    bool found;
 
     { // Empty
         chars = gup_array_char();
@@ -87,6 +163,8 @@ void test_gup_array_char(void) {
         assert(chars->capacity == 0);
         assert(chars->count == 0);
         assert(chars->data == NULL);
+
+        free(chars);
     }
 
     { // From a few elements
@@ -98,6 +176,9 @@ void test_gup_array_char(void) {
         assert(chars->data[0] == 'a');
         assert(chars->data[1] == 'b');
         assert(chars->data[2] == 'c');
+
+        free(chars->data);
+        free(chars);
     }
 
     { // Append
@@ -124,6 +205,9 @@ void test_gup_array_char(void) {
         assert(chars->data[4] == 'a');
         assert(chars->data[5] == 'b');
         assert(chars->data[6] == 'b');
+
+        free(chars->data);
+        free(chars);
     }
 
     { // Prepend
@@ -150,10 +234,74 @@ void test_gup_array_char(void) {
         assert(chars->data[4] == 'b');
         assert(chars->data[5] == 'a');
         assert(chars->data[6] == 'a');
+
+        free(chars->data);
+        free(chars);
     }
 
-    free(chars->data);
-    free(chars);
+    { // Remove first
+        chars = gup_array_char();
+        gup_array_char_append(chars, 'a');
+        
+        found = gup_array_char_remove_first(chars, 'b');
+
+        assert(found == false);
+        assert(chars->capacity == 1);
+        assert(chars->count == 1);
+        assert(chars->data[0] == 'a');
+
+        gup_array_char_append(chars, 'b');
+        gup_array_char_append(chars, 'b');
+        gup_array_char_append(chars, 'b');
+        gup_array_char_append(chars, 'c');
+
+        found = gup_array_char_remove_first(chars, 'b');
+
+        assert(found == true);
+        assert(chars->capacity == 4);
+        assert(chars->count == 4);
+        assert(chars->data[0] == 'a');
+        assert(chars->data[1] == 'b');
+        assert(chars->data[2] == 'b');
+        assert(chars->data[3] == 'c');
+    }
+
+    { // Remove last no occurrence
+        Gup_Array_Char * chars = gup_array_char();
+        gup_array_char_append(chars, 'a');
+        
+        found = gup_array_char_remove_last(chars, 'b');
+
+        assert(found == false);
+        assert(chars->capacity == 1);
+        assert(chars->count == 1);
+        assert(chars->data[0] == 'a');
+
+        free(chars->data);
+        free(chars);
+    }
+
+    { // Remove last with occurrence
+        char xs[] = {'a', 'b', 'c', 'b', 'd', 'b', 'e'};
+        chars = gup_array_char_from(xs, sizeof(xs)/sizeof(char));
+
+        found = gup_array_char_remove_last(chars, 'b');
+
+        // [1, 2, 3, 2, 4, 2, 5] ->
+        // [1, 2, 3, 2, 4, 5]
+        assert(found == true);
+        assert(chars->capacity == 6);
+        assert(chars->count == 6);
+        assert(chars->data[0] == 'a');
+        assert(chars->data[1] == 'b');
+        assert(chars->data[2] == 'c');
+        assert(chars->data[3] == 'b');
+        assert(chars->data[4] == 'd');
+        assert(chars->data[5] == 'e');
+
+        free(chars->data);
+        free(chars);
+    }
 }
 
 void test_gup_array_float(void) {
@@ -243,7 +391,6 @@ void test_gup_array_float(void) {
     }
 
     { // Remove first
-        bool found;
         floats = gup_array_float();
         gup_array_float_append(floats, 1);
         
@@ -268,6 +415,9 @@ void test_gup_array_float(void) {
         assert(floats->data[1] == 2);
         assert(floats->data[2] == 2);
         assert(floats->data[3] == 3);
+
+        free(floats->data);
+        free(floats);
     }
 
     { // Remove last no occurrence
@@ -306,7 +456,6 @@ void test_gup_array_float(void) {
         free(floats->data);
         free(floats);
     }
-
 }
 
 void test_gup_array_int(void) {
@@ -420,7 +569,6 @@ void test_gup_array_int(void) {
     }
 
     { // Remove first
-        bool found;
         ints = gup_array_int();
         gup_array_int_append(ints, 1);
         
@@ -445,6 +593,9 @@ void test_gup_array_int(void) {
         assert(ints->data[1] == 2);
         assert(ints->data[2] == 2);
         assert(ints->data[3] == 3);
+
+        free(ints->data);
+        free(ints);
     }
 
     { // Remove last no occurrence
@@ -483,7 +634,6 @@ void test_gup_array_int(void) {
         free(ints->data);
         free(ints);
     }
-
 }
 
 void test_gup_array(void) {
