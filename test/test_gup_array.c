@@ -1,7 +1,7 @@
 #include "../src/guppy.h"
 
 void test_gup_array_bool(void) {
-    Gup_Array_Bool *bools;
+    Gup_Array_Bool *bools, *x_bools, *y_bools;
     bool found;
 
     { // Empty
@@ -26,6 +26,70 @@ void test_gup_array_bool(void) {
 
         free(bools->data);
         free(bools);
+    }
+
+    { // Empty arrays are equivalent
+        const bool xs[] = {0};
+        const bool ys[] = {0};
+        x_bools = gup_array_bool_from(xs, sizeof(xs) / sizeof(bool));
+        y_bools = gup_array_bool_from(ys, sizeof(ys) / sizeof(bool));
+        
+        bool are_they_equal = gup_array_bool_eq(x_bools, y_bools);
+
+        assert(are_they_equal == true);
+
+        free(x_bools->data);
+        free(y_bools->data);
+        free(x_bools);
+        free(y_bools);
+    }
+
+    { // One empty one not is not equivalent
+        const bool xs[] = {true, false, true};
+        const bool ys[] = {0};
+        x_bools = gup_array_bool_from(xs, sizeof(xs) / sizeof(bool));
+        y_bools = gup_array_bool_from(ys, sizeof(ys) / sizeof(bool));
+        
+        bool are_they_equal = gup_array_bool_eq(x_bools, y_bools);
+
+        assert(are_they_equal == false);
+
+        free(x_bools->data);
+        free(y_bools->data);
+        free(x_bools);
+        free(y_bools);
+    }
+
+    { // Identical non-empty arrays are equivalent
+        const bool xs[] = {true, false, true};
+        const bool ys[] = {true, false, true};
+        x_bools = gup_array_bool_from(xs, sizeof(xs) / sizeof(bool));
+        y_bools = gup_array_bool_from(ys, sizeof(ys) / sizeof(bool));
+        
+        bool are_they_equal = gup_array_bool_eq(x_bools, y_bools);
+
+        assert(are_they_equal == true);
+
+        free(x_bools->data);
+        free(y_bools->data);
+        free(x_bools);
+        free(y_bools);
+    }
+
+    { // Differing non-empty arrays are not equivalent
+        const bool xs[] = {true, false, true};
+        const bool ys[] = {true, false, true, false};
+        x_bools = gup_array_bool_from(xs, sizeof(xs) / sizeof(bool));
+        y_bools = gup_array_bool_from(ys, sizeof(ys) / sizeof(bool));
+        
+        bool are_they_equal = gup_array_bool_eq(x_bools, y_bools);
+
+        assert(are_they_equal == false);
+
+        free(x_bools->data);
+        free(y_bools->data);
+        free(x_bools);
+        free(y_bools);
     }
 
     { // Append
@@ -154,7 +218,7 @@ void test_gup_array_bool(void) {
 }
 
 void test_gup_array_char(void) {
-    Gup_Array_Char *chars;
+    Gup_Array_Char *chars, *x_chars, *y_chars;
     bool found;
 
     { // Empty
@@ -179,6 +243,70 @@ void test_gup_array_char(void) {
 
         free(chars->data);
         free(chars);
+    }
+
+    { // Empty arrays are equivalent
+        const char xs[] = {0};
+        const char ys[] = {0};
+        x_chars = gup_array_char_from(xs, sizeof(xs) / sizeof(char));
+        y_chars = gup_array_char_from(ys, sizeof(ys) / sizeof(char));
+        
+        char are_they_equal = gup_array_char_eq(x_chars, y_chars);
+
+        assert(are_they_equal == true);
+
+        free(x_chars->data);
+        free(y_chars->data);
+        free(x_chars);
+        free(y_chars);
+    }
+
+    { // One empty one not is not equivalent
+        const char xs[] = {true, false, true};
+        const char ys[] = {0};
+        x_chars = gup_array_char_from(xs, sizeof(xs) / sizeof(char));
+        y_chars = gup_array_char_from(ys, sizeof(ys) / sizeof(char));
+        
+        char are_they_equal = gup_array_char_eq(x_chars, y_chars);
+
+        assert(are_they_equal == false);
+
+        free(x_chars->data);
+        free(y_chars->data);
+        free(x_chars);
+        free(y_chars);
+    }
+
+    { // Identical non-empty arrays are equivalent
+        const char xs[] = {true, false, true};
+        const char ys[] = {true, false, true};
+        x_chars = gup_array_char_from(xs, sizeof(xs) / sizeof(char));
+        y_chars = gup_array_char_from(ys, sizeof(ys) / sizeof(char));
+        
+        char are_they_equal = gup_array_char_eq(x_chars, y_chars);
+
+        assert(are_they_equal == true);
+
+        free(x_chars->data);
+        free(y_chars->data);
+        free(x_chars);
+        free(y_chars);
+    }
+
+    { // Differing non-empty arrays are not equivalent
+        const char xs[] = {true, false, true};
+        const char ys[] = {true, false, true, false};
+        x_chars = gup_array_char_from(xs, sizeof(xs) / sizeof(char));
+        y_chars = gup_array_char_from(ys, sizeof(ys) / sizeof(char));
+        
+        char are_they_equal = gup_array_char_eq(x_chars, y_chars);
+
+        assert(are_they_equal == false);
+
+        free(x_chars->data);
+        free(y_chars->data);
+        free(x_chars);
+        free(y_chars);
     }
 
     { // Append
@@ -305,7 +433,7 @@ void test_gup_array_char(void) {
 }
 
 void test_gup_array_float(void) {
-    Gup_Array_Float *floats;
+    Gup_Array_Float *floats, *x_floats, *y_floats;
     bool found;
 
     { // Empty
@@ -330,6 +458,70 @@ void test_gup_array_float(void) {
 
         free(floats->data);
         free(floats);
+    }
+
+    { // Empty arrays are equivalent
+        const float xs[] = {0};
+        const float ys[] = {0};
+        x_floats = gup_array_float_from(xs, sizeof(xs) / sizeof(float));
+        y_floats = gup_array_float_from(ys, sizeof(ys) / sizeof(float));
+        
+        float are_they_equal = gup_array_float_eq(x_floats, y_floats);
+
+        assert(are_they_equal == true);
+
+        free(x_floats->data);
+        free(y_floats->data);
+        free(x_floats);
+        free(y_floats);
+    }
+
+    { // One empty one not is not equivalent
+        const float xs[] = {true, false, true};
+        const float ys[] = {0};
+        x_floats = gup_array_float_from(xs, sizeof(xs) / sizeof(float));
+        y_floats = gup_array_float_from(ys, sizeof(ys) / sizeof(float));
+        
+        float are_they_equal = gup_array_float_eq(x_floats, y_floats);
+
+        assert(are_they_equal == false);
+
+        free(x_floats->data);
+        free(y_floats->data);
+        free(x_floats);
+        free(y_floats);
+    }
+
+    { // Identical non-empty arrays are equivalent
+        const float xs[] = {true, false, true};
+        const float ys[] = {true, false, true};
+        x_floats = gup_array_float_from(xs, sizeof(xs) / sizeof(float));
+        y_floats = gup_array_float_from(ys, sizeof(ys) / sizeof(float));
+        
+        float are_they_equal = gup_array_float_eq(x_floats, y_floats);
+
+        assert(are_they_equal == true);
+
+        free(x_floats->data);
+        free(y_floats->data);
+        free(x_floats);
+        free(y_floats);
+    }
+
+    { // Differing non-empty arrays are not equivalent
+        const float xs[] = {true, false, true};
+        const float ys[] = {true, false, true, false};
+        x_floats = gup_array_float_from(xs, sizeof(xs) / sizeof(float));
+        y_floats = gup_array_float_from(ys, sizeof(ys) / sizeof(float));
+        
+        float are_they_equal = gup_array_float_eq(x_floats, y_floats);
+
+        assert(are_they_equal == false);
+
+        free(x_floats->data);
+        free(y_floats->data);
+        free(x_floats);
+        free(y_floats);
     }
 
     { // Append
@@ -459,7 +651,7 @@ void test_gup_array_float(void) {
 }
 
 void test_gup_array_int(void) {
-    Gup_Array_Int *ints;
+    Gup_Array_Int *ints, *x_ints, *y_ints;
     bool found;
 
     { // Empty
@@ -482,6 +674,70 @@ void test_gup_array_int(void) {
 
         free(ints->data);
         free(ints);
+    }
+
+    { // Empty arrays are equivalent
+        const int xs[] = {0};
+        const int ys[] = {0};
+        x_ints = gup_array_int_from(xs, sizeof(xs) / sizeof(int));
+        y_ints = gup_array_int_from(ys, sizeof(ys) / sizeof(int));
+        
+        int are_they_equal = gup_array_int_eq(x_ints, y_ints);
+
+        assert(are_they_equal == true);
+
+        free(x_ints->data);
+        free(y_ints->data);
+        free(x_ints);
+        free(y_ints);
+    }
+
+    { // One empty one not is not equivalent
+        const int xs[] = {true, false, true};
+        const int ys[] = {0};
+        x_ints = gup_array_int_from(xs, sizeof(xs) / sizeof(int));
+        y_ints = gup_array_int_from(ys, sizeof(ys) / sizeof(int));
+        
+        int are_they_equal = gup_array_int_eq(x_ints, y_ints);
+
+        assert(are_they_equal == false);
+
+        free(x_ints->data);
+        free(y_ints->data);
+        free(x_ints);
+        free(y_ints);
+    }
+
+    { // Identical non-empty arrays are equivalent
+        const int xs[] = {true, false, true};
+        const int ys[] = {true, false, true};
+        x_ints = gup_array_int_from(xs, sizeof(xs) / sizeof(int));
+        y_ints = gup_array_int_from(ys, sizeof(ys) / sizeof(int));
+        
+        int are_they_equal = gup_array_int_eq(x_ints, y_ints);
+
+        assert(are_they_equal == true);
+
+        free(x_ints->data);
+        free(y_ints->data);
+        free(x_ints);
+        free(y_ints);
+    }
+
+    { // Differing non-empty arrays are not equivalent
+        const int xs[] = {true, false, true};
+        const int ys[] = {true, false, true, false};
+        x_ints = gup_array_int_from(xs, sizeof(xs) / sizeof(int));
+        y_ints = gup_array_int_from(ys, sizeof(ys) / sizeof(int));
+        
+        int are_they_equal = gup_array_int_eq(x_ints, y_ints);
+
+        assert(are_they_equal == false);
+
+        free(x_ints->data);
+        free(y_ints->data);
+        free(x_ints);
+        free(y_ints);
     }
 
     { // Append
