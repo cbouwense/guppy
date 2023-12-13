@@ -52,18 +52,27 @@ void             gup_array_bool_append(Gup_Array_Bool *xs, bool x);
 Gup_Array_Bool  *gup_array_bool_from(const bool xs[], const int size);
 void             gup_array_bool_prepend(Gup_Array_Bool *xs, bool x);
 void             gup_array_bool_print(Gup_Array_Bool *xs);
+int              gup_array_bool_remove_all(Gup_Array_Bool *xs, bool x);
+bool             gup_array_bool_remove_first(Gup_Array_Bool *xs, bool x);
+bool             gup_array_bool_remove_last(Gup_Array_Bool *xs, bool x);
 
 Gup_Array_Char  *gup_array_char();
 void             gup_array_char_append(Gup_Array_Char *xs, char x);
 Gup_Array_Char  *gup_array_char_from(const char xs[], const int size);
 void             gup_array_char_prepend(Gup_Array_Char *xs, char x);
 void             gup_array_char_print(Gup_Array_Char *xs);
+int              gup_array_char_remove_all(Gup_Array_Char *xs, char x);
+bool             gup_array_char_remove_first(Gup_Array_Char *xs, char x);
+bool             gup_array_char_remove_last(Gup_Array_Char *xs, char x);
 
 Gup_Array_Float *gup_array_float();
 void             gup_array_float_append(Gup_Array_Float *xs, float x);
 Gup_Array_Float *gup_array_float_from(const float xs[], const int size);
 void             gup_array_float_prepend(Gup_Array_Float *xs, float x);
 void             gup_array_float_print(Gup_Array_Float *xs);
+int              gup_array_float_remove_all(Gup_Array_Float *xs, float x);
+bool             gup_array_float_remove_first(Gup_Array_Float *xs, float x);
+bool             gup_array_float_remove_last(Gup_Array_Float *xs, float x);
 
 Gup_Array_Int   *gup_array_int();
 void             gup_array_int_append(Gup_Array_Int *xs, int i);
@@ -231,6 +240,7 @@ void *_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
 
 // Dynamic Arrays ----------------------------------------------------------------------------------
 
+// Bool
 Gup_Array_Bool *gup_array_bool() {
     Gup_Array_Bool *xs = malloc(sizeof(Gup_Array_Bool));
     
@@ -291,6 +301,84 @@ void _gup_array_bool_print(Gup_Array_Bool *xs, const char *xs_name) {
     printf("]\n"); 
 }
 
+int gup_array_bool_remove_all(Gup_Array_Bool *xs, bool x) {
+    int remaining = 0;
+    int original_count = xs->count;
+    bool *new_xs_data = malloc(xs->count * sizeof(bool));
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != x) {
+            new_xs_data[remaining] = xs->data[i];
+            remaining++;
+        }
+    }
+
+    free(xs->data);
+    xs->data = new_xs_data;
+    xs->data = realloc(xs->data, remaining * sizeof(bool));
+    xs->capacity = remaining;
+    xs->count = remaining;
+
+    return original_count - remaining;
+}
+
+bool gup_array_bool_remove_first(Gup_Array_Bool *xs, bool x) {
+    bool found = false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (found) {
+            xs->data[i] = xs->data[i+1];
+            if (i == xs->count - 2) break;
+        } else {
+            if (xs->data[i] == x) {
+                found = true;
+            }
+        }
+    }
+
+    if (found) {
+        xs->count--;
+        xs->capacity = xs->count;
+        xs->data = realloc(xs->data, xs->capacity * sizeof(bool));
+    }
+
+    return found;
+}
+
+bool gup_array_bool_remove_last(Gup_Array_Bool *xs, bool x) {
+    bool found = false;
+
+    for (int i = xs->count-1; i > 0; i--) {
+        if (found) {
+            xs->data[i] = xs->data[i-1];
+            if (i == 1) break;
+        } else {
+            if (xs->data[i] == x) {
+                found = true;
+                xs->data[i] = xs->data[i-1];
+            }
+        }
+    }
+
+    if (found) {
+        xs->count--;
+        xs->capacity = xs->count;
+        // If we found and removed an element, then we will need to move each
+        // element of the array to the left. The first element will be garbage.
+        // e.g. 
+        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
+        // [1, 1, 2, 3, 2, 4, 5] ->
+        //    [1, 2, 3, 2, 4, 5]
+        for (int i = 0; i < xs->count; i++) {
+            xs->data[i] = xs->data[i+1];
+        }
+        xs->data = realloc(xs->data, xs->count * sizeof(bool));
+    }
+
+    return found;
+}
+
+// Char
 Gup_Array_Char *gup_array_char() {
     Gup_Array_Char *xs = malloc(sizeof(Gup_Array_Char));
     
@@ -349,6 +437,84 @@ void _gup_array_char_print(Gup_Array_Char *xs, const char *xs_name) {
     printf("]\n"); 
 }
 
+int gup_array_char_remove_all(Gup_Array_Char *xs, char x) {
+    int remaining = 0;
+    int original_count = xs->count;
+    char *new_xs_data = malloc(xs->count * sizeof(char));
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != x) {
+            new_xs_data[remaining] = xs->data[i];
+            remaining++;
+        }
+    }
+
+    free(xs->data);
+    xs->data = new_xs_data;
+    xs->data = realloc(xs->data, remaining * sizeof(char));
+    xs->capacity = remaining;
+    xs->count = remaining;
+
+    return original_count - remaining;
+}
+
+bool gup_array_char_remove_first(Gup_Array_Char *xs, char x) {
+    bool found = false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (found) {
+            xs->data[i] = xs->data[i+1];
+            if (i == xs->count - 2) break;
+        } else {
+            if (xs->data[i] == x) {
+                found = true;
+            }
+        }
+    }
+
+    if (found) {
+        xs->count--;
+        xs->capacity = xs->count;
+        xs->data = realloc(xs->data, xs->capacity * sizeof(char));
+    }
+
+    return found;
+}
+
+bool gup_array_char_remove_last(Gup_Array_Char *xs, char x) {
+    bool found = false;
+
+    for (int i = xs->count-1; i > 0; i--) {
+        if (found) {
+            xs->data[i] = xs->data[i-1];
+            if (i == 1) break;
+        } else {
+            if (xs->data[i] == x) {
+                found = true;
+                xs->data[i] = xs->data[i-1];
+            }
+        }
+    }
+
+    if (found) {
+        xs->count--;
+        xs->capacity = xs->count;
+        // If we found and removed an element, then we will need to move each
+        // element of the array to the left. The first element will be garbage.
+        // e.g. 
+        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
+        // [1, 1, 2, 3, 2, 4, 5] ->
+        //    [1, 2, 3, 2, 4, 5]
+        for (int i = 0; i < xs->count; i++) {
+            xs->data[i] = xs->data[i+1];
+        }
+        xs->data = realloc(xs->data, xs->count * sizeof(char));
+    }
+
+    return found;
+}
+
+// Float
 Gup_Array_Float *gup_array_float() {
     Gup_Array_Float *xs = malloc(sizeof(Gup_Array_Float));
     
@@ -407,6 +573,84 @@ void _gup_array_float_print(Gup_Array_Float *xs, const char *xs_name) {
     printf("]\n"); 
 }
 
+int gup_array_float_remove_all(Gup_Array_Float *xs, float x) {
+    int remaining = 0;
+    int original_count = xs->count;
+    float *new_xs_data = malloc(xs->count * sizeof(float));
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != x) {
+            new_xs_data[remaining] = xs->data[i];
+            remaining++;
+        }
+    }
+
+    free(xs->data);
+    xs->data = new_xs_data;
+    xs->data = realloc(xs->data, remaining * sizeof(float));
+    xs->capacity = remaining;
+    xs->count = remaining;
+
+    return original_count - remaining;
+}
+
+bool gup_array_float_remove_first(Gup_Array_Float *xs, float x) {
+    bool found = false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (found) {
+            xs->data[i] = xs->data[i+1];
+            if (i == xs->count - 2) break;
+        } else {
+            if (xs->data[i] == x) {
+                found = true;
+            }
+        }
+    }
+
+    if (found) {
+        xs->count--;
+        xs->capacity = xs->count;
+        xs->data = realloc(xs->data, xs->capacity * sizeof(float));
+    }
+
+    return found;
+}
+
+bool gup_array_float_remove_last(Gup_Array_Float *xs, float x) {
+    bool found = false;
+
+    for (int i = xs->count-1; i > 0; i--) {
+        if (found) {
+            xs->data[i] = xs->data[i-1];
+            if (i == 1) break;
+        } else {
+            if (xs->data[i] == x) {
+                found = true;
+                xs->data[i] = xs->data[i-1];
+            }
+        }
+    }
+
+    if (found) {
+        xs->count--;
+        xs->capacity = xs->count;
+        // If we found and removed an element, then we will need to move each
+        // element of the array to the left. The first element will be garbage.
+        // e.g. 
+        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
+        // [1, 1, 2, 3, 2, 4, 5] ->
+        //    [1, 2, 3, 2, 4, 5]
+        for (int i = 0; i < xs->count; i++) {
+            xs->data[i] = xs->data[i+1];
+        }
+        xs->data = realloc(xs->data, xs->count * sizeof(float));
+    }
+
+    return found;
+}
+
+// Int
 Gup_Array_Int *gup_array_int() {
     Gup_Array_Int *ints = malloc(sizeof(Gup_Array_Int));
     

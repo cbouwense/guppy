@@ -158,6 +158,7 @@ void test_gup_array_char(void) {
 
 void test_gup_array_float(void) {
     Gup_Array_Float *floats;
+    bool found;
 
     { // Empty
         floats = gup_array_float();
@@ -165,6 +166,8 @@ void test_gup_array_float(void) {
         assert(floats->capacity == 0);
         assert(floats->count == 0);
         assert(floats->data == NULL);
+
+        free(floats);
     }
 
     { // From a few elements
@@ -176,6 +179,9 @@ void test_gup_array_float(void) {
         assert(floats->data[0] == 1.0f);
         assert(floats->data[1] == 2.0f);
         assert(floats->data[2] == 3.0f);
+
+        free(floats->data);
+        free(floats);
     }
 
     { // Append
@@ -202,6 +208,9 @@ void test_gup_array_float(void) {
         assert(floats->data[4] == 3.0f);
         assert(floats->data[5] == 3.0f);
         assert(floats->data[6] == 7.0f);
+
+        free(floats->data);
+        free(floats);
     }
 
     { // Prepend
@@ -228,10 +237,76 @@ void test_gup_array_float(void) {
         assert(floats->data[4] == 38.0f);
         assert(floats->data[5] == 17.0f);
         assert(floats->data[6] == 42.0f);
+
+        free(floats->data);
+        free(floats);
     }
 
-    free(floats->data);
-    free(floats);
+    { // Remove first
+        bool found;
+        floats = gup_array_float();
+        gup_array_float_append(floats, 1);
+        
+        found = gup_array_float_remove_first(floats, 0);
+
+        assert(found == false);
+        assert(floats->capacity == 1);
+        assert(floats->count == 1);
+        assert(floats->data[0] == 1);
+
+        gup_array_float_append(floats, 2);
+        gup_array_float_append(floats, 2);
+        gup_array_float_append(floats, 2);
+        gup_array_float_append(floats, 3);
+
+        found = gup_array_float_remove_first(floats, 2);
+
+        assert(found == true);
+        assert(floats->capacity == 4);
+        assert(floats->count == 4);
+        assert(floats->data[0] == 1);
+        assert(floats->data[1] == 2);
+        assert(floats->data[2] == 2);
+        assert(floats->data[3] == 3);
+    }
+
+    { // Remove last no occurrence
+        Gup_Array_Float * floats = gup_array_float();
+        gup_array_float_append(floats, 1);
+        
+        found = gup_array_float_remove_last(floats, 0);
+
+        assert(found == false);
+        assert(floats->capacity == 1);
+        assert(floats->count == 1);
+        assert(floats->data[0] == 1);
+
+        free(floats->data);
+        free(floats);
+    }
+
+    { // Remove last with occurrence
+        float xs[] = {1.0f, 2.0f, 3.0f, 2.0f, 4.0f, 2.0f, 5.0f};
+        floats = gup_array_float_from(xs, sizeof(xs)/sizeof(float));
+
+        found = gup_array_float_remove_last(floats, 2);
+
+        // [1, 2, 3, 2, 4, 2, 5] ->
+        // [1, 2, 3, 2, 4, 5]
+        assert(found == true);
+        assert(floats->capacity == 6);
+        assert(floats->count == 6);
+        assert(floats->data[0] == 1.0f);
+        assert(floats->data[1] == 2.0f);
+        assert(floats->data[2] == 3.0f);
+        assert(floats->data[3] == 2.0f);
+        assert(floats->data[4] == 4.0f);
+        assert(floats->data[5] == 5.0f);
+
+        free(floats->data);
+        free(floats);
+    }
+
 }
 
 void test_gup_array_int(void) {
@@ -408,6 +483,7 @@ void test_gup_array_int(void) {
         free(ints->data);
         free(ints);
     }
+
 }
 
 void test_gup_array(void) {
