@@ -47,15 +47,15 @@ typedef struct {
  **************************************************************************************************/
 
 // Dynamic arrays ----------------------------------------------------------------------------------
-GupArrayBool  *gup_array_bool();
-void           gup_array_bool_append(GupArrayBool *xs, bool x);
-bool           gup_array_bool_eq(GupArrayBool *xs, GupArrayBool *ys);
-GupArrayBool  *gup_array_bool_from(const bool xs[], const int size);
-void           gup_array_bool_prepend(GupArrayBool *xs, bool x);
-void           gup_array_bool_print(GupArrayBool *xs);
-int            gup_array_bool_remove_all(GupArrayBool *xs, bool x);
-bool           gup_array_bool_remove_first(GupArrayBool *xs, bool x);
-bool           gup_array_bool_remove_last(GupArrayBool *xs, bool x);
+GupArrayBool gup_array_bool();
+GupArrayBool gup_array_bool_from(const bool xs[], const int size);
+GupArrayBool gup_array_bool_append(GupArrayBool xs, bool x);
+GupArrayBool gup_array_bool_prepend(GupArrayBool xs, bool x);
+bool         gup_array_bool_eq(GupArrayBool xs, GupArrayBool ys);
+void         gup_array_bool_print(GupArrayBool xs);
+GupArrayBool gup_array_bool_remove_all(GupArrayBool xs, bool x);
+GupArrayBool gup_array_bool_remove_first(GupArrayBool xs, bool x);
+GupArrayBool gup_array_bool_remove_last(GupArrayBool xs, bool x);
 
 GupArrayChar  *gup_array_char();
 void           gup_array_char_append(GupArrayChar *xs, char x);
@@ -189,154 +189,153 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
 // Dynamic Arrays ----------------------------------------------------------------------------------
 
 // Bool
-GupArrayBool *gup_array_bool() {
-    GupArrayBool *xs = malloc(sizeof(GupArrayBool));
-    
-    xs->capacity = 0;
-    xs->count = 0;
-    xs->data = NULL;
-
+GupArrayBool gup_array_bool() {
+    GupArrayBool xs = {
+        .capacity = 0,
+        .count = 0,
+        .data = NULL
+    };
     return xs;
 }
 
-bool gup_array_bool_eq(GupArrayBool *xs, GupArrayBool *ys) {
-    gup_assert(xs != NULL && ys != NULL, "Tried comparing two null `GupArrayBool`s.");
-    gup_assert(xs != NULL || ys != NULL, "Tried comparing a null `GupArrayBool` with a defined one.");
-
-    if (xs->count != ys->count) return false;
+bool gup_array_bool_eq(GupArrayBool xs, GupArrayBool ys) {
+    if (xs.count != ys.count) return false;
     
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
     }
 
     return true;
 }
 
-GupArrayBool *gup_array_bool_from(const bool xs[], const int size)  {
-    GupArrayBool *bools = gup_array_bool();
-    bools->data = malloc(size * sizeof(bool));
+GupArrayBool gup_array_bool_from(const bool xs[], const int size)  {
+    GupArrayBool bools = gup_array_bool();
+    bools.data = malloc(size * sizeof(bool));
 
-    bools->capacity = size;
-    bools->count = size;
+    bools.capacity = size;
+    bools.count = size;
     for (int i = 0; i < size; i++) {
-        bools->data[i] = xs[i];
+        bools.data[i] = xs[i];
     }
 
     return bools;
 }
 
-void gup_array_bool_append(GupArrayBool *xs, bool x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(bool));
-        xs->capacity = new_capacity;
+GupArrayBool gup_array_bool_append(GupArrayBool xs, bool x) {
+    if (xs.count == xs.capacity) {
+        const int new_capacity = xs.capacity == 0 ? 1 : xs.capacity * 2;
+        xs.data = realloc(xs.data, new_capacity * sizeof(bool));
+        xs.capacity = new_capacity;
     }
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    xs.data[xs.count] = x;
+    xs.count++;
+
+    return xs;
 }
 
-void gup_array_bool_prepend(GupArrayBool *xs, bool x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(bool));
-        xs->capacity = new_capacity;
+GupArrayBool gup_array_bool_prepend(GupArrayBool xs, bool x) {
+    if (xs.count == xs.capacity) {
+        const int new_capacity = xs.capacity == 0 ? 1 : xs.capacity * 2;
+        xs.data = realloc(xs.data, new_capacity * sizeof(bool));
+        xs.capacity = new_capacity;
     }
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = xs.count; i > 0; i--) {
+        xs.data[i] = xs.data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    xs.data[0] = x;
+    xs.count++;
+
+    return xs;
 }
 
 #define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
-void _gup_array_bool_print(GupArrayBool *xs, const char *xs_name) {
+void _gup_array_bool_print(GupArrayBool xs, const char *xs_name) {
     printf("%s: [", xs_name);
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] == true) printf("true");
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] == true) printf("true");
         else printf("false");
 
-        if (i != xs->count-1) printf(", ");
+        if (i != xs.count-1) printf(", ");
     }
     printf("]\n"); 
 }
 
-int gup_array_bool_remove_all(GupArrayBool *xs, bool x) {
+GupArrayBool gup_array_bool_remove_all(GupArrayBool xs, bool x) {
     int remaining = 0;
-    int original_count = xs->count;
-    bool *new_xs_data = malloc(xs->count * sizeof(bool));
+    bool *new_xs_data = malloc(xs.count * sizeof(bool));
 
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != x) {
-            new_xs_data[remaining] = xs->data[i];
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != x) {
+            new_xs_data[remaining] = xs.data[i];
             remaining++;
         }
     }
 
-    free(xs->data);
-    xs->data = new_xs_data;
-    xs->data = realloc(xs->data, remaining * sizeof(bool));
-    xs->capacity = remaining;
-    xs->count = remaining;
+    free(xs.data);
+    xs.data = new_xs_data;
+    xs.data = realloc(xs.data, remaining * sizeof(bool));
+    xs.capacity = remaining;
+    xs.count = remaining;
 
-    return original_count - remaining;
+    return xs;
 }
 
-bool gup_array_bool_remove_first(GupArrayBool *xs, bool x) {
+GupArrayBool gup_array_bool_remove_first(GupArrayBool xs, bool x) {
     bool found = false;
 
-    for (int i = 0; i < xs->count; i++) {
+    for (int i = 0; i < xs.count; i++) {
         if (found) {
-            xs->data[i] = xs->data[i+1];
-            if (i == xs->count - 2) break;
+            xs.data[i] = xs.data[i+1];
+            if (i == xs.count - 2) break;
         } else {
-            if (xs->data[i] == x) {
+            if (xs.data[i] == x) {
                 found = true;
             }
         }
     }
 
     if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        xs->data = realloc(xs->data, xs->capacity * sizeof(bool));
+        xs.count--;
+        xs.capacity = xs.count;
+        xs.data = realloc(xs.data, xs.capacity * sizeof(bool));
     }
 
-    return found;
+    return xs;
 }
 
-bool gup_array_bool_remove_last(GupArrayBool *xs, bool x) {
+GupArrayBool gup_array_bool_remove_last(GupArrayBool xs, bool x) {
     bool found = false;
 
-    for (int i = xs->count-1; i > 0; i--) {
+    for (int i = xs.count-1; i > 0; i--) {
         if (found) {
-            xs->data[i] = xs->data[i-1];
+            xs.data[i] = xs.data[i-1];
             if (i == 1) break;
         } else {
-            if (xs->data[i] == x) {
+            if (xs.data[i] == x) {
                 found = true;
-                xs->data[i] = xs->data[i-1];
+                xs.data[i] = xs.data[i-1];
             }
         }
     }
 
     if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
+        xs.count--;
+        xs.capacity = xs.count;
         // If we found and removed an element, then we will need to move each
         // element of the array to the left. The first element will be garbage.
         // e.g. 
-        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
-        // [1, 1, 2, 3, 2, 4, 5] ->
+        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) .
+        // [1, 1, 2, 3, 2, 4, 5] .
         //    [1, 2, 3, 2, 4, 5]
-        for (int i = 0; i < xs->count; i++) {
-            xs->data[i] = xs->data[i+1];
+        for (int i = 0; i < xs.count; i++) {
+            xs.data[i] = xs.data[i+1];
         }
-        xs->data = realloc(xs->data, xs->count * sizeof(bool));
+        xs.data = realloc(xs.data, xs.count * sizeof(bool));
     }
 
-    return found;
+    return xs;
 }
 
 // Char
@@ -1501,7 +1500,7 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
     free(settings_text);
 
 defer:
-    for (int i = 0; i < line_count + 2; i++) {
+    for (int i = 0; i < line_count; i++) {
         free(settings_lines[i]);
     }
     free(settings_lines);

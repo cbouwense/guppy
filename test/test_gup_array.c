@@ -1,31 +1,27 @@
 #include "../src/guppy.h"
 
 void test_gup_array_bool(void) {
-    GupArrayBool *bools, *x_bools, *y_bools;
-    bool found;
+    GupArrayBool bools, x_bools, y_bools;
 
     { // Empty
         bools = gup_array_bool();
 
-        assert(bools->capacity == 0);
-        assert(bools->count == 0);
-        assert(bools->data == NULL);
-
-        free(bools);
+        assert(bools.capacity == 0);
+        assert(bools.count == 0);
+        assert(bools.data == NULL);
     }
 
     { // From a few elements
         const bool xs[] = {true, false, true};
         bools = gup_array_bool_from(xs, sizeof(xs) / sizeof(bool));
 
-        assert(bools->capacity == 3);
-        assert(bools->count == 3);
-        assert(bools->data[0] == true);
-        assert(bools->data[1] == false);
-        assert(bools->data[2] == true);
+        assert(bools.capacity == 3);
+        assert(bools.count == 3);
+        assert(bools.data[0] == true);
+        assert(bools.data[1] == false);
+        assert(bools.data[2] == true);
 
-        free(bools->data);
-        free(bools);
+        free(bools.data);
     }
 
     { // Empty arrays are equivalent
@@ -38,10 +34,8 @@ void test_gup_array_bool(void) {
 
         assert(are_they_equal == true);
 
-        free(x_bools->data);
-        free(y_bools->data);
-        free(x_bools);
-        free(y_bools);
+        free(x_bools.data);
+        free(y_bools.data);
     }
 
     { // One empty one not is not equivalent
@@ -54,10 +48,8 @@ void test_gup_array_bool(void) {
 
         assert(are_they_equal == false);
 
-        free(x_bools->data);
-        free(y_bools->data);
-        free(x_bools);
-        free(y_bools);
+        free(x_bools.data);
+        free(y_bools.data);
     }
 
     { // Identical non-empty arrays are equivalent
@@ -70,10 +62,8 @@ void test_gup_array_bool(void) {
 
         assert(are_they_equal == true);
 
-        free(x_bools->data);
-        free(y_bools->data);
-        free(x_bools);
-        free(y_bools);
+        free(x_bools.data);
+        free(y_bools.data);
     }
 
     { // Differing non-empty arrays are not equivalent
@@ -86,135 +76,123 @@ void test_gup_array_bool(void) {
 
         assert(are_they_equal == false);
 
-        free(x_bools->data);
-        free(y_bools->data);
-        free(x_bools);
-        free(y_bools);
+        free(x_bools.data);
+        free(y_bools.data);
     }
 
     { // Append
         bools = gup_array_bool();
-        gup_array_bool_append(bools, true);
+        bools = gup_array_bool_append(bools, true);
         
-        assert(bools->capacity == 1);
-        assert(bools->count == 1);
-        assert(bools->data[0] == true);
+        assert(bools.capacity == 1);
+        assert(bools.count == 1);
+        assert(bools.data[0] == true);
 
-        gup_array_bool_append(bools, true);
-        gup_array_bool_append(bools, false);
-        gup_array_bool_append(bools, true);
-        gup_array_bool_append(bools, true);
-        gup_array_bool_append(bools, false);
-        gup_array_bool_append(bools, false);
+        bools = gup_array_bool_append(bools, true);
+        bools = gup_array_bool_append(bools, false);
+        bools = gup_array_bool_append(bools, true);
+        bools = gup_array_bool_append(bools, true);
+        bools = gup_array_bool_append(bools, false);
+        bools = gup_array_bool_append(bools, false);
 
-        assert(bools->capacity == 8);
-        assert(bools->count == 7);
-        assert(bools->data[0] == true);
-        assert(bools->data[1] == true);
-        assert(bools->data[2] == false);
-        assert(bools->data[3] == true);
-        assert(bools->data[4] == true);
-        assert(bools->data[5] == false);
-        assert(bools->data[6] == false);
+        assert(bools.capacity == 8);
+        assert(bools.count == 7);
+        assert(bools.data[0] == true);
+        assert(bools.data[1] == true);
+        assert(bools.data[2] == false);
+        assert(bools.data[3] == true);
+        assert(bools.data[4] == true);
+        assert(bools.data[5] == false);
+        assert(bools.data[6] == false);
 
-        free(bools->data);
-        free(bools);
+        free(bools.data);
     }
 
     { // Prepend
         bools = gup_array_bool();
-        gup_array_bool_prepend(bools, true);
+        bools = gup_array_bool_prepend(bools, true);
         
-        assert(bools->capacity == 1);
-        assert(bools->count == 1);
-        assert(bools->data[0] == true);
+        assert(bools.capacity == 1);
+        assert(bools.count == 1);
+        assert(bools.data[0] == true);
 
-        gup_array_bool_prepend(bools, true);
-        gup_array_bool_prepend(bools, false);
-        gup_array_bool_prepend(bools, true);
-        gup_array_bool_prepend(bools, true);
-        gup_array_bool_prepend(bools, false);
-        gup_array_bool_prepend(bools, false);
+        bools = gup_array_bool_prepend(bools, true);
+        bools = gup_array_bool_prepend(bools, false);
+        bools = gup_array_bool_prepend(bools, true);
+        bools = gup_array_bool_prepend(bools, true);
+        bools = gup_array_bool_prepend(bools, false);
+        bools = gup_array_bool_prepend(bools, false);
 
-        assert(bools->capacity == 8);
-        assert(bools->count == 7);
-        assert(bools->data[0] == false);
-        assert(bools->data[1] == false);
-        assert(bools->data[2] == true);
-        assert(bools->data[3] == true);
-        assert(bools->data[4] == false);
-        assert(bools->data[5] == true);
-        assert(bools->data[6] == true);
+        assert(bools.capacity == 8);
+        assert(bools.count == 7);
+        assert(bools.data[0] == false);
+        assert(bools.data[1] == false);
+        assert(bools.data[2] == true);
+        assert(bools.data[3] == true);
+        assert(bools.data[4] == false);
+        assert(bools.data[5] == true);
+        assert(bools.data[6] == true);
 
-        free(bools->data);
-        free(bools);
+        free(bools.data);
     }
 
     { // Remove first
         bools = gup_array_bool();
-        gup_array_bool_append(bools, true);
+        bools = gup_array_bool_append(bools, true);
         
-        found = gup_array_bool_remove_first(bools, false);
+        bools = gup_array_bool_remove_first(bools, false);
 
-        assert(found == false);
-        assert(bools->capacity == 1);
-        assert(bools->count == 1);
-        assert(bools->data[0] == true);
+        assert(bools.capacity == 1);
+        assert(bools.count == 1);
+        assert(bools.data[0] == true);
 
-        gup_array_bool_append(bools, false);
-        gup_array_bool_append(bools, false);
-        gup_array_bool_append(bools, false);
-        gup_array_bool_append(bools, true);
+        bools = gup_array_bool_append(bools, false);
+        bools = gup_array_bool_append(bools, false);
+        bools = gup_array_bool_append(bools, false);
+        bools = gup_array_bool_append(bools, true);
 
-        found = gup_array_bool_remove_first(bools, false);
+        bools = gup_array_bool_remove_first(bools, false);
 
-        assert(found == true);
-        assert(bools->capacity == 4);
-        assert(bools->count == 4);
-        assert(bools->data[0] == true);
-        assert(bools->data[1] == false);
-        assert(bools->data[2] == false);
-        assert(bools->data[3] == true);
+        assert(bools.capacity == 4);
+        assert(bools.count == 4);
+        assert(bools.data[0] == true);
+        assert(bools.data[1] == false);
+        assert(bools.data[2] == false);
+        assert(bools.data[3] == true);
 
-        free(bools->data);
-        free(bools);
+        free(bools.data);
     }
 
     { // Remove last no occurrence
-        GupArrayBool * bools = gup_array_bool();
-        gup_array_bool_append(bools, true);
+        bools = gup_array_bool();
+        bools = gup_array_bool_append(bools, true);
         
-        found = gup_array_bool_remove_last(bools, false);
+        bools = gup_array_bool_remove_last(bools, false);
 
-        assert(found == false);
-        assert(bools->capacity == 1);
-        assert(bools->count == 1);
-        assert(bools->data[0] == true);
+        assert(bools.capacity == 1);
+        assert(bools.count == 1);
+        assert(bools.data[0] == true);
 
-        free(bools->data);
-        free(bools);
+        free(bools.data);
     }
 
     { // Remove last with occurrence
         bool xs[] = {true, false, true, false, true, false, false};
         bools = gup_array_bool_from(xs, sizeof(xs)/sizeof(bool));
 
-        found = gup_array_bool_remove_last(bools, false);
+        bools = gup_array_bool_remove_last(bools, false);
 
-        assert(found == true);
-        assert(bools->capacity == 6);
-        assert(bools->count == 6);
-        assert(bools->data[0] == true);
-        assert(bools->data[1] == false);
-        assert(bools->data[2] == true);
-        assert(bools->data[3] == false);
-        assert(bools->data[4] == true);
-        assert(bools->data[5] == false);
+        assert(bools.capacity == 6);
+        assert(bools.count == 6);
+        assert(bools.data[0] == true);
+        assert(bools.data[1] == false);
+        assert(bools.data[2] == true);
+        assert(bools.data[3] == false);
+        assert(bools.data[4] == true);
+        assert(bools.data[5] == false);
 
-        free(bools->data);
-        free(bools);
+        free(bools.data);
     }
-
 }
 
 void test_gup_array_char(void) {
