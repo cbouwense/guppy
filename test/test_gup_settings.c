@@ -2,43 +2,43 @@
 
 void test_gup_does_setting_file_line_contain_key(void) {
     {
-        Gup_String_View line = SV_STATIC("title = \"guppy.h\"");
-        Gup_String_View key  = SV_STATIC("title");
+        GupStringView line = SV_STATIC("title = \"guppy.h\"");
+        GupStringView key  = SV_STATIC("title");
 
         assert(true == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     {
-        Gup_String_View line = SV_STATIC("title = \"guppy.h\"");
-        Gup_String_View key  = SV_STATIC("author");
+        GupStringView line = SV_STATIC("title = \"guppy.h\"");
+        GupStringView key  = SV_STATIC("author");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     { // Comments always return false
-        Gup_String_View line = SV_STATIC("# Comment");
-        Gup_String_View key  = SV_STATIC("title");
+        GupStringView line = SV_STATIC("# Comment");
+        GupStringView key  = SV_STATIC("title");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     { // Section headers always return false
-        Gup_String_View line = SV_STATIC("[Section header]");
-        Gup_String_View key  = SV_STATIC("title");
+        GupStringView line = SV_STATIC("[Section header]");
+        GupStringView key  = SV_STATIC("title");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     { // Empty lines always return false
-        Gup_String_View line = SV_STATIC("");
-        Gup_String_View key  = SV_STATIC("title");
+        GupStringView line = SV_STATIC("");
+        GupStringView key  = SV_STATIC("title");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     { // Lines without equals signs always return false
-        Gup_String_View line = SV_STATIC("title is guppy.h");
-        Gup_String_View key  = SV_STATIC("title");
+        GupStringView line = SV_STATIC("title is guppy.h");
+        GupStringView key  = SV_STATIC("title");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }

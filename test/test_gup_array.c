@@ -1,7 +1,7 @@
 #include "../src/guppy.h"
 
 void test_gup_array_bool(void) {
-    Gup_Array_Bool *bools, *x_bools, *y_bools;
+    GupArrayBool *bools, *x_bools, *y_bools;
     bool found;
 
     { // Empty
@@ -181,7 +181,7 @@ void test_gup_array_bool(void) {
     }
 
     { // Remove last no occurrence
-        Gup_Array_Bool * bools = gup_array_bool();
+        GupArrayBool * bools = gup_array_bool();
         gup_array_bool_append(bools, true);
         
         found = gup_array_bool_remove_last(bools, false);
@@ -218,7 +218,7 @@ void test_gup_array_bool(void) {
 }
 
 void test_gup_array_char(void) {
-    Gup_Array_Char *chars, *x_chars, *y_chars;
+    GupArrayChar *chars, *x_chars, *y_chars;
     bool found;
 
     { // Empty
@@ -395,7 +395,7 @@ void test_gup_array_char(void) {
     }
 
     { // Remove last no occurrence
-        Gup_Array_Char * chars = gup_array_char();
+        GupArrayChar * chars = gup_array_char();
         gup_array_char_append(chars, 'a');
         
         found = gup_array_char_remove_last(chars, 'b');
@@ -433,7 +433,7 @@ void test_gup_array_char(void) {
 }
 
 void test_gup_array_float(void) {
-    Gup_Array_Float *floats, *x_floats, *y_floats;
+    GupArrayFloat *floats, *x_floats, *y_floats;
     bool found;
 
     { // Empty
@@ -613,7 +613,7 @@ void test_gup_array_float(void) {
     }
 
     { // Remove last no occurrence
-        Gup_Array_Float * floats = gup_array_float();
+        GupArrayFloat * floats = gup_array_float();
         gup_array_float_append(floats, 1);
         
         found = gup_array_float_remove_last(floats, 0);
@@ -651,7 +651,7 @@ void test_gup_array_float(void) {
 }
 
 void test_gup_array_int(void) {
-    Gup_Array_Int *ints, *x_ints, *y_ints;
+    GupArrayInt *ints, *x_ints, *y_ints;
     bool found;
 
     { // Empty
@@ -855,7 +855,7 @@ void test_gup_array_int(void) {
     }
 
     { // Remove last no occurrence
-        Gup_Array_Int * ints = gup_array_int();
+        GupArrayInt * ints = gup_array_int();
         gup_array_int_append(ints, 1);
         
         found = gup_array_int_remove_last(ints, 0);
