@@ -84,17 +84,24 @@ void test_gup_settings_get_from_file(void) {
 }
 
 void test_gup_settings_set(void) {
+    char *result;
+
     { // Setting that exists
         gup_settings_set("title", "asdf.h");
 
-        assert(gup_cstr_eq(gup_settings_get("title"), "asdf.h"));
+        result = gup_settings_get("title");
+        assert(gup_cstr_eq(result, "asdf.h"));
+
+        free(result);
     }
 
     { // Setting that doesn't exist
-        gup_settings_set("does_not_exist", "should still show up though");
+        gup_settings_set("does_not_existasdfasdfasdfasdfasdf", "should still show up though");
 
-        assert(gup_settings_get("does_not_exist") != NULL);
-        assert(gup_cstr_eq(gup_settings_get("does_not_exist"), "should still show up though"));
+        result = gup_settings_get("does_not_existasdfasdfasdfasdfasdf"); 
+        assert(gup_cstr_eq(result, "should still show up though"));
+
+        free(result);
     }
 }
 

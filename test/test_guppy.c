@@ -37,14 +37,6 @@ void run_all_guppy_tests(void) {
 
 int main(void) {
     gup_operation_seconds_verbose(run_all_guppy_tests);
-    // gup_memory_init();
-
-    // int * ints;
-    // ints = malloc(3 * sizeof(int));
-    // ints = realloc(ints, 4 * sizeof(int));
-    // free(ints);
-
-    // gup_memory_print();
 
     return 0;
 }

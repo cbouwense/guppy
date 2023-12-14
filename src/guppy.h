@@ -1063,7 +1063,7 @@ char **gup_file_read_lines(const char *file_path) {
     gup_defer_return(lines);
 
 defer:
-    if (line) free(line);
+    free(line);
     if (fp) fclose(fp);
 
     return result;
@@ -1112,7 +1112,7 @@ char **gup_file_read_lines_keep_newlines(const char *file_path) {
     gup_defer_return(lines);
 
 defer:
-    if (line) free(line);
+    free(line);
     if (fp) fclose(fp);
     return result;
 }
@@ -1406,13 +1406,15 @@ char *gup_settings_get_from_file(const char *key, const char *file_path) {
 
 defer:
     for (int i = 0; i < line_count; i++) {
-        if (settings_lines[i]) free(settings_lines[i]);
+        free(settings_lines[i]);
     }
+    free(settings_lines);
+
     return result;
 }
 
 int gup_settings_get_int(const char *key) {
-    const char *value = gup_settings_get(key);
+    char *value = gup_settings_get(key);
     if (value == NULL) {
         #ifdef GUPPY_VERBOSE
         printf("Failed to get value for key \"%s\"\n", key);
@@ -1426,6 +1428,7 @@ int gup_settings_get_int(const char *key) {
         printf("Invalid value for key \"%s\". Are you sure it's an int?\n.", key);
     }
 
+    free(value);
     return (int) result;
 }
 
@@ -1461,6 +1464,8 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
         // Replace the line with the key with the new value
         char *new_line = malloc(strlen(key) + strlen(value) + 3);
         sprintf(new_line, "%s = \"%s\"\n", key, value);
+
+        free(settings_lines[i]);
         settings_lines[i] = new_line;
         found = true;
     }
@@ -1468,23 +1473,22 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
     // If we didn't find the key, increase the memory allocated for the array and add the new key
     // value pair to the end.
     if (!found) {
-        char **new_settings_lines = malloc((line_count + 2) * sizeof(char *));
-        for (int i = 0; i < line_count; i++) {
-            new_settings_lines[i] = settings_lines[i];
-        }
+        settings_lines = realloc(settings_lines, (line_count + 2) * sizeof(char *));
 
         char *new_line = malloc(strlen(key) + strlen(value) + 3);
         sprintf(new_line, "%s = \"%s\"\n", key, value);
         
-        new_settings_lines[line_count-1] = new_line;
-        new_settings_lines[line_count] = NULL;
+        settings_lines[line_count-1] = new_line;
+        settings_lines[line_count] = NULL;
 
         // Flatten the lines into a single string
-        char *new_settings_text = gup_string_array_flatten(new_settings_lines);
+        char *new_settings_text = gup_string_array_flatten(settings_lines);
 
         // Write to the file
         gup_file_write(new_settings_text, file_path);
 
+        // free(new_line);
+        free(new_settings_text);
         gup_defer_return(true);
     }
 
@@ -1497,8 +1501,8 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
     free(settings_text);
 
 defer:
-    for (int i = 0; i < line_count; i++) {
-        if (settings_lines[i]) free(settings_lines[i]);
+    for (int i = 0; i < line_count + 2; i++) {
+        free(settings_lines[i]);
     }
     free(settings_lines);
 

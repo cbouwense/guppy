@@ -392,6 +392,9 @@ void test_gup_array_char(void) {
         assert(chars->data[1] == 'b');
         assert(chars->data[2] == 'b');
         assert(chars->data[3] == 'c');
+
+        free(chars->data);
+        free(chars);
     }
 
     { // Remove last no occurrence
@@ -660,6 +663,8 @@ void test_gup_array_int(void) {
         assert(ints->capacity == 0);
         assert(ints->count == 0);
         assert(ints->data == NULL);
+
+        free(ints);
     }
 
     { // From a few elements
@@ -822,6 +827,9 @@ void test_gup_array_int(void) {
         assert(ints->count == 2);
         assert(ints->data[0] == 1);
         assert(ints->data[1] == 3);
+
+        free(ints->data);
+        free(ints);
     }
 
     { // Remove first

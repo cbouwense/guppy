@@ -34,6 +34,8 @@ void test_gup_file_read(void) {
     { // empty.txt
         file_contents = gup_file_read("./resources/empty.txt");
         assert(strcmp(file_contents, "") == 0);
+
+        free(file_contents);
     }
 
     { // one_newline.txt
@@ -73,6 +75,7 @@ void test_gup_file_read_lines(void) {
         assert(lines[1] == NULL);
 
         free(lines[0]);
+        free(lines);
     }
 
     { // foo.txt
@@ -90,8 +93,9 @@ void test_gup_file_read_lines(void) {
 
         const int line_count = gup_file_line_count("./resources/foo.txt");
         for (int i = 0; i < line_count; i++) {
-            if (lines[i]) free(lines[i]);
+            free(lines[i]);
         }
+        free(lines);
     }
 
     { // settings.toml
@@ -113,8 +117,9 @@ void test_gup_file_read_lines(void) {
 
         const int line_count = gup_file_line_count("./resources/settings.toml");
         for (int i = 0; i < line_count; i++) {
-            if (lines[i]) free(lines[i]);
+            free(lines[i]);
         }
+        free(lines);
     }
 }
 
@@ -137,6 +142,7 @@ void test_gup_file_read_lines_keep_newlines(void) {
         assert(lines[1] == NULL);
 
         free(lines[0]);
+        free(lines);
     }
 
     { // foo.txt
@@ -154,8 +160,9 @@ void test_gup_file_read_lines_keep_newlines(void) {
 
         const int line_count = gup_file_line_count("./resources/foo.txt");
         for (int i = 0; i < line_count; i++) {
-            if (lines[i]) free(lines[i]);
+            free(lines[i]);
         }
+        free(lines);
     }
 
     { // settings.toml
@@ -176,8 +183,9 @@ void test_gup_file_read_lines_keep_newlines(void) {
 
         const int line_count = gup_file_line_count("./resources/settings.toml");
         for (int i = 0; i < line_count; i++) {
-            if (lines[i]) free(lines[i]);
+            free(lines[i]);
         }
+        free(lines);
     }
 }
 
@@ -192,22 +200,31 @@ void test_gup_file_write(void) {
     { // Empty line write
         result = gup_file_write("", "./resources/empty_write.txt");
         file_contents = gup_file_read("./resources/empty_write.txt");
+
         assert(result);
         assert(strcmp("", file_contents) == 0);
+
+        free(file_contents);
     }
 
     { // Single line write
         result = gup_file_write("Hello", "./resources/hello.txt");
         file_contents = gup_file_read("./resources/hello.txt");
+
         assert(result);
         assert(strcmp("Hello", file_contents) == 0);
+
+        free(file_contents);
     }
 
     { // Multi line write
         result = gup_file_write("Hello\nWorld\n", "./resources/hello_world.txt");
         file_contents = gup_file_read("./resources/hello_world.txt");
+
         assert(result);
         assert(strcmp("Hello\nWorld\n", file_contents) == 0);
+
+        free(file_contents);
     }
 }
 
@@ -223,24 +240,33 @@ void test_gup_file_write_lines(void) {
         const char *lines[] = {0};
         result = gup_file_write_lines(lines, 0, "./resources/empty_write_lines.txt");
         file_contents = gup_file_read("./resources/empty_write_lines.txt");
+        
         assert(result);
         assert(strcmp("", file_contents) == 0);
+
+        free(file_contents);
     }
 
     { // Single line write
         const char *lines[] = {"Hello"};
         result = gup_file_write_lines(lines, 1, "./resources/hello_lines.txt");
         file_contents = gup_file_read("./resources/hello_lines.txt");
+
         assert(result);
         assert(strcmp("Hello\n", file_contents) == 0);
+
+        free(file_contents);
     }
 
     { // Multi line write
         const char *lines[] = {"Hello", "World", ""};
         result = gup_file_write_lines(lines, 3, "./resources/hello_world_lines.txt");
         file_contents = gup_file_read("./resources/hello_world_lines.txt");
+
         assert(result);
         assert(strcmp("Hello\nWorld\n\n", file_contents) == 0);
+
+        free(file_contents);
     }
 }
 
