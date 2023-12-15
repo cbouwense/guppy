@@ -49,13 +49,15 @@ typedef struct {
 // Dynamic arrays ----------------------------------------------------------------------------------
 GupArrayBool gup_array_bool();
 GupArrayBool gup_array_bool_from(const bool xs[], const int size);
-bool gup_array_bool_eq(GupArrayBool xs, GupArrayBool ys);
-void gup_array_bool_print(GupArrayBool xs);
-void gup_array_bool_append(GupArrayBool *xs, bool x);
-void gup_array_bool_prepend(GupArrayBool *xs, bool x);
-void gup_array_bool_remove_all(GupArrayBool *xs, bool x);
-void gup_array_bool_remove_first(GupArrayBool *xs, bool x);
-void gup_array_bool_remove_last(GupArrayBool *xs, bool x);
+bool         gup_array_bool_eq(GupArrayBool xs, GupArrayBool ys);
+void         gup_array_bool_print(GupArrayBool xs);
+void         gup_array_bool_append(GupArrayBool *xs, bool x);
+void         gup_array_bool_prepend(GupArrayBool *xs, bool x);
+void         gup_array_bool_remove_all(GupArrayBool *xs, bool x);
+void         gup_array_bool_remove_first(GupArrayBool *xs, bool x);
+void         gup_array_bool_remove_last(GupArrayBool *xs, bool x);
+GupArrayBool gup_array_bool_map(GupArrayBool xs, bool (*fn)(bool));
+void         gup_array_bool_map_in_place(GupArrayBool xs, bool (*fn)(bool));
 
 GupArrayChar gup_array_char();
 GupArrayChar gup_array_char_from(const char xs[], const int size);
@@ -133,29 +135,29 @@ bool  gup_settings_set_to_file(const char *key, const char *value, const char *f
 bool  gup_settings_set_int(const char *key, int value);
 
 // String view -------------------------------------------------------------------------------------
-GupStringView   gup_sv();
-GupStringView   gup_sv_from_parts(const char *data, size_t count);
-GupStringView   gup_sv_from_cstr(const char *cstr);
-char           *gup_sv_to_cstr(GupStringView sv);
-GupStringView   gup_sv_trim_left(GupStringView sv);
-GupStringView   gup_sv_trim_right(GupStringView sv);
-GupStringView   gup_sv_trim(GupStringView sv);
-GupStringView   gup_sv_trim_char_left(GupStringView *sv, char c);
-GupStringView   gup_sv_trim_char_right(GupStringView *sv, char c);
-GupStringView   gup_sv_trim_char(GupStringView *sv, char c);
-GupStringView   gup_sv_take_left_while(GupStringView sv, bool (*predicate)(char x));
-GupStringView   gup_sv_chop_by_delim(GupStringView *sv, char delim);
-GupStringView   gup_sv_chop_by_sv(GupStringView *sv, GupStringView thicc_delim);
-bool            gup_sv_try_chop_by_delim(GupStringView *sv, char delim, GupStringView *chunk);
-GupStringView   gup_sv_chop_left(GupStringView *sv, size_t n);
-GupStringView   gup_sv_chop_right(GupStringView *sv, size_t n);
-int             gup_sv_index_of(GupStringView sv, char c);
-bool            gup_sv_eq(GupStringView a, GupStringView b);
-bool            gup_sv_eq_ignorecase(GupStringView a, GupStringView b);
-bool            gup_sv_eq_cstr(GupStringView sv, const char *cstr);
-bool            gup_sv_starts_with(GupStringView sv, GupStringView prefix);
-bool            gup_sv_ends_with(GupStringView sv, GupStringView suffix);
-bool            gup_sv_is_empty(GupStringView sv);
+GupStringView  gup_sv();
+GupStringView  gup_sv_from_parts(const char *data, size_t count);
+GupStringView  gup_sv_from_cstr(const char *cstr);
+char          *gup_sv_to_cstr(GupStringView sv);
+GupStringView  gup_sv_trim_left(GupStringView sv);
+GupStringView  gup_sv_trim_right(GupStringView sv);
+GupStringView  gup_sv_trim(GupStringView sv);
+GupStringView  gup_sv_trim_char_left(GupStringView *sv, char c);
+GupStringView  gup_sv_trim_char_right(GupStringView *sv, char c);
+GupStringView  gup_sv_trim_char(GupStringView *sv, char c);
+GupStringView  gup_sv_take_left_while(GupStringView sv, bool (*predicate)(char x));
+GupStringView  gup_sv_chop_by_delim(GupStringView *sv, char delim);
+GupStringView  gup_sv_chop_by_sv(GupStringView *sv, GupStringView thicc_delim);
+bool           gup_sv_try_chop_by_delim(GupStringView *sv, char delim, GupStringView *chunk);
+GupStringView  gup_sv_chop_left(GupStringView *sv, size_t n);
+GupStringView  gup_sv_chop_right(GupStringView *sv, size_t n);
+int            gup_sv_index_of(GupStringView sv, char c);
+bool           gup_sv_eq(GupStringView a, GupStringView b);
+bool           gup_sv_eq_ignorecase(GupStringView a, GupStringView b);
+bool           gup_sv_eq_cstr(GupStringView sv, const char *cstr);
+bool           gup_sv_starts_with(GupStringView sv, GupStringView prefix);
+bool           gup_sv_ends_with(GupStringView sv, GupStringView suffix);
+bool           gup_sv_is_empty(GupStringView sv);
 
 // C-string utilities ------------------------------------------------------------------------------
 char *gup_string_trim_double_quotes(const char *string);
@@ -166,13 +168,13 @@ char  gup_cstr_eq(const char *a, const char *b);
 
 // Miscellaneous
 double gup_operation_seconds(void (*fn)());
+#define gup_array_size(a) sizeof(a)/sizeof(a[0]) 
+typedef unsigned int uint;
+#define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
  **************************************************************************************************/
-
-typedef unsigned int uint;
-#define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 
 // Assert ------------------------------------------------------------------------------------------
 
@@ -328,6 +330,22 @@ void gup_array_bool_remove_last(GupArrayBool *xs, bool x) {
     }
 }
 
+GupArrayBool gup_array_bool_map(GupArrayBool xs, bool (*fn)(bool)) {
+    GupArrayBool new = gup_array_bool_from(xs.data, xs.count);
+    
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+void gup_array_bool_map_in_place(GupArrayBool xs, bool (*fn)(bool)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
 // Char
 GupArrayChar gup_array_char() {
     GupArrayChar xs = {
@@ -463,6 +481,22 @@ void gup_array_char_remove_last(GupArrayChar *xs, char x) {
             xs->data[i] = xs->data[i+1];
         }
         xs->data = realloc(xs->data, xs->count * sizeof(char));
+    }
+}
+
+GupArrayChar gup_array_char_map(GupArrayChar xs, char (*fn)(char)) {
+    GupArrayChar new = gup_array_char_from(xs.data, xs.count);
+    
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+void gup_array_char_map_in_place(GupArrayChar xs, char (*fn)(char)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
     }
 }
 
@@ -604,6 +638,22 @@ void gup_array_float_remove_last(GupArrayFloat *xs, float x) {
     }
 }
 
+GupArrayFloat gup_array_float_map(GupArrayFloat xs, float (*fn)(float)) {
+    GupArrayFloat new = gup_array_float_from(xs.data, xs.count);
+    
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+void gup_array_float_map_in_place(GupArrayFloat xs, float (*fn)(float)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
 // Int
 GupArrayInt gup_array_int() {
     GupArrayInt xs = {
@@ -742,6 +792,22 @@ void gup_array_int_remove_last(GupArrayInt *xs, int x) {
     }
 }
 
+GupArrayInt gup_array_int_map(GupArrayInt xs, int (*fn)(int)) {
+    GupArrayInt new = gup_array_int_from(xs.data, xs.count);
+    
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+void gup_array_int_map_in_place(GupArrayInt xs, int (*fn)(int)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
 // Memory ------------------------------------------------------------------------------------------
 
 /*
@@ -814,7 +880,6 @@ void *_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
 #define malloc(bytes) _gup_malloc(bytes, __FILE__, __LINE__)
 
 #endif // GUPPY_DEBUG_MEMORY
-
 
 // File operations ---------------------------------------------------------------------------------
 

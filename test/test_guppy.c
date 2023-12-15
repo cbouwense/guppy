@@ -28,6 +28,7 @@ void run_all_guppy_tests(void) {
     test_gup_string();
     test_gup_sv();
 
+    _reset_settings_file();
     #ifdef GUPPY_DEBUG_MEMORY
     gup_memory_print();
     #endif

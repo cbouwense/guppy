@@ -1,5 +1,13 @@
 #include "../src/guppy.h"
 
+bool negate(bool b) {
+    return !b;
+}
+
+char add_one(char c) {
+    return c + 1;
+}
+
 void test_gup_array_bool(void) {
     GupArrayBool bools, x_bools, y_bools;
 
@@ -13,7 +21,7 @@ void test_gup_array_bool(void) {
 
     { // From a few elements
         const bool xs[] = {true, false, true};
-        bools = gup_array_bool_from(xs, sizeof(xs) / sizeof(bool));
+        bools = gup_array_bool_from(xs, gup_array_size(xs));
 
         assert(bools.capacity == 3);
         assert(bools.count == 3);
@@ -189,6 +197,36 @@ void test_gup_array_bool(void) {
 
         free(bools.data);
     }
+
+    { // Map
+        bool bs[] = {true, false, true};
+        GupArrayBool bools = gup_array_bool_from(bs, gup_array_size(bs));
+        GupArrayBool inverted_bools = gup_array_bool_map(bools, negate);
+
+        assert(inverted_bools.capacity == bools.capacity);
+        assert(inverted_bools.count == bools.capacity);
+        assert(inverted_bools.data[0] == !bools.data[0]);
+        assert(inverted_bools.data[1] == !bools.data[1]);
+        assert(inverted_bools.data[2] == !bools.data[2]);
+
+        free(bools.data);
+        free(inverted_bools.data);
+    }
+
+    { // Map in place
+        bool bs[] = {true, false, true};
+        GupArrayBool bools = gup_array_bool_from(bs, gup_array_size(bs));
+        gup_array_bool_map_in_place(bools, negate);
+
+        assert(bools.capacity == 3);
+        assert(bools.capacity == 3);
+        assert(bools.data[0] == false);
+        assert(bools.data[1] == true);
+        assert(bools.data[2] == false);
+
+        free(bools.data);
+    }
+
 }
 
 void test_gup_array_char(void) {
@@ -204,7 +242,7 @@ void test_gup_array_char(void) {
 
     { // From a few elements
         const char xs[] = {'a', 'b', 'c'};
-        chars = gup_array_char_from(xs, sizeof(xs) / sizeof(char));
+        chars = gup_array_char_from(xs, gup_array_size(xs));
 
         assert(chars.capacity == 3);
         assert(chars.count == 3);
@@ -384,6 +422,36 @@ void test_gup_array_char(void) {
         free(chars.data);
         
     }
+
+    { // Map
+        char cs[] = {'a', 'b', 'c'};
+        GupArrayChar chars = gup_array_char_from(cs, gup_array_size(cs));
+        GupArrayChar shifted_chars = gup_array_char_map(chars, add_one);
+
+        assert(shifted_chars.capacity == chars.capacity);
+        assert(shifted_chars.count == chars.capacity);
+        assert(shifted_chars.data[0] == chars.data[0] + 1);
+        assert(shifted_chars.data[1] == chars.data[1] + 1);
+        assert(shifted_chars.data[2] == chars.data[2] + 1);
+
+        free(chars.data);
+        free(shifted_chars.data);
+    }
+
+    { // Map in place
+        char cs[] = {'a', 'b', 'c'};
+        GupArrayChar chars = gup_array_char_from(cs, gup_array_size(cs));
+        gup_array_char_map_in_place(chars, add_one);
+
+        assert(chars.capacity == 3);
+        assert(chars.capacity == 3);
+        assert(chars.data[0] == 'b');
+        assert(chars.data[1] == 'c');
+        assert(chars.data[2] == 'd');
+
+        free(chars.data);
+    }
+    
 }
 
 void test_gup_array_float(void) {
@@ -399,7 +467,7 @@ void test_gup_array_float(void) {
 
     { // From a few elements
         const float xs[] = {1.0f, 2.0f, 3.0f};
-        floats = gup_array_float_from(xs, sizeof(xs) / sizeof(float));
+        floats = gup_array_float_from(xs, gup_array_size(xs));
 
         assert(floats.capacity == 3);
         assert(floats.count == 3);
@@ -592,7 +660,7 @@ void test_gup_array_int(void) {
 
     { // From a few elements
         const int xs[] = {1, 2, 3};
-        ints = gup_array_int_from(xs, sizeof(xs) / sizeof(int));
+        ints = gup_array_int_from(xs, gup_array_size(xs));
 
         assert(ints.capacity == 3);
         assert(ints.count == 3);
