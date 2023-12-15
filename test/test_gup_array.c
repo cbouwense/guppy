@@ -196,31 +196,27 @@ void test_gup_array_bool(void) {
 }
 
 void test_gup_array_char(void) {
-    GupArrayChar *chars, *x_chars, *y_chars;
-    bool found;
+    GupArrayChar chars, x_chars, y_chars;
 
     { // Empty
         chars = gup_array_char();
 
-        assert(chars->capacity == 0);
-        assert(chars->count == 0);
-        assert(chars->data == NULL);
-
-        free(chars);
+        assert(chars.capacity == 0);
+        assert(chars.count == 0);
+        assert(chars.data == NULL);
     }
 
     { // From a few elements
         const char xs[] = {'a', 'b', 'c'};
         chars = gup_array_char_from(xs, sizeof(xs) / sizeof(char));
 
-        assert(chars->capacity == 3);
-        assert(chars->count == 3);
-        assert(chars->data[0] == 'a');
-        assert(chars->data[1] == 'b');
-        assert(chars->data[2] == 'c');
+        assert(chars.capacity == 3);
+        assert(chars.count == 3);
+        assert(chars.data[0] == 'a');
+        assert(chars.data[1] == 'b');
+        assert(chars.data[2] == 'c');
 
-        free(chars->data);
-        free(chars);
+        free(chars.data);
     }
 
     { // Empty arrays are equivalent
@@ -233,10 +229,8 @@ void test_gup_array_char(void) {
 
         assert(are_they_equal == true);
 
-        free(x_chars->data);
-        free(y_chars->data);
-        free(x_chars);
-        free(y_chars);
+        free(x_chars.data);
+        free(y_chars.data);
     }
 
     { // One empty one not is not equivalent
@@ -249,10 +243,8 @@ void test_gup_array_char(void) {
 
         assert(are_they_equal == false);
 
-        free(x_chars->data);
-        free(y_chars->data);
-        free(x_chars);
-        free(y_chars);
+        free(x_chars.data);
+        free(y_chars.data);
     }
 
     { // Identical non-empty arrays are equivalent
@@ -265,10 +257,8 @@ void test_gup_array_char(void) {
 
         assert(are_they_equal == true);
 
-        free(x_chars->data);
-        free(y_chars->data);
-        free(x_chars);
-        free(y_chars);
+        free(x_chars.data);
+        free(y_chars.data);
     }
 
     { // Differing non-empty arrays are not equivalent
@@ -281,164 +271,151 @@ void test_gup_array_char(void) {
 
         assert(are_they_equal == false);
 
-        free(x_chars->data);
-        free(y_chars->data);
-        free(x_chars);
-        free(y_chars);
+        free(x_chars.data);
+        free(y_chars.data);
     }
 
     { // Append
         chars = gup_array_char();
-        gup_array_char_append(chars, 'a');
+        chars = gup_array_char_append(chars, 'a');
         
-        assert(chars->capacity == 1);
-        assert(chars->count == 1);
-        assert(chars->data[0] == 'a');
+        assert(chars.capacity == 1);
+        assert(chars.count == 1);
+        assert(chars.data[0] == 'a');
 
-        gup_array_char_append(chars, 'a');
-        gup_array_char_append(chars, 'b');
-        gup_array_char_append(chars, 'a');
-        gup_array_char_append(chars, 'a');
-        gup_array_char_append(chars, 'b');
-        gup_array_char_append(chars, 'b');
+        chars = gup_array_char_append(chars, 'a');
+        chars = gup_array_char_append(chars, 'b');
+        chars = gup_array_char_append(chars, 'a');
+        chars = gup_array_char_append(chars, 'a');
+        chars = gup_array_char_append(chars, 'b');
+        chars = gup_array_char_append(chars, 'b');
 
-        assert(chars->capacity == 8);
-        assert(chars->count == 7);
-        assert(chars->data[0] == 'a');
-        assert(chars->data[1] == 'a');
-        assert(chars->data[2] == 'b');
-        assert(chars->data[3] == 'a');
-        assert(chars->data[4] == 'a');
-        assert(chars->data[5] == 'b');
-        assert(chars->data[6] == 'b');
+        assert(chars.capacity == 8);
+        assert(chars.count == 7);
+        assert(chars.data[0] == 'a');
+        assert(chars.data[1] == 'a');
+        assert(chars.data[2] == 'b');
+        assert(chars.data[3] == 'a');
+        assert(chars.data[4] == 'a');
+        assert(chars.data[5] == 'b');
+        assert(chars.data[6] == 'b');
 
-        free(chars->data);
-        free(chars);
+        free(chars.data);
     }
 
     { // Prepend
         chars = gup_array_char();
-        gup_array_char_prepend(chars, 'a');
+        chars = gup_array_char_prepend(chars, 'a');
         
-        assert(chars->capacity == 1);
-        assert(chars->count == 1);
-        assert(chars->data[0] == 'a');
+        assert(chars.capacity == 1);
+        assert(chars.count == 1);
+        assert(chars.data[0] == 'a');
 
-        gup_array_char_prepend(chars, 'a');
-        gup_array_char_prepend(chars, 'b');
-        gup_array_char_prepend(chars, 'a');
-        gup_array_char_prepend(chars, 'a');
-        gup_array_char_prepend(chars, 'b');
-        gup_array_char_prepend(chars, 'b');
+        chars = gup_array_char_prepend(chars, 'a');
+        chars = gup_array_char_prepend(chars, 'b');
+        chars = gup_array_char_prepend(chars, 'a');
+        chars = gup_array_char_prepend(chars, 'a');
+        chars = gup_array_char_prepend(chars, 'b');
+        chars = gup_array_char_prepend(chars, 'b');
 
-        assert(chars->capacity == 8);
-        assert(chars->count == 7);
-        assert(chars->data[0] == 'b');
-        assert(chars->data[1] == 'b');
-        assert(chars->data[2] == 'a');
-        assert(chars->data[3] == 'a');
-        assert(chars->data[4] == 'b');
-        assert(chars->data[5] == 'a');
-        assert(chars->data[6] == 'a');
+        assert(chars.capacity == 8);
+        assert(chars.count == 7);
+        assert(chars.data[0] == 'b');
+        assert(chars.data[1] == 'b');
+        assert(chars.data[2] == 'a');
+        assert(chars.data[3] == 'a');
+        assert(chars.data[4] == 'b');
+        assert(chars.data[5] == 'a');
+        assert(chars.data[6] == 'a');
 
-        free(chars->data);
-        free(chars);
+        free(chars.data);
     }
 
     { // Remove first
         chars = gup_array_char();
-        gup_array_char_append(chars, 'a');
+        chars = gup_array_char_append(chars, 'a');
         
-        found = gup_array_char_remove_first(chars, 'b');
+        chars = gup_array_char_remove_first(chars, 'b');
 
-        assert(found == false);
-        assert(chars->capacity == 1);
-        assert(chars->count == 1);
-        assert(chars->data[0] == 'a');
+        assert(chars.capacity == 1);
+        assert(chars.count == 1);
+        assert(chars.data[0] == 'a');
 
-        gup_array_char_append(chars, 'b');
-        gup_array_char_append(chars, 'b');
-        gup_array_char_append(chars, 'b');
-        gup_array_char_append(chars, 'c');
+        chars = gup_array_char_append(chars, 'b');
+        chars = gup_array_char_append(chars, 'b');
+        chars = gup_array_char_append(chars, 'b');
+        chars = gup_array_char_append(chars, 'c');
 
-        found = gup_array_char_remove_first(chars, 'b');
+        chars = gup_array_char_remove_first(chars, 'b');
 
-        assert(found == true);
-        assert(chars->capacity == 4);
-        assert(chars->count == 4);
-        assert(chars->data[0] == 'a');
-        assert(chars->data[1] == 'b');
-        assert(chars->data[2] == 'b');
-        assert(chars->data[3] == 'c');
+        assert(chars.capacity == 4);
+        assert(chars.count == 4);
+        assert(chars.data[0] == 'a');
+        assert(chars.data[1] == 'b');
+        assert(chars.data[2] == 'b');
+        assert(chars.data[3] == 'c');
 
-        free(chars->data);
-        free(chars);
+        free(chars.data);
     }
 
     { // Remove last no occurrence
-        GupArrayChar * chars = gup_array_char();
-        gup_array_char_append(chars, 'a');
+        GupArrayChar chars = gup_array_char();
+        chars = gup_array_char_append(chars, 'a');
         
-        found = gup_array_char_remove_last(chars, 'b');
+        chars = gup_array_char_remove_last(chars, 'b');
 
-        assert(found == false);
-        assert(chars->capacity == 1);
-        assert(chars->count == 1);
-        assert(chars->data[0] == 'a');
+        assert(chars.capacity == 1);
+        assert(chars.count == 1);
+        assert(chars.data[0] == 'a');
 
-        free(chars->data);
-        free(chars);
+        free(chars.data);
+        
     }
 
     { // Remove last with occurrence
         char xs[] = {'a', 'b', 'c', 'b', 'd', 'b', 'e'};
         chars = gup_array_char_from(xs, sizeof(xs)/sizeof(char));
 
-        found = gup_array_char_remove_last(chars, 'b');
+        chars = gup_array_char_remove_last(chars, 'b');
 
         // [1, 2, 3, 2, 4, 2, 5] ->
         // [1, 2, 3, 2, 4, 5]
-        assert(found == true);
-        assert(chars->capacity == 6);
-        assert(chars->count == 6);
-        assert(chars->data[0] == 'a');
-        assert(chars->data[1] == 'b');
-        assert(chars->data[2] == 'c');
-        assert(chars->data[3] == 'b');
-        assert(chars->data[4] == 'd');
-        assert(chars->data[5] == 'e');
+        assert(chars.capacity == 6);
+        assert(chars.count == 6);
+        assert(chars.data[0] == 'a');
+        assert(chars.data[1] == 'b');
+        assert(chars.data[2] == 'c');
+        assert(chars.data[3] == 'b');
+        assert(chars.data[4] == 'd');
+        assert(chars.data[5] == 'e');
 
-        free(chars->data);
-        free(chars);
+        free(chars.data);
+        
     }
 }
 
 void test_gup_array_float(void) {
-    GupArrayFloat *floats, *x_floats, *y_floats;
-    bool found;
+    GupArrayFloat floats, x_floats, y_floats;
 
     { // Empty
         floats = gup_array_float();
 
-        assert(floats->capacity == 0);
-        assert(floats->count == 0);
-        assert(floats->data == NULL);
-
-        free(floats);
+        assert(floats.capacity == 0);
+        assert(floats.count == 0);
+        assert(floats.data == NULL);
     }
 
     { // From a few elements
         const float xs[] = {1.0f, 2.0f, 3.0f};
         floats = gup_array_float_from(xs, sizeof(xs) / sizeof(float));
 
-        assert(floats->capacity == 3);
-        assert(floats->count == 3);
-        assert(floats->data[0] == 1.0f);
-        assert(floats->data[1] == 2.0f);
-        assert(floats->data[2] == 3.0f);
+        assert(floats.capacity == 3);
+        assert(floats.count == 3);
+        assert(floats.data[0] == 1.0f);
+        assert(floats.data[1] == 2.0f);
+        assert(floats.data[2] == 3.0f);
 
-        free(floats->data);
-        free(floats);
+        free(floats.data);
     }
 
     { // Empty arrays are equivalent
@@ -451,10 +428,8 @@ void test_gup_array_float(void) {
 
         assert(are_they_equal == true);
 
-        free(x_floats->data);
-        free(y_floats->data);
-        free(x_floats);
-        free(y_floats);
+        free(x_floats.data);
+        free(y_floats.data);
     }
 
     { // One empty one not is not equivalent
@@ -467,10 +442,8 @@ void test_gup_array_float(void) {
 
         assert(are_they_equal == false);
 
-        free(x_floats->data);
-        free(y_floats->data);
-        free(x_floats);
-        free(y_floats);
+        free(x_floats.data);
+        free(y_floats.data);
     }
 
     { // Identical non-empty arrays are equivalent
@@ -483,10 +456,8 @@ void test_gup_array_float(void) {
 
         assert(are_they_equal == true);
 
-        free(x_floats->data);
-        free(y_floats->data);
-        free(x_floats);
-        free(y_floats);
+        free(x_floats.data);
+        free(y_floats.data);
     }
 
     { // Differing non-empty arrays are not equivalent
@@ -499,164 +470,150 @@ void test_gup_array_float(void) {
 
         assert(are_they_equal == false);
 
-        free(x_floats->data);
-        free(y_floats->data);
-        free(x_floats);
-        free(y_floats);
+        free(x_floats.data);
+        free(y_floats.data);
     }
 
     { // Append
         floats = gup_array_float();
-        gup_array_float_append(floats, 42.0f);
+        floats = gup_array_float_append(floats, 42.0f);
         
-        assert(floats->capacity == 1);
-        assert(floats->count == 1);
-        assert(floats->data[0] == 42.0f);
+        assert(floats.capacity == 1);
+        assert(floats.count == 1);
+        assert(floats.data[0] == 42.0f);
 
-        gup_array_float_append(floats, 17.0f);
-        gup_array_float_append(floats, 38.0f);
-        gup_array_float_append(floats, 1.0f);
-        gup_array_float_append(floats, 3.0f);
-        gup_array_float_append(floats, 3.0f);
-        gup_array_float_append(floats, 7.0f);
+        floats = gup_array_float_append(floats, 17.0f);
+        floats = gup_array_float_append(floats, 38.0f);
+        floats = gup_array_float_append(floats, 1.0f);
+        floats = gup_array_float_append(floats, 3.0f);
+        floats = gup_array_float_append(floats, 3.0f);
+        floats = gup_array_float_append(floats, 7.0f);
 
-        assert(floats->capacity == 8);
-        assert(floats->count == 7);
-        assert(floats->data[0] == 42.0f);
-        assert(floats->data[1] == 17.0f);
-        assert(floats->data[2] == 38.0f);
-        assert(floats->data[3] == 1.0f);
-        assert(floats->data[4] == 3.0f);
-        assert(floats->data[5] == 3.0f);
-        assert(floats->data[6] == 7.0f);
+        assert(floats.capacity == 8);
+        assert(floats.count == 7);
+        assert(floats.data[0] == 42.0f);
+        assert(floats.data[1] == 17.0f);
+        assert(floats.data[2] == 38.0f);
+        assert(floats.data[3] == 1.0f);
+        assert(floats.data[4] == 3.0f);
+        assert(floats.data[5] == 3.0f);
+        assert(floats.data[6] == 7.0f);
 
-        free(floats->data);
-        free(floats);
+        free(floats.data);
     }
 
     { // Prepend
         floats = gup_array_float();
-        gup_array_float_prepend(floats, 42.0f);
+        floats = gup_array_float_prepend(floats, 42.0f);
         
-        assert(floats->capacity == 1);
-        assert(floats->count == 1);
-        assert(floats->data[0] == 42.0f);
+        assert(floats.capacity == 1);
+        assert(floats.count == 1);
+        assert(floats.data[0] == 42.0f);
 
-        gup_array_float_prepend(floats, 17.0f);
-        gup_array_float_prepend(floats, 38.0f);
-        gup_array_float_prepend(floats, 1.0f);
-        gup_array_float_prepend(floats, 3.0f);
-        gup_array_float_prepend(floats, 3.0f);
-        gup_array_float_prepend(floats, 7.0f);
+        floats = gup_array_float_prepend(floats, 17.0f);
+        floats = gup_array_float_prepend(floats, 38.0f);
+        floats = gup_array_float_prepend(floats, 1.0f);
+        floats = gup_array_float_prepend(floats, 3.0f);
+        floats = gup_array_float_prepend(floats, 3.0f);
+        floats = gup_array_float_prepend(floats, 7.0f);
 
-        assert(floats->capacity == 8);
-        assert(floats->count == 7);
-        assert(floats->data[0] == 7.0f);
-        assert(floats->data[1] == 3.0f);
-        assert(floats->data[2] == 3.0f);
-        assert(floats->data[3] == 1.0f);
-        assert(floats->data[4] == 38.0f);
-        assert(floats->data[5] == 17.0f);
-        assert(floats->data[6] == 42.0f);
+        assert(floats.capacity == 8);
+        assert(floats.count == 7);
+        assert(floats.data[0] == 7.0f);
+        assert(floats.data[1] == 3.0f);
+        assert(floats.data[2] == 3.0f);
+        assert(floats.data[3] == 1.0f);
+        assert(floats.data[4] == 38.0f);
+        assert(floats.data[5] == 17.0f);
+        assert(floats.data[6] == 42.0f);
 
-        free(floats->data);
-        free(floats);
+        free(floats.data);
     }
 
     { // Remove first
         floats = gup_array_float();
-        gup_array_float_append(floats, 1);
+        floats = gup_array_float_append(floats, 1);
         
-        found = gup_array_float_remove_first(floats, 0);
+        floats = gup_array_float_remove_first(floats, 0);
 
-        assert(found == false);
-        assert(floats->capacity == 1);
-        assert(floats->count == 1);
-        assert(floats->data[0] == 1);
+        assert(floats.capacity == 1);
+        assert(floats.count == 1);
+        assert(floats.data[0] == 1);
 
-        gup_array_float_append(floats, 2);
-        gup_array_float_append(floats, 2);
-        gup_array_float_append(floats, 2);
-        gup_array_float_append(floats, 3);
+        floats = gup_array_float_append(floats, 2);
+        floats = gup_array_float_append(floats, 2);
+        floats = gup_array_float_append(floats, 2);
+        floats = gup_array_float_append(floats, 3);
 
-        found = gup_array_float_remove_first(floats, 2);
+        floats = gup_array_float_remove_first(floats, 2);
 
-        assert(found == true);
-        assert(floats->capacity == 4);
-        assert(floats->count == 4);
-        assert(floats->data[0] == 1);
-        assert(floats->data[1] == 2);
-        assert(floats->data[2] == 2);
-        assert(floats->data[3] == 3);
+        assert(floats.capacity == 4);
+        assert(floats.count == 4);
+        assert(floats.data[0] == 1);
+        assert(floats.data[1] == 2);
+        assert(floats.data[2] == 2);
+        assert(floats.data[3] == 3);
 
-        free(floats->data);
-        free(floats);
+        free(floats.data);
     }
 
     { // Remove last no occurrence
-        GupArrayFloat * floats = gup_array_float();
-        gup_array_float_append(floats, 1);
+        floats = gup_array_float();
+        floats = gup_array_float_append(floats, 1);
         
-        found = gup_array_float_remove_last(floats, 0);
+        floats = gup_array_float_remove_last(floats, 0);
 
-        assert(found == false);
-        assert(floats->capacity == 1);
-        assert(floats->count == 1);
-        assert(floats->data[0] == 1);
 
-        free(floats->data);
-        free(floats);
+        assert(floats.capacity == 1);
+        assert(floats.count == 1);
+        assert(floats.data[0] == 1);
+
+        free(floats.data);
     }
 
     { // Remove last with occurrence
         float xs[] = {1.0f, 2.0f, 3.0f, 2.0f, 4.0f, 2.0f, 5.0f};
         floats = gup_array_float_from(xs, sizeof(xs)/sizeof(float));
 
-        found = gup_array_float_remove_last(floats, 2);
+        floats = gup_array_float_remove_last(floats, 2);
 
         // [1, 2, 3, 2, 4, 2, 5] ->
         // [1, 2, 3, 2, 4, 5]
-        assert(found == true);
-        assert(floats->capacity == 6);
-        assert(floats->count == 6);
-        assert(floats->data[0] == 1.0f);
-        assert(floats->data[1] == 2.0f);
-        assert(floats->data[2] == 3.0f);
-        assert(floats->data[3] == 2.0f);
-        assert(floats->data[4] == 4.0f);
-        assert(floats->data[5] == 5.0f);
+        assert(floats.capacity == 6);
+        assert(floats.count == 6);
+        assert(floats.data[0] == 1.0f);
+        assert(floats.data[1] == 2.0f);
+        assert(floats.data[2] == 3.0f);
+        assert(floats.data[3] == 2.0f);
+        assert(floats.data[4] == 4.0f);
+        assert(floats.data[5] == 5.0f);
 
-        free(floats->data);
-        free(floats);
+        free(floats.data);
     }
 }
 
 void test_gup_array_int(void) {
-    GupArrayInt *ints, *x_ints, *y_ints;
-    bool found;
+    GupArrayInt ints, x_ints, y_ints;
 
     { // Empty
         ints = gup_array_int();
 
-        assert(ints->capacity == 0);
-        assert(ints->count == 0);
-        assert(ints->data == NULL);
-
-        free(ints);
+        assert(ints.capacity == 0);
+        assert(ints.count == 0);
+        assert(ints.data == NULL);
     }
 
     { // From a few elements
         const int xs[] = {1, 2, 3};
         ints = gup_array_int_from(xs, sizeof(xs) / sizeof(int));
 
-        assert(ints->capacity == 3);
-        assert(ints->count == 3);
-        assert(ints->data[0] == 1);
-        assert(ints->data[1] == 2);
-        assert(ints->data[2] == 3);
+        assert(ints.capacity == 3);
+        assert(ints.count == 3);
+        assert(ints.data[0] == 1);
+        assert(ints.data[1] == 2);
+        assert(ints.data[2] == 3);
 
-        free(ints->data);
-        free(ints);
+        free(ints.data);
     }
 
     { // Empty arrays are equivalent
@@ -669,10 +626,8 @@ void test_gup_array_int(void) {
 
         assert(are_they_equal == true);
 
-        free(x_ints->data);
-        free(y_ints->data);
-        free(x_ints);
-        free(y_ints);
+        free(x_ints.data);
+        free(y_ints.data);
     }
 
     { // One empty one not is not equivalent
@@ -685,10 +640,8 @@ void test_gup_array_int(void) {
 
         assert(are_they_equal == false);
 
-        free(x_ints->data);
-        free(y_ints->data);
-        free(x_ints);
-        free(y_ints);
+        free(x_ints.data);
+        free(y_ints.data);
     }
 
     { // Identical non-empty arrays are equivalent
@@ -701,10 +654,8 @@ void test_gup_array_int(void) {
 
         assert(are_they_equal == true);
 
-        free(x_ints->data);
-        free(y_ints->data);
-        free(x_ints);
-        free(y_ints);
+        free(x_ints.data);
+        free(y_ints.data);
     }
 
     { // Differing non-empty arrays are not equivalent
@@ -717,164 +668,149 @@ void test_gup_array_int(void) {
 
         assert(are_they_equal == false);
 
-        free(x_ints->data);
-        free(y_ints->data);
-        free(x_ints);
-        free(y_ints);
+        free(x_ints.data);
+        free(y_ints.data);
     }
 
     { // Append
         ints = gup_array_int();
-        gup_array_int_append(ints, 42);
+        ints = gup_array_int_append(ints, 42);
         
-        assert(ints->capacity == 1);
-        assert(ints->count == 1);
-        assert(ints->data[0] == 42);
+        assert(ints.capacity == 1);
+        assert(ints.count == 1);
+        assert(ints.data[0] == 42);
 
-        gup_array_int_append(ints, 17);
-        gup_array_int_append(ints, 38);
-        gup_array_int_append(ints, 1);
-        gup_array_int_append(ints, 3);
-        gup_array_int_append(ints, 3);
-        gup_array_int_append(ints, 7);
+        ints = gup_array_int_append(ints, 17);
+        ints = gup_array_int_append(ints, 38);
+        ints = gup_array_int_append(ints, 1);
+        ints = gup_array_int_append(ints, 3);
+        ints = gup_array_int_append(ints, 3);
+        ints = gup_array_int_append(ints, 7);
 
-        assert(ints->capacity == 8);
-        assert(ints->count == 7);
-        assert(ints->data[0] == 42);
-        assert(ints->data[1] == 17);
-        assert(ints->data[2] == 38);
-        assert(ints->data[3] == 1);
-        assert(ints->data[4] == 3);
-        assert(ints->data[5] == 3);
-        assert(ints->data[6] == 7);
+        assert(ints.capacity == 8);
+        assert(ints.count == 7);
+        assert(ints.data[0] == 42);
+        assert(ints.data[1] == 17);
+        assert(ints.data[2] == 38);
+        assert(ints.data[3] == 1);
+        assert(ints.data[4] == 3);
+        assert(ints.data[5] == 3);
+        assert(ints.data[6] == 7);
 
-        free(ints->data);
-        free(ints);
+        free(ints.data);
     }
 
     { // Prepend
         ints = gup_array_int();
-        gup_array_int_prepend(ints, 42);
+        ints = gup_array_int_prepend(ints, 42);
         
-        assert(ints->capacity == 1);
-        assert(ints->count == 1);
-        assert(ints->data[0] == 42);
+        assert(ints.capacity == 1);
+        assert(ints.count == 1);
+        assert(ints.data[0] == 42);
 
-        gup_array_int_prepend(ints, 17);
-        gup_array_int_prepend(ints, 38);
-        gup_array_int_prepend(ints, 1);
-        gup_array_int_prepend(ints, 3);
-        gup_array_int_prepend(ints, 3);
-        gup_array_int_prepend(ints, 7);
+        ints = gup_array_int_prepend(ints, 17);
+        ints = gup_array_int_prepend(ints, 38);
+        ints = gup_array_int_prepend(ints, 1);
+        ints = gup_array_int_prepend(ints, 3);
+        ints = gup_array_int_prepend(ints, 3);
+        ints = gup_array_int_prepend(ints, 7);
 
-        assert(ints->capacity == 8);
-        assert(ints->count == 7);
-        assert(ints->data[0] == 7);
-        assert(ints->data[1] == 3);
-        assert(ints->data[2] == 3);
-        assert(ints->data[3] == 1);
-        assert(ints->data[4] == 38);
-        assert(ints->data[5] == 17);
-        assert(ints->data[6] == 42);
+        assert(ints.capacity == 8);
+        assert(ints.count == 7);
+        assert(ints.data[0] == 7);
+        assert(ints.data[1] == 3);
+        assert(ints.data[2] == 3);
+        assert(ints.data[3] == 1);
+        assert(ints.data[4] == 38);
+        assert(ints.data[5] == 17);
+        assert(ints.data[6] == 42);
     
-        free(ints->data);
-        free(ints);
+        free(ints.data);
     }
 
     { // Remove all
-        int found_count;
         ints = gup_array_int();
-        gup_array_int_append(ints, 1);
+        ints = gup_array_int_append(ints, 1);
         
-        found_count = gup_array_int_remove_all(ints, 0);
+        ints = gup_array_int_remove_all(ints, 0);
 
-        assert(found_count == 0);
-        assert(ints->capacity == 1);
-        assert(ints->count == 1);
-        assert(ints->data[0] == 1);
+        assert(ints.capacity == 1);
+        assert(ints.count == 1);
+        assert(ints.data[0] == 1);
 
         for (int i = 0; i < 1234; i++) {
-            gup_array_int_append(ints, 2);
+            ints = gup_array_int_append(ints, 2);
         }
-        gup_array_int_append(ints, 3);
+        ints = gup_array_int_append(ints, 3);
 
-        found_count = gup_array_int_remove_all(ints, 2);
+        ints = gup_array_int_remove_all(ints, 2);
 
-        assert(found_count == 1234);
-        assert(ints->capacity == 2);
-        assert(ints->count == 2);
-        assert(ints->data[0] == 1);
-        assert(ints->data[1] == 3);
+        assert(ints.capacity == 2);
+        assert(ints.count == 2);
+        assert(ints.data[0] == 1);
+        assert(ints.data[1] == 3);
 
-        free(ints->data);
-        free(ints);
+        free(ints.data);
     }
 
     { // Remove first
         ints = gup_array_int();
-        gup_array_int_append(ints, 1);
+        ints = gup_array_int_append(ints, 1);
         
-        found = gup_array_int_remove_first(ints, 0);
+        ints = gup_array_int_remove_first(ints, 0);
 
-        assert(found == false);
-        assert(ints->capacity == 1);
-        assert(ints->count == 1);
-        assert(ints->data[0] == 1);
+        assert(ints.capacity == 1);
+        assert(ints.count == 1);
+        assert(ints.data[0] == 1);
 
-        gup_array_int_append(ints, 2);
-        gup_array_int_append(ints, 2);
-        gup_array_int_append(ints, 2);
-        gup_array_int_append(ints, 3);
+        ints = gup_array_int_append(ints, 2);
+        ints = gup_array_int_append(ints, 2);
+        ints = gup_array_int_append(ints, 2);
+        ints = gup_array_int_append(ints, 3);
 
-        found = gup_array_int_remove_first(ints, 2);
+        ints = gup_array_int_remove_first(ints, 2);
 
-        assert(found == true);
-        assert(ints->capacity == 4);
-        assert(ints->count == 4);
-        assert(ints->data[0] == 1);
-        assert(ints->data[1] == 2);
-        assert(ints->data[2] == 2);
-        assert(ints->data[3] == 3);
+        assert(ints.capacity == 4);
+        assert(ints.count == 4);
+        assert(ints.data[0] == 1);
+        assert(ints.data[1] == 2);
+        assert(ints.data[2] == 2);
+        assert(ints.data[3] == 3);
 
-        free(ints->data);
-        free(ints);
+        free(ints.data);
     }
 
     { // Remove last no occurrence
-        GupArrayInt * ints = gup_array_int();
-        gup_array_int_append(ints, 1);
+        GupArrayInt ints = gup_array_int();
+        ints = gup_array_int_append(ints, 1);
         
-        found = gup_array_int_remove_last(ints, 0);
+        ints = gup_array_int_remove_last(ints, 0);
 
-        assert(found == false);
-        assert(ints->capacity == 1);
-        assert(ints->count == 1);
-        assert(ints->data[0] == 1);
+        assert(ints.capacity == 1);
+        assert(ints.count == 1);
+        assert(ints.data[0] == 1);
 
-        free(ints->data);
-        free(ints);
+        free(ints.data);
     }
 
     { // Remove last with occurrence
         int xs[] = {1, 2, 3, 2, 4, 2, 5};
         ints = gup_array_int_from(xs, sizeof(xs)/sizeof(int));
 
-        found = gup_array_int_remove_last(ints, 2);
+        ints = gup_array_int_remove_last(ints, 2);
 
         // [1, 2, 3, 2, 4, 2, 5] ->
         // [1, 2, 3, 2, 4, 5]
-        assert(found == true);
-        assert(ints->capacity == 6);
-        assert(ints->count == 6);
-        assert(ints->data[0] == 1);
-        assert(ints->data[1] == 2);
-        assert(ints->data[2] == 3);
-        assert(ints->data[3] == 2);
-        assert(ints->data[4] == 4);
-        assert(ints->data[5] == 5);
+        assert(ints.capacity == 6);
+        assert(ints.count == 6);
+        assert(ints.data[0] == 1);
+        assert(ints.data[1] == 2);
+        assert(ints.data[2] == 3);
+        assert(ints.data[3] == 2);
+        assert(ints.data[4] == 4);
+        assert(ints.data[5] == 5);
 
-        free(ints->data);
-        free(ints);
+        free(ints.data);
     }
 }
 

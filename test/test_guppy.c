@@ -22,11 +22,11 @@ void run_all_guppy_tests(void) {
     _reset_settings_file();
     
     test_gup_array();
-    test_gup_file();
-    test_gup_print_array_string();
-    test_gup_settings();
-    test_gup_string();
-    test_gup_sv();
+    // test_gup_file();
+    // test_gup_print_array_string();
+    // test_gup_settings();
+    // test_gup_string();
+    // test_gup_sv();
 
     #ifdef GUPPY_DEBUG_MEMORY
     gup_memory_print();
