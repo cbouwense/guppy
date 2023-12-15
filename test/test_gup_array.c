@@ -82,18 +82,18 @@ void test_gup_array_bool(void) {
 
     { // Append
         bools = gup_array_bool();
-        bools = gup_array_bool_append(bools, true);
+        gup_array_bool_append(&bools, true);
         
         assert(bools.capacity == 1);
         assert(bools.count == 1);
         assert(bools.data[0] == true);
 
-        bools = gup_array_bool_append(bools, true);
-        bools = gup_array_bool_append(bools, false);
-        bools = gup_array_bool_append(bools, true);
-        bools = gup_array_bool_append(bools, true);
-        bools = gup_array_bool_append(bools, false);
-        bools = gup_array_bool_append(bools, false);
+        gup_array_bool_append(&bools, true);
+        gup_array_bool_append(&bools, false);
+        gup_array_bool_append(&bools, true);
+        gup_array_bool_append(&bools, true);
+        gup_array_bool_append(&bools, false);
+        gup_array_bool_append(&bools, false);
 
         assert(bools.capacity == 8);
         assert(bools.count == 7);
@@ -110,18 +110,18 @@ void test_gup_array_bool(void) {
 
     { // Prepend
         bools = gup_array_bool();
-        bools = gup_array_bool_prepend(bools, true);
+        gup_array_bool_prepend(&bools, true);
         
         assert(bools.capacity == 1);
         assert(bools.count == 1);
         assert(bools.data[0] == true);
 
-        bools = gup_array_bool_prepend(bools, true);
-        bools = gup_array_bool_prepend(bools, false);
-        bools = gup_array_bool_prepend(bools, true);
-        bools = gup_array_bool_prepend(bools, true);
-        bools = gup_array_bool_prepend(bools, false);
-        bools = gup_array_bool_prepend(bools, false);
+        gup_array_bool_prepend(&bools, true);
+        gup_array_bool_prepend(&bools, false);
+        gup_array_bool_prepend(&bools, true);
+        gup_array_bool_prepend(&bools, true);
+        gup_array_bool_prepend(&bools, false);
+        gup_array_bool_prepend(&bools, false);
 
         assert(bools.capacity == 8);
         assert(bools.count == 7);
@@ -138,20 +138,18 @@ void test_gup_array_bool(void) {
 
     { // Remove first
         bools = gup_array_bool();
-        bools = gup_array_bool_append(bools, true);
-        
-        bools = gup_array_bool_remove_first(bools, false);
+        gup_array_bool_append(&bools, true);
+        gup_array_bool_remove_first(&bools, false);
 
         assert(bools.capacity == 1);
         assert(bools.count == 1);
         assert(bools.data[0] == true);
 
-        bools = gup_array_bool_append(bools, false);
-        bools = gup_array_bool_append(bools, false);
-        bools = gup_array_bool_append(bools, false);
-        bools = gup_array_bool_append(bools, true);
-
-        bools = gup_array_bool_remove_first(bools, false);
+        gup_array_bool_append(&bools, false);
+        gup_array_bool_append(&bools, false);
+        gup_array_bool_append(&bools, false);
+        gup_array_bool_append(&bools, true);
+        gup_array_bool_remove_first(&bools, false);
 
         assert(bools.capacity == 4);
         assert(bools.count == 4);
@@ -165,9 +163,8 @@ void test_gup_array_bool(void) {
 
     { // Remove last no occurrence
         bools = gup_array_bool();
-        bools = gup_array_bool_append(bools, true);
-        
-        bools = gup_array_bool_remove_last(bools, false);
+        gup_array_bool_append(&bools, true);
+        gup_array_bool_remove_last(&bools, false);
 
         assert(bools.capacity == 1);
         assert(bools.count == 1);
@@ -179,8 +176,7 @@ void test_gup_array_bool(void) {
     { // Remove last with occurrence
         bool xs[] = {true, false, true, false, true, false, false};
         bools = gup_array_bool_from(xs, sizeof(xs)/sizeof(bool));
-
-        bools = gup_array_bool_remove_last(bools, false);
+        gup_array_bool_remove_last(&bools, false);
 
         assert(bools.capacity == 6);
         assert(bools.count == 6);
@@ -277,18 +273,18 @@ void test_gup_array_char(void) {
 
     { // Append
         chars = gup_array_char();
-        chars = gup_array_char_append(chars, 'a');
+        gup_array_char_append(&chars, 'a');
         
         assert(chars.capacity == 1);
         assert(chars.count == 1);
         assert(chars.data[0] == 'a');
 
-        chars = gup_array_char_append(chars, 'a');
-        chars = gup_array_char_append(chars, 'b');
-        chars = gup_array_char_append(chars, 'a');
-        chars = gup_array_char_append(chars, 'a');
-        chars = gup_array_char_append(chars, 'b');
-        chars = gup_array_char_append(chars, 'b');
+        gup_array_char_append(&chars, 'a');
+        gup_array_char_append(&chars, 'b');
+        gup_array_char_append(&chars, 'a');
+        gup_array_char_append(&chars, 'a');
+        gup_array_char_append(&chars, 'b');
+        gup_array_char_append(&chars, 'b');
 
         assert(chars.capacity == 8);
         assert(chars.count == 7);
@@ -305,18 +301,18 @@ void test_gup_array_char(void) {
 
     { // Prepend
         chars = gup_array_char();
-        chars = gup_array_char_prepend(chars, 'a');
+        gup_array_char_prepend(&chars, 'a');
         
         assert(chars.capacity == 1);
         assert(chars.count == 1);
         assert(chars.data[0] == 'a');
 
-        chars = gup_array_char_prepend(chars, 'a');
-        chars = gup_array_char_prepend(chars, 'b');
-        chars = gup_array_char_prepend(chars, 'a');
-        chars = gup_array_char_prepend(chars, 'a');
-        chars = gup_array_char_prepend(chars, 'b');
-        chars = gup_array_char_prepend(chars, 'b');
+        gup_array_char_prepend(&chars, 'a');
+        gup_array_char_prepend(&chars, 'b');
+        gup_array_char_prepend(&chars, 'a');
+        gup_array_char_prepend(&chars, 'a');
+        gup_array_char_prepend(&chars, 'b');
+        gup_array_char_prepend(&chars, 'b');
 
         assert(chars.capacity == 8);
         assert(chars.count == 7);
@@ -333,20 +329,18 @@ void test_gup_array_char(void) {
 
     { // Remove first
         chars = gup_array_char();
-        chars = gup_array_char_append(chars, 'a');
-        
-        chars = gup_array_char_remove_first(chars, 'b');
+        gup_array_char_append(&chars, 'a');
+        gup_array_char_remove_first(&chars, 'b');
 
         assert(chars.capacity == 1);
         assert(chars.count == 1);
         assert(chars.data[0] == 'a');
 
-        chars = gup_array_char_append(chars, 'b');
-        chars = gup_array_char_append(chars, 'b');
-        chars = gup_array_char_append(chars, 'b');
-        chars = gup_array_char_append(chars, 'c');
-
-        chars = gup_array_char_remove_first(chars, 'b');
+        gup_array_char_append(&chars, 'b');
+        gup_array_char_append(&chars, 'b');
+        gup_array_char_append(&chars, 'b');
+        gup_array_char_append(&chars, 'c');
+        gup_array_char_remove_first(&chars, 'b');
 
         assert(chars.capacity == 4);
         assert(chars.count == 4);
@@ -359,10 +353,9 @@ void test_gup_array_char(void) {
     }
 
     { // Remove last no occurrence
-        GupArrayChar chars = gup_array_char();
-        chars = gup_array_char_append(chars, 'a');
-        
-        chars = gup_array_char_remove_last(chars, 'b');
+        chars = gup_array_char();
+        gup_array_char_append(&chars, 'a');
+        gup_array_char_remove_last(&chars, 'b');
 
         assert(chars.capacity == 1);
         assert(chars.count == 1);
@@ -375,8 +368,7 @@ void test_gup_array_char(void) {
     { // Remove last with occurrence
         char xs[] = {'a', 'b', 'c', 'b', 'd', 'b', 'e'};
         chars = gup_array_char_from(xs, sizeof(xs)/sizeof(char));
-
-        chars = gup_array_char_remove_last(chars, 'b');
+        gup_array_char_remove_last(&chars, 'b');
 
         // [1, 2, 3, 2, 4, 2, 5] ->
         // [1, 2, 3, 2, 4, 5]
@@ -476,18 +468,18 @@ void test_gup_array_float(void) {
 
     { // Append
         floats = gup_array_float();
-        floats = gup_array_float_append(floats, 42.0f);
+        gup_array_float_append(&floats, 42.0f);
         
         assert(floats.capacity == 1);
         assert(floats.count == 1);
         assert(floats.data[0] == 42.0f);
 
-        floats = gup_array_float_append(floats, 17.0f);
-        floats = gup_array_float_append(floats, 38.0f);
-        floats = gup_array_float_append(floats, 1.0f);
-        floats = gup_array_float_append(floats, 3.0f);
-        floats = gup_array_float_append(floats, 3.0f);
-        floats = gup_array_float_append(floats, 7.0f);
+        gup_array_float_append(&floats, 17.0f);
+        gup_array_float_append(&floats, 38.0f);
+        gup_array_float_append(&floats, 1.0f);
+        gup_array_float_append(&floats, 3.0f);
+        gup_array_float_append(&floats, 3.0f);
+        gup_array_float_append(&floats, 7.0f);
 
         assert(floats.capacity == 8);
         assert(floats.count == 7);
@@ -504,18 +496,18 @@ void test_gup_array_float(void) {
 
     { // Prepend
         floats = gup_array_float();
-        floats = gup_array_float_prepend(floats, 42.0f);
+        gup_array_float_prepend(&floats, 42.0f);
         
         assert(floats.capacity == 1);
         assert(floats.count == 1);
         assert(floats.data[0] == 42.0f);
 
-        floats = gup_array_float_prepend(floats, 17.0f);
-        floats = gup_array_float_prepend(floats, 38.0f);
-        floats = gup_array_float_prepend(floats, 1.0f);
-        floats = gup_array_float_prepend(floats, 3.0f);
-        floats = gup_array_float_prepend(floats, 3.0f);
-        floats = gup_array_float_prepend(floats, 7.0f);
+        gup_array_float_prepend(&floats, 17.0f);
+        gup_array_float_prepend(&floats, 38.0f);
+        gup_array_float_prepend(&floats, 1.0f);
+        gup_array_float_prepend(&floats, 3.0f);
+        gup_array_float_prepend(&floats, 3.0f);
+        gup_array_float_prepend(&floats, 7.0f);
 
         assert(floats.capacity == 8);
         assert(floats.count == 7);
@@ -532,20 +524,18 @@ void test_gup_array_float(void) {
 
     { // Remove first
         floats = gup_array_float();
-        floats = gup_array_float_append(floats, 1);
-        
-        floats = gup_array_float_remove_first(floats, 0);
+        gup_array_float_append(&floats, 1);
+        gup_array_float_remove_first(&floats, 0);
 
         assert(floats.capacity == 1);
         assert(floats.count == 1);
         assert(floats.data[0] == 1);
 
-        floats = gup_array_float_append(floats, 2);
-        floats = gup_array_float_append(floats, 2);
-        floats = gup_array_float_append(floats, 2);
-        floats = gup_array_float_append(floats, 3);
-
-        floats = gup_array_float_remove_first(floats, 2);
+        gup_array_float_append(&floats, 2);
+        gup_array_float_append(&floats, 2);
+        gup_array_float_append(&floats, 2);
+        gup_array_float_append(&floats, 3);
+        gup_array_float_remove_first(&floats, 2);
 
         assert(floats.capacity == 4);
         assert(floats.count == 4);
@@ -559,10 +549,8 @@ void test_gup_array_float(void) {
 
     { // Remove last no occurrence
         floats = gup_array_float();
-        floats = gup_array_float_append(floats, 1);
-        
-        floats = gup_array_float_remove_last(floats, 0);
-
+        gup_array_float_append(&floats, 1);
+        gup_array_float_remove_last(&floats, 0);
 
         assert(floats.capacity == 1);
         assert(floats.count == 1);
@@ -574,8 +562,7 @@ void test_gup_array_float(void) {
     { // Remove last with occurrence
         float xs[] = {1.0f, 2.0f, 3.0f, 2.0f, 4.0f, 2.0f, 5.0f};
         floats = gup_array_float_from(xs, sizeof(xs)/sizeof(float));
-
-        floats = gup_array_float_remove_last(floats, 2);
+        gup_array_float_remove_last(&floats, 2);
 
         // [1, 2, 3, 2, 4, 2, 5] ->
         // [1, 2, 3, 2, 4, 5]
@@ -674,18 +661,18 @@ void test_gup_array_int(void) {
 
     { // Append
         ints = gup_array_int();
-        ints = gup_array_int_append(ints, 42);
+        gup_array_int_append(&ints, 42);
         
         assert(ints.capacity == 1);
         assert(ints.count == 1);
         assert(ints.data[0] == 42);
 
-        ints = gup_array_int_append(ints, 17);
-        ints = gup_array_int_append(ints, 38);
-        ints = gup_array_int_append(ints, 1);
-        ints = gup_array_int_append(ints, 3);
-        ints = gup_array_int_append(ints, 3);
-        ints = gup_array_int_append(ints, 7);
+        gup_array_int_append(&ints, 17);
+        gup_array_int_append(&ints, 38);
+        gup_array_int_append(&ints, 1);
+        gup_array_int_append(&ints, 3);
+        gup_array_int_append(&ints, 3);
+        gup_array_int_append(&ints, 7);
 
         assert(ints.capacity == 8);
         assert(ints.count == 7);
@@ -702,18 +689,18 @@ void test_gup_array_int(void) {
 
     { // Prepend
         ints = gup_array_int();
-        ints = gup_array_int_prepend(ints, 42);
+        gup_array_int_prepend(&ints, 42);
         
         assert(ints.capacity == 1);
         assert(ints.count == 1);
         assert(ints.data[0] == 42);
 
-        ints = gup_array_int_prepend(ints, 17);
-        ints = gup_array_int_prepend(ints, 38);
-        ints = gup_array_int_prepend(ints, 1);
-        ints = gup_array_int_prepend(ints, 3);
-        ints = gup_array_int_prepend(ints, 3);
-        ints = gup_array_int_prepend(ints, 7);
+        gup_array_int_prepend(&ints, 17);
+        gup_array_int_prepend(&ints, 38);
+        gup_array_int_prepend(&ints, 1);
+        gup_array_int_prepend(&ints, 3);
+        gup_array_int_prepend(&ints, 3);
+        gup_array_int_prepend(&ints, 7);
 
         assert(ints.capacity == 8);
         assert(ints.count == 7);
@@ -730,20 +717,18 @@ void test_gup_array_int(void) {
 
     { // Remove all
         ints = gup_array_int();
-        ints = gup_array_int_append(ints, 1);
-        
-        ints = gup_array_int_remove_all(ints, 0);
+        gup_array_int_append(&ints, 1);
+        gup_array_int_remove_all(&ints, 0);
 
         assert(ints.capacity == 1);
         assert(ints.count == 1);
         assert(ints.data[0] == 1);
 
         for (int i = 0; i < 1234; i++) {
-            ints = gup_array_int_append(ints, 2);
+            gup_array_int_append(&ints, 2);
         }
-        ints = gup_array_int_append(ints, 3);
-
-        ints = gup_array_int_remove_all(ints, 2);
+        gup_array_int_append(&ints, 3);
+        gup_array_int_remove_all(&ints, 2);
 
         assert(ints.capacity == 2);
         assert(ints.count == 2);
@@ -755,20 +740,18 @@ void test_gup_array_int(void) {
 
     { // Remove first
         ints = gup_array_int();
-        ints = gup_array_int_append(ints, 1);
-        
-        ints = gup_array_int_remove_first(ints, 0);
+        gup_array_int_append(&ints, 1);
+        gup_array_int_remove_first(&ints, 0);
 
         assert(ints.capacity == 1);
         assert(ints.count == 1);
         assert(ints.data[0] == 1);
 
-        ints = gup_array_int_append(ints, 2);
-        ints = gup_array_int_append(ints, 2);
-        ints = gup_array_int_append(ints, 2);
-        ints = gup_array_int_append(ints, 3);
-
-        ints = gup_array_int_remove_first(ints, 2);
+        gup_array_int_append(&ints, 2);
+        gup_array_int_append(&ints, 2);
+        gup_array_int_append(&ints, 2);
+        gup_array_int_append(&ints, 3);
+        gup_array_int_remove_first(&ints, 2);
 
         assert(ints.capacity == 4);
         assert(ints.count == 4);
@@ -781,10 +764,9 @@ void test_gup_array_int(void) {
     }
 
     { // Remove last no occurrence
-        GupArrayInt ints = gup_array_int();
-        ints = gup_array_int_append(ints, 1);
-        
-        ints = gup_array_int_remove_last(ints, 0);
+        ints = gup_array_int();
+        gup_array_int_append(&ints, 1);
+        gup_array_int_remove_last(&ints, 0);
 
         assert(ints.capacity == 1);
         assert(ints.count == 1);
@@ -796,8 +778,7 @@ void test_gup_array_int(void) {
     { // Remove last with occurrence
         int xs[] = {1, 2, 3, 2, 4, 2, 5};
         ints = gup_array_int_from(xs, sizeof(xs)/sizeof(int));
-
-        ints = gup_array_int_remove_last(ints, 2);
+        gup_array_int_remove_last(&ints, 2);
 
         // [1, 2, 3, 2, 4, 2, 5] ->
         // [1, 2, 3, 2, 4, 5]
