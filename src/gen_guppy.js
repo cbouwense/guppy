@@ -2,13 +2,18 @@ const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const module_declarations = (type) => {
-    const first = type.charAt(0);
-    const upper = capitalizeFirstLetter(type);
-    const typedef = `GupArray${upper}`
+const module_declarations = (t) => {
+    const f = t.charAt(0);
+    const T = capitalizeFirstLetter(t);
 
 return (
-`void gup_array_append_${type}(GupArray${upper} *xs, ${type} x);`)};
+`
+{ // ${t}
+    GupArray${T} xs = gup_array_${t}();
+    GupArray${T} ys = gup_array_from_${t}(static_${f}s, gup_array_size(static_${f}s));
+
+    assert(gup_array_eq_${t}(xs, ys) == false);
+}`)};
 
 const primitives = [
     'bool',

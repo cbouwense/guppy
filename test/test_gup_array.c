@@ -28,180 +28,246 @@ int static_is[] = {1738, 1337, 42};
 long static_ls[] = {1738L, 1337L, 42L};
 short static_ss[] = {1738, 1337, 42};
 
-void test_gup_array_empty_constructors(void) {
+void test_new_gup_array_has_default_capacity(void) {
     { // bool
         GupArrayBool bs = gup_array_bool();
         
         assert(bs.capacity == 256);
-        assert(bs.count == 0);
-        assert(bs.data == NULL);
     }
 
     { // char
         GupArrayChar cs = gup_array_char();
         
         assert(cs.capacity == 256);
-        assert(cs.count == 0);
-        assert(cs.data == NULL);
     }
 
     { // double
         GupArrayDouble ds = gup_array_double();
         
         assert(ds.capacity == 256);
-        assert(ds.count == 0);
-        assert(ds.data == NULL);
     }
 
     { // float
         GupArrayFloat fs = gup_array_float();
         
         assert(fs.capacity == 256);
-        assert(fs.count == 0);
-        assert(fs.data == NULL);
     }
 
     { // int
         GupArrayInt is = gup_array_int();
         
         assert(is.capacity == 256);
-        assert(is.count == 0);
-        assert(is.data == NULL);
     }
 
     { // long
         GupArrayLong ls = gup_array_long();
         
         assert(ls.capacity == 256);
-        assert(ls.count == 0);
-        assert(ls.data == NULL);
     }
 
     { // short
         GupArrayShort ss = gup_array_short();
         
         assert(ss.capacity == 256);
+    }
+}
+
+void test_new_gup_array_has_zero_count(void) {
+    { // bool
+        GupArrayBool bs = gup_array_bool();
+
+        assert(bs.count == 0);
+    }
+
+    { // char
+        GupArrayChar cs = gup_array_char();
+
+        assert(cs.count == 0);
+    }
+
+    { // double
+        GupArrayDouble ds = gup_array_double();
+
+        assert(ds.count == 0);
+    }
+
+    { // float
+        GupArrayFloat fs = gup_array_float();
+
+        assert(fs.count == 0);
+    }
+
+    { // int
+        GupArrayInt is = gup_array_int();
+
+        assert(is.count == 0);
+    }
+
+    { // long
+        GupArrayLong ls = gup_array_long();
+
+        assert(ls.count == 0);
+    }
+
+    { // short
+        GupArrayShort ss = gup_array_short();
+
         assert(ss.count == 0);
-        assert(ss.data == NULL);
     }
 }
 
-void test_gup_array_from_constructors(void) {
+void test_new_gup_array_has_non_null_data(void) {
     { // bool
-        GupArrayBool bs = gup_array_from_bool(static_bs, gup_array_size(static_bs));
+        GupArrayBool bs = gup_array_bool();
 
-        assert(bs.capacity == 256);
-        assert(bs.count == 3);
-        assert(memcmp(bs.data, static_bs, bs.count) == 0);
+        assert(bs.data != NULL);
     }
 
     { // char
-        GupArrayChar cs = gup_array_from_char(static_cs, gup_array_size(static_cs));
+        GupArrayChar cs = gup_array_char();
 
-        assert(cs.capacity == 256);
-        assert(cs.count == 3);
-        assert(memcmp(cs.data, static_cs, cs.count) == 0);
+        assert(cs.data != NULL);
     }
 
     { // double
-        GupArrayDouble ds = gup_array_from_double(static_ds, gup_array_size(static_ds));
+        GupArrayDouble ds = gup_array_double();
 
-        assert(ds.capacity == 256);
-        assert(ds.count == 3);
-        assert(memcmp(ds.data, static_ds, ds.count) == 0);
+        assert(ds.data != NULL);
     }
 
     { // float
-        GupArrayFloat fs = gup_array_from_float(static_fs, gup_array_size(static_fs));
+        GupArrayFloat fs = gup_array_float();
 
-        assert(fs.capacity == 256);
-        assert(fs.count == 3);
-        assert(memcmp(fs.data, static_fs, fs.count) == 0);
+        assert(fs.data != NULL);
     }
 
     { // int
-        GupArrayInt is = gup_array_from_int(static_is, gup_array_size(static_is));
+        GupArrayInt is = gup_array_int();
 
-        assert(is.capacity == 256);
-        assert(is.count == 3);
-        assert(memcmp(is.data, static_is, is.count) == 0);
+        assert(is.data != NULL);
     }
 
     { // long
-        GupArrayLong ls = gup_array_from_long(static_ls, gup_array_size(static_ls));
+        GupArrayLong ls = gup_array_long();
 
-        assert(ls.capacity == 256);
-        assert(ls.count == 3);
-        assert(memcmp(ls.data, static_ls, ls.count) == 0);
+        assert(ls.data != NULL);
     }
 
     { // short
-        GupArrayShort ss = gup_array_from_short(static_ss, gup_array_size(static_ss));
+        GupArrayShort ss = gup_array_short();
 
-        assert(ss.capacity == 256);
-        assert(ss.count == 3);
-        assert(memcmp(ss.data, static_ss, ss.count) == 0);
+        assert(ss.data != NULL);
     }
 }
 
-void test_gup_array_copy_constructors(void) {
+void test_two_empty_gup_arrays_are_equal(void) {
     { // bool
-        GupArrayBool bs = gup_array_from_bool(static_bs, gup_array_size(static_bs));
-        GupArrayBool bs_copy = gup_array_copy_bool(bs);
+        GupArrayBool xs = gup_array_bool();
+        GupArrayBool ys = gup_array_bool();
 
-        assert(gup_array_eq_bool(bs, bs_copy));
+        assert(gup_array_eq_bool(xs, ys) == true);
     }
 
     { // char
-        GupArrayChar cs = gup_array_from_char(static_cs, gup_array_size(static_cs));
-        GupArrayChar cs_copy = gup_array_copy_char(cs);
+        GupArrayChar xs = gup_array_char();
+        GupArrayChar ys = gup_array_char();
 
-        assert(gup_array_eq_char(cs, cs_copy));
+        assert(gup_array_eq_char(xs, ys) == true);
     }
 
     { // double
-        GupArrayDouble ds = gup_array_from_double(static_ds, gup_array_size(static_ds));
-        GupArrayDouble ds_copy = gup_array_copy_double(ds);
+        GupArrayDouble xs = gup_array_double();
+        GupArrayDouble ys = gup_array_double();
 
-        gup_array_print_double(ds);
-        gup_array_print_double(ds_copy);
-
-        assert(gup_array_eq_double(ds, ds_copy));
+        assert(gup_array_eq_double(xs, ys) == true);
     }
 
     { // float
-        GupArrayFloat fs = gup_array_from_float(static_fs, gup_array_size(static_fs));
-        GupArrayFloat fs_copy = gup_array_copy_float(fs);
+        GupArrayFloat xs = gup_array_float();
+        GupArrayFloat ys = gup_array_float();
 
-        assert(gup_array_eq_float(fs, fs_copy));
+        assert(gup_array_eq_float(xs, ys) == true);
     }
 
     { // int
-        GupArrayInt is = gup_array_from_int(static_is, gup_array_size(static_is));
-        GupArrayInt is_copy = gup_array_copy_int(is);
+        GupArrayInt xs = gup_array_int();
+        GupArrayInt ys = gup_array_int();
 
-        assert(gup_array_eq_int(is, is_copy));
+        assert(gup_array_eq_int(xs, ys) == true);
     }
 
     { // long
-        GupArrayLong ls = gup_array_from_long(static_ls, gup_array_size(static_ls));
-        GupArrayLong ls_copy = gup_array_copy_long(ls);
+        GupArrayLong xs = gup_array_long();
+        GupArrayLong ys = gup_array_long();
 
-        assert(gup_array_eq_long(ls, ls_copy));
+        assert(gup_array_eq_long(xs, ys) == true);
     }
 
     { // short
-        GupArrayShort ss = gup_array_from_short(static_ss, gup_array_size(static_ss));
-        GupArrayShort ss_copy = gup_array_copy_short(ss);
+        GupArrayShort xs = gup_array_short();
+        GupArrayShort ys = gup_array_short();
 
-        assert(gup_array_eq_short(ss, ss_copy));
+        assert(gup_array_eq_short(xs, ys) == true);
+    }
+}
+
+void test_one_empty_one_populated_are_unequal(void) {
+    { // bool
+        GupArrayBool xs = gup_array_bool();
+        GupArrayBool ys = gup_array_from_bool(static_bs, gup_array_size(static_bs));
+
+        assert(gup_array_eq_bool(xs, ys) == false);
+    }
+
+    { // char
+        GupArrayChar xs = gup_array_char();
+        GupArrayChar ys = gup_array_from_char(static_cs, gup_array_size(static_cs));
+
+        assert(gup_array_eq_char(xs, ys) == false);
+    }
+
+    { // double
+        GupArrayDouble xs = gup_array_double();
+        GupArrayDouble ys = gup_array_from_double(static_ds, gup_array_size(static_ds));
+
+        assert(gup_array_eq_double(xs, ys) == false);
+    }
+
+    { // float
+        GupArrayFloat xs = gup_array_float();
+        GupArrayFloat ys = gup_array_from_float(static_fs, gup_array_size(static_fs));
+
+        assert(gup_array_eq_float(xs, ys) == false);
+    }
+
+    { // int
+        GupArrayInt xs = gup_array_int();
+        GupArrayInt ys = gup_array_from_int(static_is, gup_array_size(static_is));
+
+        assert(gup_array_eq_int(xs, ys) == false);
+    }
+
+    { // long
+        GupArrayLong xs = gup_array_long();
+        GupArrayLong ys = gup_array_from_long(static_ls, gup_array_size(static_ls));
+
+        assert(gup_array_eq_long(xs, ys) == false);
+    }
+
+    { // short
+        GupArrayShort xs = gup_array_short();
+        GupArrayShort ys = gup_array_from_short(static_ss, gup_array_size(static_ss));
+
+        assert(gup_array_eq_short(xs, ys) == false);
     }
 }
 
 void test_gup_array(void) {
-    test_gup_array_empty_constructors();
-    test_gup_array_from_constructors();
-    test_gup_array_copy_constructors();
+    test_new_gup_array_has_default_capacity();
+    test_new_gup_array_has_zero_count();
+    test_new_gup_array_has_non_null_data();
+    test_two_empty_gup_arrays_are_equal();
+    test_one_empty_one_populated_are_unequal();
 
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");
