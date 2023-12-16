@@ -4,6 +4,18 @@ bool negate(bool b) {
     return !b;
 }
 
+bool is_false(bool b) {
+    return !b;
+}
+
+bool and(bool a, bool b) {
+    return a && b;
+}
+
+bool or(bool a, bool b) {
+    return a || b;
+}
+
 char add_one(char c) {
     return c + 1;
 }
@@ -17,6 +29,17 @@ void test_gup_array_bool(void) {
         assert(bools.capacity == 0);
         assert(bools.count == 0);
         assert(bools.data == NULL);
+    }
+
+    { // Copy
+        const bool xs[] = {true, false, true};
+        x_bools = gup_array_bool_from(xs, gup_array_size(xs));
+        y_bools = gup_array_bool_copy(x_bools);
+
+        assert(gup_array_bool_eq(x_bools, y_bools));
+
+        free(x_bools.data);
+        free(y_bools.data);
     }
 
     { // From a few elements
@@ -225,6 +248,73 @@ void test_gup_array_bool(void) {
         assert(bools.data[2] == false);
 
         free(bools.data);
+    }
+
+    { // Filter
+        bool bs[] = {true, false, true, false, false, false, true, false};
+        GupArrayBool bools = gup_array_bool_from(bs, gup_array_size(bs));
+        GupArrayBool inverted_bools = gup_array_bool_filter(bools, is_false);
+
+        assert(inverted_bools.capacity == 8);
+        assert(inverted_bools.count == 5);
+        assert(inverted_bools.data[0] == false);
+        assert(inverted_bools.data[1] == false);
+        assert(inverted_bools.data[2] == false);
+        assert(inverted_bools.data[3] == false);
+        assert(inverted_bools.data[4] == false);    
+
+        free(bools.data);
+        free(inverted_bools.data);
+    }
+
+    { // Filter in place
+        bool bs[] = {true, false, true, false, false, false, true, false};
+        GupArrayBool bools = gup_array_bool_from(bs, gup_array_size(bs));
+        gup_array_bool_filter_in_place(&bools, is_false);
+
+        assert(bools.capacity == 5);
+        assert(bools.count == 5);
+        assert(bools.data[0] == false);
+        assert(bools.data[1] == false);
+        assert(bools.data[2] == false);
+        assert(bools.data[3] == false);
+        assert(bools.data[4] == false);    
+
+        free(bools.data);
+    }
+
+    { // Reduce
+        bool and_reduced, or_reduced;
+        bool xs[] = {false, false, false, false, false};
+        bool ys[] = {false, false, true, false, false};
+        bool zs[] = {true, true, true, true, true};
+        GupArrayBool all_false = gup_array_bool_from(xs, gup_array_size(xs));
+        GupArrayBool some_false = gup_array_bool_from(ys, gup_array_size(ys));
+        GupArrayBool all_true = gup_array_bool_from(zs, gup_array_size(zs));
+
+        and_reduced = gup_array_bool_reduce(all_false, and, false);
+        or_reduced = gup_array_bool_reduce(all_false, or, false);
+        assert(and_reduced == false);
+        assert(or_reduced == false);
+
+        and_reduced = gup_array_bool_reduce(some_false, and, false);
+        or_reduced = gup_array_bool_reduce(some_false, or, false);
+        assert(and_reduced == false);
+        assert(or_reduced == true);
+
+        and_reduced = gup_array_bool_reduce(all_true, and, false);
+        or_reduced = gup_array_bool_reduce(all_true, or, false);
+        assert(and_reduced == false);
+        assert(or_reduced == true);
+
+        and_reduced = gup_array_bool_reduce(all_true, and, true);
+        or_reduced = gup_array_bool_reduce(all_false, or, true);
+        assert(and_reduced == true);
+        assert(or_reduced == true);
+    
+        free(all_false.data);
+        free(some_false.data);
+        free(all_true.data);
     }
 
 }
@@ -450,8 +540,7 @@ void test_gup_array_char(void) {
         assert(chars.data[2] == 'd');
 
         free(chars.data);
-    }
-    
+    }   
 }
 
 void test_gup_array_float(void) {

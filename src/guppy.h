@@ -48,6 +48,7 @@ typedef struct {
 
 // Dynamic arrays ----------------------------------------------------------------------------------
 GupArrayBool gup_array_bool();
+GupArrayBool gup_array_bool_copy(GupArrayBool xs);
 GupArrayBool gup_array_bool_from(const bool xs[], const int size);
 bool         gup_array_bool_eq(GupArrayBool xs, GupArrayBool ys);
 void         gup_array_bool_print(GupArrayBool xs);
@@ -58,36 +59,39 @@ void         gup_array_bool_remove_first(GupArrayBool *xs, bool x);
 void         gup_array_bool_remove_last(GupArrayBool *xs, bool x);
 GupArrayBool gup_array_bool_map(GupArrayBool xs, bool (*fn)(bool));
 void         gup_array_bool_map_in_place(GupArrayBool xs, bool (*fn)(bool));
+GupArrayBool gup_array_bool_filter(GupArrayBool xs, bool (*fn)(bool));
+void         gup_array_bool_filter_in_place(GupArrayBool *xs, bool (*fn)(bool));
+bool         gup_array_bool_reduce(GupArrayBool xs, bool (*fn)(bool, bool), bool start);
 
 GupArrayChar gup_array_char();
 GupArrayChar gup_array_char_from(const char xs[], const int size);
-bool gup_array_char_eq(GupArrayChar xs, GupArrayChar ys);
-void gup_array_char_print(GupArrayChar xs);
-void gup_array_char_append(GupArrayChar *xs, char x);
-void gup_array_char_prepend(GupArrayChar *xs, char x);
-void gup_array_char_remove_all(GupArrayChar *xs, char x);
-void gup_array_char_remove_first(GupArrayChar *xs, char x);
-void gup_array_char_remove_last(GupArrayChar *xs, char x);
+bool         gup_array_char_eq(GupArrayChar xs, GupArrayChar ys);
+void         gup_array_char_print(GupArrayChar xs);
+void         gup_array_char_append(GupArrayChar *xs, char x);
+void         gup_array_char_prepend(GupArrayChar *xs, char x);
+void         gup_array_char_remove_all(GupArrayChar *xs, char x);
+void         gup_array_char_remove_first(GupArrayChar *xs, char x);
+void         gup_array_char_remove_last(GupArrayChar *xs, char x);
 
 GupArrayFloat gup_array_float();
 GupArrayFloat gup_array_float_from(const float xs[], const int size);
-bool gup_array_float_eq(GupArrayFloat xs, GupArrayFloat ys);
-void gup_array_float_print(GupArrayFloat xs);
-void gup_array_float_append(GupArrayFloat *xs, float x);
-void gup_array_float_prepend(GupArrayFloat *xs, float x);
-void gup_array_float_remove_all(GupArrayFloat *xs, float x);
-void gup_array_float_remove_first(GupArrayFloat *xs, float x);
-void gup_array_float_remove_last(GupArrayFloat *xs, float x);
+bool          gup_array_float_eq(GupArrayFloat xs, GupArrayFloat ys);
+void          gup_array_float_print(GupArrayFloat xs);
+void          gup_array_float_append(GupArrayFloat *xs, float x);
+void          gup_array_float_prepend(GupArrayFloat *xs, float x);
+void          gup_array_float_remove_all(GupArrayFloat *xs, float x);
+void          gup_array_float_remove_first(GupArrayFloat *xs, float x);
+void          gup_array_float_remove_last(GupArrayFloat *xs, float x);
 
 GupArrayInt gup_array_int();
 GupArrayInt gup_array_int_from(const int xs[], const int size);
-bool gup_array_int_eq(GupArrayInt xs, GupArrayInt ys);
-void gup_array_int_print(GupArrayInt xs);
-void gup_array_int_append(GupArrayInt *xs, int i);
-void gup_array_int_prepend(GupArrayInt *xs, int i);
-void gup_array_int_remove_all(GupArrayInt *xs, int x);
-void gup_array_int_remove_first(GupArrayInt *xs, int x);
-void gup_array_int_remove_last(GupArrayInt *xs, int x);
+bool        gup_array_int_eq(GupArrayInt xs, GupArrayInt ys);
+void        gup_array_int_print(GupArrayInt xs);
+void        gup_array_int_append(GupArrayInt *xs, int i);
+void        gup_array_int_prepend(GupArrayInt *xs, int i);
+void        gup_array_int_remove_all(GupArrayInt *xs, int x);
+void        gup_array_int_remove_first(GupArrayInt *xs, int x);
+void        gup_array_int_remove_last(GupArrayInt *xs, int x);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -198,6 +202,16 @@ GupArrayBool gup_array_bool() {
         .data = NULL
     };
     return xs;
+}
+
+GupArrayBool gup_array_bool_copy(GupArrayBool xs) {
+    GupArrayBool new = gup_array_bool();
+    new.capacity = xs.capacity;
+    new.count = xs.count;
+    new.data = malloc(xs.capacity * sizeof(bool));
+    memcpy(new.data, xs.data, xs.count);
+
+    return new;
 }
 
 GupArrayBool gup_array_bool_from(const bool xs[], const int size)  {
@@ -344,6 +358,35 @@ void gup_array_bool_map_in_place(GupArrayBool xs, bool (*fn)(bool)) {
     for (int i = 0; i < xs.count; i++) {
         xs.data[i] = fn(xs.data[i]);
     }
+}
+
+GupArrayBool gup_array_bool_filter(GupArrayBool xs, bool (*fn)(bool)) {
+    GupArrayBool new = gup_array_bool();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_bool_append(&new, xs.data[i]); 
+        }
+    }
+
+    return new;
+}
+
+void gup_array_bool_filter_in_place(GupArrayBool *xs, bool (*fn)(bool)) {
+    GupArrayBool new = gup_array_bool_filter(*xs, fn);
+
+    free(xs->data);
+    *xs = gup_array_bool_from(new.data, new.count);
+
+    free(new.data);
+}
+
+bool gup_array_bool_reduce(GupArrayBool xs, bool (*fn)(bool, bool), bool start) {
+    bool result = start;
+    for (int i = 0; i < xs.count; i++) {
+        result = fn(result, xs.data[i]);
+    }
+    return result;
 }
 
 // Char
