@@ -163,6 +163,9 @@ void test_gup_array_copy_constructors(void) {
         GupArrayDouble ds = gup_array_from_double(static_ds, gup_array_size(static_ds));
         GupArrayDouble ds_copy = gup_array_copy_double(ds);
 
+        gup_array_print_double(ds);
+        gup_array_print_double(ds_copy);
+
         assert(gup_array_eq_double(ds, ds_copy));
     }
 
@@ -198,6 +201,7 @@ void test_gup_array_copy_constructors(void) {
 void test_gup_array(void) {
     test_gup_array_empty_constructors();
     test_gup_array_from_constructors();
+    test_gup_array_copy_constructors();
 
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");

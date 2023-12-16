@@ -97,101 +97,24 @@ bool gup_array_eq_int(GupArrayInt xs, GupArrayInt ys);
 bool gup_array_eq_long(GupArrayLong xs, GupArrayLong ys);
 bool gup_array_eq_short(GupArrayShort xs, GupArrayShort ys);
 
+void gup_array_print_bool(GupArrayBool xs);
+void gup_array_print_char(GupArrayChar xs);
+void gup_array_print_double(GupArrayDouble xs);
+void gup_array_print_float(GupArrayFloat xs);
+void gup_array_print_int(GupArrayInt xs);
+void gup_array_print_long(GupArrayLong xs);
+void gup_array_print_short(GupArrayShort xs);
 
-
-void         gup_array_bool_print(GupArrayBool xs);
-void         gup_array_bool_append(GupArrayBool *xs, bool x);
-void         gup_array_bool_prepend(GupArrayBool *xs, bool x);
-void         gup_array_bool_remove_all(GupArrayBool *xs, bool x);
-void         gup_array_bool_remove_first(GupArrayBool *xs, bool x);
-void         gup_array_bool_remove_last(GupArrayBool *xs, bool x);
-GupArrayBool gup_array_bool_map(GupArrayBool xs, bool (*fn)(bool));
-void         gup_array_bool_map_in_place(GupArrayBool xs, bool (*fn)(bool));
-GupArrayBool gup_array_bool_filter(GupArrayBool xs, bool (*fn)(bool));
-void         gup_array_bool_filter_in_place(GupArrayBool *xs, bool (*fn)(bool));
-bool         gup_array_bool_reduce(GupArrayBool xs, bool (*fn)(bool, bool), bool start);
-
-
-void         gup_array_char_print(GupArrayChar xs);
-void         gup_array_char_append(GupArrayChar *xs, char x);
-void         gup_array_char_prepend(GupArrayChar *xs, char x);
-void         gup_array_char_remove_all(GupArrayChar *xs, char x);
-void         gup_array_char_remove_first(GupArrayChar *xs, char x);
-void         gup_array_char_remove_last(GupArrayChar *xs, char x);
-GupArrayChar gup_array_char_map(GupArrayChar xs, char (*fn)(char));
-void         gup_array_char_map_in_place(GupArrayChar xs, char (*fn)(char));
-GupArrayChar gup_array_char_filter(GupArrayChar xs, char (*fn)(char));
-void         gup_array_char_filter_in_place(GupArrayChar *xs, char (*fn)(char));
-char         gup_array_char_reduce(GupArrayChar xs, char (*fn)(char, char), char start);
+void gup_array_append_bool(GupArrayBool *xs, bool x);
+void gup_array_append_char(GupArrayChar *xs, char x);
+void gup_array_append_double(GupArrayDouble *xs, double x);
+void gup_array_append_float(GupArrayFloat *xs, float x);
+void gup_array_append_int(GupArrayInt *xs, int x);
+void gup_array_append_long(GupArrayLong *xs, long x);
+void gup_array_append_short(GupArrayShort *xs, short x);
 
 
 
-void           gup_array_double_print(GupArrayDouble xs);
-void           gup_array_double_append(GupArrayDouble *xs, double x);
-void           gup_array_double_prepend(GupArrayDouble *xs, double x);
-void           gup_array_double_remove_all(GupArrayDouble *xs, double x);
-void           gup_array_double_remove_first(GupArrayDouble *xs, double x);
-void           gup_array_double_remove_last(GupArrayDouble *xs, double x);
-GupArrayDouble gup_array_double_map(GupArrayDouble xs, double (*fn)(double));
-void           gup_array_double_map_in_place(GupArrayDouble xs, double (*fn)(double));
-GupArrayDouble gup_array_double_filter(GupArrayDouble xs, double (*fn)(double));
-void           gup_array_double_filter_in_place(GupArrayDouble *xs, double (*fn)(double));
-double         gup_array_double_reduce(GupArrayDouble xs, double (*fn)(double, double), double start);
-
-
-
-void          gup_array_float_print(GupArrayFloat xs);
-void          gup_array_float_append(GupArrayFloat *xs, float x);
-void          gup_array_float_prepend(GupArrayFloat *xs, float x);
-void          gup_array_float_remove_all(GupArrayFloat *xs, float x);
-void          gup_array_float_remove_first(GupArrayFloat *xs, float x);
-void          gup_array_float_remove_last(GupArrayFloat *xs, float x);
-GupArrayFloat gup_array_float_map(GupArrayFloat xs, float (*fn)(float));
-void          gup_array_float_map_in_place(GupArrayFloat xs, float (*fn)(float));
-GupArrayFloat gup_array_float_filter(GupArrayFloat xs, float (*fn)(float));
-void          gup_array_float_filter_in_place(GupArrayFloat *xs, float (*fn)(float));
-float         gup_array_float_reduce(GupArrayFloat xs, float (*fn)(float, float), float start);
-
-
-void         gup_array_int_print(GupArrayInt xs);
-void         gup_array_int_append(GupArrayInt *xs, int x);
-void         gup_array_int_prepend(GupArrayInt *xs, int x);
-void         gup_array_int_remove_all(GupArrayInt *xs, int x);
-void         gup_array_int_remove_first(GupArrayInt *xs, int x);
-void         gup_array_int_remove_last(GupArrayInt *xs, int x);
-GupArrayInt  gup_array_int_map(GupArrayInt xs, int (*fn)(int));
-void         gup_array_int_map_in_place(GupArrayInt xs, int (*fn)(int));
-GupArrayInt  gup_array_int_filter(GupArrayInt xs, int (*fn)(int));
-void         gup_array_int_filter_in_place(GupArrayInt *xs, int (*fn)(int));
-int          gup_array_int_reduce(GupArrayInt xs, int (*fn)(int, int), int start);
-
-
-
-void         gup_array_long_print(GupArrayLong xs);
-void         gup_array_long_append(GupArrayLong *xs, long x);
-void         gup_array_long_prepend(GupArrayLong *xs, long x);
-void         gup_array_long_remove_all(GupArrayLong *xs, long x);
-void         gup_array_long_remove_first(GupArrayLong *xs, long x);
-void         gup_array_long_remove_last(GupArrayLong *xs, long x);
-GupArrayLong gup_array_long_map(GupArrayLong xs, long (*fn)(long));
-void         gup_array_long_map_in_place(GupArrayLong xs, long (*fn)(long));
-GupArrayLong gup_array_long_filter(GupArrayLong xs, long (*fn)(long));
-void         gup_array_long_filter_in_place(GupArrayLong *xs, long (*fn)(long));
-long         gup_array_long_reduce(GupArrayLong xs, long (*fn)(long, long), long start);
-
-
-
-void          gup_array_short_print(GupArrayShort xs);
-void          gup_array_short_append(GupArrayShort *xs, short x);
-void          gup_array_short_prepend(GupArrayShort *xs, short x);
-void          gup_array_short_remove_all(GupArrayShort *xs, short x);
-void          gup_array_short_remove_first(GupArrayShort *xs, short x);
-void          gup_array_short_remove_last(GupArrayShort *xs, short x);
-GupArrayShort gup_array_short_map(GupArrayShort xs, short (*fn)(short));
-void          gup_array_short_map_in_place(GupArrayShort xs, short (*fn)(short));
-GupArrayShort gup_array_short_filter(GupArrayShort xs, short (*fn)(short));
-void          gup_array_short_filter_in_place(GupArrayShort *xs, short (*fn)(short));
-short         gup_array_short_reduce(GupArrayShort xs, short (*fn)(short, short), short start);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -458,7 +381,7 @@ GupArrayBool gup_array_copy_bool(GupArrayBool xs) {
     new.capacity = xs.capacity;
     new.count = xs.count;
     new.data = malloc(xs.capacity * sizeof(bool));
-    memcpy(new.data, xs.data, xs.count);
+    memcpy(new.data, xs.data, xs.count * sizeof(bool));
 
     return new;
 }
@@ -468,7 +391,7 @@ GupArrayChar gup_array_copy_char(GupArrayChar xs) {
     new.capacity = xs.capacity;
     new.count = xs.count;
     new.data = malloc(xs.capacity * sizeof(char));
-    memcpy(new.data, xs.data, xs.count);
+    memcpy(new.data, xs.data, xs.count * sizeof(char));
 
     return new;
 }
@@ -478,7 +401,7 @@ GupArrayDouble gup_array_copy_double(GupArrayDouble xs) {
     new.capacity = xs.capacity;
     new.count = xs.count;
     new.data = malloc(xs.capacity * sizeof(double));
-    memcpy(new.data, xs.data, xs.count);
+    memcpy(new.data, xs.data, xs.count * sizeof(double));
 
     return new;
 }
@@ -488,7 +411,7 @@ GupArrayFloat gup_array_copy_float(GupArrayFloat xs) {
     new.capacity = xs.capacity;
     new.count = xs.count;
     new.data = malloc(xs.capacity * sizeof(float));
-    memcpy(new.data, xs.data, xs.count);
+    memcpy(new.data, xs.data, xs.count * sizeof(float));
 
     return new;
 }
@@ -498,7 +421,7 @@ GupArrayInt gup_array_copy_int(GupArrayInt xs) {
     new.capacity = xs.capacity;
     new.count = xs.count;
     new.data = malloc(xs.capacity * sizeof(int));
-    memcpy(new.data, xs.data, xs.count);
+    memcpy(new.data, xs.data, xs.count * sizeof(int));
 
     return new;
 }
@@ -508,7 +431,7 @@ GupArrayLong gup_array_copy_long(GupArrayLong xs) {
     new.capacity = xs.capacity;
     new.count = xs.count;
     new.data = malloc(xs.capacity * sizeof(long));
-    memcpy(new.data, xs.data, xs.count);
+    memcpy(new.data, xs.data, xs.count * sizeof(long));
 
     return new;
 }
@@ -518,7 +441,7 @@ GupArrayShort gup_array_copy_short(GupArrayShort xs) {
     new.capacity = xs.capacity;
     new.count = xs.count;
     new.data = malloc(xs.capacity * sizeof(short));
-    memcpy(new.data, xs.data, xs.count);
+    memcpy(new.data, xs.data, xs.count * sizeof(short));
 
     return new;
 }
@@ -594,11 +517,9 @@ bool gup_array_eq_short(GupArrayShort xs, GupArrayShort ys) {
     return true;
 }
 
-
-
-
-#define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
-void _gup_array_bool_print(GupArrayBool xs, const char *xs_name) {
+// Print
+#define gup_array_print_bool(xs) _gup_array_print_bool(xs, #xs)
+void _gup_array_print_bool(GupArrayBool xs, const char *xs_name) {
     printf("%s: [", xs_name);
     for (int i = 0; i < xs.count; i++) {
         if (xs.data[i] == true) printf("true");
@@ -609,6 +530,73 @@ void _gup_array_bool_print(GupArrayBool xs, const char *xs_name) {
     printf("]\n"); 
 }
 
+#define gup_array_print_char(xs) _gup_array_print_char(xs, #xs)
+void _gup_array_print_char(GupArrayChar xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        printf("%c", xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_print_double(xs) _gup_array_print_double(xs, #xs)
+void _gup_array_print_double(GupArrayDouble xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        printf("%f", xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_print_float(xs) _gup_array_print_float(xs, #xs)
+void _gup_array_print_float(GupArrayFloat xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        printf("%f", xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_print_int(xs) _gup_array_print_int(xs, #xs)
+void _gup_array_print_int(GupArrayInt xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        printf("%d", xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_print_long(xs) _gup_array_print_long(xs, #xs)
+void _gup_array_print_long(GupArrayLong xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        printf("%ld", xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+#define gup_array_print_short(xs) _gup_array_print_short(xs, #xs)
+void _gup_array_print_short(GupArrayShort xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        printf("%d", xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n"); 
+}
+
+// Append
 void gup_array_bool_append(GupArrayBool *xs, bool x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
@@ -619,6 +607,8 @@ void gup_array_bool_append(GupArrayBool *xs, bool x) {
     xs->data[xs->count] = x;
     xs->count++;
 }
+
+
 
 void gup_array_bool_prepend(GupArrayBool *xs, bool x) {
     if (xs->count == xs->capacity) {
@@ -751,15 +741,6 @@ bool gup_array_bool_reduce(GupArrayBool xs, bool (*fn)(bool, bool), bool start) 
 
 
 
-#define gup_array_char_print(xs) _gup_array_char_print(xs, #xs)
-void _gup_array_char_print(GupArrayChar xs, const char *xs_name) {
-    printf("%s: [", xs_name);
-    for (int i = 0; i < xs.count; i++) {
-        printf("'%c'", xs.data[i]);
-        if (i != xs.count-1) printf(", ");
-    }
-    printf("]\n"); 
-}
 
 void gup_array_char_append(GupArrayChar *xs, char x) {
     if (xs->count == xs->capacity) {
@@ -872,38 +853,8 @@ void gup_array_char_map_in_place(GupArrayChar xs, char (*fn)(char)) {
     }
 }
 
-GupArrayFloat gup_array_float_from(const float xs[], const int size)  {
-    GupArrayFloat floats = gup_array_float();
-    floats.data = malloc(size * sizeof(float));
 
-    floats.capacity = size;
-    floats.count = size;
-    for (int i = 0; i < size; i++) {
-        floats.data[i] = xs[i];
-    }
 
-    return floats;
-}
-
-bool gup_array_float_eq(GupArrayFloat xs, GupArrayFloat ys) {
-    if (xs.count != ys.count) return false;
-    
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-#define gup_array_float_print(xs) _gup_array_float_print(xs, #xs)
-void _gup_array_float_print(GupArrayFloat xs, const char *xs_name) {
-    printf("%s: [", xs_name);
-    for (int i = 0; i < xs.count; i++) {
-        printf("%f", xs.data[i]);
-        if (i != xs.count-1) printf(", ");
-    }
-    printf("]\n"); 
-}
 
 void gup_array_float_append(GupArrayFloat *xs, float x) {
     if (xs->count == xs->capacity) {
@@ -1001,7 +952,7 @@ void gup_array_float_remove_last(GupArrayFloat *xs, float x) {
 }
 
 GupArrayFloat gup_array_float_map(GupArrayFloat xs, float (*fn)(float)) {
-    GupArrayFloat new = gup_array_float_from(xs.data, xs.count);
+    GupArrayFloat new = gup_array_from_float(xs.data, xs.count);
     
     for (int i = 0; i < xs.count; i++) {
         new.data[i] = fn(xs.data[i]);
@@ -1018,15 +969,6 @@ void gup_array_float_map_in_place(GupArrayFloat xs, float (*fn)(float)) {
 
 
 
-#define gup_array_int_print(xs) _gup_array_int_print(xs, #xs)
-void _gup_array_int_print(GupArrayInt xs, const char *xs_name) {
-    printf("%s: [", xs_name);
-    for (int i = 0; i < xs.count; i++) {
-        printf("%d", xs.data[i]);
-        if (i != xs.count-1) printf(", ");
-    }
-    printf("]\n"); 
-}
 
 void gup_array_int_append(GupArrayInt *xs, int x) {
     if (xs->count == xs->capacity) {

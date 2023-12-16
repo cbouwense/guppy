@@ -4,11 +4,11 @@ const capitalizeFirstLetter = (string) => {
 
 const module_declarations = (type) => {
     const first = type.charAt(0);
-    const upperType = capitalizeFirstLetter(type);
-    const typedef = `GupArray${upperType}`
+    const upper = capitalizeFirstLetter(type);
+    const typedef = `GupArray${upper}`
 
 return (
-`GupArray${upperType} gup_array_from_${type}(const ${type} xs[], const int size);`)};
+`void gup_array_append_${type}(GupArray${upper} *xs, ${type} x);`)};
 
 const primitives = [
     'bool',
