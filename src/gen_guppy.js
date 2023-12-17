@@ -9,10 +9,14 @@ const module_declarations = (t) => {
 return (
 `
 { // ${t}
-    GupArray${T} xs = gup_array_${t}();
+    GupArray${T} xs = gup_array_from_${t}(static_${f}s, gup_array_size(static_${f}s));
     GupArray${T} ys = gup_array_from_${t}(static_${f}s, gup_array_size(static_${f}s));
 
-    assert(gup_array_eq_${t}(xs, ys) == false);
+    assert(gup_array_eq_${t}(xs, ys) == true);
+    assert(gup_array_eq_${t}(ys, xs) == true);
+
+    free(xs.data);
+    free(ys.data);
 }`)};
 
 const primitives = [

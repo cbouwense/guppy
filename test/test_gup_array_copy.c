@@ -20,11 +20,11 @@ char add_one(char c) {
     return c + 1;
 }
 
-void test_gup_array_b(void) {
+void test_gup_array_bool(void) {
     GupArrayBool bools, x_bools, y_bools;
 
     { // Empty
-        bools = gup_array_b();
+        bools = gup_array_bool();
 
         assert(bools.capacity == 0);
         assert(bools.count == 0);
@@ -112,7 +112,7 @@ void test_gup_array_b(void) {
     }
 
     { // Append
-        bools = gup_array_b();
+        bools = gup_array_bool();
         gup_array_bool_append(&bools, true);
         
         assert(bools.capacity == 1);
@@ -140,7 +140,7 @@ void test_gup_array_b(void) {
     }
 
     { // Prepend
-        bools = gup_array_b();
+        bools = gup_array_bool();
         gup_array_bool_prepend(&bools, true);
         
         assert(bools.capacity == 1);
@@ -168,7 +168,7 @@ void test_gup_array_b(void) {
     }
 
     { // Remove first
-        bools = gup_array_b();
+        bools = gup_array_bool();
         gup_array_bool_append(&bools, true);
         gup_array_bool_remove_first(&bools, false);
 
@@ -193,7 +193,7 @@ void test_gup_array_b(void) {
     }
 
     { // Remove last no occurrence
-        bools = gup_array_b();
+        bools = gup_array_bool();
         gup_array_bool_append(&bools, true);
         gup_array_bool_remove_last(&bools, false);
 
@@ -319,11 +319,11 @@ void test_gup_array_b(void) {
 
 }
 
-void test_gup_array_c(void) {
+void test_gup_array_char(void) {
     GupArrayChar chars, x_chars, y_chars;
 
     { // Empty
-        chars = gup_array_c();
+        chars = gup_array_char();
 
         assert(chars.capacity == 0);
         assert(chars.count == 0);
@@ -400,7 +400,7 @@ void test_gup_array_c(void) {
     }
 
     { // Append
-        chars = gup_array_c();
+        chars = gup_array_char();
         gup_array_char_append(&chars, 'a');
         
         assert(chars.capacity == 1);
@@ -428,7 +428,7 @@ void test_gup_array_c(void) {
     }
 
     { // Prepend
-        chars = gup_array_c();
+        chars = gup_array_char();
         gup_array_char_prepend(&chars, 'a');
         
         assert(chars.capacity == 1);
@@ -456,7 +456,7 @@ void test_gup_array_c(void) {
     }
 
     { // Remove first
-        chars = gup_array_c();
+        chars = gup_array_char();
         gup_array_char_append(&chars, 'a');
         gup_array_char_remove_first(&chars, 'b');
 
@@ -481,7 +481,7 @@ void test_gup_array_c(void) {
     }
 
     { // Remove last no occurrence
-        chars = gup_array_c();
+        chars = gup_array_char();
         gup_array_char_append(&chars, 'a');
         gup_array_char_remove_last(&chars, 'b');
 
@@ -953,8 +953,8 @@ void test_gup_array_int(void) {
 }
 
 void test_gup_array(void) {
-    test_gup_array_b();
-    test_gup_array_c();
+    test_gup_array_bool();
+    test_gup_array_char();
     test_gup_array_float();
     test_gup_array_int();
 

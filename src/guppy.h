@@ -289,8 +289,10 @@ GupArrayBool gup_array_from_bool(const bool xs[], const int size)  {
 
     bools.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     bools.count = size;
-    bools.data = malloc(size * sizeof(bool));
-    memcpy(bools.data, xs, size * sizeof(bool));
+    bools.data = realloc(bools.data, bools.capacity * sizeof(bool));
+    for (int i = 0; i < size; i++) {
+        bools.data[i] = xs[i];
+    }
 
     return bools;
 }
@@ -300,8 +302,10 @@ GupArrayChar gup_array_from_char(const char xs[], const int size)  {
 
     chars.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     chars.count = size;
-    chars.data = malloc(size * sizeof(char));
-    memcpy(chars.data, xs, size * sizeof(char));
+    chars.data = realloc(chars.data, chars.capacity * sizeof(char));
+    for (int i = 0; i < size; i++) {
+        chars.data[i] = xs[i];
+    }
 
     return chars;
 }
@@ -311,8 +315,10 @@ GupArrayDouble gup_array_from_double(const double xs[], const int size)  {
 
     doubles.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     doubles.count = size;
-    doubles.data = malloc(size * sizeof(double));
-    memcpy(doubles.data, xs, size * sizeof(double));
+    doubles.data = realloc(doubles.data, doubles.capacity * sizeof(double));
+    for (int i = 0; i < size; i++) {
+        doubles.data[i] = xs[i];
+    }
 
     return doubles;
 }
@@ -322,8 +328,10 @@ GupArrayFloat gup_array_from_float(const float xs[], const int size)  {
 
     floats.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     floats.count = size;
-    floats.data = malloc(size * sizeof(float));
-    memcpy(floats.data, xs, size * sizeof(float));
+    floats.data = realloc(floats.data, floats.capacity * sizeof(float));
+    for (int i = 0; i < size; i++) {
+        floats.data[i] = xs[i];
+    }
 
     return floats;
 }
@@ -333,8 +341,10 @@ GupArrayInt gup_array_from_int(const int xs[], const int size)  {
 
     ints.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     ints.count = size;
-    ints.data = malloc(size * sizeof(int));
-    memcpy(ints.data, xs, size * sizeof(int));
+    ints.data = realloc(ints.data, ints.capacity * sizeof(int));
+    for (int i = 0; i < size; i++) {
+        ints.data[i] = xs[i];
+    }
 
     return ints;
 }
@@ -344,8 +354,10 @@ GupArrayLong gup_array_from_long(const long xs[], const int size)  {
 
     longs.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     longs.count = size;
-    longs.data = malloc(size * sizeof(long));
-    memcpy(longs.data, xs, size * sizeof(long));
+    longs.data = realloc(longs.data, longs.capacity * sizeof(long));
+    for (int i = 0; i < size; i++) {
+        longs.data[i] = xs[i];
+    }
 
     return longs;
 }
@@ -355,8 +367,10 @@ GupArrayShort gup_array_from_short(const short xs[], const int size)  {
 
     shorts.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     shorts.count = size;
-    shorts.data = malloc(size * sizeof(short));
-    memcpy(shorts.data, xs, size * sizeof(short));
+    shorts.data = realloc(shorts.data, shorts.capacity * sizeof(short));
+    for (int i = 0; i < size; i++) {
+        shorts.data[i] = xs[i];
+    }
 
     return shorts;
 }
@@ -442,6 +456,14 @@ bool gup_array_eq_bool(GupArrayBool xs, GupArrayBool ys) {
 
     return true;
 }
+
+// bool static_bs[] = {true, false, true};
+// char static_cs[] = {'a', 'b', 'c'};
+// double static_ds[] = {17.38, 133.7, 0.42};
+// float static_fs[] = {17.38f, 133.7f, 0.42f};
+// int static_is[] = {1738, 1337, 42};
+// long static_ls[] = {1738L, 1337L, 42L};
+// short static_ss[] = {1738, 1337, 42};
 
 bool gup_array_eq_char(GupArrayChar xs, GupArrayChar ys) {
     if (xs.count != ys.count) return false;
@@ -650,6 +672,7 @@ void gup_array_append_long(GupArrayLong *xs, long x) {
 }
 
 void gup_array_append_short(GupArrayShort *xs, short x) {
+    
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(short));
@@ -1807,7 +1830,8 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
         if (!gup_sv_eq(line_key, gup_sv_trim(gup_sv_from_cstr(key)))) continue; // Skip lines that don't match the key.
 
         // Replace the line with the key with the new value
-        char *new_line = malloc(strlen(key) + strlen(value) + 3);
+        // TODO: this is horrendous
+        char *new_line = malloc(strlen(key) + strlen(value) + 3 + 5 + 1);
         sprintf(new_line, "%s = \"%s\"\n", key, value);
 
         free(settings_lines[i]);
@@ -1820,7 +1844,8 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
     if (!found) {
         settings_lines = realloc(settings_lines, (line_count + 2) * sizeof(char *));
 
-        char *new_line = malloc(strlen(key) + strlen(value) + 3);
+        // TODO: This is horrendous
+        char *new_line = malloc(strlen(key) + strlen(value) + 3 + 5 + 1);
         sprintf(new_line, "%s = \"%s\"\n", key, value);
         
         settings_lines[line_count-1] = new_line;
