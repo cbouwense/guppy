@@ -581,7 +581,7 @@ void test_equivalent_but_differently_sized_gup_arrays_are_unequal(void) {
     { // bool
         GupArrayBool xs = gup_array_from_bool(static_bs, gup_array_size(static_bs));
         GupArrayBool ys = gup_array_from_bool(static_bs, gup_array_size(static_bs));
-        gup_array_append_bool(&ys, static_bs[0]);
+        gup_array_append_bool(&ys, false);
 
         assert(gup_array_eq_bool(xs, ys) == false);
 
@@ -592,7 +592,7 @@ void test_equivalent_but_differently_sized_gup_arrays_are_unequal(void) {
     { // char
         GupArrayChar xs = gup_array_from_char(static_cs, gup_array_size(static_cs));
         GupArrayChar ys = gup_array_from_char(static_cs, gup_array_size(static_cs));
-        gup_array_append_char(&ys, static_cs[0]);
+        gup_array_append_char(&ys, false);
 
         assert(gup_array_eq_char(xs, ys) == false);
 

@@ -220,310 +220,82 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
 #define GUP_ARRAY_DEFAULT_CAPACITY 256
 
 // Default constructors
-GupArrayBool gup_array_bool() {
-    GupArrayBool xs = {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(bool))
-    };
-    return xs;
-}
+#define GUP_DEFINE_ARRAY(T, t) GupArray##T gup_array_##t() {\
+    GupArray##T xs = {                                      \
+        .capacity = 256,                                    \
+        .count = 0,                                         \
+        .data = malloc(256 * sizeof(t))                     \
+    };                                                      \
+    return xs;                                              \
+}                                                           \
 
-GupArrayChar gup_array_char() {
-    GupArrayChar xs = {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(char))
-    };
-    return xs;
-}
-
-GupArrayDouble gup_array_double() {
-    GupArrayDouble xs = {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(double))
-    };
-    return xs;
-}
-
-GupArrayFloat gup_array_float() {
-    GupArrayFloat xs = {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(float))
-    };
-    return xs;
-}
-
-GupArrayInt gup_array_int() {
-    GupArrayInt xs = {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(int))
-    };
-    return xs;
-}
-
-GupArrayLong gup_array_long() {
-    GupArrayLong xs = {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(long))
-    };
-    return xs;
-}
-
-GupArrayShort gup_array_short() {
-    GupArrayShort xs = {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(short))
-    };
-    return xs;
-}
+GUP_DEFINE_ARRAY(Bool, bool)
+GUP_DEFINE_ARRAY(Char, char)
+GUP_DEFINE_ARRAY(Double, double)
+GUP_DEFINE_ARRAY(Float, float)
+GUP_DEFINE_ARRAY(Int, int)
+GUP_DEFINE_ARRAY(Long, long)
+GUP_DEFINE_ARRAY(Short, short)
 
 // From constructors
-GupArrayBool gup_array_from_bool(const bool xs[], const int size)  {
-    GupArrayBool bools = gup_array_bool();
+#define GUP_DEFINE_ARRAY_FROM(T, t) GupArray##T gup_array_from_##t(const t xs[], const int size)  {\
+    GupArray##T new = gup_array_##t();                                                             \
+                                                                                                   \
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;          \
+    new.count = size;                                                                              \
+    new.data = realloc(new.data, new.capacity * sizeof(t));                                        \
+    for (int i = 0; i < size; i++) {                                                               \
+       new.data[i] = xs[i];                                                                        \
+    }                                                                                              \
+                                                                                                   \
+    return new;                                                                                    \
+}                                                                                                  \
 
-    bools.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
-    bools.count = size;
-    bools.data = realloc(bools.data, bools.capacity * sizeof(bool));
-    for (int i = 0; i < size; i++) {
-        bools.data[i] = xs[i];
-    }
-
-    return bools;
-}
-
-GupArrayChar gup_array_from_char(const char xs[], const int size)  {
-    GupArrayChar chars = gup_array_char();
-
-    chars.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
-    chars.count = size;
-    chars.data = realloc(chars.data, chars.capacity * sizeof(char));
-    for (int i = 0; i < size; i++) {
-        chars.data[i] = xs[i];
-    }
-
-    return chars;
-}
-
-GupArrayDouble gup_array_from_double(const double xs[], const int size)  {
-    GupArrayDouble doubles = gup_array_double();
-
-    doubles.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
-    doubles.count = size;
-    doubles.data = realloc(doubles.data, doubles.capacity * sizeof(double));
-    for (int i = 0; i < size; i++) {
-        doubles.data[i] = xs[i];
-    }
-
-    return doubles;
-}
-
-GupArrayFloat gup_array_from_float(const float xs[], const int size)  {
-    GupArrayFloat floats = gup_array_float();
-
-    floats.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
-    floats.count = size;
-    floats.data = realloc(floats.data, floats.capacity * sizeof(float));
-    for (int i = 0; i < size; i++) {
-        floats.data[i] = xs[i];
-    }
-
-    return floats;
-}
-
-GupArrayInt gup_array_from_int(const int xs[], const int size)  {
-    GupArrayInt ints = gup_array_int();
-
-    ints.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
-    ints.count = size;
-    ints.data = realloc(ints.data, ints.capacity * sizeof(int));
-    for (int i = 0; i < size; i++) {
-        ints.data[i] = xs[i];
-    }
-
-    return ints;
-}
-
-GupArrayLong gup_array_from_long(const long xs[], const int size)  {
-    GupArrayLong longs = gup_array_long();
-
-    longs.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
-    longs.count = size;
-    longs.data = realloc(longs.data, longs.capacity * sizeof(long));
-    for (int i = 0; i < size; i++) {
-        longs.data[i] = xs[i];
-    }
-
-    return longs;
-}
-
-GupArrayShort gup_array_from_short(const short xs[], const int size)  {
-    GupArrayShort shorts = gup_array_short();
-
-    shorts.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
-    shorts.count = size;
-    shorts.data = realloc(shorts.data, shorts.capacity * sizeof(short));
-    for (int i = 0; i < size; i++) {
-        shorts.data[i] = xs[i];
-    }
-
-    return shorts;
-}
+GUP_DEFINE_ARRAY_FROM(Bool, bool)
+GUP_DEFINE_ARRAY_FROM(Char, char)
+GUP_DEFINE_ARRAY_FROM(Double, double)
+GUP_DEFINE_ARRAY_FROM(Float, float)
+GUP_DEFINE_ARRAY_FROM(Int, int)
+GUP_DEFINE_ARRAY_FROM(Long, long)
+GUP_DEFINE_ARRAY_FROM(Short, short)
 
 // Copy constructors 
-GupArrayBool gup_array_copy_bool(GupArrayBool xs) {
-    GupArrayBool new = gup_array_bool();
-    new.capacity = xs.capacity;
-    new.count = xs.count;
-    new.data = malloc(xs.capacity * sizeof(bool));
-    memcpy(new.data, xs.data, xs.count * sizeof(bool));
+#define GUP_DEFINE_ARRAY_COPY(T, t) GupArray##T gup_array_copy_##t(GupArray##T xs) {\
+    GupArray##T new = gup_array_##t();                                              \
+    new.capacity = xs.capacity;                                                     \
+    new.count = xs.count;                                                           \
+    new.data = malloc(xs.capacity * sizeof(#t));                                    \
+    memcpy(new.data, xs.data, xs.count * sizeof(#t));                               \
+                                                                                    \
+    return new;                                                                     \
+}                                                                                   \
 
-    return new;
-}
-
-GupArrayChar gup_array_copy_char(GupArrayChar xs) {
-    GupArrayChar new = gup_array_char();
-    new.capacity = xs.capacity;
-    new.count = xs.count;
-    new.data = malloc(xs.capacity * sizeof(char));
-    memcpy(new.data, xs.data, xs.count * sizeof(char));
-
-    return new;
-}
-
-GupArrayDouble gup_array_copy_double(GupArrayDouble xs) {
-    GupArrayDouble new = gup_array_double();
-    new.capacity = xs.capacity;
-    new.count = xs.count;
-    new.data = malloc(xs.capacity * sizeof(double));
-    memcpy(new.data, xs.data, xs.count * sizeof(double));
-
-    return new;
-}
-
-GupArrayFloat gup_array_copy_float(GupArrayFloat xs) {
-    GupArrayFloat new = gup_array_float();
-    new.capacity = xs.capacity;
-    new.count = xs.count;
-    new.data = malloc(xs.capacity * sizeof(float));
-    memcpy(new.data, xs.data, xs.count * sizeof(float));
-
-    return new;
-}
-
-GupArrayInt gup_array_copy_int(GupArrayInt xs) {
-    GupArrayInt new = gup_array_int();
-    new.capacity = xs.capacity;
-    new.count = xs.count;
-    new.data = malloc(xs.capacity * sizeof(int));
-    memcpy(new.data, xs.data, xs.count * sizeof(int));
-
-    return new;
-}
-
-GupArrayLong gup_array_copy_long(GupArrayLong xs) {
-    GupArrayLong new = gup_array_long();
-    new.capacity = xs.capacity;
-    new.count = xs.count;
-    new.data = malloc(xs.capacity * sizeof(long));
-    memcpy(new.data, xs.data, xs.count * sizeof(long));
-
-    return new;
-}
-
-GupArrayShort gup_array_copy_short(GupArrayShort xs) {
-    GupArrayShort new = gup_array_short();
-    new.capacity = xs.capacity;
-    new.count = xs.count;
-    new.data = malloc(xs.capacity * sizeof(short));
-    memcpy(new.data, xs.data, xs.count * sizeof(short));
-
-    return new;
-}
+GUP_DEFINE_ARRAY_COPY(Bool, bool)
+GUP_DEFINE_ARRAY_COPY(Char, char)
+GUP_DEFINE_ARRAY_COPY(Double, double)
+GUP_DEFINE_ARRAY_COPY(Float, float)
+GUP_DEFINE_ARRAY_COPY(Int, int)
+GUP_DEFINE_ARRAY_COPY(Long, long)
+GUP_DEFINE_ARRAY_COPY(Short, short)
 
 // Equals
-bool gup_array_eq_bool(GupArrayBool xs, GupArrayBool ys) {
-    if (xs.count != ys.count) return false;
-    
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
+#define GUP_DEFINE_ARRAY_EQ(T, t) bool gup_array_eq_##t(GupArray##T xs, GupArray##T ys) {\
+    if (xs.count != ys.count) return false;                                              \
+                                                                                         \
+    for (int i = 0; i < xs.count; i++) {                                                 \
+        if (xs.data[i] != ys.data[i]) return false;                                      \
+    }                                                                                    \
+                                                                                         \
+    return true;                                                                         \
+}                                                                                        \
 
-    return true;
-}
-
-// bool static_bs[] = {true, false, true};
-// char static_cs[] = {'a', 'b', 'c'};
-// double static_ds[] = {17.38, 133.7, 0.42};
-// float static_fs[] = {17.38f, 133.7f, 0.42f};
-// int static_is[] = {1738, 1337, 42};
-// long static_ls[] = {1738L, 1337L, 42L};
-// short static_ss[] = {1738, 1337, 42};
-
-bool gup_array_eq_char(GupArrayChar xs, GupArrayChar ys) {
-    if (xs.count != ys.count) return false;
-    
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_eq_double(GupArrayDouble xs, GupArrayDouble ys) {
-    if (xs.count != ys.count) return false;
-    
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_eq_float(GupArrayFloat xs, GupArrayFloat ys) {
-    if (xs.count != ys.count) return false;
-    
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_eq_int(GupArrayInt xs, GupArrayInt ys) {
-    if (xs.count != ys.count) return false;
-    
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_eq_long(GupArrayLong xs, GupArrayLong ys) {
-    if (xs.count != ys.count) return false;
-    
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_eq_short(GupArrayShort xs, GupArrayShort ys) {
-    if (xs.count != ys.count) return false;
-    
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
+GUP_DEFINE_ARRAY_EQ(Bool, bool)
+GUP_DEFINE_ARRAY_EQ(Char, char)
+GUP_DEFINE_ARRAY_EQ(Double, double)
+GUP_DEFINE_ARRAY_EQ(Float, float)
+GUP_DEFINE_ARRAY_EQ(Int, int)
+GUP_DEFINE_ARRAY_EQ(Long, long)
+GUP_DEFINE_ARRAY_EQ(Short, short)
 
 // Print
 #define gup_array_print_bool(xs) _gup_array_print_bool(xs, #xs)
@@ -605,87 +377,26 @@ void _gup_array_print_short(GupArrayShort xs, const char *xs_name) {
 }
 
 // Append
-void gup_array_append_bool(GupArrayBool *xs, bool x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(bool));
-        xs->capacity = new_capacity;
-    }
+#define GUP_DEFINE_ARRAY_APPEND(T, t) void gup_array_append_##t(GupArray##T *xs, t x) {\
+    if (xs->count == xs->capacity) {                                                      \
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;                \
+        xs->data = realloc(xs->data, new_capacity * sizeof(#t));                          \
+        xs->capacity = new_capacity;                                                      \
+    }                                                                                     \
+                                                                                          \
+    xs->data[xs->count] = x;                                                              \
+    xs->count++;                                                                          \
+}                                                                                         \
 
-    xs->data[xs->count] = x;
-    xs->count++;
-}
+GUP_DEFINE_ARRAY_APPEND(Bool, bool)
+GUP_DEFINE_ARRAY_APPEND(Char, char)
+GUP_DEFINE_ARRAY_APPEND(Double, double)
+GUP_DEFINE_ARRAY_APPEND(Float, float)
+GUP_DEFINE_ARRAY_APPEND(Int, int)
+GUP_DEFINE_ARRAY_APPEND(Long, long)
+GUP_DEFINE_ARRAY_APPEND(Short, short)
 
-void gup_array_append_char(GupArrayChar *xs, char x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(char));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-void gup_array_append_double(GupArrayDouble *xs, double x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(double));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-void gup_array_append_float(GupArrayFloat *xs, float x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(float));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-void gup_array_append_int(GupArrayInt *xs, int x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(int));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-void gup_array_append_long(GupArrayLong *xs, long x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(long));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-void gup_array_append_short(GupArrayShort *xs, short x) {
-    
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(short));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-
-
-
+// Prepend
 void gup_array_bool_prepend(GupArrayBool *xs, bool x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
