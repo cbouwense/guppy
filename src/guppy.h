@@ -113,8 +113,13 @@ void gup_array_append_int(GupArrayInt *xs, int x);
 void gup_array_append_long(GupArrayLong *xs, long x);
 void gup_array_append_short(GupArrayShort *xs, short x);
 
-
-
+void gup_array_prepend_bool(GupArrayBool *xs, bool x);
+void gup_array_prepend_char(GupArrayChar *xs, char x);
+void gup_array_prepend_double(GupArrayDouble *xs, double x);
+void gup_array_prepend_float(GupArrayFloat *xs, float x);
+void gup_array_prepend_int(GupArrayInt *xs, int x);
+void gup_array_prepend_long(GupArrayLong *xs, long x);
+void gup_array_prepend_short(GupArrayShort *xs, short x);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -378,15 +383,15 @@ void _gup_array_print_short(GupArrayShort xs, const char *xs_name) {
 
 // Append
 #define GUP_DEFINE_ARRAY_APPEND(T, t) void gup_array_append_##t(GupArray##T *xs, t x) {\
-    if (xs->count == xs->capacity) {                                                      \
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;                \
-        xs->data = realloc(xs->data, new_capacity * sizeof(#t));                          \
-        xs->capacity = new_capacity;                                                      \
-    }                                                                                     \
-                                                                                          \
-    xs->data[xs->count] = x;                                                              \
-    xs->count++;                                                                          \
-}                                                                                         \
+    if (xs->count == xs->capacity) {                                                   \
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;             \
+        xs->data = realloc(xs->data, new_capacity * sizeof(#t));                       \
+        xs->capacity = new_capacity;                                                   \
+    }                                                                                  \
+                                                                                       \
+    xs->data[xs->count] = x;                                                           \
+    xs->count++;                                                                       \
+}                                                                                      \
 
 GUP_DEFINE_ARRAY_APPEND(Bool, bool)
 GUP_DEFINE_ARRAY_APPEND(Char, char)
@@ -397,89 +402,56 @@ GUP_DEFINE_ARRAY_APPEND(Long, long)
 GUP_DEFINE_ARRAY_APPEND(Short, short)
 
 // Prepend
-void gup_array_bool_prepend(GupArrayBool *xs, bool x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(bool));
-        xs->capacity = new_capacity;
-    }
+#define GUP_DEFINE_ARRAY_PREPEND(T, t) void gup_array_prepend_##t(GupArray##T *xs, t x) {\
+    if (xs->count == xs->capacity) {                                                     \
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;               \
+        xs->data = realloc(xs->data, new_capacity * sizeof(t));                          \
+        xs->capacity = new_capacity;                                                     \
+    }                                                                                    \
+                                                                                         \
+    for (int i = xs->count; i > 0; i--) {                                                \
+        xs->data[i] = xs->data[i-1];                                                     \
+    }                                                                                    \
+    xs->data[0] = x;                                                                     \
+    xs->count++;                                                                         \
+}                                                                                        \
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[0] = x;
-    xs->count++;
-}
+GUP_DEFINE_ARRAY_PREPEND(Bool, bool)
+GUP_DEFINE_ARRAY_PREPEND(Char, char)
+GUP_DEFINE_ARRAY_PREPEND(Double, double)
+GUP_DEFINE_ARRAY_PREPEND(Float, float)
+GUP_DEFINE_ARRAY_PREPEND(Int, int)
+GUP_DEFINE_ARRAY_PREPEND(Long, long)
+GUP_DEFINE_ARRAY_PREPEND(Short, short)
 
-void gup_array_bool_remove_all(GupArrayBool *xs, bool x) {
-    int remaining = 0;
-    bool *new_xs_data = malloc(xs->count * sizeof(bool));
+// Remove all
+#define GUP_DEFINE_ARRAY_REMOVE_ALL(T, t) void gup_array_remove_all_##t(GupArray##T *xs, t x) {\
+    int remaining = 0;                                                                         \
+    t *new_xs_data = malloc(xs->count * sizeof(t));                                            \
+                                                                                               \
+    for (int i = 0; i < xs->count; i++) {                                                      \
+        if (xs->data[i] != x) {                                                                \
+            new_xs_data[remaining] = xs->data[i];                                              \
+            remaining++;                                                                       \
+        }                                                                                      \
+    }                                                                                          \
+                                                                                               \
+    free(xs->data);                                                                            \
+    xs->data = new_xs_data;                                                                    \
+    xs->data = realloc(xs->data, remaining * sizeof(t));                                       \
+    xs->capacity = remaining;                                                                  \
+    xs->count = remaining;                                                                     \
+}                                                                                              \
 
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != x) {
-            new_xs_data[remaining] = xs->data[i];
-            remaining++;
-        }
-    }
+GUP_DEFINE_ARRAY_REMOVE_ALL(Bool, bool)
+GUP_DEFINE_ARRAY_REMOVE_ALL(Char, char)
+GUP_DEFINE_ARRAY_REMOVE_ALL(Double, double)
+GUP_DEFINE_ARRAY_REMOVE_ALL(Float, float)
+GUP_DEFINE_ARRAY_REMOVE_ALL(Int, int)
+GUP_DEFINE_ARRAY_REMOVE_ALL(Long, long)
+GUP_DEFINE_ARRAY_REMOVE_ALL(Short, short)
 
-    free(xs->data);
-    xs->data = new_xs_data;
-    xs->data = realloc(xs->data, remaining * sizeof(bool));
-    xs->capacity = remaining;
-    xs->count = remaining;
-}
 
-void gup_array_bool_remove_first(GupArrayBool *xs, bool x) {
-    bool found = false;
-
-    for (int i = 0; i < xs->count; i++) {
-        if (found) {
-            xs->data[i] = xs->data[i+1];
-            if (i == xs->count - 2) break;
-        } else {
-            if (xs->data[i] == x) {
-                found = true;
-            }
-        }
-    }
-
-    if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        xs->data = realloc(xs->data, xs->capacity * sizeof(bool));
-    }
-}
-
-void gup_array_bool_remove_last(GupArrayBool *xs, bool x) {
-    bool found = false;
-
-    for (int i = xs->count-1; i > 0; i--) {
-        if (found) {
-            xs->data[i] = xs->data[i-1];
-            if (i == 1) break;
-        } else {
-            if (xs->data[i] == x) {
-                found = true;
-                xs->data[i] = xs->data[i-1];
-            }
-        }
-    }
-
-    if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        // If we found and removed an element, then we will need to move each
-        // element of the array to the left-> The first element will be garbage->
-        // e->g-> 
-        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
-        // [1, 1, 2, 3, 2, 4, 5] ->
-        //    [1, 2, 3, 2, 4, 5]
-        for (int i = 0; i < xs->count; i++) {
-            xs->data[i] = xs->data[i+1];
-        }
-        xs->data = realloc(xs->data, xs->count * sizeof(bool));
-    }
-}
 
 GupArrayBool gup_array_bool_map(GupArrayBool xs, bool (*fn)(bool)) {
     GupArrayBool new = gup_array_from_bool(xs.data, xs.count);
@@ -528,31 +500,6 @@ bool gup_array_bool_reduce(GupArrayBool xs, bool (*fn)(bool, bool), bool start) 
 
 
 
-
-void gup_array_char_append(GupArrayChar *xs, char x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(char));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-void gup_array_char_prepend(GupArrayChar *xs, char x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(char));
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[0] = x;
-    xs->count++;
-}
 
 void gup_array_char_remove_all(GupArrayChar *xs, char x) {
     int remaining = 0;
@@ -643,31 +590,6 @@ void gup_array_char_map_in_place(GupArrayChar xs, char (*fn)(char)) {
 
 
 
-void gup_array_float_append(GupArrayFloat *xs, float x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(float));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-void gup_array_float_prepend(GupArrayFloat *xs, float x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(float));
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[0] = x;
-    xs->count++;
-}
-
 void gup_array_float_remove_all(GupArrayFloat *xs, float x) {
     int remaining = 0;
     float *new_xs_data = malloc(xs->count * sizeof(float));
@@ -757,30 +679,6 @@ void gup_array_float_map_in_place(GupArrayFloat xs, float (*fn)(float)) {
 
 
 
-void gup_array_int_append(GupArrayInt *xs, int x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(int));
-        xs->capacity = new_capacity;
-    }
-
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-void gup_array_int_prepend(GupArrayInt *xs, int x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(int));
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[0] = x;
-    xs->count++;
-}
 
 void gup_array_int_remove_all(GupArrayInt *xs, int x) {
     int remaining = 0;
@@ -929,7 +827,7 @@ void *_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
     _gup_bytes_allocated += bytes;
     // TODO: filepath : line number
     // char file_path_as_chars[] = gup_string 
-    gup_array_int_append(&_gup_allocation_sites, line_number);
+    gup_array_append_int(&_gup_allocation_sites, line_number);
 
     return ptr;
 }
