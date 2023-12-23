@@ -127,6 +127,31 @@ void test_one_append_one_prepend_orders_correctly(void) {
     free(xs.data);
 }
 
+void test_map_on_empty_produces_empty(void) {
+    GupArrayBool xs = gup_array_bool();
+
+    GupArrayBool ys = gup_array_map_bool(xs, negate);
+
+    assert(gup_array_eq_bool(xs, ys));
+    assert(ys.count == 0);
+
+    free(xs.data);
+    free(ys.data);
+}
+
+void test_map(void) {
+    bool static_bools[] = {true, true, false};
+    GupArrayBool xs = gup_array_from_bool(static_bools, gup_array_size(static_bools));
+
+    GupArrayBool ys = gup_array_map_bool(xs, negate);
+
+    assert(ys.data[0] == false);
+    assert(ys.data[1] == false);
+    assert(ys.data[2] == true);
+
+    free(xs.data);
+    free(ys.data);
+}
 
 void test_gup_array(void) {
     test_new_gup_array_has_default_capacity();
@@ -139,6 +164,8 @@ void test_gup_array(void) {
     test_symmetric_gup_array_args_are_equal();
     test_equivalent_but_differently_sized_gup_arrays_are_unequal();
     test_one_append_one_prepend_orders_correctly();
+    test_map_on_empty_produces_empty();
+    test_map();
 
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");

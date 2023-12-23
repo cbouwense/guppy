@@ -243,18 +243,18 @@ GUP_DEFINE_ARRAY(Long, long)
 GUP_DEFINE_ARRAY(Short, short)
 
 // From constructors
-#define GUP_DEFINE_ARRAY_FROM(T, t) GupArray##T gup_array_from_##t(const t xs[], const int size)  {\
-    GupArray##T new = gup_array_##t();                                                             \
-                                                                                                   \
-    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;          \
-    new.count = size;                                                                              \
-    new.data = realloc(new.data, new.capacity * sizeof(t));                                        \
-    for (int i = 0; i < size; i++) {                                                               \
-       new.data[i] = xs[i];                                                                        \
-    }                                                                                              \
-                                                                                                   \
-    return new;                                                                                    \
-}                                                                                                  \
+#define GUP_DEFINE_ARRAY_FROM(T, t) GupArray##T gup_array_from_##t(const t xs[], const int size) {\
+    GupArray##T new = gup_array_##t();                                                            \
+                                                                                                  \
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;         \
+    new.count = size;                                                                             \
+    new.data = realloc(new.data, new.capacity * sizeof(t));                                       \
+    for (int i = 0; i < size; i++) {                                                              \
+       new.data[i] = xs[i];                                                                       \
+    }                                                                                             \
+                                                                                                  \
+    return new;                                                                                   \
+}                                                                                                 \
 
 GUP_DEFINE_ARRAY_FROM(Bool, bool)
 GUP_DEFINE_ARRAY_FROM(Char, char)
@@ -451,23 +451,31 @@ GUP_DEFINE_ARRAY_REMOVE_ALL(Int, int)
 GUP_DEFINE_ARRAY_REMOVE_ALL(Long, long)
 GUP_DEFINE_ARRAY_REMOVE_ALL(Short, short)
 
+#define GUP_DEFINE_ARRAY_MAP(T, t) GupArray##T gup_array_map_##t(GupArray##T xs, t (*fn)(t)) {\
+    GupArray##T new = gup_array_from_##t(xs.data, xs.count);                                  \
+                                                                                              \
+    for (int i = 0; i < xs.count; i++) {                                                      \
+        new.data[i] = fn(xs.data[i]);                                                         \
+    }                                                                                         \
+                                                                                              \
+    return new;                                                                               \
+}                                                                                             \
 
-
-GupArrayBool gup_array_bool_map(GupArrayBool xs, bool (*fn)(bool)) {
-    GupArrayBool new = gup_array_from_bool(xs.data, xs.count);
-    
-    for (int i = 0; i < xs.count; i++) {
-        new.data[i] = fn(xs.data[i]);
-    }
-
-    return new;
-}
+GUP_DEFINE_ARRAY_MAP(Bool, bool)
+GUP_DEFINE_ARRAY_MAP(Char, char)
+GUP_DEFINE_ARRAY_MAP(Double, double)
+GUP_DEFINE_ARRAY_MAP(Float, float)
+GUP_DEFINE_ARRAY_MAP(Int, int)
+GUP_DEFINE_ARRAY_MAP(Long, long)
+GUP_DEFINE_ARRAY_MAP(Short, short)
 
 void gup_array_bool_map_in_place(GupArrayBool xs, bool (*fn)(bool)) {
     for (int i = 0; i < xs.count; i++) {
         xs.data[i] = fn(xs.data[i]);
     }
 }
+
+
 
 GupArrayBool gup_array_bool_filter(GupArrayBool xs, bool (*fn)(bool)) {
     GupArrayBool new = gup_array_bool();
@@ -501,85 +509,6 @@ bool gup_array_bool_reduce(GupArrayBool xs, bool (*fn)(bool, bool), bool start) 
 
 
 
-void gup_array_char_remove_all(GupArrayChar *xs, char x) {
-    int remaining = 0;
-    char *new_xs_data = malloc(xs->count * sizeof(char));
-
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != x) {
-            new_xs_data[remaining] = xs->data[i];
-            remaining++;
-        }
-    }
-
-    free(xs->data);
-    xs->data = new_xs_data;
-    xs->data = realloc(xs->data, remaining * sizeof(char));
-    xs->capacity = remaining;
-    xs->count = remaining;
-}
-
-void gup_array_char_remove_first(GupArrayChar *xs, char x) {
-    bool found = false;
-
-    for (int i = 0; i < xs->count; i++) {
-        if (found) {
-            xs->data[i] = xs->data[i+1];
-            if (i == xs->count - 2) break;
-        } else {
-            if (xs->data[i] == x) {
-                found = true;
-            }
-        }
-    }
-
-    if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        xs->data = realloc(xs->data, xs->capacity * sizeof(char));
-    }
-}
-
-void gup_array_char_remove_last(GupArrayChar *xs, char x) {
-    bool found = false;
-
-    for (int i = xs->count-1; i > 0; i--) {
-        if (found) {
-            xs->data[i] = xs->data[i-1];
-            if (i == 1) break;
-        } else {
-            if (xs->data[i] == x) {
-                found = true;
-                xs->data[i] = xs->data[i-1];
-            }
-        }
-    }
-
-    if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        // If we found and removed an element, then we will need to move each
-        // element of the array to the left-> The first element will be garbage->
-        // e->g-> 
-        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
-        // [1, 1, 2, 3, 2, 4, 5] ->
-        //    [1, 2, 3, 2, 4, 5]
-        for (int i = 0; i < xs->count; i++) {
-            xs->data[i] = xs->data[i+1];
-        }
-        xs->data = realloc(xs->data, xs->count * sizeof(char));
-    }
-}
-
-GupArrayChar gup_array_char_map(GupArrayChar xs, char (*fn)(char)) {
-    GupArrayChar new = gup_array_from_char(xs.data, xs.count);
-    
-    for (int i = 0; i < xs.count; i++) {
-        new.data[i] = fn(xs.data[i]);
-    }
-
-    return new;
-}
 
 void gup_array_char_map_in_place(GupArrayChar xs, char (*fn)(char)) {
     for (int i = 0; i < xs.count; i++) {
@@ -587,177 +516,10 @@ void gup_array_char_map_in_place(GupArrayChar xs, char (*fn)(char)) {
     }
 }
 
-
-
-
-void gup_array_float_remove_all(GupArrayFloat *xs, float x) {
-    int remaining = 0;
-    float *new_xs_data = malloc(xs->count * sizeof(float));
-
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != x) {
-            new_xs_data[remaining] = xs->data[i];
-            remaining++;
-        }
-    }
-
-    free(xs->data);
-    xs->data = new_xs_data;
-    xs->data = realloc(xs->data, remaining * sizeof(float));
-    xs->capacity = remaining;
-    xs->count = remaining;
-}
-
-void gup_array_float_remove_first(GupArrayFloat *xs, float x) {
-    bool found = false;
-
-    for (int i = 0; i < xs->count; i++) {
-        if (found) {
-            xs->data[i] = xs->data[i+1];
-            if (i == xs->count - 2) break;
-        } else {
-            if (xs->data[i] == x) {
-                found = true;
-            }
-        }
-    }
-
-    if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        xs->data = realloc(xs->data, xs->capacity * sizeof(float));
-    }
-}
-
-void gup_array_float_remove_last(GupArrayFloat *xs, float x) {
-    bool found = false;
-
-    for (int i = xs->count-1; i > 0; i--) {
-        if (found) {
-            xs->data[i] = xs->data[i-1];
-            if (i == 1) break;
-        } else {
-            if (xs->data[i] == x) {
-                found = true;
-                xs->data[i] = xs->data[i-1];
-            }
-        }
-    }
-
-    if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        // If we found and removed an element, then we will need to move each
-        // element of the array to the left-> The first element will be garbage->
-        // e->g-> 
-        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
-        // [1, 1, 2, 3, 2, 4, 5] ->
-        //    [1, 2, 3, 2, 4, 5]
-        for (int i = 0; i < xs->count; i++) {
-            xs->data[i] = xs->data[i+1];
-        }
-        xs->data = realloc(xs->data, xs->count * sizeof(float));
-    }
-}
-
-GupArrayFloat gup_array_float_map(GupArrayFloat xs, float (*fn)(float)) {
-    GupArrayFloat new = gup_array_from_float(xs.data, xs.count);
-    
-    for (int i = 0; i < xs.count; i++) {
-        new.data[i] = fn(xs.data[i]);
-    }
-
-    return new;
-}
-
 void gup_array_float_map_in_place(GupArrayFloat xs, float (*fn)(float)) {
     for (int i = 0; i < xs.count; i++) {
         xs.data[i] = fn(xs.data[i]);
     }
-}
-
-
-
-
-
-void gup_array_int_remove_all(GupArrayInt *xs, int x) {
-    int remaining = 0;
-    int *new_xs_data = malloc(xs->count * sizeof(int));
-
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != x) {
-            new_xs_data[remaining] = xs->data[i];
-            remaining++;
-        }
-    }
-
-    free(xs->data);
-    xs->data = new_xs_data;
-    xs->data = realloc(xs->data, remaining * sizeof(int));
-    xs->capacity = remaining;
-    xs->count = remaining;
-}
-
-void gup_array_int_remove_first(GupArrayInt *xs, int x) {
-    bool found = false;
-
-    for (int i = 0; i < xs->count; i++) {
-        if (found) {
-            xs->data[i] = xs->data[i+1];
-            if (i == xs->count - 2) break;
-        } else {
-            if (xs->data[i] == x) {
-                found = true;
-            }
-        }
-    }
-
-    if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        xs->data = realloc(xs->data, xs->capacity * sizeof(int));
-    }
-}
-
-void gup_array_int_remove_last(GupArrayInt *xs, int x) {
-    bool found = false;
-
-    for (int i = xs->count-1; i > 0; i--) {
-        if (found) {
-            xs->data[i] = xs->data[i-1];
-            if (i == 1) break;
-        } else {
-            if (xs->data[i] == x) {
-                found = true;
-                xs->data[i] = xs->data[i-1];
-            }
-        }
-    }
-
-    if (found) {
-        xs->count--;
-        xs->capacity = xs->count;
-        // If we found and removed an element, then we will need to move each
-        // element of the array to the left-> The first element will be garbage->
-        // e->g-> 
-        // [1, 2, 3, 2, 4, 2, 5] (remove last 2) ->
-        // [1, 1, 2, 3, 2, 4, 5] ->
-        //    [1, 2, 3, 2, 4, 5]
-        for (int i = 0; i < xs->count; i++) {
-            xs->data[i] = xs->data[i+1];
-        }
-        xs->data = realloc(xs->data, xs->count * sizeof(int));
-    }
-}
-
-GupArrayInt gup_array_int_map(GupArrayInt xs, int (*fn)(int)) {
-    GupArrayInt new = gup_array_from_int (xs.data, xs.count);
-    
-    for (int i = 0; i < xs.count; i++) {
-        new.data[i] = fn(xs.data[i]);
-    }
-
-    return new;
 }
 
 void gup_array_int_map_in_place(GupArrayInt xs, int (*fn)(int)) {

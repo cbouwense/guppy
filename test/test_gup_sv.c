@@ -300,7 +300,6 @@ void test_gup_sv_trim_char(void) {
     }
 }
 
-
 void test_gup_sv(void) {
     test_gup_sv_from_cstr();
     test_gup_sv_trim_left();
