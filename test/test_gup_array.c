@@ -4,16 +4,16 @@ bool negate(bool b) {
     return !b;
 }
 
-bool is_false(bool b) {
-    return !b;
+bool is_leet(double d) {
+    return d == (double)1337 || d == 133.7 || d == 13.37 || d == 1.337;
 }
 
-bool and(bool a, bool b) {
-    return a && b;
+bool not_leet(double d) {
+    return !is_leet(d);
 }
 
-bool or(bool a, bool b) {
-    return a || b;
+bool is_over_9000(float f) {
+    return f > 9000.0;
 }
 
 char add_one(char c) {
@@ -153,6 +153,154 @@ void test_map(void) {
     free(ys.data);
 }
 
+void test_map_in_place(void) {
+    char static_chars[] = {'a', 'y', 'y', 'l', 'm', 'a', 'o'};
+    GupArrayChar xs = gup_array_from_char(static_chars, gup_array_size(static_chars));
+
+    gup_array_map_in_place_char(xs, add_one);
+
+    assert(xs.data[0] == 'b');
+    assert(xs.data[1] == 'z');
+    assert(xs.data[2] == 'z');
+    assert(xs.data[3] == 'm');
+    assert(xs.data[4] == 'n');
+    assert(xs.data[5] == 'b');
+    assert(xs.data[6] == 'p');
+
+    free(xs.data);
+}
+
+void test_filter_on_empty_produces_empty(void) {
+    GupArrayDouble xs = gup_array_double();
+
+    GupArrayDouble ys = gup_array_filter_double(xs, is_leet);
+
+    assert(ys.count == 0);
+
+    free(xs.data);
+    free(ys.data);
+}
+
+void test_filter_matches_none_returns_copy(void) {
+    GupArrayDouble xs = gup_array_double();
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 133.7);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 1.337);
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 133.7);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 1.337);
+
+    GupArrayDouble ys = gup_array_filter_double(xs, not_leet);
+
+    assert(ys.count == 0);
+
+    free(xs.data);
+    free(ys.data);
+}
+
+void test_filter_matches_some_only_keeps_matches(void) {
+    GupArrayDouble xs = gup_array_double();
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 17.38);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 0.42);
+
+    GupArrayDouble ys = gup_array_filter_double(xs, is_leet);
+
+    assert(ys.count == 2);
+    assert(ys.data[0] == 1337);
+    assert(ys.data[1] == 13.37);
+
+    free(xs.data);
+    free(ys.data);
+}
+
+void test_filter_matches_all_returns_copy(void) {
+    GupArrayDouble xs = gup_array_double();
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 133.7);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 1.337);
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 133.7);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 1.337);
+
+    GupArrayDouble ys = gup_array_filter_double(xs, is_leet);
+
+    assert(gup_array_eq_double(xs, ys));
+
+    free(xs.data);
+    free(ys.data);
+}
+
+void test_filter_in_place_on_empty_produces_empty(void) {
+    GupArrayDouble xs = gup_array_double();
+
+    gup_array_filter_in_place_double(&xs, is_leet);
+
+    assert(xs.count == 0);
+
+    free(xs.data);
+}
+
+void test_filter_in_place_matches_none_returns_copy(void) {
+    GupArrayDouble xs = gup_array_double();
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 133.7);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 1.337);
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 133.7);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 1.337);
+
+    GupArrayDouble ys = gup_array_filter_double(xs, not_leet);
+
+    assert(ys.count == 0);
+
+    free(xs.data);
+    free(ys.data);
+}
+
+void test_filter_in_place_matches_some_only_keeps_matches(void) {
+    GupArrayDouble xs = gup_array_double();
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 17.38);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 0.42);
+
+    GupArrayDouble ys = gup_array_filter_double(xs, is_leet);
+
+    assert(ys.count == 2);
+    assert(ys.data[0] == 1337);
+    assert(ys.data[1] == 13.37);
+
+    free(xs.data);
+    free(ys.data);
+}
+
+void test_filter_in_place_matches_all_returns_copy(void) {
+    GupArrayDouble xs = gup_array_double();
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 133.7);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 1.337);
+    gup_array_append_double(&xs, 1337);
+    gup_array_append_double(&xs, 133.7);
+    gup_array_append_double(&xs, 13.37);
+    gup_array_append_double(&xs, 1.337);
+
+    GupArrayDouble ys = gup_array_filter_double(xs, is_leet);
+
+    assert(gup_array_eq_double(xs, ys));
+
+    free(xs.data);
+    free(ys.data);
+}
+
 void test_gup_array(void) {
     test_new_gup_array_has_default_capacity();
     test_new_gup_array_has_zero_count();
@@ -166,6 +314,14 @@ void test_gup_array(void) {
     test_one_append_one_prepend_orders_correctly();
     test_map_on_empty_produces_empty();
     test_map();
+    test_map_in_place();
+    test_filter_on_empty_produces_empty();
+    test_filter_matches_some_only_keeps_matches();
+    test_filter_matches_all_returns_copy();
+    test_filter_in_place_on_empty_produces_empty();
+    test_filter_in_place_matches_none_returns_copy();
+    test_filter_in_place_matches_some_only_keeps_matches();
+    test_filter_in_place_matches_all_returns_copy();
 
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");

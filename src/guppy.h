@@ -121,6 +121,46 @@ void gup_array_prepend_int(GupArrayInt *xs, int x);
 void gup_array_prepend_long(GupArrayLong *xs, long x);
 void gup_array_prepend_short(GupArrayShort *xs, short x);
 
+GupArrayBool   gup_array_map_bool(GupArrayBool xs, bool (*fn)(bool));
+GupArrayChar   gup_array_map_char(GupArrayChar xs, char (*fn)(char));
+GupArrayDouble gup_array_map_double(GupArrayDouble xs, double (*fn)(double));
+GupArrayFloat  gup_array_map_float(GupArrayFloat xs, float (*fn)(float));
+GupArrayInt    gup_array_map_int(GupArrayInt xs, int (*fn)(int));
+GupArrayLong   gup_array_map_long(GupArrayLong xs, long (*fn)(long));
+GupArrayShort  gup_array_map_short(GupArrayShort xs, short (*fn)(short));
+
+void gup_array_map_in_place_bool(GupArrayBool xs, bool (*fn)(bool));
+void gup_array_map_in_place_char(GupArrayChar xs, char (*fn)(char));
+void gup_array_map_in_place_double(GupArrayDouble xs, double (*fn)(double));
+void gup_array_map_in_place_float(GupArrayFloat xs, float (*fn)(float));
+void gup_array_map_in_place_int(GupArrayInt xs, int (*fn)(int));
+void gup_array_map_in_place_long(GupArrayLong xs, long (*fn)(long));
+void gup_array_map_in_place_short(GupArrayShort xs, short (*fn)(short));
+
+GupArrayBool   gup_array_filter_bool(GupArrayBool xs, bool (*fn)(bool));
+GupArrayChar   gup_array_filter_char(GupArrayChar xs, bool (*fn)(char));
+GupArrayDouble gup_array_filter_double(GupArrayDouble xs, bool (*fn)(double));
+GupArrayFloat  gup_array_filter_float(GupArrayFloat xs, bool (*fn)(float));
+GupArrayInt    gup_array_filter_int(GupArrayInt xs, bool (*fn)(int));
+GupArrayLong   gup_array_filter_long(GupArrayLong xs, bool (*fn)(long));
+GupArrayShort  gup_array_filter_short(GupArrayShort xs, bool (*fn)(short));
+
+void gup_array_filter_in_place_bool(GupArrayBool *xs, bool (*fn)(bool));
+void gup_array_filter_in_place_char(GupArrayChar *xs, bool (*fn)(char));
+void gup_array_filter_in_place_double(GupArrayDouble *xs, bool (*fn)(double));
+void gup_array_filter_in_place_float(GupArrayFloat *xs, bool (*fn)(float));
+void gup_array_filter_in_place_int(GupArrayInt *xs, bool (*fn)(int));
+void gup_array_filter_in_place_long(GupArrayLong *xs, bool (*fn)(long));
+void gup_array_filter_in_place_short(GupArrayShort *xs, bool (*fn)(short));
+
+bool   gup_array_reduce_bool(GupArrayBool xs, bool (*fn)(bool, bool), bool start);
+char   gup_array_reduce_char(GupArrayChar xs, char (*fn)(char, char), char start);
+double gup_array_reduce_double(GupArrayDouble xs, double (*fn)(double, double), double start);
+float  gup_array_reduce_float(GupArrayFloat xs, float (*fn)(float, float), float start);
+int    gup_array_reduce_int(GupArrayInt xs, int (*fn)(int, int), int start);
+long   gup_array_reduce_long(GupArrayLong xs, long (*fn)(long, long), long start);
+short  gup_array_reduce_short(GupArrayShort xs, short (*fn)(short, short), short start);
+
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
 
@@ -469,64 +509,72 @@ GUP_DEFINE_ARRAY_MAP(Int, int)
 GUP_DEFINE_ARRAY_MAP(Long, long)
 GUP_DEFINE_ARRAY_MAP(Short, short)
 
-void gup_array_bool_map_in_place(GupArrayBool xs, bool (*fn)(bool)) {
-    for (int i = 0; i < xs.count; i++) {
-        xs.data[i] = fn(xs.data[i]);
-    }
-}
+#define GUP_DEFINE_ARRAY_MAP_IN_PLACE(T, t) void gup_array_map_in_place_##t(GupArray##T xs, t (*fn)(t)) {\
+    for (int i = 0; i < xs.count; i++) {                                                                 \
+        xs.data[i] = fn(xs.data[i]);                                                                     \
+    }                                                                                                    \
+}                                                                                                        \
 
+GUP_DEFINE_ARRAY_MAP_IN_PLACE(Bool, bool)
+GUP_DEFINE_ARRAY_MAP_IN_PLACE(Char, char)
+GUP_DEFINE_ARRAY_MAP_IN_PLACE(Double, double)
+GUP_DEFINE_ARRAY_MAP_IN_PLACE(Float, float)
+GUP_DEFINE_ARRAY_MAP_IN_PLACE(Int, int)
+GUP_DEFINE_ARRAY_MAP_IN_PLACE(Long, long)
+GUP_DEFINE_ARRAY_MAP_IN_PLACE(Short, short)
 
+#define GUP_DEFINE_ARRAY_FILTER(T, t) GupArray##T gup_array_filter_##t(GupArray##T xs, bool (*fn)(t)) {\
+    GupArray##T new = gup_array_##t();                                                                 \
+                                                                                                       \
+    for (int i = 0; i < xs.count; i++) {                                                               \
+        if (fn(xs.data[i])) {                                                                          \
+            gup_array_append_##t(&new, xs.data[i]);                                                    \
+        }                                                                                              \
+    }                                                                                                  \
+                                                                                                       \
+    return new;                                                                                        \
+}                                                                                                      \
 
-GupArrayBool gup_array_bool_filter(GupArrayBool xs, bool (*fn)(bool)) {
-    GupArrayBool new = gup_array_bool();
+GUP_DEFINE_ARRAY_FILTER(Bool, bool)
+GUP_DEFINE_ARRAY_FILTER(Char, char)
+GUP_DEFINE_ARRAY_FILTER(Double, double)
+GUP_DEFINE_ARRAY_FILTER(Float, float)
+GUP_DEFINE_ARRAY_FILTER(Int, int)
+GUP_DEFINE_ARRAY_FILTER(Long, long)
+GUP_DEFINE_ARRAY_FILTER(Short, short)
 
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_append_bool(&new, xs.data[i]); 
-        }
-    }
+#define GUP_DEFINE_ARRAY_FILTER_IN_PLACE(T, t) void gup_array_filter_in_place_##t(GupArray##T *xs, bool (*fn)(t)) {\
+    GupArray##T new = gup_array_filter_##t(*xs, fn);                                                               \
+                                                                                                                   \
+    free(xs->data);                                                                                                \
+    *xs = gup_array_from_##t(new.data, new.count);                                                                 \
+                                                                                                                   \
+    free(new.data);                                                                                                \
+}                                                                                                                  \
 
-    return new;
-}
+GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Bool, bool)
+GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Char, char)
+GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Double, double)
+GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Float, float)
+GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Int, int)
+GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Long, long)
+GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Short, short)
 
-void gup_array_bool_filter_in_place(GupArrayBool *xs, bool (*fn)(bool)) {
-    GupArrayBool new = gup_array_bool_filter(*xs, fn);
+#define GUP_DEFINE_ARRAY_REDUCE(T, t) t gup_array_reduce_##t(GupArray##T xs, t (*fn)(t, t), t start) {\
+    t result = start;                                                                                 \
+    for (int i = 0; i < xs.count; i++) {                                                              \
+        result = fn(result, xs.data[i]);                                                              \
+    }                                                                                                 \
+    return result;                                                                                    \
+}                                                                                                     \
 
-    free(xs->data);
-    *xs = gup_array_from_bool(new.data, new.count);
-
-    free(new.data);
-}
-
-bool gup_array_bool_reduce(GupArrayBool xs, bool (*fn)(bool, bool), bool start) {
-    bool result = start;
-    for (int i = 0; i < xs.count; i++) {
-        result = fn(result, xs.data[i]);
-    }
-    return result;
-}
-
-
-
-
-
-void gup_array_char_map_in_place(GupArrayChar xs, char (*fn)(char)) {
-    for (int i = 0; i < xs.count; i++) {
-        xs.data[i] = fn(xs.data[i]);
-    }
-}
-
-void gup_array_float_map_in_place(GupArrayFloat xs, float (*fn)(float)) {
-    for (int i = 0; i < xs.count; i++) {
-        xs.data[i] = fn(xs.data[i]);
-    }
-}
-
-void gup_array_int_map_in_place(GupArrayInt xs, int (*fn)(int)) {
-    for (int i = 0; i < xs.count; i++) {
-        xs.data[i] = fn(xs.data[i]);
-    }
-}
+GUP_DEFINE_ARRAY_REDUCE(Bool, bool)
+GUP_DEFINE_ARRAY_REDUCE(Char, char)
+GUP_DEFINE_ARRAY_REDUCE(Double, double)
+GUP_DEFINE_ARRAY_REDUCE(Float, float)
+GUP_DEFINE_ARRAY_REDUCE(Int, int)
+GUP_DEFINE_ARRAY_REDUCE(Long, long)
+GUP_DEFINE_ARRAY_REDUCE(Short, short)
 
 // Memory ------------------------------------------------------------------------------------------
 
