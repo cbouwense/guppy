@@ -301,20 +301,94 @@ void test_filter_in_place_matches_all_returns_copy(void) {
     free(ys.data);
 }
 
+void test_gup_array_char_from_cstr(void) {
+    char chars[] = {'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!'};
+    char *str = "Hello, World!";
+    GupArrayChar xs = gup_array_from_char(chars, gup_array_size(chars));
+
+    GupArrayChar ys = gup_array_from_char_cstr(str);
+
+    assert(gup_array_eq_char(xs, ys));
+
+    free(xs.data);
+    free(ys.data);
+}
+
+void test_gup_array_string(void) {
+    GupArrayString strs = gup_array_string();
+
+    assert(strs.count == 0);
+
+    free(strs.data);
+}
+
+void test_gup_array_from_string(void) {
+    GupArrayChar hello = gup_array_from_char_cstr("Hello");
+    GupArrayChar world = gup_array_from_char_cstr("World");
+    GupArrayChar bang = gup_array_from_char_cstr("!");
+    GupArrayChar cs[] = {hello, world, bang};
+
+    GupArrayString strs = gup_array_from_string(cs, gup_array_size(cs));
+
+    assert(strs.count == 3);
+
+    free(hello.data);
+    free(world.data);
+    free(bang.data);
+    free(strs.data);
+}
+
+void test_gup_array_copy_equals_original(void) {
+    int static_ints[] = {1, 7, 3, 8};
+    GupArrayInt dyn_ints = gup_array_from_int(static_ints, gup_array_size(static_ints));
+
+    GupArrayInt dyn_ints_copy = gup_array_copy_int(dyn_ints);
+
+    gup_array_print_int(dyn_ints);
+    gup_array_print_int(dyn_ints_copy);
+
+    assert(gup_array_eq_int(dyn_ints, dyn_ints_copy));
+
+    free(dyn_ints.data); 
+    free(dyn_ints_copy.data); 
+}
+
+void test_gup_array_copy_string(void) {
+    GupArrayChar hello = gup_array_from_char_cstr("Hello");
+    GupArrayChar world = gup_array_from_char_cstr("World");
+    GupArrayChar bang = gup_array_from_char_cstr("!");
+    GupArrayChar cs[] = {hello, world, bang};
+    GupArrayString strs = gup_array_from_string(cs, gup_array_size(cs));
+
+    GupArrayString strs_copy = gup_array_copy_string(strs);
+
+    assert(gup_array_eq_string(strs, strs_copy));
+
+    free(hello.data);
+    free(world.data);
+    free(bang.data);
+    free(strs.data);
+    free(strs_copy.data);
+}
+
 void test_gup_array(void) {
     test_new_gup_array_has_default_capacity();
     test_new_gup_array_has_zero_count();
     test_new_gup_array_has_non_null_data();
+
     test_two_empty_gup_arrays_are_equal();
     test_one_empty_one_populated_are_unequal();
     test_a_gup_array_is_equal_to_itself();
+    test_gup_array_copy_equals_original();
     test_equivalent_gup_arrays_are_equal();
     test_symmetric_gup_array_args_are_equal();
     test_equivalent_but_differently_sized_gup_arrays_are_unequal();
     test_one_append_one_prepend_orders_correctly();
+
     test_map_on_empty_produces_empty();
     test_map();
     test_map_in_place();
+
     test_filter_on_empty_produces_empty();
     test_filter_matches_some_only_keeps_matches();
     test_filter_matches_all_returns_copy();
@@ -323,6 +397,13 @@ void test_gup_array(void) {
     test_filter_in_place_matches_some_only_keeps_matches();
     test_filter_in_place_matches_all_returns_copy();
 
+    test_gup_array_char_from_cstr();
+
+    // Strings
+    test_gup_array_string();
+    test_gup_array_from_string();
+    test_gup_array_copy_string();
+    
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");
     #endif // GUPPY_VERBOSE

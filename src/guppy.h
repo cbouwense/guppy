@@ -60,6 +60,12 @@ typedef struct {
     short *data;
 } GupArrayShort;
 
+typedef struct {
+    int capacity;
+    int count;
+    GupArrayChar *data;
+} GupArrayString;
+
 /**************************************************************************************************
  * Public API                                                                                     *
  **************************************************************************************************/
@@ -72,14 +78,16 @@ GupArrayFloat  gup_array_float();
 GupArrayInt    gup_array_int();
 GupArrayLong   gup_array_long();
 GupArrayShort  gup_array_short();
+GupArrayString gup_array_string(); 
 
-GupArrayBool   gup_array_from_bool(const bool xs[], const int size);
-GupArrayChar   gup_array_from_char(const char xs[], const int size);
-GupArrayDouble gup_array_from_double(const double xs[], const int size);
-GupArrayFloat  gup_array_from_float(const float xs[], const int size);
-GupArrayInt    gup_array_from_int(const int xs[], const int size);
-GupArrayLong   gup_array_from_long(const long xs[], const int size);
-GupArrayShort  gup_array_from_short(const short xs[], const int size);
+GupArrayBool   gup_array_from_bool(bool xs[], const int size);
+GupArrayChar   gup_array_from_char(char xs[], const int size);
+GupArrayDouble gup_array_from_double(double xs[], const int size);
+GupArrayFloat  gup_array_from_float(float xs[], const int size);
+GupArrayInt    gup_array_from_int(int xs[], const int size);
+GupArrayLong   gup_array_from_long(long xs[], const int size);
+GupArrayShort  gup_array_from_short(short xs[], const int size);
+GupArrayString gup_array_from_string(GupArrayChar xs[], const int size);
 
 GupArrayBool   gup_array_copy_bool(GupArrayBool xs);
 GupArrayChar   gup_array_copy_char(GupArrayChar xs);
@@ -88,6 +96,7 @@ GupArrayFloat  gup_array_copy_float(GupArrayFloat xs);
 GupArrayInt    gup_array_copy_int(GupArrayInt xs);
 GupArrayLong   gup_array_copy_long(GupArrayLong xs);
 GupArrayShort  gup_array_copy_short(GupArrayShort xs);
+GupArrayString gup_array_copy_string(GupArrayString xs);
 
 bool gup_array_eq_bool(GupArrayBool xs, GupArrayBool ys);
 bool gup_array_eq_char(GupArrayChar xs, GupArrayChar ys);
@@ -96,6 +105,7 @@ bool gup_array_eq_float(GupArrayFloat xs, GupArrayFloat ys);
 bool gup_array_eq_int(GupArrayInt xs, GupArrayInt ys);
 bool gup_array_eq_long(GupArrayLong xs, GupArrayLong ys);
 bool gup_array_eq_short(GupArrayShort xs, GupArrayShort ys);
+bool gup_array_eq_string(GupArrayString xs, GupArrayString ys);
 
 void gup_array_print_bool(GupArrayBool xs);
 void gup_array_print_char(GupArrayChar xs);
@@ -104,6 +114,7 @@ void gup_array_print_float(GupArrayFloat xs);
 void gup_array_print_int(GupArrayInt xs);
 void gup_array_print_long(GupArrayLong xs);
 void gup_array_print_short(GupArrayShort xs);
+void gup_array_print_string(GupArrayString xs);
 
 void gup_array_append_bool(GupArrayBool *xs, bool x);
 void gup_array_append_char(GupArrayChar *xs, char x);
@@ -112,6 +123,7 @@ void gup_array_append_float(GupArrayFloat *xs, float x);
 void gup_array_append_int(GupArrayInt *xs, int x);
 void gup_array_append_long(GupArrayLong *xs, long x);
 void gup_array_append_short(GupArrayShort *xs, short x);
+void gup_array_append_string(GupArrayString *xs, char *x);
 
 void gup_array_prepend_bool(GupArrayBool *xs, bool x);
 void gup_array_prepend_char(GupArrayChar *xs, char x);
@@ -120,6 +132,7 @@ void gup_array_prepend_float(GupArrayFloat *xs, float x);
 void gup_array_prepend_int(GupArrayInt *xs, int x);
 void gup_array_prepend_long(GupArrayLong *xs, long x);
 void gup_array_prepend_short(GupArrayShort *xs, short x);
+void gup_array_prepend_string(GupArrayString *xs, char *x);
 
 GupArrayBool   gup_array_map_bool(GupArrayBool xs, bool (*fn)(bool));
 GupArrayChar   gup_array_map_char(GupArrayChar xs, char (*fn)(char));
@@ -128,6 +141,7 @@ GupArrayFloat  gup_array_map_float(GupArrayFloat xs, float (*fn)(float));
 GupArrayInt    gup_array_map_int(GupArrayInt xs, int (*fn)(int));
 GupArrayLong   gup_array_map_long(GupArrayLong xs, long (*fn)(long));
 GupArrayShort  gup_array_map_short(GupArrayShort xs, short (*fn)(short));
+GupArrayString gup_array_map_string(GupArrayString xs, char *(*fn)(char *));
 
 void gup_array_map_in_place_bool(GupArrayBool xs, bool (*fn)(bool));
 void gup_array_map_in_place_char(GupArrayChar xs, char (*fn)(char));
@@ -136,6 +150,7 @@ void gup_array_map_in_place_float(GupArrayFloat xs, float (*fn)(float));
 void gup_array_map_in_place_int(GupArrayInt xs, int (*fn)(int));
 void gup_array_map_in_place_long(GupArrayLong xs, long (*fn)(long));
 void gup_array_map_in_place_short(GupArrayShort xs, short (*fn)(short));
+void gup_array_map_in_place_string(GupArrayString xs, char *(*fn)(char *));
 
 GupArrayBool   gup_array_filter_bool(GupArrayBool xs, bool (*fn)(bool));
 GupArrayChar   gup_array_filter_char(GupArrayChar xs, bool (*fn)(char));
@@ -144,6 +159,7 @@ GupArrayFloat  gup_array_filter_float(GupArrayFloat xs, bool (*fn)(float));
 GupArrayInt    gup_array_filter_int(GupArrayInt xs, bool (*fn)(int));
 GupArrayLong   gup_array_filter_long(GupArrayLong xs, bool (*fn)(long));
 GupArrayShort  gup_array_filter_short(GupArrayShort xs, bool (*fn)(short));
+GupArrayString  gup_array_filter_string(GupArrayString xs, bool (*fn)(char *));
 
 void gup_array_filter_in_place_bool(GupArrayBool *xs, bool (*fn)(bool));
 void gup_array_filter_in_place_char(GupArrayChar *xs, bool (*fn)(char));
@@ -152,6 +168,7 @@ void gup_array_filter_in_place_float(GupArrayFloat *xs, bool (*fn)(float));
 void gup_array_filter_in_place_int(GupArrayInt *xs, bool (*fn)(int));
 void gup_array_filter_in_place_long(GupArrayLong *xs, bool (*fn)(long));
 void gup_array_filter_in_place_short(GupArrayShort *xs, bool (*fn)(short));
+void gup_array_filter_in_place_string(GupArrayString *xs, bool (*fn)(char *));
 
 bool   gup_array_reduce_bool(GupArrayBool xs, bool (*fn)(bool, bool), bool start);
 char   gup_array_reduce_char(GupArrayChar xs, char (*fn)(char, char), char start);
@@ -160,6 +177,7 @@ float  gup_array_reduce_float(GupArrayFloat xs, float (*fn)(float, float), float
 int    gup_array_reduce_int(GupArrayInt xs, int (*fn)(int, int), int start);
 long   gup_array_reduce_long(GupArrayLong xs, long (*fn)(long, long), long start);
 short  gup_array_reduce_short(GupArrayShort xs, short (*fn)(short, short), short start);
+char  *gup_array_reduce_string(GupArrayString xs, char *(*fn)(char *, char *), char *start);
 
 // Assert ------------------------------------------------------------------------------------------
 void gup_assert(bool pass_condition, const char *failure_explanation);
@@ -265,82 +283,107 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
 #define GUP_ARRAY_DEFAULT_CAPACITY 256
 
 // Default constructors
-#define GUP_DEFINE_ARRAY(T, t) GupArray##T gup_array_##t() {\
-    GupArray##T xs = {                                      \
-        .capacity = 256,                                    \
-        .count = 0,                                         \
-        .data = malloc(256 * sizeof(t))                     \
-    };                                                      \
-    return xs;                                              \
-}                                                           \
+#define GUP_DEFINE_ARRAY(U, l, t) GupArray##U gup_array_##l() {\
+    GupArray##U xs = {                                         \
+        .capacity = 256,                                       \
+        .count = 0,                                            \
+        .data = malloc(256 * sizeof(t))                        \
+    };                                                         \
+    return xs;                                                 \
+}                                                              \
 
-GUP_DEFINE_ARRAY(Bool, bool)
-GUP_DEFINE_ARRAY(Char, char)
-GUP_DEFINE_ARRAY(Double, double)
-GUP_DEFINE_ARRAY(Float, float)
-GUP_DEFINE_ARRAY(Int, int)
-GUP_DEFINE_ARRAY(Long, long)
-GUP_DEFINE_ARRAY(Short, short)
+GUP_DEFINE_ARRAY(Bool, bool, bool)
+GUP_DEFINE_ARRAY(Char, char, char)
+GUP_DEFINE_ARRAY(Double, double, double)
+GUP_DEFINE_ARRAY(Float, float, float)
+GUP_DEFINE_ARRAY(Int, int, int)
+GUP_DEFINE_ARRAY(Long, long, long)
+GUP_DEFINE_ARRAY(Short, short, short)
+GUP_DEFINE_ARRAY(String, string, GupArrayChar)
 
 // From constructors
-#define GUP_DEFINE_ARRAY_FROM(T, t) GupArray##T gup_array_from_##t(const t xs[], const int size) {\
-    GupArray##T new = gup_array_##t();                                                            \
-                                                                                                  \
-    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;         \
-    new.count = size;                                                                             \
-    new.data = realloc(new.data, new.capacity * sizeof(t));                                       \
-    for (int i = 0; i < size; i++) {                                                              \
-       new.data[i] = xs[i];                                                                       \
-    }                                                                                             \
-                                                                                                  \
-    return new;                                                                                   \
-}                                                                                                 \
+#define GUP_DEFINE_ARRAY_FROM(U, l, t) GupArray##U gup_array_from_##l(t xs[], const int size) {\
+    GupArray##U new = gup_array_##l();                                                               \
+                                                                                                     \
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;            \
+    new.count = size;                                                                                \
+    new.data = realloc(new.data, new.capacity * sizeof(t));                                          \
+    for (int i = 0; i < size; i++) {                                                                 \
+       new.data[i] = xs[i];                                                                          \
+    }                                                                                                \
+                                                                                                     \
+    return new;                                                                                      \
+}                                                                                                    \
 
-GUP_DEFINE_ARRAY_FROM(Bool, bool)
-GUP_DEFINE_ARRAY_FROM(Char, char)
-GUP_DEFINE_ARRAY_FROM(Double, double)
-GUP_DEFINE_ARRAY_FROM(Float, float)
-GUP_DEFINE_ARRAY_FROM(Int, int)
-GUP_DEFINE_ARRAY_FROM(Long, long)
-GUP_DEFINE_ARRAY_FROM(Short, short)
+GUP_DEFINE_ARRAY_FROM(Bool, bool, bool)
+GUP_DEFINE_ARRAY_FROM(Char, char, char)
+GUP_DEFINE_ARRAY_FROM(Double, double, double)
+GUP_DEFINE_ARRAY_FROM(Float, float, float)
+GUP_DEFINE_ARRAY_FROM(Int,  int, int)
+GUP_DEFINE_ARRAY_FROM(Long, long, long)
+GUP_DEFINE_ARRAY_FROM(Short, short, short)
+GUP_DEFINE_ARRAY_FROM(String, string, GupArrayChar)
 
-// Copy constructors 
-#define GUP_DEFINE_ARRAY_COPY(T, t) GupArray##T gup_array_copy_##t(GupArray##T xs) {\
-    GupArray##T new = gup_array_##t();                                              \
-    new.capacity = xs.capacity;                                                     \
-    new.count = xs.count;                                                           \
-    new.data = malloc(xs.capacity * sizeof(#t));                                    \
-    memcpy(new.data, xs.data, xs.count * sizeof(#t));                               \
-                                                                                    \
-    return new;                                                                     \
-}                                                                                   \
+GupArrayChar gup_array_from_char_cstr(char *cstr) {
+    GupArrayChar new = gup_array_char();
+    
+    for (char *cstr_ptr = cstr; *cstr_ptr != '\0'; cstr_ptr++) {
+        gup_array_append_char(&new, *cstr_ptr);
+    }
 
-GUP_DEFINE_ARRAY_COPY(Bool, bool)
-GUP_DEFINE_ARRAY_COPY(Char, char)
-GUP_DEFINE_ARRAY_COPY(Double, double)
-GUP_DEFINE_ARRAY_COPY(Float, float)
-GUP_DEFINE_ARRAY_COPY(Int, int)
-GUP_DEFINE_ARRAY_COPY(Long, long)
-GUP_DEFINE_ARRAY_COPY(Short, short)
+    return new;
+}
+
+// Copy constructors
+#define GUP_DEFINE_ARRAY_COPY(U, l, t) GupArray##U gup_array_copy_##l(GupArray##U xs) {\
+    GupArray##U new = {                                                                \
+        .capacity = xs.capacity,                                                       \
+        .count = xs.count,                                                             \
+        .data = malloc(xs.capacity * sizeof(t)),                                       \
+                                                                                       \
+    };                                                                                 \
+    memcpy(new.data, xs.data, xs.count * sizeof(t));                                   \
+                                                                                       \
+    return new;                                                                        \
+}                                                                                      \
+
+GUP_DEFINE_ARRAY_COPY(Bool, bool, bool)
+GUP_DEFINE_ARRAY_COPY(Char, char, char)
+GUP_DEFINE_ARRAY_COPY(Double, double, double)
+GUP_DEFINE_ARRAY_COPY(Float, float, float)
+GUP_DEFINE_ARRAY_COPY(Int, int, int)
+GUP_DEFINE_ARRAY_COPY(Long, long, long)
+GUP_DEFINE_ARRAY_COPY(Short, short, short)
+GUP_DEFINE_ARRAY_COPY(String, string, GupArrayChar)
 
 // Equals
-#define GUP_DEFINE_ARRAY_EQ(T, t) bool gup_array_eq_##t(GupArray##T xs, GupArray##T ys) {\
-    if (xs.count != ys.count) return false;                                              \
-                                                                                         \
-    for (int i = 0; i < xs.count; i++) {                                                 \
-        if (xs.data[i] != ys.data[i]) return false;                                      \
-    }                                                                                    \
-                                                                                         \
-    return true;                                                                         \
-}                                                                                        \
+#define GUP_DEFINE_ARRAY_EQ(U, l, t) bool gup_array_eq_##l(GupArray##U xs, GupArray##U ys) {\
+    if (xs.count != ys.count) return false;                                                 \
+                                                                                            \
+    for (int i = 0; i < xs.count; i++) {                                                    \
+        if (xs.data[i] != ys.data[i]) return false;                                         \
+    }                                                                                       \
+                                                                                            \
+    return true;                                                                            \
+}                                                                                           \
 
-GUP_DEFINE_ARRAY_EQ(Bool, bool)
-GUP_DEFINE_ARRAY_EQ(Char, char)
-GUP_DEFINE_ARRAY_EQ(Double, double)
-GUP_DEFINE_ARRAY_EQ(Float, float)
-GUP_DEFINE_ARRAY_EQ(Int, int)
-GUP_DEFINE_ARRAY_EQ(Long, long)
-GUP_DEFINE_ARRAY_EQ(Short, short)
+GUP_DEFINE_ARRAY_EQ(Bool, bool, bool)
+GUP_DEFINE_ARRAY_EQ(Char, char, char)
+GUP_DEFINE_ARRAY_EQ(Double, double, double)
+GUP_DEFINE_ARRAY_EQ(Float, float, float)
+GUP_DEFINE_ARRAY_EQ(Int, int, int)
+GUP_DEFINE_ARRAY_EQ(Long, long, long)
+GUP_DEFINE_ARRAY_EQ(Short, short, short)
+
+bool gup_array_eq_string(GupArrayString xs, GupArrayString ys) {
+    if (xs.count != ys.count) return false;                     
+
+    for (int i = 0; i < xs.count; i++) {
+        if (!gup_array_eq_char(xs.data[i], ys.data[i])) return false;
+    }                                                               
+
+    return true;
+}
 
 // Print
 #define gup_array_print_bool(xs) _gup_array_print_bool(xs, #xs)
@@ -352,18 +395,18 @@ void _gup_array_print_bool(GupArrayBool xs, const char *xs_name) {
 
         if (i != xs.count-1) printf(", ");
     }
-    printf("]\n"); 
+    printf("]\n");
 }
 
 #define gup_array_print_char(xs) _gup_array_print_char(xs, #xs)
 void _gup_array_print_char(GupArrayChar xs, const char *xs_name) {
     printf("%s: [", xs_name);
     for (int i = 0; i < xs.count; i++) {
-        printf("%c", xs.data[i]);
+        printf("'%c'", xs.data[i]);
 
         if (i != xs.count-1) printf(", ");
     }
-    printf("]\n"); 
+    printf("]\n");
 }
 
 #define gup_array_print_double(xs) _gup_array_print_double(xs, #xs)
@@ -374,7 +417,7 @@ void _gup_array_print_double(GupArrayDouble xs, const char *xs_name) {
 
         if (i != xs.count-1) printf(", ");
     }
-    printf("]\n"); 
+    printf("]\n");
 }
 
 #define gup_array_print_float(xs) _gup_array_print_float(xs, #xs)
@@ -385,7 +428,7 @@ void _gup_array_print_float(GupArrayFloat xs, const char *xs_name) {
 
         if (i != xs.count-1) printf(", ");
     }
-    printf("]\n"); 
+    printf("]\n");
 }
 
 #define gup_array_print_int(xs) _gup_array_print_int(xs, #xs)
@@ -396,7 +439,7 @@ void _gup_array_print_int(GupArrayInt xs, const char *xs_name) {
 
         if (i != xs.count-1) printf(", ");
     }
-    printf("]\n"); 
+    printf("]\n");
 }
 
 #define gup_array_print_long(xs) _gup_array_print_long(xs, #xs)
@@ -407,7 +450,7 @@ void _gup_array_print_long(GupArrayLong xs, const char *xs_name) {
 
         if (i != xs.count-1) printf(", ");
     }
-    printf("]\n"); 
+    printf("]\n");
 }
 
 #define gup_array_print_short(xs) _gup_array_print_short(xs, #xs)
@@ -418,7 +461,18 @@ void _gup_array_print_short(GupArrayShort xs, const char *xs_name) {
 
         if (i != xs.count-1) printf(", ");
     }
-    printf("]\n"); 
+    printf("]\n");
+}
+
+#define gup_array_print_string(xs) _gup_array_print_string(xs, #xs)
+void _gup_array_print_string(GupArrayString xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        gup_array_print_char(xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
 // Append
