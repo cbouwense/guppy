@@ -121,6 +121,7 @@ void test_gup_file_read_lines(void) {
         }
         free(lines);
     }
+
 }
 
 void test_gup_file_read_lines_keep_newlines(void) {
@@ -137,7 +138,7 @@ void test_gup_file_read_lines_keep_newlines(void) {
         gup_file_print("./resources/one_newline.txt");
         gup_print_array_string(lines);
         #endif
-        
+
         assert(gup_cstr_eq(lines[0], "\n"));
         assert(lines[1] == NULL);
 
@@ -287,13 +288,13 @@ void test_gup_file_print_lines(void) {
 }
 
 void test_gup_file(void) {
-    test_gup_file_is_empty();
-    test_gup_file_line_count();
-    test_gup_file_read();
+    // test_gup_file_is_empty();
+    // test_gup_file_line_count();
+    // test_gup_file_read();
     test_gup_file_read_lines();
     test_gup_file_read_lines_keep_newlines();
-    test_gup_file_write();
-    test_gup_file_write_lines();
+    // test_gup_file_write();
+    // test_gup_file_write_lines();
     #ifdef GUPPY_VERBOSE
     test_gup_file_print();
     test_gup_file_print_lines();

@@ -318,7 +318,7 @@ void test_gup_array_char_from_cstr(void) {
     char *str = "Hello, World!";
     GupArrayChar xs = gup_array_from_char(chars, gup_array_size(chars));
 
-    GupArrayChar ys = gup_array_from_char_cstr(str);
+    GupArrayChar ys = gup_array_from_cstr_char(str);
 
     assert(gup_array_eq_char(xs, ys));
 
@@ -335,9 +335,9 @@ void test_gup_array_string(void) {
 }
 
 void test_gup_array_from_string(void) {
-    GupArrayChar hello = gup_array_from_char_cstr("Hello");
-    GupArrayChar world = gup_array_from_char_cstr("World");
-    GupArrayChar bang = gup_array_from_char_cstr("!");
+    GupArrayChar hello = gup_array_from_cstr_char("Hello");
+    GupArrayChar world = gup_array_from_cstr_char("World");
+    GupArrayChar bang = gup_array_from_cstr_char("!");
     GupArrayChar cs[] = {hello, world, bang};
 
     GupArrayString strs = gup_array_from_string(cs, gup_array_size(cs));
@@ -351,9 +351,9 @@ void test_gup_array_from_string(void) {
 }
 
 void test_gup_array_copy_string(void) {
-    GupArrayChar hello = gup_array_from_char_cstr("Hello");
-    GupArrayChar world = gup_array_from_char_cstr("World");
-    GupArrayChar bang = gup_array_from_char_cstr("!");
+    GupArrayChar hello = gup_array_from_cstr_char("Hello");
+    GupArrayChar world = gup_array_from_cstr_char("World");
+    GupArrayChar bang = gup_array_from_cstr_char("!");
     GupArrayChar cs[] = {hello, world, bang};
     GupArrayString strs = gup_array_from_string(cs, gup_array_size(cs));
 
@@ -369,9 +369,9 @@ void test_gup_array_copy_string(void) {
 }
 
 void test_gup_array_append_string(void) {
-    GupArrayChar hello = gup_array_from_char_cstr("Hello");
-    GupArrayChar world = gup_array_from_char_cstr("World");
-    GupArrayChar bang = gup_array_from_char_cstr("!");
+    GupArrayChar hello = gup_array_from_cstr_char("Hello");
+    GupArrayChar world = gup_array_from_cstr_char("World");
+    GupArrayChar bang = gup_array_from_cstr_char("!");
     GupArrayChar char_arrays[] = {hello, world, bang};
     GupArrayString strs_from = gup_array_from_string(char_arrays, gup_array_size(char_arrays));
 
