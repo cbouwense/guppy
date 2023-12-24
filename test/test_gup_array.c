@@ -72,6 +72,18 @@ void test_one_empty_one_populated_are_unequal(void) {
     free(ys.data);
 }
 
+void test_gup_array_copy_equals_original(void) {
+    int static_ints[] = {1, 7, 3, 8};
+    GupArrayInt dyn_ints = gup_array_from_int(static_ints, gup_array_size(static_ints));
+
+    GupArrayInt dyn_ints_copy = gup_array_copy_int(dyn_ints);
+
+    assert(gup_array_eq_int(dyn_ints, dyn_ints_copy));
+
+    free(dyn_ints.data); 
+    free(dyn_ints_copy.data); 
+}
+
 void test_a_gup_array_is_equal_to_itself(void) {
     GupArrayShort xs = gup_array_short();
 
@@ -338,21 +350,6 @@ void test_gup_array_from_string(void) {
     free(strs.data);
 }
 
-void test_gup_array_copy_equals_original(void) {
-    int static_ints[] = {1, 7, 3, 8};
-    GupArrayInt dyn_ints = gup_array_from_int(static_ints, gup_array_size(static_ints));
-
-    GupArrayInt dyn_ints_copy = gup_array_copy_int(dyn_ints);
-
-    gup_array_print_int(dyn_ints);
-    gup_array_print_int(dyn_ints_copy);
-
-    assert(gup_array_eq_int(dyn_ints, dyn_ints_copy));
-
-    free(dyn_ints.data); 
-    free(dyn_ints_copy.data); 
-}
-
 void test_gup_array_copy_string(void) {
     GupArrayChar hello = gup_array_from_char_cstr("Hello");
     GupArrayChar world = gup_array_from_char_cstr("World");
@@ -369,6 +366,27 @@ void test_gup_array_copy_string(void) {
     free(bang.data);
     free(strs.data);
     free(strs_copy.data);
+}
+
+void test_gup_array_append_string(void) {
+    GupArrayChar hello = gup_array_from_char_cstr("Hello");
+    GupArrayChar world = gup_array_from_char_cstr("World");
+    GupArrayChar bang = gup_array_from_char_cstr("!");
+    GupArrayChar char_arrays[] = {hello, world, bang};
+    GupArrayString strs_from = gup_array_from_string(char_arrays, gup_array_size(char_arrays));
+
+    GupArrayString strs = gup_array_string();
+    gup_array_append_string(&strs, hello);
+    gup_array_append_string(&strs, world);
+    gup_array_append_string(&strs, bang);
+
+    assert(gup_array_eq_string(strs, strs_from));
+
+    free(strs.data);
+    free(strs_from.data);
+    free(hello.data);
+    free(world.data);
+    free(bang.data);
 }
 
 void test_gup_array(void) {
@@ -403,6 +421,7 @@ void test_gup_array(void) {
     test_gup_array_string();
     test_gup_array_from_string();
     test_gup_array_copy_string();
+    test_gup_array_append_string();
     
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");
