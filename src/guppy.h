@@ -1,8 +1,9 @@
-#ifndef GUPPY_H
-#define GUPPY_H
+#ifndef GUPPY_H_
+#define GUPPY_H_
 
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -12,8 +13,8 @@
 #include <unistd.h>
 
 typedef struct {
-    size_t length;
     const char *data;
+    size_t length;
 } GupStringView;
 
 typedef struct {
@@ -200,6 +201,7 @@ GupArrayString gup_file_read_lines(const char *file_path);
 char **        gup_file_read_lines_as_cstrs(const char *file_path);
 GupArrayString gup_file_read_lines_keep_newlines(const char *file_path);
 char **        gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path);
+long           gup_file_size(const char *file_path);
 bool           gup_file_write(const char *text_to_write, const char *file_path);
 bool           gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path);
 
@@ -914,17 +916,12 @@ GupString gup_file_read(const char *file_path) {
     FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
         #ifdef GUPPY_VERBOSE
-        printf("Failed to open file %s\n", file_path);
+        printf("Failed to open file %s: %s\n", file_path, strerror(errno));
         #endif
         return result;
     }
 
-    // TODO: This is not portable. Make a function.
-    // Determine how many bytes are in the file.
-    fseek(fp, 0, SEEK_END);
-    size_t file_size = ftell(fp);
-    rewind(fp);
-
+    int file_size = gup_file_size(file_path);
     char *buffer = (char *) malloc(file_size + 1);
     size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
 
@@ -1121,6 +1118,19 @@ defer:
     if (fp) fclose(fp);
 
     return result;
+}
+
+long gup_file_size(const char *file_path) {
+    FILE *fp = fopen(file_path, "rb");
+    char failure_reason[1024];
+    sprintf(failure_reason, "Failed to open %s: %s", file_path, strerror(errno));
+    gup_assert(fp != NULL, failure_reason);
+
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    fclose(fp);
+
+    return file_size;
 }
 
 bool gup_file_write(const char *text_to_write, const char *file_path) {
@@ -1897,4 +1907,4 @@ double gup_operation_seconds_verbose(void (*fn)()) {
     return result;
 }
 
-#endif // GUPPY_H
+#endif // GUPPY_H_

@@ -5,6 +5,7 @@
     "stdio.h": "c",
     "guppy.h": "c",
     "stdlib.h": "c",
-    "unistd.h": "c"
+    "unistd.h": "c",
+    "cerrno": "c"
 }
 }
