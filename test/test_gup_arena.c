@@ -10,8 +10,9 @@ void test_gup_arena_create(void) {
     gup_arena_destroy(a);
 }
 
-// The real assertion here is that AddressSanitzer doesn't say there's a leak.
-void test_gup_arena_can_allocate_stuff_and_not_need_to_free_it() {
+// The real test here is that AddressSanitzer doesn't say there's a leak
+// when this is run.
+void test_gup_arena_can_allocate_stuff_and_not_need_to_free_it(void) {
     GupArena a = gup_arena_create();
 
     char *foo = gup_arena_alloc(&a, strlen("foo") + 1);
@@ -31,7 +32,24 @@ void test_gup_arena_can_allocate_stuff_and_not_need_to_free_it() {
     gup_arena_destroy(a);
 }
 
+// The real test here is that AddressSanitzer doesn't say there's a leak
+// when this is run.
+void test_gup_arena_can_be_freed_and_not_leak_memory(void) {
+    GupArena a = gup_arena_create();
+
+    const int count = 9001;
+    int **lots_of_ints = gup_arena_alloc(&a, sizeof(int *) * count);
+    for (int i = 0; i < count; i++) {
+        lots_of_ints[i] = gup_arena_alloc(&a, sizeof(int));
+        *lots_of_ints[i] = i;
+    }
+
+    gup_arena_free(a);
+    free(a.data);
+}
+
 void test_gup_arena(void) {
     test_gup_arena_create();
     test_gup_arena_can_allocate_stuff_and_not_need_to_free_it();
+    test_gup_arena_can_be_freed_and_not_leak_memory();
 }
