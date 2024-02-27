@@ -6,6 +6,7 @@
     "guppy.h": "c",
     "stdlib.h": "c",
     "unistd.h": "c",
-    "cerrno": "c"
+    "cerrno": "c",
+    "functional": "c"
 }
 }

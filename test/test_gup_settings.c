@@ -2,43 +2,43 @@
 
 void test_gup_does_setting_file_line_contain_key(void) {
     {
-        GupStringView line = SV_STATIC("title = \"guppy.h\"");
-        GupStringView key  = SV_STATIC("title");
+        GupStringView line = SV("title = \"guppy.h\"");
+        GupStringView key  = SV("title");
 
         assert(true == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     {
-        GupStringView line = SV_STATIC("title = \"guppy.h\"");
-        GupStringView key  = SV_STATIC("author");
+        GupStringView line = SV("title = \"guppy.h\"");
+        GupStringView key  = SV("author");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     { // Comments always return false
-        GupStringView line = SV_STATIC("# Comment");
-        GupStringView key  = SV_STATIC("title");
+        GupStringView line = SV("# Comment");
+        GupStringView key  = SV("title");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     { // Section headers always return false
-        GupStringView line = SV_STATIC("[Section header]");
-        GupStringView key  = SV_STATIC("title");
+        GupStringView line = SV("[Section header]");
+        GupStringView key  = SV("title");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     { // Empty lines always return false
-        GupStringView line = SV_STATIC("");
-        GupStringView key  = SV_STATIC("title");
+        GupStringView line = SV("");
+        GupStringView key  = SV("title");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }
 
     { // Lines without equals signs always return false
-        GupStringView line = SV_STATIC("title is guppy.h");
-        GupStringView key  = SV_STATIC("title");
+        GupStringView line = SV("title is guppy.h");
+        GupStringView key  = SV("title");
 
         assert(false == _gup_does_setting_file_line_contain_key(line, key));
     }

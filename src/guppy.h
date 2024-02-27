@@ -67,9 +67,23 @@ typedef struct {
     GupArrayChar *data;
 } GupArrayString;
 
+typedef struct {
+    int capacity;
+    int count;
+    void **data;
+} GupArrayPtr;
+
+typedef GupArrayPtr GupArena;
+
 /**************************************************************************************************
  * Public API                                                                                     *
  **************************************************************************************************/
+
+// Arena -------------------------------------------------------------------------------------------
+GupArena  gup_arena_create();
+void      gup_arena_destroy(GupArena a); // Free all the allocated memory and the arena itself
+void     *gup_arena_alloc(GupArena *a, size_t bytes);
+void      gup_arena_free(GupArena a); // Free all the allocated memory, but not the arena itself
 
 // Dynamic arrays ----------------------------------------------------------------------------------
 GupArrayBool   gup_array_bool();
@@ -209,15 +223,6 @@ bool           gup_file_write_lines(const char **lines_to_write, const int line_
 void gup_print_cwd(void);
 void gup_print_string(const char *string);
 
-// Print null terminated arrays --------------------------------------------------------------------
-void gup_print_array_bool(bool array[]);
-void gup_print_array_char(char array[]);
-void gup_print_array_double(double array[]);
-void gup_print_array_float(float array[]);
-void gup_print_array_int(int array[]);
-void gup_print_array_long(long array[]);
-void gup_print_array_string(char *array[]);
-
 // Print array slices [start, end) -----------------------------------------------------------------
 void gup_print_array_slice_bool(bool array[], size_t start, size_t end);
 void gup_print_array_slice_char(char array[], size_t start, size_t end);
@@ -276,6 +281,46 @@ typedef unsigned int uint;
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
+#define GUP_ARRAY_DEFAULT_CAPACITY 256
+
+// Arena -------------------------------------------------------------------------------------------
+
+GupArena gup_arena_create() {
+    return (GupArena) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void *)),
+    };
+}
+
+void gup_arena_destroy(GupArena a) {
+    gup_arena_free(a);
+    free(a.data);
+}
+
+void *gup_arena_alloc(GupArena *a, size_t bytes) {
+    if (a->count == a->capacity) {
+        const int new_capacity = a->capacity == 0 ? 1 : a->capacity * 2;
+        a->data = realloc(a->data, new_capacity * sizeof(void *));
+        a->capacity = new_capacity;
+    }
+
+    void *ptr = malloc(bytes);
+    assert(ptr != NULL);
+
+    a->data[a->count] = ptr;
+    a->count++;
+
+    return ptr;
+}
+
+void gup_arena_free(GupArena a) {
+    for (int i = 0; i < a.count; i++) {
+        free(a.data[i]);
+    }
+}
+
+// TODO: Can I move this up to the Public API section
 // Assert ------------------------------------------------------------------------------------------
 
 void _gup_assert(bool pass_condition, const char *failure_explanation, const char *readable_pass_condition, const char *file_path, int line_number) {
@@ -290,14 +335,12 @@ void _gup_assert(bool pass_condition, const char *failure_explanation, const cha
 
 // Dynamic Arrays ----------------------------------------------------------------------------------
 
-#define GUP_ARRAY_DEFAULT_CAPACITY 256
-
 // Default constructors
 #define GUP_DEFINE_ARRAY(U, l, t) GupArray##U gup_array_##l() {\
     GupArray##U xs = {                                         \
-        .capacity = 256,                                       \
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,                \
         .count = 0,                                            \
-        .data = malloc(256 * sizeof(t))                        \
+        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(t)) \
     };                                                         \
     return xs;                                                 \
 }                                                              \
@@ -921,11 +964,11 @@ GupString gup_file_read(const char *file_path) {
         return result;
     }
 
-    int file_size = gup_file_size(file_path);
+    long file_size = gup_file_size(file_path);
     char *buffer = (char *) malloc(file_size + 1);
     size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
 
-    gup_assert(bytes_read == file_size, "Failed to read file");
+    gup_assert((long)bytes_read == file_size, "Failed to read file");
 
     buffer[file_size] = '\0';
     result = gup_array_char_from_cstr(buffer);
@@ -940,7 +983,6 @@ defer:
 char *gup_file_read_as_cstr(const char *file_path) {
     char *result;
     char *buffer;
-    size_t file_size;
 
     FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
@@ -950,16 +992,11 @@ char *gup_file_read_as_cstr(const char *file_path) {
         return NULL;
     }
 
-    // TODO: This is not portable. Make a function.
-    // Determine how many bytes are in the file.
-    fseek(fp, 0, SEEK_END);
-    file_size = ftell(fp);
-    rewind(fp);
-
+    long file_size = gup_file_size(file_path);
     buffer = (char *) malloc(file_size + 1);
 
     size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
-    if (bytes_read != file_size) {
+    if ((long)bytes_read != file_size) {
         #ifdef GUPPY_VERBOSE
         printf("Failed to read file %s\n", file_path);
         #endif
@@ -1182,130 +1219,6 @@ void gup_print_cwd(void) {
 
 void gup_print_string(const char *string) {
     printf("\"%s\"\n", string);
-}
-
-// Print null terminated arrays --------------------------------------------------------------------
-
-void gup_print_array_bool(bool array[]) {
-    printf("[");
-
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        if (array[i] == true) {
-            printf("true");
-        } else {
-            printf("false");
-        }
-
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-
-void gup_print_array_char(char array[]) {
-    printf("[");
-
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        switch (array[i]) {
-            case '\n':
-                printf("'\\n'");
-                break;
-            case '\t':
-                printf("'\\t'");
-                break;
-            case '\r':
-                printf("'\\r'");
-                break;
-            case '\v':
-                printf("'\\v'");
-                break;
-            case '\b':
-                printf("'\\b'");
-                break;
-            case '\f':
-                printf("'\\f'");
-                break;
-            case '\a':
-                printf("'\\a'");
-                break;
-            case '\\':
-                printf("'\\\\'");
-                break;
-            case '\'':
-                printf("'\\''");
-                break;
-            case '\"':
-                printf("'\\\"'");
-                break;
-            default:
-                printf("'%c'", array[i]);
-                break;
-        }
-        
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-
-void gup_print_array_double(double array[]) {
-    printf("[");
-
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        printf("%.17f", array[i]);
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-
-void gup_print_array_float(float array[]) {
-    printf("[");
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        printf("%f", array[i]);
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-
-void gup_print_array_int(int array[]) {
-    printf("[");
-    for (size_t i = 0; array[i] != '\0'; i++) {
-        printf("%d", array[i]);
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-
-void gup_print_array_long(long array[]) {
-    printf("[");
-    for (int i = 0; array[i] != '\0'; i++) {
-        printf("%ld", array[i]);
-        if (array[i+1] != '\0') {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-
-void gup_print_array_string(char *array[]) {
-    gup_assert(array != NULL, "You tried to print an array of strings, but you sent in a null ptr.");
-    
-    printf("[");
-    for (size_t i = 0; array[i] != NULL; i++) {
-        printf("\"%s\"", array[i]);
-        if (array[i+1] != NULL) {
-            printf(", ");
-        }
-    }
-    printf("]\n");
 }
 
 // Print array slices ------------------------------------------------------------------------------
@@ -1534,14 +1447,8 @@ defer:
  * He uses the MIT license, so it's all good. Check out his repo here: https://github.com/tsoding/sv
  */
 
-#define SV(cstr_lit) sv_from_parts(cstr_lit, sizeof(cstr_lit) - 1)
-#define SV_STATIC(cstr_lit)   \
-    {                         \
-        sizeof(cstr_lit) - 1, \
-        (cstr_lit)            \
-    }
-
-#define SV_NULL sv_from_parts(NULL, 0)
+#define SV(cstr_lit) gup_sv_from_parts(cstr_lit, sizeof(cstr_lit) - 1)
+#define SV_NULL gup_sv_from_parts(NULL, 0)
 
 // printf macros for String_View
 #define SV_Fmt "%.*s"

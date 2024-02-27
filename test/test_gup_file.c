@@ -319,9 +319,8 @@ void test_gup_file_read_lines_as_cstrs_keep_newlines(void) {
 }
 
 void test_gup_file_size(void) {
-    int result = gup_file_size("./resources/hello.txt");
-
-    gup_assert(result == 5, "Expected hello.txt to have 5 characters");
+    gup_assert(gup_file_size("./resources/empty.txt") == 0, "Expected empty.txt to have 0 characters");
+    gup_assert(gup_file_size("./resources/hello.txt") == 5, "Expected hello.txt to have 5 characters");
 }
 
 void test_gup_file_write(void) {
