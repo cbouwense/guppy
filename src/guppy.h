@@ -263,6 +263,11 @@ bool           gup_sv_eq_cstr(GupStringView sv, const char *cstr);
 bool           gup_sv_starts_with(GupStringView sv, GupStringView prefix);
 bool           gup_sv_ends_with(GupStringView sv, GupStringView suffix);
 bool           gup_sv_is_empty(GupStringView sv);
+void           gup_sv_print(GupStringView sv);
+
+// XML ---------------------------------------------------------------------------------------------
+
+bool gup_xml_has_tag(const char *xml, const char *tag);
 
 // C-string utilities ------------------------------------------------------------------------------
 char *gup_string_trim_double_quotes(const char *string);
@@ -376,17 +381,17 @@ void gup_array_string_free(GupArrayString xs) {
 
 // From constructors
 #define GUP_DEFINE_ARRAY_FROM(U, l, t) GupArray##U gup_array_##l##_from(t xs[], const int size) {\
-    GupArray##U new = gup_array_##l();                                                         \
-                                                                                               \
-    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;      \
-    new.count = size;                                                                          \
-    new.data = realloc(new.data, new.capacity * sizeof(t));                                    \
-    for (int i = 0; i < size; i++) {                                                           \
-       new.data[i] = xs[i];                                                                    \
-    }                                                                                          \
-                                                                                               \
-    return new;                                                                                \
-}                                                                                              \
+    GupArray##U new = gup_array_##l();                                                           \
+                                                                                                 \
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;        \
+    new.count = size;                                                                            \
+    new.data = realloc(new.data, new.capacity * sizeof(t));                                      \
+    for (int i = 0; i < size; i++) {                                                             \
+       new.data[i] = xs[i];                                                                      \
+    }                                                                                            \
+                                                                                                 \
+    return new;                                                                                  \
+}                                                                                                \
 
 GUP_DEFINE_ARRAY_FROM(Bool, bool, bool)
 GUP_DEFINE_ARRAY_FROM(Char, char, char)
@@ -1657,6 +1662,14 @@ bool gup_sv_is_empty(GupStringView sv) {
     return sv.length == 0;
 }
 
+void gup_sv_print(GupStringView sv) {
+    // TODO: no more size_t please
+    for (int i = 0; i < (int)sv.length; i++) {
+        printf("%c", sv.data[i]);
+    }
+    printf("\n");
+}
+
 bool gup_sv_eq(GupStringView a, GupStringView b) {
     if (a.length != b.length) {
         return false;
@@ -1785,6 +1798,28 @@ char gup_cstr_eq(const char *a, const char *b) {
     return strcmp(a, b) == 0;
 }
 
+// XML ---------------------------------------------------------------------------------------------
+
+bool gup_xml_has_tag(const char *xml, const char *tag) {
+    GupStringView sv = gup_sv_from_cstr(xml);
+
+    // Remove the left bracket
+    sv = gup_sv_trim_char_left(&sv, '<');
+
+    // Remove the right bracket
+    sv = gup_sv_trim_char_right(&sv, '>');
+    
+    // Remove the trailing forward slash
+    sv = gup_sv_trim_char_right(&sv, '/');
+
+    // Trim the whitespace
+    sv = gup_sv_trim(sv);
+
+    gup_sv_print(sv);
+
+    // Compare tag with what's left
+    return gup_sv_eq_cstr(sv, tag);
+}
 
 // Miscellaneous -----------------------------------------------------------------------------------
 

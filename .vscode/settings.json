@@ -8,5 +8,6 @@
     "unistd.h": "c",
     "cerrno": "c",
     "functional": "c"
-}
+},
+"C_Cpp.errorSquiggles": "disabled"
 }
