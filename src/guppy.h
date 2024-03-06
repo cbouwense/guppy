@@ -171,6 +171,20 @@ GupArrayLong   gup_array_long_filter(GupArrayLong xs, bool (*fn)(long));
 void           gup_array_long_filter_in_place(GupArrayLong *xs, bool (*fn)(long));
 long           gup_array_long_reduce(GupArrayLong xs, long (*fn)(long, long), long start);
 
+GupArrayPtr    gup_array_ptr();
+void           gup_array_short_free(GupArrayShort xs);
+GupArrayPtr    gup_array_ptr_from(void* xs[], const int size);
+GupArrayPtr    gup_array_ptr_copy(GupArrayPtr xs);
+bool           gup_array_ptr_eq(GupArrayPtr xs, GupArrayPtr ys);
+void           gup_array_ptr_print(GupArrayPtr xs);
+void           gup_array_ptr_append(GupArrayPtr *xs, void* x);
+void           gup_array_ptr_prepend(GupArrayPtr *xs, void* x);
+GupArrayPtr    gup_array_ptr_map(GupArrayPtr xs, void* (*fn)(void*));
+void           gup_array_ptr_map_in_place(GupArrayPtr xs, void* (*fn)(void*));
+GupArrayPtr    gup_array_ptr_filter(GupArrayPtr xs, bool (*fn)(void*));
+void           gup_array_ptr_filter_in_place(GupArrayPtr *xs, bool (*fn)(void*));
+void*          gup_array_ptr_reduce(GupArrayPtr xs, void* (*fn)(void*, void*), void* start);
+
 GupArrayShort  gup_array_short();
 void           gup_array_short_free(GupArrayShort xs);
 GupArrayShort  gup_array_short_from(short xs[], const int size);
@@ -267,7 +281,20 @@ void           gup_sv_print(GupStringView sv);
 
 // XML ---------------------------------------------------------------------------------------------
 
-bool gup_xml_has_tag(const char *xml, const char *tag);
+typedef struct {
+    GupStringView key;
+    GupStringView value;
+} GupXMLAttribute;
+
+typedef struct {
+    GupStringView name;       // XML tag name
+    GupArrayPtr   attributes; // Dynamic array of attributes as key value pairs
+    GupArrayPtr   children;   // Dynamic array of children XML tags  
+} GupXMLTag;
+
+GupXMLTag      gup_xml_parse(const char *xml);
+bool           gup_xml_has_tag(const char *xml, const char *tag);
+GupArrayString gup_xml_get_tag_attributes(const char *xml, const char *tag);
 
 // C-string utilities ------------------------------------------------------------------------------
 char *gup_string_trim_double_quotes(const char *string);
@@ -356,6 +383,7 @@ GUP_DEFINE_ARRAY(Double, double, double)
 GUP_DEFINE_ARRAY(Float, float, float)
 GUP_DEFINE_ARRAY(Int, int, int)
 GUP_DEFINE_ARRAY(Long, long, long)
+GUP_DEFINE_ARRAY(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY(Short, short, short)
 GUP_DEFINE_ARRAY(String, string, GupArrayChar)
 
@@ -371,6 +399,13 @@ GUP_DEFINE_ARRAY_FREE(Float, float, float)
 GUP_DEFINE_ARRAY_FREE(Int, int, int)
 GUP_DEFINE_ARRAY_FREE(Long, long, long)
 GUP_DEFINE_ARRAY_FREE(Short, short, short)
+
+void gup_array_ptr_free(GupArrayPtr xs) {
+    for (int i = 0; i < xs.count; i++) {
+        free(xs.data[i]);
+    }
+    free(xs.data);
+}
 
 void gup_array_string_free(GupArrayString xs) {
     for (int i = 0; i < xs.count; i++) {
@@ -399,6 +434,7 @@ GUP_DEFINE_ARRAY_FROM(Double, double, double)
 GUP_DEFINE_ARRAY_FROM(Float, float, float)
 GUP_DEFINE_ARRAY_FROM(Int,  int, int)
 GUP_DEFINE_ARRAY_FROM(Long, long, long)
+GUP_DEFINE_ARRAY_FROM(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_FROM(Short, short, short)
 
 GupArrayChar gup_array_char_from_cstr(char *cstr) {
@@ -484,6 +520,19 @@ GUP_DEFINE_ARRAY_COPY(Int, int, int)
 GUP_DEFINE_ARRAY_COPY(Long, long, long)
 GUP_DEFINE_ARRAY_COPY(Short, short, short)
 
+GupArrayPtr gup_array_ptr_copy(GupArrayPtr xs) {
+    GupArrayPtr new = {
+        .capacity = xs.capacity,
+        .count = 0,
+        .data = malloc(xs.capacity * sizeof(void *)),
+    };
+    for (int i = 0; i < xs.count; i++) {
+        gup_array_ptr_append(&new, xs.data[i]);
+    }
+
+    return new;
+}
+
 GupArrayString gup_array_string_copy(GupArrayString xs) {
     GupArrayString new = {
         .capacity = xs.capacity,
@@ -496,7 +545,6 @@ GupArrayString gup_array_string_copy(GupArrayString xs) {
 
     return new;
 }
-
 
 // Equals
 #define GUP_DEFINE_ARRAY_EQ(U, l, t) bool gup_array_##l##_eq(GupArray##U xs, GupArray##U ys) {\
@@ -515,6 +563,7 @@ GUP_DEFINE_ARRAY_EQ(Double, double, double)
 GUP_DEFINE_ARRAY_EQ(Float, float, float)
 GUP_DEFINE_ARRAY_EQ(Int, int, int)
 GUP_DEFINE_ARRAY_EQ(Long, long, long)
+GUP_DEFINE_ARRAY_EQ(Ptr, ptr, void*) // TODO: is shallow check ok?
 GUP_DEFINE_ARRAY_EQ(Short, short, short)
 
 #define gup_array_char_eq_cstr(xs, cstr) _gup_array_char_eq_cstr(xs, cstr, strlen(cstr))
@@ -602,6 +651,17 @@ void _gup_array_long_print(GupArrayLong xs, const char *xs_name) {
     printf("]\n");
 }
 
+#define gup_array_ptr_print(xs) _gup_array_ptr_print(xs, #xs)
+void _gup_array_ptr_print(GupArrayPtr xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        printf("%p", xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n");
+}
+
 #define gup_array_short_print(xs) _gup_array_short_print(xs, #xs)
 void _gup_array_short_print(GupArrayShort xs, const char *xs_name) {
     printf("%s: [", xs_name);
@@ -642,6 +702,7 @@ GUP_DEFINE_ARRAY_APPEND(Double, double, double)
 GUP_DEFINE_ARRAY_APPEND(Float, float, float)
 GUP_DEFINE_ARRAY_APPEND(Int, int, int)
 GUP_DEFINE_ARRAY_APPEND(Long, long, long)
+GUP_DEFINE_ARRAY_APPEND(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_APPEND(Short, short, short)
 
 void gup_array_string_append(GupArrayString *xs, GupArrayChar x) {
@@ -677,6 +738,7 @@ GUP_DEFINE_ARRAY_PREPEND(Float, float, float)
 GUP_DEFINE_ARRAY_PREPEND(Int, int, int)
 GUP_DEFINE_ARRAY_PREPEND(Long, long, long)
 GUP_DEFINE_ARRAY_PREPEND(Short, short, short)
+GUP_DEFINE_ARRAY_PREPEND(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_PREPEND(String, string, GupArrayChar)
 
 #define GUP_DEFINE_ARRAY_MAP(U, l, t) GupArray##U gup_array_##l##_map(GupArray##U xs, t (*fn)(t)) {\
@@ -696,6 +758,7 @@ GUP_DEFINE_ARRAY_MAP(Float, float, float)
 GUP_DEFINE_ARRAY_MAP(Int, int, int)
 GUP_DEFINE_ARRAY_MAP(Long, long, long)
 GUP_DEFINE_ARRAY_MAP(Short, short, short)
+GUP_DEFINE_ARRAY_MAP(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_MAP(String, string, GupArrayChar)
 
 #define GUP_DEFINE_ARRAY_MAP_IN_PLACE(U, l, t) void gup_array_##l##_map_in_place(GupArray##U xs, t (*fn)(t)) {\
@@ -710,6 +773,7 @@ GUP_DEFINE_ARRAY_MAP_IN_PLACE(Double, double, double)
 GUP_DEFINE_ARRAY_MAP_IN_PLACE(Float, float, float)
 GUP_DEFINE_ARRAY_MAP_IN_PLACE(Int, int, int)
 GUP_DEFINE_ARRAY_MAP_IN_PLACE(Long, long, long)
+GUP_DEFINE_ARRAY_MAP_IN_PLACE(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_MAP_IN_PLACE(Short, short, short)
 GUP_DEFINE_ARRAY_MAP_IN_PLACE(String, string, GupArrayChar)
 
@@ -731,6 +795,7 @@ GUP_DEFINE_ARRAY_FILTER(Double, double, double)
 GUP_DEFINE_ARRAY_FILTER(Float, float, float)
 GUP_DEFINE_ARRAY_FILTER(Int, int, int)
 GUP_DEFINE_ARRAY_FILTER(Long, long, long)
+GUP_DEFINE_ARRAY_FILTER(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_FILTER(Short, short, short)
 GUP_DEFINE_ARRAY_FILTER(String, string, GupArrayChar)
 
@@ -749,6 +814,7 @@ GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Double, double, double)
 GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Float, float, float)
 GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Int, int, int)
 GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Long, long, long)
+GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_FILTER_IN_PLACE(Short, short, short)
 GUP_DEFINE_ARRAY_FILTER_IN_PLACE(String, string, GupArrayChar)
 
@@ -766,6 +832,7 @@ GUP_DEFINE_ARRAY_REDUCE(Double, double, double)
 GUP_DEFINE_ARRAY_REDUCE(Float, float, float)
 GUP_DEFINE_ARRAY_REDUCE(Int, int, int)
 GUP_DEFINE_ARRAY_REDUCE(Long, long, long)
+GUP_DEFINE_ARRAY_REDUCE(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_REDUCE(Short, short, short)
 GUP_DEFINE_ARRAY_REDUCE(String, string, GupArrayChar)
 
@@ -1618,9 +1685,7 @@ GupStringView gup_sv_chop_by_delim(GupStringView *sv, char delim) {
 GupStringView gup_sv_chop_by_sv(GupStringView *sv, GupStringView thicc_delim) {
     GupStringView window = gup_sv_from_parts(sv->data, thicc_delim.length);
     size_t i = 0;
-    while (i + thicc_delim.length < sv->length
-        && !(gup_sv_eq(window, thicc_delim)))
-    {
+    while (i + thicc_delim.length < sv->length && !(gup_sv_eq(window, thicc_delim))) {
         i++;
         window.data++;
     }
@@ -1800,7 +1865,7 @@ char gup_cstr_eq(const char *a, const char *b) {
 
 // XML ---------------------------------------------------------------------------------------------
 
-bool gup_xml_has_tag(const char *xml, const char *tag) {
+GupStringView _gup_xml_get_tag_name(const char *xml) {
     GupStringView sv = gup_sv_from_cstr(xml);
 
     // Remove the left bracket
@@ -1817,8 +1882,66 @@ bool gup_xml_has_tag(const char *xml, const char *tag) {
 
     gup_sv_print(sv);
 
-    // Compare tag with what's left
-    return gup_sv_eq_cstr(sv, tag);
+    return sv;
+}
+
+GupXMLTag gup_xml_parse(const char *xml) {
+    GupStringView sv = _gup_xml_get_tag_name(xml); 
+    
+    GupXMLTag tag = (GupXMLTag) {
+        .name = sv,
+        .attributes = gup_array_ptr(),
+        .children = gup_array_ptr(),
+    };
+
+    printf("tag name: ");
+    gup_sv_print(tag.name);
+
+    return tag;
+}
+
+GupArrayString gup_xml_get_tag_attributes(const char *xml, const char *tag) {
+    GupArrayString attrs = gup_array_string();
+
+    GupStringView sv = gup_sv_from_parts(xml, strlen(xml));
+    gup_sv_chop_by_delim(&sv, '<');
+
+    // If we've found the tag
+    if (strncmp(sv.data, tag, strlen(tag)) == 0) {
+        gup_sv_chop_by_delim(&sv, ' ');
+        gup_sv_trim_left(sv);
+        // GupStringView key = gup_sv_chop_by_delim(&sv, '=');
+        // gup_string_array_append(&attrs, )
+    }
+
+    return attrs;
+}
+
+bool gup_xml_has_tag(const char *xml, const char *tag) {
+    GupStringView xml_sv1 = gup_sv_from_cstr(xml);
+    GupStringView xml_sv2 = gup_sv_from_cstr(xml);
+    GupStringView xml_sv3 = gup_sv_from_cstr(xml);
+
+    char tag_as_opener[1024];
+    char tag_as_self_closing[1024];
+    char tag_with_space[1024];
+    sprintf(tag_as_opener, "<%s>", tag);
+    sprintf(tag_as_self_closing, "<%s/>", tag);
+    sprintf(tag_with_space, "<%s ", tag);
+
+    GupStringView opener_chopped = gup_sv_chop_by_sv(&xml_sv1, gup_sv_from_cstr(tag_as_opener));
+    GupStringView self_closing_chopped = gup_sv_chop_by_sv(&xml_sv2, gup_sv_from_cstr(tag_as_self_closing));
+    GupStringView with_space_chopped = gup_sv_chop_by_sv(&xml_sv3, gup_sv_from_cstr(tag_with_space));
+    
+    gup_sv_print(opener_chopped);
+    gup_sv_print(self_closing_chopped);
+    gup_sv_print(with_space_chopped);
+
+    const bool is_opener = gup_sv_eq_cstr(opener_chopped, tag_as_opener);
+    const bool is_self_closing = gup_sv_eq_cstr(self_closing_chopped, tag_as_self_closing);
+    const bool is_with_space = gup_sv_eq_cstr(with_space_chopped, tag_with_space);
+
+    return is_opener || is_self_closing || is_with_space;
 }
 
 // Miscellaneous -----------------------------------------------------------------------------------

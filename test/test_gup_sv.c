@@ -182,6 +182,26 @@ void test_gup_sv_try_chop_by_delim(void) {
     }
 }
 
+void test_gup_sv_chop_by_sv(void) {
+    { // Buffer gets the part before the delimiter
+        GupStringView sv = gup_sv_from_cstr("Hello, world!");
+        GupStringView delim = gup_sv_from_cstr(", ");
+        GupStringView buffer = gup_sv_chop_by_sv(&sv, delim);
+
+        assert(gup_sv_eq_cstr(buffer, "Hello"));
+        assert(gup_sv_eq_cstr(sv, "world!"));
+    }
+
+    { // Buffer gets the entire string if delim is not found
+        GupStringView sv = gup_sv_from_cstr("Hello, world!");
+        GupStringView delim = gup_sv_from_cstr("Goodbye");
+        GupStringView buffer = gup_sv_chop_by_sv(&sv, delim);
+
+        assert(gup_sv_eq_cstr(buffer, "Hello, world!"));
+        assert(gup_sv_eq_cstr(sv, ""));
+    }
+}
+
 void test_gup_sv_index_of(void) {
     {
         GupStringView sv = gup_sv_from_cstr("Hello, world!");
@@ -307,6 +327,7 @@ void test_gup_sv(void) {
     test_gup_sv_trim();
     test_gup_sv_chop_by_delim();
     test_gup_sv_try_chop_by_delim();
+    test_gup_sv_chop_by_sv();
     test_gup_sv_index_of();
     test_gup_sv_trim_char_left();
     test_gup_sv_trim_char_right();
