@@ -293,9 +293,7 @@ typedef struct {
     GupArrayPtr  children;   // Dynamic array of children XML tags  
 } GupXMLTag;
 
-GupXMLTag      gup_xml_parse(const char *xml);
-bool           gup_xml_has_tag(const char *xml, const char *tag);
-GupArrayString gup_xml_get_tag_attributes(const char *xml, const char *tag);
+GupXMLTag gup_xml_parse(const char *xml);
 
 // C-string utilities ------------------------------------------------------------------------------
 char *gup_string_trim_double_quotes(const char *string);
@@ -1893,8 +1891,9 @@ typedef enum {
 } GupXMLParseState;
 
 GupXMLTag gup_xml_parse(const char *xml) {
-    GupXMLTag tag = {0};
-    GupString buf = gup_array_char(); // TODO: might be good to have different buffers for tag and data
+    GupXMLTag result = {0};
+    GupString tag = gup_array_char();
+    GupString data = gup_array_char();
     GupXMLParseState parse_state = _GUP_XML_PARSE_BEGIN;
 
     for (int i = 0; xml[i] != '\0'; i++) {
@@ -1904,11 +1903,11 @@ GupXMLTag gup_xml_parse(const char *xml) {
         if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
             switch (parse_state) {
                 case _GUP_XML_TAG_BEGIN: {
-                    gup_array_char_append(&buf, c);
+                    gup_array_char_append(&tag, c);
                     break;
                 }
                 case _GUP_XML_TAG_END: {
-                    gup_array_char_append(&buf, c);
+                    gup_array_char_append(&data, c);
                     break;
                 }
                 default: {
@@ -1918,8 +1917,8 @@ GupXMLTag gup_xml_parse(const char *xml) {
         } else if (c == '<') {
             switch (parse_state) {
                 case _GUP_XML_TAG_END: {
-                    tag.data = gup_array_char_to_cstr(buf);
-                    buf.count = 0;
+                    result.data = gup_array_char_to_cstr(data);
+                    data.count = 0;
                     break;
                 }
                 default: {
@@ -1935,8 +1934,8 @@ GupXMLTag gup_xml_parse(const char *xml) {
                     continue;
                 }
                 case _GUP_XML_TAG_BEGIN: {
-                    tag.name = gup_array_char_to_cstr(buf);
-                    buf.count = 0;
+                    result.name = gup_array_char_to_cstr(tag);
+                    tag.count = 0;
                     break;
                 }
                 default: {
@@ -1948,52 +1947,9 @@ GupXMLTag gup_xml_parse(const char *xml) {
         }
     }
 
-    gup_array_char_free(buf);
-    return tag;
-}
-
-GupArrayString gup_xml_get_tag_attributes(const char *xml, const char *tag) {
-    GupArrayString attrs = gup_array_string();
-
-    GupStringView sv = gup_sv_from_parts(xml, strlen(xml));
-    gup_sv_chop_by_delim(&sv, '<');
-
-    // If we've found the tag
-    if (strncmp(sv.data, tag, strlen(tag)) == 0) {
-        gup_sv_chop_by_delim(&sv, ' ');
-        gup_sv_trim_left(sv);
-        // GupStringView key = gup_sv_chop_by_delim(&sv, '=');
-        // gup_string_array_append(&attrs, )
-    }
-
-    return attrs;
-}
-
-bool gup_xml_has_tag(const char *xml, const char *tag) {
-    GupStringView xml_sv1 = gup_sv_from_cstr(xml);
-    GupStringView xml_sv2 = gup_sv_from_cstr(xml);
-    GupStringView xml_sv3 = gup_sv_from_cstr(xml);
-
-    char tag_as_opener[1024];
-    char tag_as_self_closing[1024];
-    char tag_with_space[1024];
-    sprintf(tag_as_opener, "<%s>", tag);
-    sprintf(tag_as_self_closing, "<%s/>", tag);
-    sprintf(tag_with_space, "<%s ", tag);
-
-    GupStringView opener_chopped = gup_sv_chop_by_sv(&xml_sv1, gup_sv_from_cstr(tag_as_opener));
-    GupStringView self_closing_chopped = gup_sv_chop_by_sv(&xml_sv2, gup_sv_from_cstr(tag_as_self_closing));
-    GupStringView with_space_chopped = gup_sv_chop_by_sv(&xml_sv3, gup_sv_from_cstr(tag_with_space));
-    
-    gup_sv_print(opener_chopped);
-    gup_sv_print(self_closing_chopped);
-    gup_sv_print(with_space_chopped);
-
-    const bool is_opener = gup_sv_eq_cstr(opener_chopped, tag_as_opener);
-    const bool is_self_closing = gup_sv_eq_cstr(self_closing_chopped, tag_as_self_closing);
-    const bool is_with_space = gup_sv_eq_cstr(with_space_chopped, tag_with_space);
-
-    return is_opener || is_self_closing || is_with_space;
+    gup_array_char_free(tag);
+    gup_array_char_free(data);
+    return result;
 }
 
 // Miscellaneous -----------------------------------------------------------------------------------
