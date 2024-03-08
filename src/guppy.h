@@ -287,9 +287,10 @@ typedef struct {
 } GupXMLAttribute;
 
 typedef struct {
-    GupStringView name;       // XML tag name
-    GupArrayPtr   attributes; // Dynamic array of attributes as key value pairs
-    GupArrayPtr   children;   // Dynamic array of children XML tags  
+    char        *name;       // XML tag name
+    char        *data;       // Text inside of the open and close tags
+    GupArrayPtr  attributes; // Dynamic array of attributes as key value pairs
+    GupArrayPtr  children;   // Dynamic array of children XML tags  
 } GupXMLTag;
 
 GupXMLTag      gup_xml_parse(const char *xml);
@@ -1885,18 +1886,69 @@ GupStringView _gup_xml_get_tag_name(const char *xml) {
     return sv;
 }
 
+typedef enum {
+    _GUP_XML_PARSE_BEGIN = 0,
+    _GUP_XML_TAG_BEGIN = 1,
+    _GUP_XML_TAG_END = 2,
+} GupXMLParseState;
+
 GupXMLTag gup_xml_parse(const char *xml) {
-    GupStringView sv = _gup_xml_get_tag_name(xml); 
+    GupXMLTag tag = {0};
+    GupString buf = gup_array_char(); // TODO: might be good to have different buffers for tag and data
+    GupXMLParseState parse_state = _GUP_XML_PARSE_BEGIN;
+
+    for (int i = 0; xml[i] != '\0'; i++) {
+        const char c = xml[i];
     
-    GupXMLTag tag = (GupXMLTag) {
-        .name = sv,
-        .attributes = gup_array_ptr(),
-        .children = gup_array_ptr(),
-    };
+        // If cursor is on a letter (ASCII only currently).
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+            switch (parse_state) {
+                case _GUP_XML_TAG_BEGIN: {
+                    gup_array_char_append(&buf, c);
+                    break;
+                }
+                case _GUP_XML_TAG_END: {
+                    gup_array_char_append(&buf, c);
+                    break;
+                }
+                default: {
+                    continue;
+                }
+            }
+        } else if (c == '<') {
+            switch (parse_state) {
+                case _GUP_XML_TAG_END: {
+                    tag.data = gup_array_char_to_cstr(buf);
+                    buf.count = 0;
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+            parse_state = _GUP_XML_TAG_BEGIN;
+        } else if (c == '>') {
+            switch (parse_state) {
+                case _GUP_XML_PARSE_BEGIN: {
+                    // Really, this could probably be seen as some kind of parsing error.
+                    // Maybe at least a warning?
+                    continue;
+                }
+                case _GUP_XML_TAG_BEGIN: {
+                    tag.name = gup_array_char_to_cstr(buf);
+                    buf.count = 0;
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
 
-    printf("tag name: ");
-    gup_sv_print(tag.name);
+            parse_state = _GUP_XML_TAG_END;
+        }
+    }
 
+    gup_array_char_free(buf);
     return tag;
 }
 

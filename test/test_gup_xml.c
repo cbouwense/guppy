@@ -16,7 +16,8 @@ void test_gup_xml_get_tag_attributes(void) {
 void test_gup_xml_parse(void) {
     GupXMLTag tag = gup_xml_parse("<foo>bar</foo>");
 
-    assert(gup_sv_eq_cstr(tag.name, "foo") == 0);
+    assert(strcmp(tag.name, "foo") == 0);
+    assert(strcmp(tag.data, "bar") == 0);
 
     gup_array_ptr_free(tag.attributes);
     gup_array_ptr_free(tag.children);
