@@ -1179,63 +1179,260 @@ void gup_array_string_prepend(GupArrayString *xs, GupArrayChar x) {
     xs->count++;
 }
 
-#define GUP_DEFINE_ARRAY_MAP(U, l, t) GupArray##U gup_array_##l##_map(GupArray##U xs, t (*fn)(t)) {\
-    GupArray##U new = gup_array_##l##_create_from(xs.data, xs.count);                                     \
-                                                                                                 \
-    for (int i = 0; i < xs.count; i++) {                                                         \
-        new.data[i] = fn(xs.data[i]);                                                            \
-    }                                                                                            \
-                                                                                                 \
-    return new;                                                                                  \
-}                                                                                                \
+// Map
+GupArrayBool gup_array_bool_map(GupArrayBool xs, bool (*fn)(bool)) {
+    GupArrayBool new = gup_array_bool_create_from(xs.data, xs.count);
 
-GUP_DEFINE_ARRAY_MAP(Bool, bool, bool)
-GUP_DEFINE_ARRAY_MAP(Char, char, char)
-GUP_DEFINE_ARRAY_MAP(Double, double, double)
-GUP_DEFINE_ARRAY_MAP(Float, float, float)
-GUP_DEFINE_ARRAY_MAP(Int, int, int)
-GUP_DEFINE_ARRAY_MAP(Long, long, long)
-GUP_DEFINE_ARRAY_MAP(Short, short, short)
-GUP_DEFINE_ARRAY_MAP(Ptr, ptr, void*)
-GUP_DEFINE_ARRAY_MAP(String, string, GupArrayChar)
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
 
-#define GUP_DEFINE_ARRAY_MAP_IN_PLACE(U, l, t) void gup_array_##l##_map_in_place(GupArray##U xs, t (*fn)(t)) {\
-    for (int i = 0; i < xs.count; i++) {                                                                    \
-        xs.data[i] = fn(xs.data[i]);                                                                        \
-    }                                                                                                       \
-}                                                                                                           \
+    return new;
+}
 
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(Bool, bool, bool)
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(Char, char, char)
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(Double, double, double)
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(Float, float, float)
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(Int, int, int)
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(Long, long, long)
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(Ptr, ptr, void*)
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(Short, short, short)
-GUP_DEFINE_ARRAY_MAP_IN_PLACE(String, string, GupArrayChar)
+GupArrayChar gup_array_char_map(GupArrayChar xs, char (*fn)(char)) {
+    GupArrayChar new = gup_array_char_create_from(xs.data, xs.count);
 
-#define GUP_DEFINE_ARRAY_FILTER(U, l, t) GupArray##U gup_array_##l##_filter(GupArray##U xs, bool (*fn)(t)) {\
-    GupArray##U new = gup_array_##l##_create();                                                                      \
-                                                                                                            \
-    for (int i = 0; i < xs.count; i++) {                                                                    \
-        if (fn(xs.data[i])) {                                                                               \
-            gup_array_##l##_append(&new, xs.data[i]);                                                       \
-        }                                                                                                   \
-    }                                                                                                       \
-                                                                                                            \
-    return new;                                                                                             \
-}                                                                                                           \
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
 
-GUP_DEFINE_ARRAY_FILTER(Bool, bool, bool)
-GUP_DEFINE_ARRAY_FILTER(Char, char, char)
-GUP_DEFINE_ARRAY_FILTER(Double, double, double)
-GUP_DEFINE_ARRAY_FILTER(Float, float, float)
-GUP_DEFINE_ARRAY_FILTER(Int, int, int)
-GUP_DEFINE_ARRAY_FILTER(Long, long, long)
-GUP_DEFINE_ARRAY_FILTER(Ptr, ptr, void*)
-GUP_DEFINE_ARRAY_FILTER(Short, short, short)
-GUP_DEFINE_ARRAY_FILTER(String, string, GupArrayChar)
+    return new;
+}
+
+GupArrayDouble gup_array_double_map(GupArrayDouble xs, double (*fn)(double)) {
+    GupArrayDouble new = gup_array_double_create_from(xs.data, xs.count);
+
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+GupArrayFloat gup_array_float_map(GupArrayFloat xs, float (*fn)(float)) {
+    GupArrayFloat new = gup_array_float_create_from(xs.data, xs.count);
+
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+GupArrayInt gup_array_int_map(GupArrayInt xs, int (*fn)(int)) {
+    GupArrayInt new = gup_array_int_create_from(xs.data, xs.count);
+
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+GupArrayLong gup_array_long_map(GupArrayLong xs, long (*fn)(long)) {
+    GupArrayLong new = gup_array_long_create_from(xs.data, xs.count);
+
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+GupArrayShort gup_array_short_map(GupArrayShort xs, short (*fn)(short)) {
+    GupArrayShort new = gup_array_short_create_from(xs.data, xs.count);
+
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+GupArrayPtr gup_array_ptr_map(GupArrayPtr xs, void* (*fn)(void*)) {
+    GupArrayPtr new = gup_array_ptr_create_from(xs.data, xs.count);
+
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+GupArrayString gup_array_string_map(GupArrayString xs, GupArrayChar (*fn)(GupArrayChar)) {
+    GupArrayString new = gup_array_string_create_from(xs.data, xs.count);
+
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = fn(xs.data[i]);
+    }
+
+    return new;
+}
+
+// Map in place
+void gup_array_bool_map_in_place(GupArrayBool xs, bool (*fn)(bool)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+void gup_array_char_map_in_place(GupArrayChar xs, char (*fn)(char)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+void gup_array_double_map_in_place(GupArrayDouble xs, double (*fn)(double)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+void gup_array_float_map_in_place(GupArrayFloat xs, float (*fn)(float)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+void gup_array_int_map_in_place(GupArrayInt xs, int (*fn)(int)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+void gup_array_long_map_in_place(GupArrayLong xs, long (*fn)(long)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+void gup_array_short_map_in_place(GupArrayShort xs, short (*fn)(short)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+void gup_array_ptr_map_in_place(GupArrayPtr xs, void* (*fn)(void*)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+void gup_array_string_map_in_place(GupArrayString xs, GupArrayChar (*fn)(GupArrayChar)) {
+    for (int i = 0; i < xs.count; i++) {
+        xs.data[i] = fn(xs.data[i]);
+    }
+}
+
+// Filter
+GupArrayBool gup_array_bool_filter(GupArrayBool xs, bool (*fn)(bool)) {
+    GupArrayBool new = gup_array_bool_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_bool_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayChar gup_array_char_filter(GupArrayChar xs, bool (*fn)(char)) {
+    GupArrayChar new = gup_array_char_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_char_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayDouble gup_array_double_filter(GupArrayDouble xs, bool (*fn)(double)) {
+    GupArrayDouble new = gup_array_double_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_double_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayFloat gup_array_float_filter(GupArrayFloat xs, bool (*fn)(float)) {
+    GupArrayFloat new = gup_array_float_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_float_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayInt gup_array_int_filter(GupArrayInt xs, bool (*fn)(int)) {
+    GupArrayInt new = gup_array_int_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_int_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayLong gup_array_long_filter(GupArrayLong xs, bool (*fn)(long)) {
+    GupArrayLong new = gup_array_long_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_long_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayShort gup_array_short_filter(GupArrayShort xs, bool (*fn)(short)) {
+    GupArrayShort new = gup_array_short_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_short_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayPtr gup_array_ptr_filter(GupArrayPtr xs, bool (*fn)(void*)) {
+    GupArrayPtr new = gup_array_ptr_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_ptr_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayString gup_array_string_filter(GupArrayString xs, bool (*fn)(GupArrayChar)) {
+    GupArrayString new = gup_array_string_create();
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_string_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
 
 #define GUP_DEFINE_ARRAY_FILTER_IN_PLACE(U, l, t) void gup_array_##l##_filter_in_place(GupArray##U *xs, bool (*fn)(t)) {\
     GupArray##U new = gup_array_##l##_filter(*xs, fn);                                                                  \

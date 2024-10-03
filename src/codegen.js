@@ -1,16 +1,14 @@
 function generate(uppercase, lowercase, type) {
-    console.log(`void gup_array_${lowercase}_prepend(GupArray${uppercase} *xs, ${type} x) {`);
-    console.log(`    if (xs->count == xs->capacity) {`);
-    console.log(`        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;`);
-    console.log(`        xs->data = realloc(xs->data, new_capacity * sizeof(${type}));`);
-    console.log(`        xs->capacity = new_capacity;`);
+    console.log(`GupArray${uppercase} gup_array_${lowercase}_filter(GupArray${uppercase} xs, bool (*fn)(${type})) {`);
+    console.log(`    GupArray${uppercase} new = gup_array_${lowercase}_create();`);
+    console.log(``);
+    console.log(`    for (int i = 0; i < xs.count; i++) {`);
+    console.log(`        if (fn(xs.data[i])) {`);
+    console.log(`            gup_array_${lowercase}_append(&new, xs.data[i]);`);
+    console.log(`        }`);
     console.log(`    }`);
     console.log(``);
-    console.log(`    for (int i = xs->count; i > 0; i--) {`);
-    console.log(`        xs->data[i] = xs->data[i-1];`);
-    console.log(`    }`);
-    console.log(`    xs->data[0] = x;`);
-    console.log(`    xs->count++;`);
+    console.log(`    return new;`);
     console.log(`}`);
     console.log('')
 }
