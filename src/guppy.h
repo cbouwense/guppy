@@ -691,8 +691,8 @@ GupArrayFloat gup_array_float_copy(GupArrayFloat xs) {
     return new;
 }
 
-GupArrayInt gup_array_int_copy(GupArrayInt, xs) {
-    GupArrayInt, new = {
+GupArrayInt gup_array_int_copy(GupArrayInt xs) {
+    GupArrayInt new = {
         .capacity = xs.capacity,
         .count = xs.count,
         .data = malloc(xs.capacity * sizeof(int)),
@@ -754,24 +754,25 @@ GupArrayString gup_array_string_copy(GupArrayString xs) {
 }
 
 // Equals
-#define GUP_DEFINE_ARRAY_EQ(U, l, t) bool gup_array_##l##_eq(GupArray##U xs, GupArray##U ys) {\
-    if (xs.count != ys.count) return false;                                                 \
-                                                                                            \
-    for (int i = 0; i < xs.count; i++) {                                                    \
-        if (xs.data[i] != ys.data[i]) return false;                                         \
-    }                                                                                       \
-                                                                                            \
-    return true;                                                                            \
-}                                                                                           \
+bool gup_array_bool_eq(GupArrayBool xs, GupArrayBool ys) {
+    if (xs.count != ys.count) return false;
 
-GUP_DEFINE_ARRAY_EQ(Bool, bool, bool)
-GUP_DEFINE_ARRAY_EQ(Char, char, char)
-GUP_DEFINE_ARRAY_EQ(Double, double, double)
-GUP_DEFINE_ARRAY_EQ(Float, float, float)
-GUP_DEFINE_ARRAY_EQ(Int, int, int)
-GUP_DEFINE_ARRAY_EQ(Long, long, long)
-GUP_DEFINE_ARRAY_EQ(Ptr, ptr, void*) // TODO: is shallow check ok?
-GUP_DEFINE_ARRAY_EQ(Short, short, short)
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_char_eq(GupArrayChar xs, GupArrayChar ys) {
+    if (xs.count != ys.count) return false;
+
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
+    }
+
+    return true;
+}
 
 #define gup_array_char_eq_cstr(xs, cstr) _gup_array_char_eq_cstr(xs, cstr, strlen(cstr))
 bool _gup_array_char_eq_cstr(GupArrayChar xs, const char *cstr, int cstr_length) {
@@ -780,12 +781,72 @@ bool _gup_array_char_eq_cstr(GupArrayChar xs, const char *cstr, int cstr_length)
     return strncmp(xs.data, cstr, xs.count) == 0;
 }
 
+bool gup_array_double_eq(GupArrayDouble xs, GupArrayDouble ys) {
+    if (xs.count != ys.count) return false;
+
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_float_eq(GupArrayFloat xs, GupArrayFloat ys) {
+    if (xs.count != ys.count) return false;
+
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_int_eq(GupArrayInt xs, GupArrayInt ys) {
+    if (xs.count != ys.count) return false;
+
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_long_eq(GupArrayLong xs, GupArrayLong ys) {
+    if (xs.count != ys.count) return false;
+
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_ptr_eq(GupArrayPtr xs, GupArrayPtr ys) {
+    if (xs.count != ys.count) return false;
+
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_short_eq(GupArrayShort xs, GupArrayShort ys) {
+    if (xs.count != ys.count) return false;
+
+    for (int i = 0; i < xs.count; i++) {
+        if (xs.data[i] != ys.data[i]) return false;
+    }
+
+    return true;
+}
+
 bool gup_array_string_eq(GupArrayString xs, GupArrayString ys) {
-    if (xs.count != ys.count) return false;                     
+    if (xs.count != ys.count) return false;
 
     for (int i = 0; i < xs.count; i++) {
         if (!gup_array_char_eq(xs.data[i], ys.data[i])) return false;
-    }                                                               
+    }
 
     return true;
 }
@@ -892,25 +953,93 @@ void _gup_array_string_print(GupArrayString xs, const char *xs_name) {
 }
 
 // Append
-#define GUP_DEFINE_ARRAY_APPEND(U, l, t) void gup_array_##l##_append(GupArray##U *xs, t x) {\
-    if (xs->count == xs->capacity) {                                                        \
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;                  \
-        xs->data = realloc(xs->data, new_capacity * sizeof(t));                             \
-        xs->capacity = new_capacity;                                                        \
-    }                                                                                       \
-                                                                                            \
-    xs->data[xs->count] = x;                                                                \
-    xs->count++;                                                                            \
-}                                                                                           \
+void gup_array_bool_append(GupArrayBool *xs, bool x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(bool));
+        xs->capacity = new_capacity;
+    }
 
-GUP_DEFINE_ARRAY_APPEND(Bool, bool, bool)
-GUP_DEFINE_ARRAY_APPEND(Char, char, char)
-GUP_DEFINE_ARRAY_APPEND(Double, double, double)
-GUP_DEFINE_ARRAY_APPEND(Float, float, float)
-GUP_DEFINE_ARRAY_APPEND(Int, int, int)
-GUP_DEFINE_ARRAY_APPEND(Long, long, long)
-GUP_DEFINE_ARRAY_APPEND(Ptr, ptr, void*)
-GUP_DEFINE_ARRAY_APPEND(Short, short, short)
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_char_append(GupArrayChar *xs, char x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(char));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_double_append(GupArrayDouble *xs, t double x{
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(double));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_float_append(GupArrayFloat *xs, float x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(float));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_int_append(GupArrayInt *xs, int x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(int));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_long_append(GupArrayLong *xs, long x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(long));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_ptr_append(GupArrayPtr *xs, void* x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(void*));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_short_append(GupArrayShort *xs, short x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(short));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
 
 void gup_array_string_append(GupArrayString *xs, GupArrayChar x) {
     if (xs->count == xs->capacity) {
