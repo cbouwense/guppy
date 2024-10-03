@@ -1,108 +1,72 @@
-GupArrayBool gup_array_bool_filter(GupArrayBool xs, bool (*fn)(bool)) {
-    GupArrayBool new = gup_array_bool_create();
-
+bool gup_array_reduce_bool(GupArrayBool xs, bool (*fn)(bool, bool), bool start) {
+    bool result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_bool_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 
-GupArrayChar gup_array_char_filter(GupArrayChar xs, bool (*fn)(char)) {
-    GupArrayChar new = gup_array_char_create();
-
+char gup_array_reduce_char(GupArrayChar xs, char (*fn)(char, char), char start) {
+    char result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_char_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 
-GupArrayDouble gup_array_double_filter(GupArrayDouble xs, bool (*fn)(double)) {
-    GupArrayDouble new = gup_array_double_create();
-
+double gup_array_reduce_double(GupArrayDouble xs, double (*fn)(double, double), double start) {
+    double result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_double_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 
-GupArrayFloat gup_array_float_filter(GupArrayFloat xs, bool (*fn)(float)) {
-    GupArrayFloat new = gup_array_float_create();
-
+float gup_array_reduce_float(GupArrayFloat xs, float (*fn)(float, float), float start) {
+    float result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_float_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 
-GupArrayInt gup_array_int_filter(GupArrayInt xs, bool (*fn)(int)) {
-    GupArrayInt new = gup_array_int_create();
-
+int gup_array_reduce_int(GupArrayInt xs, int (*fn)(int, int), int start) {
+    int result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_int_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 
-GupArrayLong gup_array_long_filter(GupArrayLong xs, bool (*fn)(long)) {
-    GupArrayLong new = gup_array_long_create();
-
+long gup_array_reduce_long(GupArrayLong xs, long (*fn)(long, long), long start) {
+    long result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_long_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 
-GupArrayShort gup_array_short_filter(GupArrayShort xs, bool (*fn)(short)) {
-    GupArrayShort new = gup_array_short_create();
-
+short gup_array_reduce_short(GupArrayShort xs, short (*fn)(short, short), short start) {
+    short result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_short_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 
-GupArrayPtr gup_array_ptr_filter(GupArrayPtr xs, bool (*fn)(void*)) {
-    GupArrayPtr new = gup_array_ptr_create();
-
+void* gup_array_reduce_ptr(GupArrayPtr xs, void* (*fn)(void*, void*), void* start) {
+    void* result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_ptr_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 
-GupArrayString gup_array_string_filter(GupArrayString xs, bool (*fn)(GupArrayChar)) {
-    GupArrayString new = gup_array_string_create();
-
+GupArrayChar gup_array_reduce_string(GupArrayString xs, GupArrayChar (*fn)(GupArrayChar, GupArrayChar), GupArrayChar start) {
+    GupArrayChar result = start;
     for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            gup_array_string_append(&new, xs.data[i]);
-        }
+        result = fn(result, xs.data[i]);
     }
-
-    return new;
+    return result;
 }
 

@@ -1,16 +1,12 @@
-function generate(uppercase, lowercase, type) {
-    console.log(`GupArray${uppercase} gup_array_${lowercase}_filter(GupArray${uppercase} xs, bool (*fn)(${type})) {`);
-    console.log(`    GupArray${uppercase} new = gup_array_${lowercase}_create();`);
-    console.log(``);
+function generate(u, l, t) {
+    console.log(`${t} gup_array_reduce_${l}(GupArray${u} xs, ${t} (*fn)(${t}, ${t}), ${t} start) {`);
+    console.log(`    ${t} result = start;`);
     console.log(`    for (int i = 0; i < xs.count; i++) {`);
-    console.log(`        if (fn(xs.data[i])) {`);
-    console.log(`            gup_array_${lowercase}_append(&new, xs.data[i]);`);
-    console.log(`        }`);
+    console.log(`        result = fn(result, xs.data[i]);`);
     console.log(`    }`);
-    console.log(``);
-    console.log(`    return new;`);
+    console.log(`    return result;`);
     console.log(`}`);
-    console.log('')
+    console.log(``);
 }
 
 generate('Bool', 'bool', 'bool');
