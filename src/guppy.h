@@ -70,7 +70,7 @@ typedef struct {
 typedef struct {
     int capacity;
     int count;
-    void **data;
+    void**data;
 } GupArrayPtr;
 
 typedef GupArrayPtr GupArena;
@@ -172,7 +172,7 @@ void           gup_array_long_filter_in_place(GupArrayLong *xs, bool (*fn)(long)
 long           gup_array_long_reduce(GupArrayLong xs, long (*fn)(long, long), long start);
 
 GupArrayPtr    gup_array_ptr_create();
-void           gup_array_short_destroy(GupArrayShort xs);
+void           gup_array_ptr_destroy(GupArrayPtr xs);
 GupArrayPtr    gup_array_ptr_from(void* xs[], const int size);
 GupArrayPtr    gup_array_ptr_copy(GupArrayPtr xs);
 bool           gup_array_ptr_eq(GupArrayPtr xs, GupArrayPtr ys);
@@ -279,22 +279,6 @@ bool           gup_sv_ends_with(GupStringView sv, GupStringView suffix);
 bool           gup_sv_is_empty(GupStringView sv);
 void           gup_sv_print(GupStringView sv);
 
-// XML ---------------------------------------------------------------------------------------------
-
-typedef struct {
-    GupStringView key;
-    GupStringView value;
-} GupXMLAttribute;
-
-typedef struct {
-    char        *name;       // XML tag name
-    char        *data;       // Text inside of the open and close tags
-    GupArrayPtr  attributes; // Dynamic array of attributes as key value pairs
-    GupArrayPtr  children;   // Dynamic array of children XML tags  
-} GupXMLTag;
-
-GupXMLTag gup_xml_parse(const char *xml);
-
 // C-string utilities ------------------------------------------------------------------------------
 char *gup_string_trim_double_quotes(const char *string);
 char *gup_string_trim_whitespace(const char *string);
@@ -320,7 +304,7 @@ GupArena gup_arena_create() {
     return (GupArena) {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
         .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void *)),
+        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void*)),
     };
 }
 
@@ -329,14 +313,14 @@ void gup_arena_destroy(GupArena a) {
     free(a.data);
 }
 
-void *gup_arena_alloc(GupArena *a, size_t bytes) {
+void*gup_arena_alloc(GupArena *a, size_t bytes) {
     if (a->count == a->capacity) {
         const int new_capacity = a->capacity == 0 ? 1 : a->capacity * 2;
-        a->data = realloc(a->data, new_capacity * sizeof(void *));
+        a->data = realloc(a->data, new_capacity * sizeof(void*));
         a->capacity = new_capacity;
     }
 
-    void *ptr = malloc(bytes);
+    void*ptr = malloc(bytes);
     assert(ptr != NULL);
 
     a->data[a->count] = ptr;
@@ -425,7 +409,7 @@ GupArrayPtr gup_array_ptr_create() {
     GupArrayPtr xs = {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
         .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void *)),
+        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void*)),
     };
     return xs;
 }
@@ -492,30 +476,112 @@ void gup_array_string_destroy(GupArrayString xs) {
 }
 
 // From constructors
-#define GUP_DEFINE_ARRAY_FROM(U, l, t) GupArray##U gup_array_##l##_from(t xs[], const int size) {\
-    GupArray##U new = gup_array_##l();                                                           \
-                                                                                                 \
-    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;        \
-    new.count = size;                                                                            \
-    new.data = realloc(new.data, new.capacity * sizeof(t));                                      \
-    for (int i = 0; i < size; i++) {                                                             \
-       new.data[i] = xs[i];                                                                      \
-    }                                                                                            \
-                                                                                                 \
-    return new;                                                                                  \
-}                                                                                                \
+GupArrayBool gup_array_bool_from(bool xs[], const int size) {
+    GupArrayBool new = gup_array_bool_create();
 
-GUP_DEFINE_ARRAY_FROM(Bool, bool, bool)
-GUP_DEFINE_ARRAY_FROM(Char, char, char)
-GUP_DEFINE_ARRAY_FROM(Double, double, double)
-GUP_DEFINE_ARRAY_FROM(Float, float, float)
-GUP_DEFINE_ARRAY_FROM(Int,  int, int)
-GUP_DEFINE_ARRAY_FROM(Long, long, long)
-GUP_DEFINE_ARRAY_FROM(Ptr, ptr, void*)
-GUP_DEFINE_ARRAY_FROM(Short, short, short)
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    new.count = size;
+    new.data = realloc(new.data, new.capacity * sizeof(bool));
+    for (int i = 0; i < size; i++) {
+       new.data[i] = xs[i];
+    }
+
+    return new;
+}
+
+GupArrayChar gup_array_char_from(char xs[], const int size) {
+    GupArrayChar new = gup_array_char_create();
+
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    new.count = size;
+    new.data = realloc(new.data, new.capacity * sizeof(char));
+    for (int i = 0; i < size; i++) {
+       new.data[i] = xs[i];
+    }
+
+    return new;
+}
+
+GupArrayDouble gup_array_double_from(double xs[], const int size) {
+    GupArrayDouble new = gup_array_double_create();
+
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    new.count = size;
+    new.data = realloc(new.data, new.capacity * sizeof(double));
+    for (int i = 0; i < size; i++) {
+       new.data[i] = xs[i];
+    }
+
+    return new;
+}
+
+GupArrayFloat gup_array_float_from(float xs[], const int size) {
+    GupArrayFloat new = gup_array_float_create();
+
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    new.count = size;
+    new.data = realloc(new.data, new.capacity * sizeof(float));
+    for (int i = 0; i < size; i++) {
+       new.data[i] = xs[i];
+    }
+
+    return new;
+}
+
+GupArrayInt gup_array_int_from(int xs[], const int size) {
+    GupArrayInt new = gup_array_int_create();
+
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    new.count = size;
+    new.data = realloc(new.data, new.capacity * sizeof(int));
+    for (int i = 0; i < size; i++) {
+       new.data[i] = xs[i];
+    }
+
+    return new;
+}
+
+GupArrayLong gup_array_long_from(long xs[], const int size) {
+    GupArrayLong new = gup_array_long_create();
+
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    new.count = size;
+    new.data = realloc(new.data, new.capacity * sizeof(long));
+    for (int i = 0; i < size; i++) {
+       new.data[i] = xs[i];
+    }
+
+    return new;
+}
+
+GupArrayPtr gup_array_ptr_from(void* xs[], const int size) {
+    GupArrayPtr new = gup_array_ptr_create();
+
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    new.count = size;
+    new.data = realloc(new.data, new.capacity * sizeof(void*));
+    for (int i = 0; i < size; i++) {
+       new.data[i] = xs[i];
+    }
+
+    return new;
+}
+
+GupArrayShort gup_array_short_from(short xs[], const int size) {
+    GupArrayShort new = gup_array_short_create();
+
+    new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    new.count = size;
+    new.data = realloc(new.data, new.capacity * sizeof(short));
+    for (int i = 0; i < size; i++) {
+       new.data[i] = xs[i];
+    }
+
+    return new;
+}
 
 GupArrayChar gup_array_char_from_cstr(char *cstr) {
-    GupArrayChar new = gup_array_char();
+    GupArrayChar new = gup_array_char_create();
     
     for (char *cstr_ptr = cstr; *cstr_ptr != '\0'; cstr_ptr++) {
         gup_array_char_append(&new, *cstr_ptr);
@@ -525,7 +591,7 @@ GupArrayChar gup_array_char_from_cstr(char *cstr) {
 }
 
 GupArrayString gup_array_string_from(GupArrayChar xs[], const int size) {
-    GupArrayString new = gup_array_string();
+    GupArrayString new = gup_array_string_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     new.count = size;
@@ -538,7 +604,7 @@ GupArrayString gup_array_string_from(GupArrayChar xs[], const int size) {
 }
 
 GupArrayString gup_array_string_from_cstrs(char **xs, const int size) {
-    GupArrayString new = gup_array_string();
+    GupArrayString new = gup_array_string_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     new.count = size;
@@ -601,7 +667,7 @@ GupArrayPtr gup_array_ptr_copy(GupArrayPtr xs) {
     GupArrayPtr new = {
         .capacity = xs.capacity,
         .count = 0,
-        .data = malloc(xs.capacity * sizeof(void *)),
+        .data = malloc(xs.capacity * sizeof(void*)),
     };
     for (int i = 0; i < xs.count; i++) {
         gup_array_ptr_append(&new, xs.data[i]);
@@ -855,7 +921,7 @@ GUP_DEFINE_ARRAY_MAP_IN_PLACE(Short, short, short)
 GUP_DEFINE_ARRAY_MAP_IN_PLACE(String, string, GupArrayChar)
 
 #define GUP_DEFINE_ARRAY_FILTER(U, l, t) GupArray##U gup_array_##l##_filter(GupArray##U xs, bool (*fn)(t)) {\
-    GupArray##U new = gup_array_##l();                                                                      \
+    GupArray##U new = gup_array_##l##_create();                                                                      \
                                                                                                             \
     for (int i = 0; i < xs.count; i++) {                                                                    \
         if (fn(xs.data[i])) {                                                                               \
@@ -924,7 +990,7 @@ static long long   _gup_bytes_allocated = 0;
 static GupArrayInt _gup_allocation_sites;
 
 void gup_memory_init(void) {
-    _gup_allocation_sites = gup_array_int();
+    _gup_allocation_sites = gup_array_int_create();
 }
 
 void gup_memory_print(void) {
@@ -940,7 +1006,7 @@ void gup_memory_print(void) {
     #endif // GUPPY_DEBUG_MEMORY
 }
 
-void _gup_free(void *ptr, const char *file_path, const int line_number) {
+void _gup_free(void*ptr, const char *file_path, const int line_number) {
     if (ptr == NULL) {
         printf("[%s:%d] ", file_path, line_number);
         printf("Tried to free a null pointer\n");
@@ -954,8 +1020,8 @@ void _gup_free(void *ptr, const char *file_path, const int line_number) {
     free(ptr);
 }
 
-void *_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
-    void *ptr = malloc(bytes);
+void*_gup_malloc(size_t bytes, const char *file_path, const int line_number) {
+    void*ptr = malloc(bytes);
 
     if (ptr == NULL) {
         printf("[%s:%d] ", file_path, line_number);
@@ -1213,7 +1279,7 @@ defer:
 }
 
 char **gup_file_read_lines_as_cstrs(const char *file_path) {
-    GupArrayString lines = gup_array_string();
+    GupArrayString lines = gup_array_string_create();
     char **result = NULL;
     char *line_buffer = NULL;
     size_t line_size = 0;
@@ -1253,7 +1319,7 @@ char **gup_file_read_lines_as_cstrs(const char *file_path) {
     gup_defer_return(gup_array_string_to_cstrs(lines));
 
 defer:
-    gup_array_string_free(lines);
+    gup_array_string_destroy(lines);
     free(line_buffer);
     if (fp) fclose(fp);
 
@@ -1299,7 +1365,7 @@ char **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path) {
     gup_defer_return(gup_array_string_to_cstrs(lines));
 
 defer:
-    gup_array_string_free(lines);
+    gup_array_string_destroy(lines);
     free(line_buffer);
     if (fp) fclose(fp);
 
@@ -1938,96 +2004,6 @@ char *gup_string_array_flatten(char **strings) {
 // I can't stand strcmp. Its API is exactly backwards as far as I'm concerned.
 char gup_cstr_eq(const char *a, const char *b) {
     return strcmp(a, b) == 0;
-}
-
-// XML ---------------------------------------------------------------------------------------------
-
-GupStringView _gup_xml_get_tag_name(const char *xml) {
-    GupStringView sv = gup_sv_from_cstr(xml);
-
-    // Remove the left bracket
-    sv = gup_sv_trim_char_left(&sv, '<');
-
-    // Remove the right bracket
-    sv = gup_sv_trim_char_right(&sv, '>');
-    
-    // Remove the trailing forward slash
-    sv = gup_sv_trim_char_right(&sv, '/');
-
-    // Trim the whitespace
-    sv = gup_sv_trim(sv);
-
-    gup_sv_print(sv);
-
-    return sv;
-}
-
-typedef enum {
-    _GUP_XML_PARSE_BEGIN = 0,
-    _GUP_XML_TAG_BEGIN = 1,
-    _GUP_XML_TAG_END = 2,
-} GupXMLParseState;
-
-GupXMLTag gup_xml_parse(const char *xml) {
-    GupXMLTag result = {0};
-    GupString tag = gup_array_char();
-    GupString data = gup_array_char();
-    GupXMLParseState parse_state = _GUP_XML_PARSE_BEGIN;
-
-    for (int i = 0; xml[i] != '\0'; i++) {
-        const char c = xml[i];
-    
-        // If cursor is on a letter (ASCII only currently).
-        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-            switch (parse_state) {
-                case _GUP_XML_TAG_BEGIN: {
-                    gup_array_char_append(&tag, c);
-                    break;
-                }
-                case _GUP_XML_TAG_END: {
-                    gup_array_char_append(&data, c);
-                    break;
-                }
-                default: {
-                    continue;
-                }
-            }
-        } else if (c == '<') {
-            switch (parse_state) {
-                case _GUP_XML_TAG_END: {
-                    result.data = gup_array_char_to_cstr(data);
-                    data.count = 0;
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-            parse_state = _GUP_XML_TAG_BEGIN;
-        } else if (c == '>') {
-            switch (parse_state) {
-                case _GUP_XML_PARSE_BEGIN: {
-                    // Really, this could probably be seen as some kind of parsing error.
-                    // Maybe at least a warning?
-                    continue;
-                }
-                case _GUP_XML_TAG_BEGIN: {
-                    result.name = gup_array_char_to_cstr(tag);
-                    tag.count = 0;
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-
-            parse_state = _GUP_XML_TAG_END;
-        }
-    }
-
-    gup_array_char_free(tag);
-    gup_array_char_free(data);
-    return result;
 }
 
 // Miscellaneous -----------------------------------------------------------------------------------

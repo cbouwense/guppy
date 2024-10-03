@@ -123,7 +123,7 @@ void test_gup_file_read_lines(void) {
         assert(lines.count == 1);
         assert(lines.data[0].count == 0);
 
-        gup_array_string_free(lines);
+        gup_array_string_destroy(lines);
     }
 
     { // foo.txt
@@ -135,7 +135,7 @@ void test_gup_file_read_lines(void) {
         assert(gup_array_char_eq_cstr(lines.data[2], "three three three"));
         assert(gup_array_char_eq_cstr(lines.data[3], ""));
 
-        gup_array_string_free(lines);
+        gup_array_string_destroy(lines);
     }
 
     { // settings.toml
@@ -151,7 +151,7 @@ void test_gup_file_read_lines(void) {
         assert(gup_array_char_eq_cstr(lines.data[6], "server = \"localhost\""));
         assert(gup_array_char_eq_cstr(lines.data[7], "port = 5432"));
 
-        gup_array_string_free(lines);
+        gup_array_string_destroy(lines);
     }
 }
 
@@ -168,7 +168,7 @@ void test_gup_file_read_lines_keep_newlines(void) {
         assert(lines.count == 1);
         assert(gup_array_char_eq_cstr(lines.data[0], "\n"));
 
-        gup_array_string_free(lines);
+        gup_array_string_destroy(lines);
     }
 
     { // foo.txt
@@ -180,7 +180,7 @@ void test_gup_file_read_lines_keep_newlines(void) {
         assert(gup_array_char_eq_cstr(lines.data[2], "three three three\n"));
         assert(gup_array_char_eq_cstr(lines.data[3], "\n"));
 
-        gup_array_string_free(lines);
+        gup_array_string_destroy(lines);
     }
 
     { // settings.toml
@@ -196,7 +196,7 @@ void test_gup_file_read_lines_keep_newlines(void) {
         assert(gup_array_char_eq_cstr(lines.data[6], "server = \"localhost\"\n"));
         assert(gup_array_char_eq_cstr(lines.data[7], "port = 5432\n"));
 
-        gup_array_string_free(lines);
+        gup_array_string_destroy(lines);
     }
 }
 
