@@ -88,7 +88,7 @@ void      gup_arena_free(GupArena a); // Free all the allocated memory, but not 
 // Dynamic arrays ----------------------------------------------------------------------------------
 GupArrayBool   gup_array_bool_create();
 void           gup_array_bool_destroy(GupArrayBool xs);
-GupArrayBool   gup_array_bool_from(bool xs[], const int size);
+GupArrayBool   gup_array_bool_create_from(bool xs[], const int size);
 GupArrayBool   gup_array_bool_copy(GupArrayBool xs);
 bool           gup_array_bool_eq(GupArrayBool xs, GupArrayBool ys);
 void           gup_array_bool_print(GupArrayBool xs);
@@ -102,7 +102,7 @@ bool           gup_array_bool_reduce(GupArrayBool xs, bool (*fn)(bool, bool), bo
    
 GupArrayChar   gup_array_char_create();
 void           gup_array_char_destroy(GupArrayChar xs);
-GupArrayChar   gup_array_char_from(char xs[], const int size);
+GupArrayChar   gup_array_char_create_from(char xs[], const int size);
 GupArrayChar   gup_array_char_copy(GupArrayChar xs);
 bool           gup_array_char_eq(GupArrayChar xs, GupArrayChar ys);
 bool           gup_array_char_eq_cstr(GupArrayChar xs, const char *cstr, int cstr_length);
@@ -117,7 +117,7 @@ char           gup_array_char_reduce(GupArrayChar xs, char (*fn)(char, char), ch
    
 GupArrayDouble gup_array_double_create();
 void           gup_array_double_destroy(GupArrayDouble xs);
-GupArrayDouble gup_array_double_from(double xs[], const int size);
+GupArrayDouble gup_array_double_create_from(double xs[], const int size);
 GupArrayDouble gup_array_double_copy(GupArrayDouble xs);
 bool           gup_array_double_eq(GupArrayDouble xs, GupArrayDouble ys);
 void           gup_array_double_print(GupArrayDouble xs);
@@ -131,7 +131,7 @@ double         gup_array_double_reduce(GupArrayDouble xs, double (*fn)(double, d
    
 GupArrayFloat  gup_array_float_create();
 void           gup_array_float_destroy(GupArrayFloat xs);
-GupArrayFloat  gup_array_float_from(float xs[], const int size);
+GupArrayFloat  gup_array_float_create_from(float xs[], const int size);
 GupArrayFloat  gup_array_float_copy(GupArrayFloat xs);
 bool           gup_array_float_eq(GupArrayFloat xs, GupArrayFloat ys);
 void           gup_array_float_print(GupArrayFloat xs);
@@ -145,7 +145,7 @@ float          gup_array_float_reduce(GupArrayFloat xs, float (*fn)(float, float
 
 GupArrayInt    gup_array_int_create();
 void           gup_array_int_destroy(GupArrayInt xs);
-GupArrayInt    gup_array_int_from(int xs[], const int size);
+GupArrayInt    gup_array_int_create_from(int xs[], const int size);
 GupArrayInt    gup_array_int_copy(GupArrayInt xs);
 bool           gup_array_int_eq(GupArrayInt xs, GupArrayInt ys);
 void           gup_array_int_print(GupArrayInt xs);
@@ -159,7 +159,7 @@ int            gup_array_int_reduce(GupArrayInt xs, int (*fn)(int, int), int sta
 
 GupArrayLong   gup_array_long_create();
 void           gup_array_short_destroy(GupArrayShort xs);
-GupArrayLong   gup_array_long_from(long xs[], const int size);
+GupArrayLong   gup_array_long_create_from(long xs[], const int size);
 GupArrayLong   gup_array_long_copy(GupArrayLong xs);
 bool           gup_array_long_eq(GupArrayLong xs, GupArrayLong ys);
 void           gup_array_long_print(GupArrayLong xs);
@@ -173,7 +173,7 @@ long           gup_array_long_reduce(GupArrayLong xs, long (*fn)(long, long), lo
 
 GupArrayPtr    gup_array_ptr_create();
 void           gup_array_ptr_destroy(GupArrayPtr xs);
-GupArrayPtr    gup_array_ptr_from(void* xs[], const int size);
+GupArrayPtr    gup_array_ptr_create_from(void* xs[], const int size);
 GupArrayPtr    gup_array_ptr_copy(GupArrayPtr xs);
 bool           gup_array_ptr_eq(GupArrayPtr xs, GupArrayPtr ys);
 void           gup_array_ptr_print(GupArrayPtr xs);
@@ -187,7 +187,7 @@ void*          gup_array_ptr_reduce(GupArrayPtr xs, void* (*fn)(void*, void*), v
 
 GupArrayShort  gup_array_short_create();
 void           gup_array_short_destroy(GupArrayShort xs);
-GupArrayShort  gup_array_short_from(short xs[], const int size);
+GupArrayShort  gup_array_short_create_from(short xs[], const int size);
 GupArrayShort  gup_array_short_copy(GupArrayShort xs);
 bool           gup_array_short_eq(GupArrayShort xs, GupArrayShort ys);
 void           gup_array_short_print(GupArrayShort xs);
@@ -201,7 +201,7 @@ short          gup_array_short_reduce(GupArrayShort xs, short (*fn)(short, short
 
 GupArrayString gup_array_string_create();
 void           gup_array_string_destroy(GupArrayString xs);
-GupArrayString gup_array_string_from(GupArrayChar xs[], const int size);
+GupArrayString gup_array_string_create_from(GupArrayChar xs[], const int size);
 GupArrayString gup_array_string_copy(GupArrayString xs);
 bool           gup_array_string_eq(GupArrayString xs, GupArrayString ys);
 void           gup_array_string_print(GupArrayString xs);
@@ -247,7 +247,7 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end);
 
 // Settings ----------------------------------------------------------------------------------------
 char *gup_settings_get(const char *key);
-char *gup_settings_get_from_file(const char *key, const char *file_path);
+char *gup_settings_get_create_from_file(const char *key, const char *file_path);
 int   gup_settings_get_int(const char *key);
 bool  gup_settings_set(const char *key, const char *value);
 bool  gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
@@ -255,8 +255,8 @@ bool  gup_settings_set_int(const char *key, int value);
 
 // String view -------------------------------------------------------------------------------------
 GupStringView  gup_sv();
-GupStringView  gup_sv_from_parts(const char *data, size_t count);
-GupStringView  gup_sv_from_cstr(const char *cstr);
+GupStringView  gup_sv_create_from_parts(const char *data, size_t count);
+GupStringView  gup_sv_create_from_cstr(const char *cstr);
 char          *gup_sv_to_cstr(GupStringView sv);
 GupStringView  gup_sv_trim_left(GupStringView sv);
 GupStringView  gup_sv_trim_right(GupStringView sv);
@@ -476,7 +476,7 @@ void gup_array_string_destroy(GupArrayString xs) {
 }
 
 // From constructors
-GupArrayBool gup_array_bool_from(bool xs[], const int size) {
+GupArrayBool gup_array_bool_create_from(bool xs[], const int size) {
     GupArrayBool new = gup_array_bool_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -489,7 +489,7 @@ GupArrayBool gup_array_bool_from(bool xs[], const int size) {
     return new;
 }
 
-GupArrayChar gup_array_char_from(char xs[], const int size) {
+GupArrayChar gup_array_char_create_from(char xs[], const int size) {
     GupArrayChar new = gup_array_char_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -502,7 +502,7 @@ GupArrayChar gup_array_char_from(char xs[], const int size) {
     return new;
 }
 
-GupArrayDouble gup_array_double_from(double xs[], const int size) {
+GupArrayDouble gup_array_double_create_from(double xs[], const int size) {
     GupArrayDouble new = gup_array_double_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -515,7 +515,7 @@ GupArrayDouble gup_array_double_from(double xs[], const int size) {
     return new;
 }
 
-GupArrayFloat gup_array_float_from(float xs[], const int size) {
+GupArrayFloat gup_array_float_create_from(float xs[], const int size) {
     GupArrayFloat new = gup_array_float_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -528,7 +528,7 @@ GupArrayFloat gup_array_float_from(float xs[], const int size) {
     return new;
 }
 
-GupArrayInt gup_array_int_from(int xs[], const int size) {
+GupArrayInt gup_array_int_create_from(int xs[], const int size) {
     GupArrayInt new = gup_array_int_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -541,7 +541,7 @@ GupArrayInt gup_array_int_from(int xs[], const int size) {
     return new;
 }
 
-GupArrayLong gup_array_long_from(long xs[], const int size) {
+GupArrayLong gup_array_long_create_from(long xs[], const int size) {
     GupArrayLong new = gup_array_long_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -554,7 +554,7 @@ GupArrayLong gup_array_long_from(long xs[], const int size) {
     return new;
 }
 
-GupArrayPtr gup_array_ptr_from(void* xs[], const int size) {
+GupArrayPtr gup_array_ptr_create_from(void* xs[], const int size) {
     GupArrayPtr new = gup_array_ptr_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -567,7 +567,7 @@ GupArrayPtr gup_array_ptr_from(void* xs[], const int size) {
     return new;
 }
 
-GupArrayShort gup_array_short_from(short xs[], const int size) {
+GupArrayShort gup_array_short_create_from(short xs[], const int size) {
     GupArrayShort new = gup_array_short_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -580,7 +580,7 @@ GupArrayShort gup_array_short_from(short xs[], const int size) {
     return new;
 }
 
-GupArrayChar gup_array_char_from_cstr(char *cstr) {
+GupArrayChar gup_array_char_create_from_cstr(char *cstr) {
     GupArrayChar new = gup_array_char_create();
     
     for (char *cstr_ptr = cstr; *cstr_ptr != '\0'; cstr_ptr++) {
@@ -590,7 +590,7 @@ GupArrayChar gup_array_char_from_cstr(char *cstr) {
     return new;
 }
 
-GupArrayString gup_array_string_from(GupArrayChar xs[], const int size) {
+GupArrayString gup_array_string_create_from(GupArrayChar xs[], const int size) {
     GupArrayString new = gup_array_string_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
@@ -603,14 +603,14 @@ GupArrayString gup_array_string_from(GupArrayChar xs[], const int size) {
     return new;
 }
 
-GupArrayString gup_array_string_from_cstrs(char **xs, const int size) {
+GupArrayString gup_array_string_create_from_cstrs(char **xs, const int size) {
     GupArrayString new = gup_array_string_create();
 
     new.capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     new.count = size;
     new.data = realloc(new.data, new.capacity * sizeof(char **));
     for (int i = 0; i < size; i++) {
-       new.data[i] = gup_array_char_from_cstr(xs[i]);
+       new.data[i] = gup_array_char_create_from_cstr(xs[i]);
     }
 
     return new;
@@ -643,25 +643,89 @@ char ** gup_array_string_to_cstrs(GupArrayString strs) {
 }
 
 // Copy constructors
-#define GUP_DEFINE_ARRAY_COPY(U, l, t) GupArray##U gup_array_##l##_copy(GupArray##U xs) {\
-    GupArray##U new = {                                                                \
-        .capacity = xs.capacity,                                                       \
-        .count = xs.count,                                                             \
-        .data = malloc(xs.capacity * sizeof(t)),                                       \
-                                                                                       \
-    };                                                                                 \
-    memcpy(new.data, xs.data, xs.count * sizeof(t));                                   \
-                                                                                       \
-    return new;                                                                        \
-}                                                                                      \
+GupArrayBool gup_array_bool_copy(GupArrayBool xs) {
+    GupArrayBool new = {
+        .capacity = xs.capacity,
+        .count = xs.count,
+        .data = malloc(xs.capacity * sizeof(bool)),
 
-GUP_DEFINE_ARRAY_COPY(Bool, bool, bool)
-GUP_DEFINE_ARRAY_COPY(Char, char, char)
-GUP_DEFINE_ARRAY_COPY(Double, double, double)
-GUP_DEFINE_ARRAY_COPY(Float, float, float)
-GUP_DEFINE_ARRAY_COPY(Int, int, int)
-GUP_DEFINE_ARRAY_COPY(Long, long, long)
-GUP_DEFINE_ARRAY_COPY(Short, short, short)
+    };
+    memcpy(new.data, xs.data, xs.count * sizeof(bool));
+
+    return new;
+}
+
+GupArrayChar gup_array_char_copy(GupArrayChar xs) {
+    GupArrayChar new = {
+        .capacity = xs.capacity,
+        .count = xs.count,
+        .data = malloc(xs.capacity * sizeof(char)),
+
+    };
+    memcpy(new.data, xs.data, xs.count * sizeof(char));
+
+    return new;
+}
+
+GupArrayDouble gup_array_double_copy(GupArrayDouble xs) {
+    GupArrayDouble new = {
+        .capacity = xs.capacity,
+        .count = xs.count,
+        .data = malloc(xs.capacity * sizeof(double)),
+
+    };
+    memcpy(new.data, xs.data, xs.count * sizeof(double));
+
+    return new;
+}
+
+GupArrayFloat gup_array_float_copy(GupArrayFloat xs) {
+    GupArrayFloat new = {
+        .capacity = xs.capacity,
+        .count = xs.count,
+        .data = malloc(xs.capacity * sizeof(float)),
+
+    };
+    memcpy(new.data, xs.data, xs.count * sizeof(float));
+
+    return new;
+}
+
+GupArrayInt gup_array_int_copy(GupArrayInt, xs) {
+    GupArrayInt, new = {
+        .capacity = xs.capacity,
+        .count = xs.count,
+        .data = malloc(xs.capacity * sizeof(int)),
+
+    };
+    memcpy(new.data, xs.data, xs.count * sizeof(int));
+
+    return new;
+}
+
+GupArrayLong gup_array_long_copy(GupArrayLong xs) {
+    GupArrayLong new = {
+        .capacity = xs.capacity,
+        .count = xs.count,
+        .data = malloc(xs.capacity * sizeof(long)),
+
+    };
+    memcpy(new.data, xs.data, xs.count * sizeof(long));
+
+    return new;
+}
+
+GupArrayShort gup_array_short_copy(GupArrayShort xs) {
+    GupArrayShort new = {
+        .capacity = xs.capacity,
+        .count = xs.count,
+        .data = malloc(xs.capacity * sizeof(short)),
+
+    };
+    memcpy(new.data, xs.data, xs.count * sizeof(short));
+
+    return new;
+}
 
 GupArrayPtr gup_array_ptr_copy(GupArrayPtr xs) {
     GupArrayPtr new = {
@@ -885,7 +949,7 @@ GUP_DEFINE_ARRAY_PREPEND(Ptr, ptr, void*)
 GUP_DEFINE_ARRAY_PREPEND(String, string, GupArrayChar)
 
 #define GUP_DEFINE_ARRAY_MAP(U, l, t) GupArray##U gup_array_##l##_map(GupArray##U xs, t (*fn)(t)) {\
-    GupArray##U new = gup_array_##l##_from(xs.data, xs.count);                                     \
+    GupArray##U new = gup_array_##l##_create_from(xs.data, xs.count);                                     \
                                                                                                  \
     for (int i = 0; i < xs.count; i++) {                                                         \
         new.data[i] = fn(xs.data[i]);                                                            \
@@ -946,7 +1010,7 @@ GUP_DEFINE_ARRAY_FILTER(String, string, GupArrayChar)
     GupArray##U new = gup_array_##l##_filter(*xs, fn);                                                                  \
                                                                                                                         \
     free(xs->data);                                                                                                     \
-    *xs = gup_array_##l##_from(new.data, new.count);                                                                    \
+    *xs = gup_array_##l##_create_from(new.data, new.count);                                                                    \
                                                                                                                         \
     free(new.data);                                                                                                     \
 }                                                                                                                       \
@@ -1186,7 +1250,7 @@ GupString gup_file_read(const char *file_path) {
     gup_assert((long)bytes_read == file_size, "Failed to read file");
 
     buffer[file_size] = '\0';
-    result = gup_array_char_from_cstr(buffer);
+    result = gup_array_char_create_from_cstr(buffer);
     gup_defer_return(result);
 
 defer:
@@ -1266,7 +1330,7 @@ GupArrayString gup_file_read_lines_keep_newlines(const char *file_path) {
 
         if (read == EOF) break;
 
-        GupArrayChar line = gup_array_char_from_cstr(line_buffer);
+        GupArrayChar line = gup_array_char_create_from_cstr(line_buffer);
         gup_array_string_append(&result, line);
         free(line.data);
     }
@@ -1311,7 +1375,7 @@ char **gup_file_read_lines_as_cstrs(const char *file_path) {
 
         // In normal gup_read_file_lines we don't want to keep newlines.
         line_buffer[read-1] = '\0';
-        GupArrayChar line = gup_array_char_from_cstr(line_buffer);
+        GupArrayChar line = gup_array_char_create_from_cstr(line_buffer);
         gup_array_string_append(&lines, line);
         free(line.data);
     }
@@ -1357,7 +1421,7 @@ char **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path) {
             gup_defer_return(gup_array_string_to_cstrs(lines));
         }
 
-        GupArrayChar line = gup_array_char_from_cstr(line_buffer);
+        GupArrayChar line = gup_array_char_create_from_cstr(line_buffer);
         gup_array_string_append(&lines, line);
         free(line.data);
     }
@@ -1515,10 +1579,10 @@ bool _gup_does_setting_file_line_contain_key(GupStringView line, GupStringView k
 bool _gup_char_is_doublequote(char x) { return x == '"'; }
 
 char *gup_settings_get(const char *key) {
-    return gup_settings_get_from_file(key, GUP_DEFAULT_SETTINGS_FILE_PATH);
+    return gup_settings_get_create_from_file(key, GUP_DEFAULT_SETTINGS_FILE_PATH);
 }
 
-char *gup_settings_get_from_file(const char *key, const char *file_path) {
+char *gup_settings_get_create_from_file(const char *key, const char *file_path) {
     char *result = NULL;
     
     int line_count = gup_file_line_count(file_path);
@@ -1530,8 +1594,8 @@ char *gup_settings_get_from_file(const char *key, const char *file_path) {
 
     for (int i = 0; i < line_count; i++) {
         const char* line = settings_lines[i];
-        if (_gup_does_setting_file_line_contain_key(gup_sv_from_cstr(line), gup_sv_from_cstr(key))) {
-            GupStringView line = gup_sv_from_cstr(settings_lines[i]);
+        if (_gup_does_setting_file_line_contain_key(gup_sv_create_from_cstr(line), gup_sv_create_from_cstr(key))) {
+            GupStringView line = gup_sv_create_from_cstr(settings_lines[i]);
 
             gup_sv_chop_by_delim(&line, '='); // Chop off the key.
 
@@ -1593,7 +1657,7 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
     const int line_count = gup_file_line_count(file_path);
     for (int i = 0; i < line_count; i++) {
         // Find the line with the key.
-        GupStringView line = gup_sv_from_cstr(settings_lines[i]);
+        GupStringView line = gup_sv_create_from_cstr(settings_lines[i]);
 
         if (gup_sv_index_of(line, '#') != -1) continue; // Skip comments.
         if (gup_sv_index_of(line, '[') != -1) continue; // Skip section headers.
@@ -1603,7 +1667,7 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
         if (!line_has_an_equals_sign) continue; // Skip lines without an equals sign.
         
         line_key = gup_sv_trim(line_key);
-        if (!gup_sv_eq(line_key, gup_sv_trim(gup_sv_from_cstr(key)))) continue; // Skip lines that don't match the key.
+        if (!gup_sv_eq(line_key, gup_sv_trim(gup_sv_create_from_cstr(key)))) continue; // Skip lines that don't match the key.
 
         // Replace the line with the key with the new value
         // TODO: this is horrendous
@@ -1662,8 +1726,8 @@ defer:
  * He uses the MIT license, so it's all good. Check out his repo here: https://github.com/tsoding/sv
  */
 
-#define SV(cstr_lit) gup_sv_from_parts(cstr_lit, sizeof(cstr_lit) - 1)
-#define SV_NULL gup_sv_from_parts(NULL, 0)
+#define SV(cstr_lit) gup_sv_create_from_parts(cstr_lit, sizeof(cstr_lit) - 1)
+#define SV_NULL gup_sv_create_from_parts(NULL, 0)
 
 // printf macros for String_View
 #define SV_Fmt "%.*s"
@@ -1681,17 +1745,17 @@ GupStringView gup_sv() {
     return sv;
 }
 
-GupStringView gup_sv_from_parts(const char *data, size_t count) {
+GupStringView gup_sv_create_from_parts(const char *data, size_t count) {
     GupStringView sv;
     sv.length = count;
     sv.data = data;
     return sv;
 }
 
-GupStringView gup_sv_from_cstr(const char *cstr) {
+GupStringView gup_sv_create_from_cstr(const char *cstr) {
     if (cstr == NULL) return gup_sv();
     
-    return gup_sv_from_parts(cstr, strlen(cstr));
+    return gup_sv_create_from_parts(cstr, strlen(cstr));
 }
 
 char *gup_sv_to_cstr(GupStringView sv) {
@@ -1707,7 +1771,7 @@ GupStringView gup_sv_trim_left(GupStringView sv) {
         i += 1;
     }
 
-    return gup_sv_from_parts(sv.data + i, sv.length - i);
+    return gup_sv_create_from_parts(sv.data + i, sv.length - i);
 }
 
 GupStringView gup_sv_trim_right(GupStringView sv) {
@@ -1716,7 +1780,7 @@ GupStringView gup_sv_trim_right(GupStringView sv) {
         i += 1;
     }
 
-    return gup_sv_from_parts(sv.data, sv.length - i);
+    return gup_sv_create_from_parts(sv.data, sv.length - i);
 }
 
 GupStringView gup_sv_trim(GupStringView sv) {
@@ -1757,7 +1821,7 @@ GupStringView gup_sv_chop_left(GupStringView *sv, size_t n) {
         n = sv->length;
     }
 
-    GupStringView result = gup_sv_from_parts(sv->data, n);
+    GupStringView result = gup_sv_create_from_parts(sv->data, n);
 
     sv->data  += n;
     sv->length -= n;
@@ -1770,7 +1834,7 @@ GupStringView gup_sv_chop_right(GupStringView *sv, size_t n) {
         n = sv->length;
     }
 
-    GupStringView result = gup_sv_from_parts(sv->data + sv->length - n, n);
+    GupStringView result = gup_sv_create_from_parts(sv->data + sv->length - n, n);
 
     sv->length -= n;
 
@@ -1792,7 +1856,7 @@ bool gup_sv_try_chop_by_delim(GupStringView *sv, char delim, GupStringView *chun
         i += 1;
     }
 
-    GupStringView result = gup_sv_from_parts(sv->data, i);
+    GupStringView result = gup_sv_create_from_parts(sv->data, i);
 
     if (i < sv->length) {
         sv->length -= i + 1;
@@ -1812,7 +1876,7 @@ GupStringView gup_sv_chop_by_delim(GupStringView *sv, char delim) {
         i += 1;
     }
 
-    GupStringView result = gup_sv_from_parts(sv->data, i);
+    GupStringView result = gup_sv_create_from_parts(sv->data, i);
 
     if (i < sv->length) {
         sv->length -= i + 1;
@@ -1826,14 +1890,14 @@ GupStringView gup_sv_chop_by_delim(GupStringView *sv, char delim) {
 }
 
 GupStringView gup_sv_chop_by_sv(GupStringView *sv, GupStringView thicc_delim) {
-    GupStringView window = gup_sv_from_parts(sv->data, thicc_delim.length);
+    GupStringView window = gup_sv_create_from_parts(sv->data, thicc_delim.length);
     size_t i = 0;
     while (i + thicc_delim.length < sv->length && !(gup_sv_eq(window, thicc_delim))) {
         i++;
         window.data++;
     }
 
-    GupStringView result = gup_sv_from_parts(sv->data, i);
+    GupStringView result = gup_sv_create_from_parts(sv->data, i);
 
     if (i + thicc_delim.length == sv->length) {
         // include last <thicc_delim.length> characters if they aren't
@@ -1850,7 +1914,7 @@ GupStringView gup_sv_chop_by_sv(GupStringView *sv, GupStringView thicc_delim) {
 
 bool gup_sv_starts_with(GupStringView sv, GupStringView expected_prefix) {
     if (expected_prefix.length <= sv.length) {
-        GupStringView actual_prefix = gup_sv_from_parts(sv.data, expected_prefix.length);
+        GupStringView actual_prefix = gup_sv_create_from_parts(sv.data, expected_prefix.length);
         return gup_sv_eq(expected_prefix, actual_prefix);
     }
 
@@ -1859,7 +1923,7 @@ bool gup_sv_starts_with(GupStringView sv, GupStringView expected_prefix) {
 
 bool gup_sv_ends_with(GupStringView sv, GupStringView expected_suffix) {
     if (expected_suffix.length <= sv.length) {
-        GupStringView actual_suffix = gup_sv_from_parts(sv.data + sv.length - expected_suffix.length, expected_suffix.length);
+        GupStringView actual_suffix = gup_sv_create_from_parts(sv.data + sv.length - expected_suffix.length, expected_suffix.length);
         return gup_sv_eq(expected_suffix, actual_suffix);
     }
 
@@ -1909,7 +1973,7 @@ bool gup_sv_eq_ignorecase(GupStringView a, GupStringView b) {
 bool gup_sv_eq_cstr(GupStringView sv, const char *cstr) {
     if (cstr == NULL) return false;
 
-    return gup_sv_eq(sv, gup_sv_from_cstr(cstr));
+    return gup_sv_eq(sv, gup_sv_create_from_cstr(cstr));
 }
 
 GupStringView gup_sv_take_left_while(GupStringView sv, bool (*predicate)(char x)) {
@@ -1917,7 +1981,7 @@ GupStringView gup_sv_take_left_while(GupStringView sv, bool (*predicate)(char x)
     while (i < sv.length && predicate(sv.data[i])) {
         i += 1;
     }
-    return gup_sv_from_parts(sv.data, i);
+    return gup_sv_create_from_parts(sv.data, i);
 }
 
 // C-string utilities ------------------------------------------------------------------------------

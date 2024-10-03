@@ -62,12 +62,12 @@ void test_gup_settings_get(void) {
     free(server);
 }
 
-void test_gup_settings_get_from_file(void) {
+void test_gup_settings_get_create_from_file(void) {
     const char *filename = "./resources/settings.toml";
-    char *title          = gup_settings_get_from_file("title", filename);
-    char *author         = gup_settings_get_from_file("author", filename);
-    char *server         = gup_settings_get_from_file("server", filename);
-    char *does_not_exist = gup_settings_get_from_file("does_not_exist", filename);
+    char *title          = gup_settings_get_create_from_file("title", filename);
+    char *author         = gup_settings_get_create_from_file("author", filename);
+    char *server         = gup_settings_get_create_from_file("server", filename);
+    char *does_not_exist = gup_settings_get_create_from_file("does_not_exist", filename);
 
     assert(gup_cstr_eq(title, "guppy.h"));
     assert(gup_cstr_eq(author, "Christian Bouwense"));
@@ -108,6 +108,6 @@ void test_gup_settings_set(void) {
 void test_gup_settings(void) {
     test_gup_does_setting_file_line_contain_key();
     test_gup_settings_get();
-    test_gup_settings_get_from_file();
+    test_gup_settings_get_create_from_file();
     test_gup_settings_set();
 }
