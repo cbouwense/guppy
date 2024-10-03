@@ -975,7 +975,7 @@ void gup_array_char_append(GupArrayChar *xs, char x) {
     xs->count++;
 }
 
-void gup_array_double_append(GupArrayDouble *xs, t double x{
+void gup_array_double_append(GupArrayDouble *xs, double x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(double));
@@ -1053,29 +1053,131 @@ void gup_array_string_append(GupArrayString *xs, GupArrayChar x) {
 }
 
 // Prepend
-#define GUP_DEFINE_ARRAY_PREPEND(U, l, t) void gup_array_##l##_prepend(GupArray##U *xs, t x) {\
-    if (xs->count == xs->capacity) {                                                        \
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;                  \
-        xs->data = realloc(xs->data, new_capacity * sizeof(t));                             \
-        xs->capacity = new_capacity;                                                        \
-    }                                                                                       \
-                                                                                            \
-    for (int i = xs->count; i > 0; i--) {                                                   \
-        xs->data[i] = xs->data[i-1];                                                        \
-    }                                                                                       \
-    xs->data[0] = x;                                                                        \
-    xs->count++;                                                                            \
-}                                                                                           \
+void gup_array_bool_prepend(GupArrayBool *xs, bool x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(bool));
+        xs->capacity = new_capacity;
+    }
 
-GUP_DEFINE_ARRAY_PREPEND(Bool, bool, bool)
-GUP_DEFINE_ARRAY_PREPEND(Char, char, char)
-GUP_DEFINE_ARRAY_PREPEND(Double, double, double)
-GUP_DEFINE_ARRAY_PREPEND(Float, float, float)
-GUP_DEFINE_ARRAY_PREPEND(Int, int, int)
-GUP_DEFINE_ARRAY_PREPEND(Long, long, long)
-GUP_DEFINE_ARRAY_PREPEND(Short, short, short)
-GUP_DEFINE_ARRAY_PREPEND(Ptr, ptr, void*)
-GUP_DEFINE_ARRAY_PREPEND(String, string, GupArrayChar)
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_char_prepend(GupArrayChar *xs, char x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(char));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_double_prepend(GupArrayDouble *xs, double x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(double));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_float_prepend(GupArrayFloat *xs, float x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(float));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_int_prepend(GupArrayInt *xs, int x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(int));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_long_prepend(GupArrayLong *xs, long x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(long));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_short_prepend(GupArrayShort *xs, short x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(short));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_ptr_prepend(GupArrayPtr *xs, void* x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(void*));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_string_prepend(GupArrayString *xs, GupArrayChar x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = realloc(xs->data, new_capacity * sizeof(GupArrayChar));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
 
 #define GUP_DEFINE_ARRAY_MAP(U, l, t) GupArray##U gup_array_##l##_map(GupArray##U xs, t (*fn)(t)) {\
     GupArray##U new = gup_array_##l##_create_from(xs.data, xs.count);                                     \
