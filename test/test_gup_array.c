@@ -45,7 +45,7 @@ void test_new_gup_array_has_zero_count(void) {
 }
 
 void test_new_gup_array_has_non_null_data(void) {
-    GupArrayBool xs = gup_array_bool();
+    GupArrayBool xs = gup_array_bool_create();
 
     assert(xs.data != NULL);
 
@@ -140,7 +140,7 @@ void test_one_append_one_prepend_orders_correctly(void) {
 }
 
 void test_map_on_empty_produces_empty(void) {
-    GupArrayBool xs = gup_array_bool();
+    GupArrayBool xs = gup_array_bool_create();
 
     GupArrayBool ys = gup_array_bool_map(xs, negate);
 
