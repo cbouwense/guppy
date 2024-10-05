@@ -1,6 +1,7 @@
-bool gup_array_bool_contains(GupArrayBool xs, bool x) {
+bool gup_array_bool_find(GupArrayBool xs, bool (*fn)(bool), bool *out) {
     for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
             return true;
         }
     }
@@ -8,9 +9,10 @@ bool gup_array_bool_contains(GupArrayBool xs, bool x) {
     return false;
 }
 
-bool gup_array_char_contains(GupArrayChar xs, char x) {
+bool gup_array_char_find(GupArrayChar xs, bool (*fn)(char), char *out) {
     for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
             return true;
         }
     }
@@ -18,9 +20,10 @@ bool gup_array_char_contains(GupArrayChar xs, char x) {
     return false;
 }
 
-bool gup_array_double_contains(GupArrayDouble xs, double x) {
+bool gup_array_double_find(GupArrayDouble xs, bool (*fn)(double), double *out) {
     for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
             return true;
         }
     }
@@ -28,9 +31,10 @@ bool gup_array_double_contains(GupArrayDouble xs, double x) {
     return false;
 }
 
-bool gup_array_float_contains(GupArrayFloat xs, float x) {
+bool gup_array_float_find(GupArrayFloat xs, bool (*fn)(float), float *out) {
     for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
             return true;
         }
     }
@@ -38,9 +42,10 @@ bool gup_array_float_contains(GupArrayFloat xs, float x) {
     return false;
 }
 
-bool gup_array_int_contains(GupArrayInt xs, int x) {
+bool gup_array_int_find(GupArrayInt xs, bool (*fn)(int), int *out) {
     for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
             return true;
         }
     }
@@ -48,9 +53,10 @@ bool gup_array_int_contains(GupArrayInt xs, int x) {
     return false;
 }
 
-bool gup_array_long_contains(GupArrayLong xs, long x) {
+bool gup_array_long_find(GupArrayLong xs, bool (*fn)(long), long *out) {
     for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
             return true;
         }
     }
@@ -58,9 +64,10 @@ bool gup_array_long_contains(GupArrayLong xs, long x) {
     return false;
 }
 
-bool gup_array_ptr_contains(GupArrayPtr xs, void* x) {
+bool gup_array_ptr_find(GupArrayPtr xs, bool (*fn)(void*), void* *out) {
     for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
             return true;
         }
     }
@@ -68,9 +75,21 @@ bool gup_array_ptr_contains(GupArrayPtr xs, void* x) {
     return false;
 }
 
-bool gup_array_short_contains(GupArrayShort xs, short x) {
+bool gup_array_short_find(GupArrayShort xs, bool (*fn)(short), short *out) {
     for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArrayChar *out) {
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            *out = xs.data[i];
             return true;
         }
     }

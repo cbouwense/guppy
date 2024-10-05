@@ -404,33 +404,186 @@ void test_gup_array_contains(void) {
     }
 
     { // Can find appended items
-        GupArrayShort ss = gup_array_short_create();
-        gup_array_short_append(&ss, 1);
-        gup_array_short_append(&ss, 7);
-        gup_array_short_append(&ss, 38);
+        GupArrayShort shorts = gup_array_short_create();
+        gup_array_short_append(&shorts, 1);
+        gup_array_short_append(&shorts, 7);
+        gup_array_short_append(&shorts, 38);
 
-        assert(gup_array_short_contains(ss, 0) == false);
-        assert(gup_array_short_contains(ss, 1) == true);
-        assert(gup_array_short_contains(ss, 2) == false);
-        assert(gup_array_short_contains(ss, 7) == true);
-        assert(gup_array_short_contains(ss, 37) == false);
-        assert(gup_array_short_contains(ss, 38) == true);
+        assert(gup_array_short_contains(shorts, 0) == false);
+        assert(gup_array_short_contains(shorts, 1) == true);
+        assert(gup_array_short_contains(shorts, 2) == false);
+        assert(gup_array_short_contains(shorts, 7) == true);
+        assert(gup_array_short_contains(shorts, 37) == false);
+        assert(gup_array_short_contains(shorts, 38) == true);
 
-        gup_array_short_destroy(ss);
+        gup_array_short_destroy(shorts);
     }
 
-    { // Can find appended items
-        float floats[3] = {0.0f, 13.37f, FLT_MAX};
-        GupArrayFloat fs = gup_array_float_create_from(floats, gup_array_len(floats));
+    { // Can find regular array items
+        float float_array[3] = {0.0f, 13.37f, FLT_MAX};
+        GupArrayFloat floats = gup_array_float_create_from(float_array, 3);
 
-        gup_assert(gup_array_float_contains(fs, 0.1f) == false);
-        gup_assert(gup_array_float_contains(fs, 0.0f) == true);
-        gup_assert(gup_array_float_contains(fs, 13.377f) == false);
-        gup_assert(gup_array_float_contains(fs, 13.37f) == true);
-        gup_assert(gup_array_float_contains(fs, FLT_MIN) == true);
-        gup_assert(gup_array_float_contains(fs, FLT_MAX) == true);
+        gup_assert(gup_array_float_contains(floats, 0.1f) == false);
+        gup_assert(gup_array_float_contains(floats, 0.0f) == true);
+        gup_assert(gup_array_float_contains(floats, 13.377f) == false);
+        gup_assert(gup_array_float_contains(floats, 13.37f) == true);
+        gup_assert(gup_array_float_contains(floats, FLT_MIN) == false);
+        gup_assert(gup_array_float_contains(floats, FLT_MAX) == true);
 
-        gup_array_float_destroy(fs);
+        gup_array_float_destroy(floats);
+    }
+
+    int int_array[2] = {17, 38};
+    GupArrayInt ints = gup_array_int_create_from(int_array, 2);
+    
+    gup_assert(gup_array_int_contains(ints, 1337) == false);
+    gup_assert(gup_array_int_contains(ints, 17) == true);
+    gup_assert(gup_array_int_contains(ints, 38) == true);
+    gup_assert(gup_array_int_contains(ints, 42) == false);
+
+    gup_array_int_prepend(&ints, 1337);
+    gup_array_int_append(&ints, 42);
+
+    gup_assert(gup_array_int_contains(ints, 1337) == true);
+    gup_assert(gup_array_int_contains(ints, 17) == true);
+    gup_assert(gup_array_int_contains(ints, 38) == true);
+    gup_assert(gup_array_int_contains(ints, 42) == true);
+
+    gup_array_int_destroy(ints);
+}
+
+bool is_undercase(char c) {
+    return c >= 97 && c <= 122;
+}
+
+bool is_the_answer(double d) {
+    return d == 42.0;
+}
+
+bool is_a_floating_answer(float f) {
+    return ( 
+        f == 0.42f ||
+        f == 4.2f ||
+        f == 42
+    );
+}
+
+bool is_not_a_floating_answer(float f) {
+    return !is_a_floating_answer(f);
+}
+
+void test_gup_array_find(void) {
+    { // Empty arrays don't find anything
+        GupArrayChar chars = gup_array_char_create();
+        char found = '\0';
+
+        bool result = gup_array_char_find(chars, is_undercase, &found);
+
+        gup_assert(result == false);
+        gup_assert(found == '\0');
+
+        gup_array_char_destroy(chars);
+    }
+
+    { // Arrays without elements but not the needle don't find it
+        GupArrayDouble doubles = gup_array_double_create();
+        double found = 0.0;
+
+        gup_array_double_append(&doubles, 13.37);
+        gup_array_double_append(&doubles, 17.38);
+        
+        bool result = gup_array_double_find(doubles, is_the_answer, &found);
+
+        gup_assert(result == false);
+        gup_assert(found == 0.0);
+
+        gup_array_double_destroy(doubles);
+    }
+
+    GupArrayFloat floats = gup_array_float_create();
+    float found = 0.0;
+
+    gup_array_float_append(&floats, 13.37f);
+    gup_array_float_append(&floats, 4.2f);
+    gup_array_float_append(&floats, 17.38f);
+    gup_array_float_append(&floats, 42);
+    
+    bool result = gup_array_float_find(floats, is_a_floating_answer, &found);
+
+    gup_assert(result == true);
+    gup_assert(found == 4.2f);
+
+    gup_array_float_prepend(&floats, 0.42f);
+    result = gup_array_float_find(floats, is_a_floating_answer, &found);
+
+    gup_assert(result == true);
+    gup_assert(found == 0.42f);
+
+
+    gup_array_float_filter_in_place(&floats, is_not_a_floating_answer);
+    result = gup_array_float_find(floats, is_a_floating_answer, &found);
+
+    gup_assert(result == false);
+    gup_assert(found == 0.42f); // the value of found will be unchanged from the previous successful find.
+
+    gup_array_float_destroy(floats);
+}
+
+bool is_all_undercase(GupString str) {
+    for (int i = 0; i < str.count; i++) {
+        if (!is_undercase(str.data[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void test_gup_array_string_find(void) {
+    { // Empty arrays don't find anything
+        GupArrayString strings = gup_array_string_create();
+        GupString found = {0};
+
+        bool result = gup_array_string_find(strings, is_all_undercase, &found);
+
+        gup_assert(result == false);
+        gup_assert(found.count == 0);
+
+        gup_array_string_destroy(strings);
+    }
+
+    { // Arrays without acceptable elements do not produce any find
+        char *string_arr[3] = {"Hello", "World", "!"};
+        GupArrayString strings = gup_array_string_create_from_cstrs(string_arr, 3);
+        GupString found = {0};
+
+        bool result = gup_array_string_find(strings, is_all_undercase, &found);
+
+        gup_assert(result == false);
+        gup_assert(found.count == 0);
+
+        gup_array_string_destroy(strings);
+    }
+
+    { // Arrays with acceptable elements produce the first one
+        char *string_arr[3] = {"Hello", "world", "!"};
+        GupArrayString strings = gup_array_string_create_from_cstrs(string_arr, 3);
+        GupString found = {0};
+
+        bool result = gup_array_string_find(strings, is_all_undercase, &found);
+
+        gup_assert(result == true);
+        gup_assert(gup_array_char_eq_cstr(found, "world"));
+
+        gup_array_char_destroy(found);
+
+        gup_array_string_prepend_cstr(&strings, "foo");
+        result = gup_array_string_find(strings, is_all_undercase, &found);
+
+        gup_assert(result == true);
+        gup_assert(gup_array_char_eq_cstr(found, "foo"));
+
+        gup_array_char_destroy(found);
+        gup_array_string_destroy(strings);
     }
 }
 
@@ -468,8 +621,9 @@ void test_gup_array(void) {
     test_gup_array_string_copy();
     test_gup_array_string_append();
     
-    // Contains
     test_gup_array_contains();
+    test_gup_array_find();
+    test_gup_array_string_find();
 
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");
