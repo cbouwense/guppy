@@ -64,7 +64,7 @@ void test_two_empty_gup_arrays_are_equal(void) {
 
 void test_one_empty_one_populated_are_unequal(void) {
     GupArrayChar xs = gup_array_char_create();
-    GupArrayChar ys = gup_array_char_create_from(static_cs, gup_array_size(static_cs));
+    GupArrayChar ys = gup_array_char_create_from(static_cs, gup_array_len(static_cs));
 
     assert(gup_array_char_eq(xs, ys) == false);
     
@@ -74,7 +74,7 @@ void test_one_empty_one_populated_are_unequal(void) {
 
 void test_gup_array_copy_equals_original(void) {
     int static_ints[] = {1, 7, 3, 8};
-    GupArrayInt dyn_ints = gup_array_int_create_from(static_ints, gup_array_size(static_ints));
+    GupArrayInt dyn_ints = gup_array_int_create_from(static_ints, gup_array_len(static_ints));
 
     GupArrayInt dyn_ints_copy = gup_array_int_copy(dyn_ints);
 
@@ -93,7 +93,7 @@ void test_a_gup_array_is_equal_to_itself(void) {
 }
 
 void test_equivalent_gup_arrays_are_equal(void) {
-    GupArrayDouble xs = gup_array_double_create_from(static_ds, gup_array_size(static_ds));
+    GupArrayDouble xs = gup_array_double_create_from(static_ds, gup_array_len(static_ds));
     GupArrayDouble ys = gup_array_double_create();
     gup_array_double_append(&ys, static_ds[0]);
     gup_array_double_append(&ys, static_ds[1]);
@@ -106,8 +106,8 @@ void test_equivalent_gup_arrays_are_equal(void) {
 }
 
 void test_symmetric_gup_array_args_are_equal(void) {
-    GupArrayBool xs = gup_array_bool_create_from(static_bs, gup_array_size(static_bs));
-    GupArrayBool ys = gup_array_bool_create_from(static_bs, gup_array_size(static_bs));
+    GupArrayBool xs = gup_array_bool_create_from(static_bs, gup_array_len(static_bs));
+    GupArrayBool ys = gup_array_bool_create_from(static_bs, gup_array_len(static_bs));
 
     assert(gup_array_bool_eq(xs, ys) == true);
     assert(gup_array_bool_eq(ys, xs) == true);
@@ -117,8 +117,8 @@ void test_symmetric_gup_array_args_are_equal(void) {
 }
 
 void test_equivalent_but_differently_sized_gup_arrays_are_unequal(void) {
-    GupArrayChar xs = gup_array_char_create_from(static_cs, gup_array_size(static_cs));
-    GupArrayChar ys = gup_array_char_create_from(static_cs, gup_array_size(static_cs));
+    GupArrayChar xs = gup_array_char_create_from(static_cs, gup_array_len(static_cs));
+    GupArrayChar ys = gup_array_char_create_from(static_cs, gup_array_len(static_cs));
     gup_array_char_append(&ys, false);
 
     assert(gup_array_char_eq(xs, ys) == false);
@@ -153,7 +153,7 @@ void test_map_on_empty_produces_empty(void) {
 
 void test_map(void) {
     bool static_bools[] = {true, true, false};
-    GupArrayBool xs = gup_array_bool_create_from(static_bools, gup_array_size(static_bools));
+    GupArrayBool xs = gup_array_bool_create_from(static_bools, gup_array_len(static_bools));
 
     GupArrayBool ys = gup_array_bool_map(xs, negate);
 
@@ -167,7 +167,7 @@ void test_map(void) {
 
 void test_map_in_place(void) {
     char static_chars[] = {'a', 'y', 'y', 'l', 'm', 'a', 'o'};
-    GupArrayChar xs = gup_array_char_create_from(static_chars, gup_array_size(static_chars));
+    GupArrayChar xs = gup_array_char_create_from(static_chars, gup_array_len(static_chars));
 
     gup_array_char_map_in_place(xs, add_one);
 
@@ -316,7 +316,7 @@ void test_filter_in_place_matches_all_returns_copy(void) {
 void test_gup_array_char_create_from_cstr(void) {
     char chars[] = {'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!'};
     char *str = "Hello, World!";
-    GupArrayChar xs = gup_array_char_create_from(chars, gup_array_size(chars));
+    GupArrayChar xs = gup_array_char_create_from(chars, gup_array_len(chars));
 
     GupArrayChar ys = gup_array_char_create_from_cstr(str);
 
@@ -340,7 +340,7 @@ void test_gup_array_string_create_from(void) {
     GupString bang = gup_array_char_create_from_cstr("!");
     GupString cs[] = {hello, world, bang};
 
-    GupArrayString strs = gup_array_string_create_from(cs, gup_array_size(cs));
+    GupArrayString strs = gup_array_string_create_from(cs, gup_array_len(cs));
 
     assert(strs.count == 3);
 
@@ -355,7 +355,7 @@ void test_gup_array_string_copy(void) {
     GupString world = gup_array_char_create_from_cstr("World");
     GupString bang = gup_array_char_create_from_cstr("!");
     GupString cs[] = {hello, world, bang};
-    GupArrayString strs = gup_array_string_create_from(cs, gup_array_size(cs));
+    GupArrayString strs = gup_array_string_create_from(cs, gup_array_len(cs));
 
     GupArrayString strs_copy = gup_array_string_copy(strs);
 
@@ -373,7 +373,7 @@ void test_gup_array_string_append(void) {
     GupArrayChar world = gup_array_char_create_from_cstr("World");
     GupArrayChar bang = gup_array_char_create_from_cstr("!");
     GupArrayChar char_arrays[] = {hello, world, bang};
-    GupArrayString strs_create_from = gup_array_string_create_from(char_arrays, gup_array_size(char_arrays));
+    GupArrayString strs_create_from = gup_array_string_create_from(char_arrays, gup_array_len(char_arrays));
 
     GupArrayString strs = gup_array_string_create();
     gup_array_string_append(&strs, hello);
@@ -387,6 +387,51 @@ void test_gup_array_string_append(void) {
     free(bang.data);
     gup_array_string_destroy(strs);
     gup_array_string_destroy(strs_create_from);
+}
+
+void test_gup_array_contains(void) {
+    { // Empty arrays never contain anything
+        GupArrayBool bs = gup_array_bool_create();
+        assert(gup_array_bool_contains(bs, true) == false);
+        assert(gup_array_bool_contains(bs, false) == false);
+        
+        GupArrayPtr ps = gup_array_ptr_create();
+        assert(gup_array_ptr_contains(ps, (void*)NULL) == false);
+        assert(gup_array_ptr_contains(ps, (void*)0x12345678) == false);
+
+        gup_array_bool_destroy(bs);
+        gup_array_ptr_destroy(ps);
+    }
+
+    { // Can find appended items
+        GupArrayShort ss = gup_array_short_create();
+        gup_array_short_append(&ss, 1);
+        gup_array_short_append(&ss, 7);
+        gup_array_short_append(&ss, 38);
+
+        assert(gup_array_short_contains(ss, 0) == false);
+        assert(gup_array_short_contains(ss, 1) == true);
+        assert(gup_array_short_contains(ss, 2) == false);
+        assert(gup_array_short_contains(ss, 7) == true);
+        assert(gup_array_short_contains(ss, 37) == false);
+        assert(gup_array_short_contains(ss, 38) == true);
+
+        gup_array_short_destroy(ss);
+    }
+
+    { // Can find appended items
+        float floats[3] = {0.0f, 13.37f, FLT_MAX};
+        GupArrayFloat fs = gup_array_float_create_from(floats, gup_array_len(floats));
+
+        gup_assert(gup_array_float_contains(fs, 0.1f) == false);
+        gup_assert(gup_array_float_contains(fs, 0.0f) == true);
+        gup_assert(gup_array_float_contains(fs, 13.377f) == false);
+        gup_assert(gup_array_float_contains(fs, 13.37f) == true);
+        gup_assert(gup_array_float_contains(fs, FLT_MIN) == true);
+        gup_assert(gup_array_float_contains(fs, FLT_MAX) == true);
+
+        gup_array_float_destroy(fs);
+    }
 }
 
 void test_gup_array(void) {
@@ -423,6 +468,9 @@ void test_gup_array(void) {
     test_gup_array_string_copy();
     test_gup_array_string_append();
     
+    // Contains
+    test_gup_array_contains();
+
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");
     #endif // GUPPY_VERBOSE
