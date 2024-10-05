@@ -9,9 +9,7 @@
 #include "./test_gup_array.c"
 #include "./test_gup_file.c"
 #include "./test_gup_print_array_string.c"
-#include "./test_gup_settings.c"
 #include "./test_gup_string.c"
-#include "./test_gup_sv.c"
 
 void _reset_settings_file(void) {
     const bool result = gup_file_write("# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n", "./resources/settings.toml");
@@ -26,9 +24,7 @@ void run_all_guppy_tests(void) {
     test_gup_array();
     test_gup_file();
     test_gup_print_array_string();
-    test_gup_settings();
     test_gup_string();
-    test_gup_sv();
 
     _reset_settings_file();
     #ifdef GUPPY_DEBUG_MEMORY

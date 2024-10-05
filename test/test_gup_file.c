@@ -212,7 +212,7 @@ void test_gup_file_read_lines_as_cstrs(void) {
     { // one_newline.txt
         lines = gup_file_read_lines_as_cstrs("./resources/one_newline.txt");
 
-        assert(gup_cstr_eq(lines[0], ""));
+        assert(strcmp(lines[0], "") == 0);
         assert(lines[1] == NULL);
 
         free(lines[0]);
@@ -222,10 +222,10 @@ void test_gup_file_read_lines_as_cstrs(void) {
     { // foo.txt
         lines = gup_file_read_lines_as_cstrs("./resources/foo.txt");
 
-        assert(gup_cstr_eq(lines[0], "one"));
-        assert(gup_cstr_eq(lines[1], "twotwo"));
-        assert(gup_cstr_eq(lines[2], "three three three"));
-        assert(gup_cstr_eq(lines[3], ""));
+        assert(strcmp(lines[0], "one") == 0);
+        assert(strcmp(lines[1], "twotwo") == 0);
+        assert(strcmp(lines[2], "three three three") == 0);
+        assert(strcmp(lines[3], "") == 0);
         assert(lines[4] == NULL);
 
         const int line_count = gup_file_line_count("./resources/foo.txt");
@@ -242,14 +242,14 @@ void test_gup_file_read_lines_as_cstrs(void) {
         gup_print_array_string(lines);
         #endif
 
-        assert(gup_cstr_eq(lines[0], "# This is a TOML file"));
-        assert(gup_cstr_eq(lines[1], ""));
-        assert(gup_cstr_eq(lines[2], "title = \"guppy.h\""));
-        assert(gup_cstr_eq(lines[3], "author = \"Christian Bouwense\""));
-        assert(gup_cstr_eq(lines[4], ""));
-        assert(gup_cstr_eq(lines[5], "[database]"));
-        assert(gup_cstr_eq(lines[6], "server = \"localhost\""));
-        assert(gup_cstr_eq(lines[7], "port = 5432"));
+        assert(strcmp(lines[0], "# This is a TOML file") == 0);
+        assert(strcmp(lines[1], "") == 0);
+        assert(strcmp(lines[2], "title = \"guppy.h\"") == 0);
+        assert(strcmp(lines[3], "author = \"Christian Bouwense\"") == 0);
+        assert(strcmp(lines[4], "") == 0);
+        assert(strcmp(lines[5], "[database]") == 0);
+        assert(strcmp(lines[6], "server = \"localhost\"") == 0);
+        assert(strcmp(lines[7], "port = 5432") == 0);
         assert(lines[8] == NULL);
 
         const int line_count = gup_file_line_count("./resources/settings.toml");
