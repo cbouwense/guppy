@@ -275,7 +275,24 @@ bool  gup_settings_set(const char *key, const char *value);
 bool  gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
 bool  gup_settings_set_int(const char *key, int value);
 
-// String view -------------------------------------------------------------------------------------
+// Strings -------------------------------------------------------------------------------------
+GupString gup_string_create();
+void      gup_string_destroy(GupString xs);
+GupString gup_string_create_from(char xs[], const int size);
+GupString gup_string_copy(GupString xs);
+bool      gup_string_eq(GupString xs, GupString ys);
+bool      gup_string_eq_cstr(GupString xs, const char *cstr, int cstr_length);
+bool      gup_string_contains(GupString xs, char x);
+void      gup_string_print(GupString xs);
+void      gup_string_append(GupString *xs, char x);
+void      gup_string_prepend(GupString *xs, char x);
+GupString gup_string_map(GupString xs, char (*fn)(char));
+void      gup_string_map_in_place(GupString xs, char (*fn)(char));
+GupString gup_string_filter(GupString xs, bool (*fn)(char));
+void      gup_string_filter_in_place(GupString *xs, bool (*fn)(char));
+char      gup_string_reduce(GupString xs, char (*fn)(char, char), char start);
+bool      gup_string_find(GupString xs, bool (*fn)(char), char *out);
+
 GupStringView  gup_sv();
 GupStringView  gup_sv_create_from_parts(const char *data, size_t count);
 GupStringView  gup_sv_create_from_cstr(const char *cstr);
@@ -2450,7 +2467,24 @@ defer:
     return result;
 }
 
-// String view -------------------------------------------------------------------------------------
+// Strings -------------------------------------------------------------------------------------
+
+#define gup_string_create gup_array_char_create
+#define gup_string_destroy gup_array_char_destroy
+#define gup_string_create_from gup_array_char_create_from
+#define gup_string_copy gup_array_char_copy
+#define gup_string_eq gup_array_char_eq
+#define gup_string_eq_cstr gup_array_char_eq_cstr
+#define gup_string_contains gup_array_char_contains
+#define gup_string_print gup_array_char_print
+#define gup_string_append gup_array_char_append
+#define gup_string_prepend gup_array_char_prepend
+#define gup_string_map gup_array_char_map
+#define gup_string_map_in_place gup_array_char_map_in_place
+#define gup_string_filter gup_array_char_filter
+#define gup_string_filter_in_place gup_array_char_filter_in_place
+#define gup_string_reduce gup_array_char_reduce
+#define gup_string_find gup_array_char_find
 
 /*
  * This string view code is inspired by (aka, straight-up copied from) sv.h by Alexey Kutepov.

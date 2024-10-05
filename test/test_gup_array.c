@@ -574,7 +574,7 @@ void test_gup_array_string_find(void) {
         gup_assert(result == true);
         gup_assert(gup_array_char_eq_cstr(found, "world"));
 
-        gup_array_char_destroy(found);
+        gup_string_destroy(found);
 
         gup_array_string_prepend_cstr(&strings, "foo");
         result = gup_array_string_find(strings, is_all_undercase, &found);
@@ -582,7 +582,7 @@ void test_gup_array_string_find(void) {
         gup_assert(result == true);
         gup_assert(gup_array_char_eq_cstr(found, "foo"));
 
-        gup_array_char_destroy(found);
+        gup_string_destroy(found);
         gup_array_string_destroy(strings);
     }
 }
