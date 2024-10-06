@@ -128,21 +128,30 @@ void test_gup_string_trim_functions(void) {
 }
 
 void test_gup_string_split(void) {
-    { // Two tokens
-        GupString str = gup_string_create_from_cstr("foo=bar");
+    { // No delimiters
+        GupString str = gup_string_create_from_cstr("foobar");
         GupArrayString tokens = gup_string_split(str, '=');
-        char *expected_array[2] = {"foo", "bar"};
-        GupArrayString expected = gup_array_string_create_from_cstrs(expected_array, 2);
 
-        gup_assert(gup_array_string_eq(tokens, expected));
+        gup_assert(gup_string_eq(str, tokens.data[0]));
+        gup_assert(tokens.count == 1);
 
-        gup_array_string_destroy(expected);
         gup_array_string_destroy(tokens);
         gup_string_destroy(str);
     }
 
-    { // Five tokens
-        GupString str = gup_string_create_from_cstr("foo=bar=baz=shib=dib");
+    { // Some delimiters around the edges
+        GupString str = gup_string_create_from_cstr("=foobar==");
+        GupArrayString tokens = gup_string_split(str, '=');
+
+        gup_assert(gup_string_eq_cstr(tokens.data[0], "foobar"));
+        gup_assert(tokens.count == 1);
+
+        gup_array_string_destroy(tokens);
+        gup_string_destroy(str);
+    }
+
+    { // A bunch of delimiters
+        GupString str = gup_string_create_from_cstr("==foo=bar=baz=shib=dib===");
         GupArrayString tokens = gup_string_split(str, '=');
         char *expected_array[5] = {"foo", "bar", "baz", "shib", "dib"};
         GupArrayString expected = gup_array_string_create_from_cstrs(expected_array, 5);

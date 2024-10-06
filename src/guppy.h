@@ -280,10 +280,10 @@ void gup_print_array_slice_int(int array[], size_t start, size_t end);
 void gup_print_array_slice_long(long array[], size_t start, size_t end);
 
 // Settings ----------------------------------------------------------------------------------------
-GupString gup_settings_get_cstr(const char *key);
-GupString gup_settings_get_cstr_from_file(const char *key, const char *file_path);
-bool      gup_settings_set(const char *key, const char *value);
-bool      gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
+bool gup_settings_get_cstr(const char *key, GupString *out);
+bool gup_settings_get_cstr_from_file(const char *key, const char *file_path, GupString *out);
+bool gup_settings_set(const char *key, const char *value);
+bool gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
 
 // Strings -------------------------------------------------------------------------------------
 GupString  gup_string_create();
@@ -468,7 +468,7 @@ GupArrayShort gup_array_short_create() {
     return xs;
 }
 
-GupArrayString gup_array_string_create() {
+GupArrayString gup_array_string_create() {  
     GupArrayString xs = {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
         .count = 0,
@@ -515,7 +515,7 @@ void gup_array_ptr_destroy(GupArrayPtr xs) {
 
 void gup_array_string_destroy(GupArrayString xs) {
     for (int i = 0; i < xs.count; i++) {
-        free(xs.data[i].data);
+        gup_array_char_destroy(xs.data[i]);
     }
     free(xs.data);
 }
@@ -2422,22 +2422,24 @@ void gup_string_without_whitespace_in_place(GupString *str) {
 GupArrayString gup_string_split(GupString str, char c) {
     GupArrayString tokens = gup_array_string_create();
     GupString token = gup_string_create();
+    GupString trimmed = gup_string_trim_char(str, c);
 
-    for (int i = 0; i < str.count; i++) {
-        if (str.data[i] == c) {
+    for (int i = 0; i < trimmed.count; i++) {
+        if (trimmed.data[i] == c) {
             gup_array_string_append(&tokens, token);
             gup_string_destroy(token);
             token = gup_string_create();
-        } else if (i == str.count-1) {
-            gup_string_append(&token, str.data[i]);
+        } else if (i == trimmed.count-1) {
+            gup_string_append(&token, trimmed.data[i]);
             gup_array_string_append(&tokens, token);
             gup_string_destroy(token);
             token = gup_string_create();
         } else {
-            gup_string_append(&token, str.data[i]);
+            gup_string_append(&token, trimmed.data[i]);
         }
     }
 
+    gup_string_destroy(trimmed);
     gup_string_destroy(token);
 
     return tokens;
@@ -2470,21 +2472,35 @@ char *gup_string_array_flatten(char **strings) {
 
 // Settings ----------------------------------------------------------------------------------------
 
-GupString gup_settings_get_cstr(const char *key) {
-    gup_settings_get_cstr_from_file(key, "src/settings.txt");
+bool gup_settings_get_cstr(const char *key, GupString *out) {
+    return gup_settings_get_cstr_from_file(key, "src/settings.txt", out);
 }
 
-bool line_contains_key(GupString line, const char *key) {
-    gup_string_contains(line, key);
-}
+bool gup_settings_get_cstr_from_file(const char *key, const char *file_path, GupString *out) {
+    bool result = false;
+    GupArrayString tokens;
+    GupArrayString file_lines = gup_file_read_lines(file_path);
 
-GupString gup_settings_get_cstr_from_file(const char *key, const char *file_path) {
-    // GupArrayString file_lines = gup_file_read_lines(file_path);
-    // gup_array_string_print(file_lines);
+    for (int i = 0; i < file_lines.count; i++) {
+        GupString line = file_lines.data[i];
+        tokens = gup_string_split(line, '=');
 
-    // GupString line_with_setting;
-    // bool found_setting = gup_array_string_find(file_lines, , &line_with_setting);
-    // gup_array_string_destroy(file_lines);
+        // If we have two tokens, we define that as a key-value pair.
+        if (tokens.count == 2) {
+            GupString line_key = tokens.data[0];
+            GupString line_value = tokens.data[1];
+
+            if (gup_string_eq_cstr(line_key, key)) {
+                *out = gup_string_copy(line_value);
+                gup_defer_return(true);
+            }
+        }
+    }
+
+defer:
+    gup_array_string_destroy(tokens);
+    gup_array_string_destroy(file_lines);
+    return result;
 }
 
 // bool gup_settings_set(const char *key, const char *value) {}
