@@ -128,12 +128,31 @@ void test_gup_string_trim_functions(void) {
 }
 
 void test_gup_string_split(void) {
-    GupString str = gup_string_create_from_cstr("foo=bar");
-    GupArrayString tokens = gup_string_split(str, '=');
-    gup_array_string_print(tokens);
+    { // Two tokens
+        GupString str = gup_string_create_from_cstr("foo=bar");
+        GupArrayString tokens = gup_string_split(str, '=');
+        char *expected_array[2] = {"foo", "bar"};
+        GupArrayString expected = gup_array_string_create_from_cstrs(expected_array, 2);
 
-    gup_array_string_destroy(tokens);
-    gup_string_destroy(str);
+        gup_assert(gup_array_string_eq(tokens, expected));
+
+        gup_array_string_destroy(expected);
+        gup_array_string_destroy(tokens);
+        gup_string_destroy(str);
+    }
+
+    { // Five tokens
+        GupString str = gup_string_create_from_cstr("foo=bar=baz=shib=dib");
+        GupArrayString tokens = gup_string_split(str, '=');
+        char *expected_array[5] = {"foo", "bar", "baz", "shib", "dib"};
+        GupArrayString expected = gup_array_string_create_from_cstrs(expected_array, 5);
+
+        gup_assert(gup_array_string_eq(tokens, expected));
+
+        gup_array_string_destroy(expected);
+        gup_array_string_destroy(tokens);
+        gup_string_destroy(str);
+    }
 }
 
 void test_gup_string(void) {

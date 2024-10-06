@@ -673,7 +673,7 @@ GupArrayString gup_array_string_create_from_cstrs(char **xs, const int size) {
 }
 
 // TODO: probably move this
-char * gup_array_char_to_cstr(GupArrayChar chars) {
+char *gup_array_char_to_cstr(GupArrayChar chars) {
     // count + 1 for null terminator
     char *result = malloc((chars.count + 1) * sizeof(char));
     
@@ -686,7 +686,7 @@ char * gup_array_char_to_cstr(GupArrayChar chars) {
 }
 
 // TODO: probably move this
-char ** gup_array_string_to_cstrs(GupArrayString strs) {
+char **gup_array_string_to_cstrs(GupArrayString strs) {
     // count + 1 for null terminator
     char **result = malloc((strs.count + 1) * sizeof(char *));
 
@@ -2426,11 +2426,19 @@ GupArrayString gup_string_split(GupString str, char c) {
     for (int i = 0; i < str.count; i++) {
         if (str.data[i] == c) {
             gup_array_string_append(&tokens, token);
-            token = gup_string_create_from_cstr("");
+            gup_string_destroy(token);
+            token = gup_string_create();
+        } else if (i == str.count-1) {
+            gup_string_append(&token, str.data[i]);
+            gup_array_string_append(&tokens, token);
+            gup_string_destroy(token);
+            token = gup_string_create();
         } else {
             gup_string_append(&token, str.data[i]);
         }
     }
+
+    gup_string_destroy(token);
 
     return tokens;
 }
