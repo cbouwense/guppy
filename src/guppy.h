@@ -84,7 +84,7 @@ void      gup_arena_free(GupArena a); // Free all the allocated memory, but not 
 
 // Dynamic arrays ----------------------------------------------------------------------------------
 GupArrayBool   gup_array_bool_create();
-GupArrayBool   gup_array_bool_create_arena(GupArena *a);
+GupArrayBool gup_array_bool_create_arena(GupArena *a);
 void           gup_array_bool_destroy(GupArrayBool xs);
 GupArrayBool   gup_array_bool_create_from_array(bool xs[], const int size);
 GupArrayBool   gup_array_bool_create_from_array_arena(GupArena *a, bool xs[], const int size);
@@ -114,6 +114,7 @@ bool           gup_array_bool_find(GupArrayBool xs, bool (*fn)(bool), bool *out)
 bool           gup_array_bool_find_arena(GupArena *a, GupArrayBool xs, bool (*fn)(bool), bool *out);
    
 GupArrayChar   gup_array_char_create();
+GupArrayChar   gup_array_char_create_arena(GupArena *a);
 void           gup_array_char_destroy(GupArrayChar xs);
 GupArrayChar   gup_array_char_create_from_array(char xs[], const int size);
 GupArrayChar   gup_array_char_create_from_cstr(char xs[]);
@@ -132,6 +133,7 @@ char           gup_array_char_reduce(GupArrayChar xs, char (*fn)(char, char), ch
 bool           gup_array_char_find(GupArrayChar xs, bool (*fn)(char), char *out);
    
 GupArrayDouble gup_array_double_create();
+GupArrayDouble gup_array_double_create_arena(GupArena *a);
 void           gup_array_double_destroy(GupArrayDouble xs);
 GupArrayDouble gup_array_double_create_from_array(double xs[], const int size);
 GupArrayDouble gup_array_double_copy(GupArrayDouble xs);
@@ -148,6 +150,7 @@ double         gup_array_double_reduce(GupArrayDouble xs, double (*fn)(double, d
 bool           gup_array_double_find(GupArrayDouble xs, bool (*fn)(double), double *out);
    
 GupArrayFloat  gup_array_float_create();
+GupArrayFloat gup_array_float_create_arena(GupArena *a);
 void           gup_array_float_destroy(GupArrayFloat xs);
 GupArrayFloat  gup_array_float_create_from_array(float xs[], const int size);
 GupArrayFloat  gup_array_float_copy(GupArrayFloat xs);
@@ -164,6 +167,7 @@ float          gup_array_float_reduce(GupArrayFloat xs, float (*fn)(float, float
 bool           gup_array_float_find(GupArrayFloat xs, bool (*fn)(float), float *out);
 
 GupArrayInt    gup_array_int_create();
+GupArrayInt gup_array_int_create_arena(GupArena *a);
 void           gup_array_int_destroy(GupArrayInt xs);
 GupArrayInt    gup_array_int_create_from_array(int xs[], const int size);
 GupArrayInt    gup_array_int_copy(GupArrayInt xs);
@@ -180,6 +184,7 @@ int            gup_array_int_reduce(GupArrayInt xs, int (*fn)(int, int), int sta
 bool           gup_array_int_find(GupArrayInt xs, bool (*fn)(int), int *out);
 
 GupArrayLong   gup_array_long_create();
+GupArrayLong gup_array_long_create_arena(GupArena *a);
 void           gup_array_short_destroy(GupArrayShort xs);
 GupArrayLong   gup_array_long_create_from_array(long xs[], const int size);
 GupArrayLong   gup_array_long_copy(GupArrayLong xs);
@@ -196,6 +201,7 @@ long           gup_array_long_reduce(GupArrayLong xs, long (*fn)(long, long), lo
 bool           gup_array_long_find(GupArrayLong xs, bool (*fn)(long), long *out);
 
 GupArrayPtr    gup_array_ptr_create();
+GupArrayPtr gup_array_ptr_create_arena(GupArena *a);
 void           gup_array_ptr_destroy(GupArrayPtr xs);
 GupArrayPtr    gup_array_ptr_create_from_array(void* xs[], const int size);
 GupArrayPtr    gup_array_ptr_copy(GupArrayPtr xs);
@@ -212,6 +218,7 @@ void*          gup_array_ptr_reduce(GupArrayPtr xs, void* (*fn)(void*, void*), v
 bool           gup_array_ptr_find(GupArrayPtr xs, bool (*fn)(void*), void* *out);
 
 GupArrayShort  gup_array_short_create();
+GupArrayShort gup_array_short_create_arena(GupArena *a);
 void           gup_array_short_destroy(GupArrayShort xs);
 GupArrayShort  gup_array_short_create_from_array(short xs[], const int size);
 GupArrayShort  gup_array_short_copy(GupArrayShort xs);
@@ -228,6 +235,7 @@ short          gup_array_short_reduce(GupArrayShort xs, short (*fn)(short, short
 bool           gup_array_short_find(GupArrayShort xs, bool (*fn)(short), short *out);
 
 GupArrayString gup_array_string_create();
+GupArrayString gup_array_string_create_arena(GupArena *a);
 void           gup_array_string_destroy(GupArrayString xs);
 GupArrayString gup_array_string_create_from_array(GupArrayChar xs[], const int size);
 GupArrayString gup_array_string_copy(GupArrayString xs);
@@ -287,9 +295,12 @@ bool gup_settings_set_to_file(const char *key, const char *value, const char *fi
 
 // Strings -------------------------------------------------------------------------------------
 GupString  gup_string_create();
+GupString  gup_string_create_arena(GupArena *a);
 void       gup_string_destroy(GupString str);
 GupString  gup_string_create_from_cstr(char str[]);
+GupString  gup_string_create_from_cstr_arena(GupArena *a, char str[]);
 GupString  gup_string_copy(GupString str);
+GupString  gup_string_copy_arena(GupArena *a, GupString str);
 bool       gup_string_eq(GupString str_a, GupString str_b);
 bool       gup_string_eq_cstr(GupString str, const char *cstr, int cstr_length);
 bool       gup_string_contains(GupString str, char c);
@@ -298,11 +309,14 @@ void       gup_string_print(GupString str);
 void       gup_string_append(GupString *str, char c);
 void       gup_string_prepend(GupString *str, char c);
 GupString  gup_string_map(GupString str, char (*fn)(char));
+GupString  gup_string_map_arena(GupArena *a, GupString str, char (*fn)(char));
 void       gup_string_map_in_place(GupString str, char (*fn)(char));
 GupString  gup_string_filter(GupString str, bool (*fn)(char));
+GupString  gup_string_filter_arena(GupArena *a, GupString str, bool (*fn)(char));
 void       gup_string_filter_in_place(GupString *str, bool (*fn)(char));
 char       gup_string_reduce(GupString str, char (*fn)(char, char), char start);
 bool       gup_string_find(GupString str, bool (*fn)(char), char *out);
+bool       gup_string_find_arena(GupArena *a, GupString str, bool (*fn)(char), char *out);
 GupString  gup_string_trim_char(GupString str, char c);
 void       gup_string_trim_char_in_place(GupString *str, char c);
 GupString  gup_string_trim_fn(GupString str, bool (*fn)(char));
@@ -414,11 +428,29 @@ GupArrayChar gup_array_char_create() {
     return xs;
 }
 
+GupArrayChar gup_array_char_create_arena(GupArena *a) {
+    GupArrayChar xs = {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(char)),
+    };
+    return xs;
+}
+
 GupArrayDouble gup_array_double_create() {
     GupArrayDouble xs = {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
         .count = 0,
         .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(double)),
+    };
+    return xs;
+}
+
+GupArrayDouble gup_array_double_create_arena(GupArena *a) {
+    GupArrayDouble xs = {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(double)),
     };
     return xs;
 }
@@ -432,11 +464,29 @@ GupArrayFloat gup_array_float_create() {
     return xs;
 }
 
+GupArrayFloat gup_array_float_create_arena(GupArena *a) {
+    GupArrayFloat xs = {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(float)),
+    };
+    return xs;
+}
+
 GupArrayInt gup_array_int_create() {
     GupArrayInt xs = {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
         .count = 0,
         .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(int)),
+    };
+    return xs;
+}
+
+GupArrayInt gup_array_int_create_arena(GupArena *a) {
+    GupArrayInt xs = {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(int)),
     };
     return xs;
 }
@@ -450,11 +500,29 @@ GupArrayLong gup_array_long_create() {
     return xs;
 }
 
+GupArrayLong gup_array_long_create_arena(GupArena *a) {
+    GupArrayLong xs = {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(long)),
+    };
+    return xs;
+}
+
 GupArrayPtr gup_array_ptr_create() {
     GupArrayPtr xs = {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
         .count = 0,
         .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void*)),
+    };
+    return xs;
+}
+
+GupArrayPtr gup_array_ptr_create_arena(GupArena *a) {
+    GupArrayPtr xs = {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void*)),
     };
     return xs;
 }
@@ -468,11 +536,29 @@ GupArrayShort gup_array_short_create() {
     return xs;
 }
 
+GupArrayShort gup_array_short_create_arena(GupArena *a) {
+    GupArrayShort xs = {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(short)),
+    };
+    return xs;
+}
+
 GupArrayString gup_array_string_create() {  
     GupArrayString xs = {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
         .count = 0,
         .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(GupArrayChar)),
+    };
+    return xs;
+}
+
+GupArrayString gup_array_string_create_arena(GupArena *a) {
+    GupArrayString xs = {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(GupArrayChar)),
     };
     return xs;
 }
@@ -716,6 +802,18 @@ GupArrayChar gup_array_char_copy(GupArrayChar xs) {
         .capacity = xs.capacity,
         .count = xs.count,
         .data = malloc(xs.capacity * sizeof(char)),
+
+    };
+    memcpy(new.data, xs.data, xs.count * sizeof(char));
+
+    return new;
+}
+
+GupArrayChar gup_array_char_copy_arena(GupArena *a, GupArrayChar xs) {
+    GupArrayChar new = {
+        .capacity = xs.capacity,
+        .count = xs.count,
+        .data = gup_arena_alloc(a, xs.capacity * sizeof(char)),
 
     };
     memcpy(new.data, xs.data, xs.count * sizeof(char));
@@ -1969,10 +2067,11 @@ void gup_file_print(const char *file_path) {
             printf("\n");
         }
     }
+    free(file_lines);
 }
 
 void gup_file_print_lines(const char *file_path) {
-     printf("[%s]\n", file_path);
+    printf("[%s]\n", file_path);
     char **file_lines = gup_file_read_lines_as_cstrs(file_path);
     if (file_lines == NULL) return;
 
@@ -1987,6 +2086,7 @@ void gup_file_print_lines(const char *file_path) {
         }
     }
     printf("\n");
+    free(file_lines);
 }
 
 GupString gup_file_read(const char *file_path) {
@@ -2321,9 +2421,11 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
 // Strings -------------------------------------------------------------------------------------
 
 #define gup_string_create gup_array_char_create
+#define gup_string_create_arena gup_array_char_create_arena
 #define gup_string_destroy gup_array_char_destroy
 #define gup_string_create_from_cstr gup_array_char_create_from_cstr
 #define gup_string_copy gup_array_char_copy
+#define gup_string_copy_arena gup_array_char_copy_arena
 #define gup_string_eq gup_array_char_eq
 #define gup_string_eq_cstr gup_array_char_eq_cstr
 #define gup_string_contains gup_array_char_contains
@@ -2371,7 +2473,24 @@ GupString gup_string_trim_char(GupString str, char c) {
     memmove(trimmed_str.data, trimmed_str.data + i, trimmed_str.count - i);
     trimmed_str.count -= i;
 
-    for (; trimmed_str.count > 0 && trimmed_str.data[trimmed_str.count - 1] == c; trimmed_str.count--) {}
+    while (trimmed_str.count > 0 && trimmed_str.data[trimmed_str.count - 1] == c) {
+        trimmed_str.count++;
+    }    
+
+    return trimmed_str;
+}
+
+GupString gup_string_trim_char_arena(GupArena *a, GupString str, char c) {
+    GupString trimmed_str = gup_string_copy_arena(a, str);
+
+    int i = 0;
+    for (; i < trimmed_str.count && trimmed_str.data[i] == c; i++) {}
+    memmove(trimmed_str.data, trimmed_str.data + i, trimmed_str.count - i);
+    trimmed_str.count -= i;
+
+    while (trimmed_str.count > 0 && trimmed_str.data[trimmed_str.count - 1] == c) {
+        trimmed_str.count--;
+    }
 
     return trimmed_str;
 }
@@ -2441,6 +2560,29 @@ GupArrayString gup_string_split(GupString str, char c) {
 
     gup_string_destroy(trimmed);
     gup_string_destroy(token);
+
+    return tokens;
+}
+
+GupArrayString gup_string_split_arena(GupArena *a, GupString str, char c) {
+    GupArrayString tokens = gup_array_string_create_arena(a);
+    GupString token = gup_string_create_arena(a);
+    GupString trimmed = gup_string_trim_char(str, c);
+
+    for (int i = 0; i < trimmed.count; i++) {
+        if (trimmed.data[i] == c) {
+            gup_array_string_append(&tokens, token);
+            gup_string_destroy(token);
+            token = gup_string_create_arena(a);
+        } else if (i == trimmed.count-1) {
+            gup_string_append(&token, trimmed.data[i]);
+            gup_array_string_append(&tokens, token);
+            gup_string_destroy(token);
+            token = gup_string_create_arena(a);
+        } else {
+            gup_string_append(&token, trimmed.data[i]);
+        }
+    }
 
     return tokens;
 }

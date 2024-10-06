@@ -237,9 +237,13 @@ void test_gup_file_read_lines_as_cstrs(void) {
 
     { // settings.toml
         lines = gup_file_read_lines_as_cstrs("./resources/settings.toml");
+        const int line_count = gup_file_line_count("./resources/settings.toml");
+
         #ifdef GUPPY_VERBOSE
         gup_file_print("./resources/settings.toml");
-        gup_print_array_string(lines);
+        for (int i = 0; i < line_count; i++) {
+            printf("%s\n", lines[i]);
+        }
         #endif
 
         assert(strcmp(lines[0], "# This is a TOML file") == 0);
@@ -252,7 +256,7 @@ void test_gup_file_read_lines_as_cstrs(void) {
         assert(strcmp(lines[7], "port = 5432") == 0);
         assert(lines[8] == NULL);
 
-        const int line_count = gup_file_line_count("./resources/settings.toml");
+        
         for (int i = 0; i < line_count; i++) {
             free(lines[i]);
         }
