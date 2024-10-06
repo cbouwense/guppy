@@ -103,7 +103,6 @@ void test_gup_string_trim_functions(void) {
         GupString str = gup_string_create_from_cstr("!!!He!ll!o!!");
         gup_string_trim_char_in_place(&str, '!');
 
-        gup_string_print(str);
         gup_assert(gup_string_eq_cstr(str, "He!ll!o"));
 
         gup_string_destroy(str);
@@ -128,9 +127,19 @@ void test_gup_string_trim_functions(void) {
     }
 }
 
+void test_gup_string_split(void) {
+    GupString str = gup_string_create_from_cstr("foo=bar");
+    GupArrayString tokens = gup_string_split(str, '=');
+    gup_array_string_print(tokens);
+
+    gup_array_string_destroy(tokens);
+    gup_string_destroy(str);
+}
+
 void test_gup_string(void) {
     test_gup_string_creates_an_empty_string();
     test_creating_a_gup_string_from_a_cstr_equals_that_cstr();
     test_gup_string_array_flatten();
     test_gup_string_trim_functions();
+    test_gup_string_split();
 }

@@ -265,6 +265,8 @@ long           gup_file_size(const char *file_path);
 bool           gup_file_write(const char *text_to_write, const char *file_path);
 bool           gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path);
 
+
+
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
 void gup_print_string(const char *string);
@@ -278,12 +280,10 @@ void gup_print_array_slice_int(int array[], size_t start, size_t end);
 void gup_print_array_slice_long(long array[], size_t start, size_t end);
 
 // Settings ----------------------------------------------------------------------------------------
-char *gup_settings_get(const char *key);
-char *gup_settings_get_create_from_file(const char *key, const char *file_path);
-int   gup_settings_get_int(const char *key);
-bool  gup_settings_set(const char *key, const char *value);
-bool  gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
-bool  gup_settings_set_int(const char *key, int value);
+GupString gup_settings_get_cstr(const char *key);
+GupString gup_settings_get_cstr_from_file(const char *key, const char *file_path);
+bool      gup_settings_set(const char *key, const char *value);
+bool      gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
 
 // Strings -------------------------------------------------------------------------------------
 GupString  gup_string_create();
@@ -293,6 +293,7 @@ GupString  gup_string_copy(GupString str);
 bool       gup_string_eq(GupString str_a, GupString str_b);
 bool       gup_string_eq_cstr(GupString str, const char *cstr, int cstr_length);
 bool       gup_string_contains(GupString str, char c);
+bool       gup_string_contains_substring(GupString str_a, GupString str_b);
 void       gup_string_print(GupString str);
 void       gup_string_append(GupString *str, char c);
 void       gup_string_prepend(GupString *str, char c);
@@ -1088,11 +1089,15 @@ void _gup_array_short_print(GupArrayShort xs, const char *xs_name) {
 
 #define gup_array_string_print(xs) _gup_array_string_print(xs, #xs)
 void _gup_array_string_print(GupArrayString xs, const char *xs_name) {
-    printf("%s: [", xs_name);
+    printf("%s: [\n", xs_name);
     for (int i = 0; i < xs.count; i++) {
-        gup_array_char_print(xs.data[i]);
-
-        if (i != xs.count-1) printf(", ");
+        printf("  \"");
+        for (int j = 0; j < xs.data[i].count; j++) {
+            printf("%c", xs.data[i].data[j]);
+        }
+        printf("\"");
+        if (i != xs.count-1) printf(",");
+        printf("\n");
     }
     printf("]\n");
 }
@@ -2323,6 +2328,23 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
 #define gup_string_eq_cstr gup_array_char_eq_cstr
 #define gup_string_contains gup_array_char_contains
 
+// TODO
+bool gup_string_contains_substring(GupString str_a, GupString str_b) {
+    return false;
+    
+    // if (str_a.count < str_b.count) {
+    //     return false;
+    // }
+    
+    // for (int a_start = 0; a_start < str_a.count; a_start++) {
+    //     if (str_a.data[i] == str_b.data[i]) {
+    //         for (int j = i+1; j < str_a.count; j++) {
+    //             if (str_a.data[j])
+    //         }
+    //     }
+    // }
+}
+
 void _gup_string_print(GupString str, const char* str_name) {
     printf("%s: \"", str_name);
     for (int i = 0; i < str.count; i++) {
@@ -2397,6 +2419,22 @@ void gup_string_without_whitespace_in_place(GupString *str) {
     gup_string_filter_in_place(str, is_not_whitespace);
 }
 
+GupArrayString gup_string_split(GupString str, char c) {
+    GupArrayString tokens = gup_array_string_create();
+    GupString token = gup_string_create();
+
+    for (int i = 0; i < str.count; i++) {
+        if (str.data[i] == c) {
+            gup_array_string_append(&tokens, token);
+            token = gup_string_create_from_cstr("");
+        } else {
+            gup_string_append(&token, str.data[i]);
+        }
+    }
+
+    return tokens;
+}
+
 // Assumes a null terminated array of strings.
 char *gup_string_array_flatten(char **strings) {
     // Calculate the total length of all the strings.
@@ -2421,6 +2459,29 @@ char *gup_string_array_flatten(char **strings) {
 
     return result;
 }
+
+// Settings ----------------------------------------------------------------------------------------
+
+GupString gup_settings_get_cstr(const char *key) {
+    gup_settings_get_cstr_from_file(key, "src/settings.txt");
+}
+
+bool line_contains_key(GupString line, const char *key) {
+    gup_string_contains(line, key);
+}
+
+GupString gup_settings_get_cstr_from_file(const char *key, const char *file_path) {
+    // GupArrayString file_lines = gup_file_read_lines(file_path);
+    // gup_array_string_print(file_lines);
+
+    // GupString line_with_setting;
+    // bool found_setting = gup_array_string_find(file_lines, , &line_with_setting);
+    // gup_array_string_destroy(file_lines);
+}
+
+// bool gup_settings_set(const char *key, const char *value) {}
+
+// bool gup_settings_set_to_file(const char *key, const char *value, const char *file_path) {}
 
 // Miscellaneous -----------------------------------------------------------------------------------
 
