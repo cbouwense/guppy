@@ -70,6 +70,7 @@ typedef struct {
     void **data;
 } GupArrayPtr;
 
+// TODO: is there a way to have an interface for an allocator maybe?
 typedef GupArrayPtr GupArena;
 
 /**************************************************************************************************
@@ -791,32 +792,6 @@ GupArrayString gup_array_string_create_from_cstrs(char **xs, const int size) {
     }
 
     return new;
-}
-
-// TODO: probably move this
-char *gup_array_char_to_cstr(GupArrayChar chars) {
-    // count + 1 for null terminator
-    char *result = malloc((chars.count + 1) * sizeof(char));
-    
-    for (int i = 0; i < chars.count; i++) {
-        result[i] = chars.data[i];
-    }
-    result[chars.count] = '\0';
-
-    return result;
-}
-
-// TODO: probably move this
-char **gup_array_string_to_cstrs(GupArrayString strs) {
-    // count + 1 for null terminator
-    char **result = malloc((strs.count + 1) * sizeof(char *));
-
-    for (int i = 0; i < strs.count; i++) {
-        result[i] = gup_array_char_to_cstr(strs.data[i]);
-    }
-    result[strs.count] = NULL;
-
-    return result;
 }
 
 // Copy constructors
@@ -2011,6 +1986,33 @@ bool gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArray
 
     return false;
 }
+
+// Miscellaneous
+
+char *gup_array_char_to_cstr(GupArrayChar chars) {
+    // count + 1 for null terminator
+    char *result = malloc((chars.count + 1) * sizeof(char));
+    
+    for (int i = 0; i < chars.count; i++) {
+        result[i] = chars.data[i];
+    }
+    result[chars.count] = '\0';
+
+    return result;
+}
+
+char **gup_array_string_to_cstrs(GupArrayString strs) {
+    // count + 1 for null terminator
+    char **result = malloc((strs.count + 1) * sizeof(char *));
+
+    for (int i = 0; i < strs.count; i++) {
+        result[i] = gup_array_char_to_cstr(strs.data[i]);
+    }
+    result[strs.count] = NULL;
+
+    return result;
+}
+
 
 // TODO: Memory ------------------------------------------------------------------------------------------
 
