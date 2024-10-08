@@ -25,7 +25,7 @@ void test_gup_string_array_flatten(void) {
         char *array[] = {NULL};
         char *string = gup_string_array_flatten(array);
 
-        assert(strcmp(string, "") == 0);
+        gup_assert(strcmp(string, "") == 0);
 
         free(string);
     }
@@ -34,7 +34,7 @@ void test_gup_string_array_flatten(void) {
         char *array[] = {"one", NULL};
         char *string = gup_string_array_flatten(array);
 
-        assert(strcmp(string, "one") == 0);
+        gup_assert(strcmp(string, "one") == 0);
 
         free(string);
     }
@@ -43,7 +43,7 @@ void test_gup_string_array_flatten(void) {
         char *array[] = {"one", "two", "three", NULL};
         char *string = gup_string_array_flatten(array);
 
-        assert(strcmp(string, "onetwothree") == 0);
+        gup_assert(strcmp(string, "onetwothree") == 0);
 
         free(string);
     }
@@ -61,6 +61,7 @@ void test_gup_string_trim_functions(void) {
     }
 
     { // Trimming takes off only those characters at the beginning and end of the string
+        //                                              He!ll!o!!o
         GupString str = gup_string_create_from_cstr("!!!He!ll!o!!");
         GupString trimmed = gup_string_trim_char(str, '!');
 

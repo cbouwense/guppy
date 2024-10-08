@@ -1,8 +1,7 @@
 #include <float.h>
 #include <limits.h>
 
-#define GUPPY_VERBOSE
-// #define GUPPY_DEBUG_MEMORY
+// #define GUPPY_VERBOSE
 #include "../src/guppy.h"
 
 #include "./test_gup_arena.c"
@@ -23,8 +22,8 @@ void run_all_guppy_tests(void) {
     test_gup_arena();
     test_gup_array();
     test_gup_file();
-    // test_gup_settings();
-    // test_gup_string();
+    test_gup_settings();
+    test_gup_string();
 
     _reset_settings_file();
     #ifdef GUPPY_DEBUG_MEMORY

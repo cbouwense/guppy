@@ -1,3 +1,3 @@
 mkdir -p build/
-gcc -Wall -Wextra --pedantic -g -o build/test_guppy test/test_guppy.c
+clang -Wall -Wextra --pedantic -g -o build/test_guppy test/test_guppy.c
 gdb -q build/test_guppy
