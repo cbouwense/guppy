@@ -134,6 +134,10 @@ GupArrayChar   gup_array_char_filter(GupArrayChar xs, bool (*fn)(char));
 void           gup_array_char_filter_in_place(GupArrayChar *xs, bool (*fn)(char));
 char           gup_array_char_reduce(GupArrayChar xs, char (*fn)(char, char), char start);
 bool           gup_array_char_find(GupArrayChar xs, bool (*fn)(char), char *out);
+char          *gup_array_char_to_cstr(GupArrayChar chars);
+char          *gup_array_char_to_cstr_arena(GupArena *a, GupArrayChar chars);
+char         **gup_array_string_to_cstrs(GupArrayString strs);
+char         **gup_array_string_to_cstrs_arena(GupArena *a, GupArrayString strs);
    
 GupArrayDouble gup_array_double_create();
 GupArrayDouble gup_array_double_create_arena(GupArena *a);
@@ -270,6 +274,7 @@ char            *gup_file_read_as_cstr_arena(GupArena *a, const char *file_path)
 GupArrayString   gup_file_read_lines(const char *file_path);
 GupArrayString   gup_file_read_lines_arena(GupArena *a, const char *file_path);
 char           **gup_file_read_lines_as_cstrs(const char *file_path);
+char           **gup_file_read_lines_as_cstrs_arena(GupArena *a, const char *file_path);
 GupArrayString   gup_file_read_lines_keep_newlines(const char *file_path);
 GupArrayString   gup_file_read_lines_keep_newlines_arena(GupArena *a, const char *file_path);
 char           **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path);
@@ -1996,6 +2001,18 @@ char *gup_array_char_to_cstr(GupArrayChar chars) {
     return result;
 }
 
+char *gup_array_char_to_cstr_arena(GupArena *a, GupArrayChar chars) {
+    // count + 1 for null terminator
+    char *result = gup_arena_alloc(a, (chars.count + 1) * sizeof(char));
+    
+    for (int i = 0; i < chars.count; i++) {
+        result[i] = chars.data[i];
+    }
+    result[chars.count] = '\0';
+
+    return result;
+}
+
 char **gup_array_string_to_cstrs(GupArrayString strs) {
     // count + 1 for null terminator
     char **result = malloc((strs.count + 1) * sizeof(char *));
@@ -2008,6 +2025,17 @@ char **gup_array_string_to_cstrs(GupArrayString strs) {
     return result;
 }
 
+char **gup_array_string_to_cstrs_arena(GupArena *a, GupArrayString strs) {
+    // count + 1 for null terminator
+    char **result = gup_arena_alloc(a, (strs.count + 1) * sizeof(char *));
+
+    for (int i = 0; i < strs.count; i++) {
+        result[i] = gup_array_char_to_cstr_arena(a, strs.data[i]);
+    }
+    result[strs.count] = NULL;
+
+    return result;
+}
 
 // TODO: Memory ------------------------------------------------------------------------------------------
 
@@ -2391,6 +2419,51 @@ defer:
     free(line_buffer);
     if (fp) fclose(fp);
 
+    return result;
+}
+
+char **gup_file_read_lines_as_cstrs_arena(GupArena *a, const char *file_path) {
+    GupArrayString lines = gup_array_string_create_arena(a );
+    char **result = NULL;
+    char *line_buffer = NULL;
+    size_t line_size = 0;
+
+    FILE *fp = fopen(file_path, "r");
+    if (fp == NULL) {
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to open file %s\n", file_path);
+        #endif
+        
+        gup_defer_return(NULL);
+    }
+
+    int line_count = gup_file_line_count(file_path);
+    if (line_count == 0) {
+        #ifdef GUPPY_VERBOSE
+        printf("No lines found in file %s\n", file_path);
+        #endif
+        
+        gup_defer_return(NULL);
+    }
+
+    for (int i = 0; i < line_count; i++) {
+        ssize_t read = getline(&line_buffer, &line_size, fp);
+
+        if (read == EOF) {
+            gup_defer_return(gup_array_string_to_cstrs_arena(a, lines));
+        }
+
+        // In normal gup_read_file_lines we don't want to keep newlines.
+        line_buffer[read-1] = '\0';
+        GupArrayChar line = gup_array_char_create_from_cstr_arena(a, line_buffer);
+        gup_array_string_append_arena(a, &lines, line);
+    }
+
+    gup_defer_return(gup_array_string_to_cstrs(lines));
+
+defer:
+    if (fp) fclose(fp);
+    free(line_buffer);
     return result;
 }
 
