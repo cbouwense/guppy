@@ -258,23 +258,24 @@ GupString      gup_array_string_reduce(GupArrayString xs, GupString (*fn)(GupStr
 bool           gup_array_string_find(GupArrayString xs, bool (*fn)(GupString), GupString *out);
 
 // File operations ---------------------------------------------------------------------------------
-bool           gup_file_create(const char *file_path);
-bool           gup_file_delete(const char *file_path);
-bool           gup_file_is_empty(const char *file_path);
-int            gup_file_line_count(const char *file_path);
-void           gup_file_print(const char *file_path);
-void           gup_file_print_lines(const char *file_path);
-GupString      gup_file_read(const char *file_path);
-char*          gup_file_read_as_cstr(const char *file_path);
-GupArrayString gup_file_read_lines(const char *file_path);
-GupArrayString gup_file_read_lines_arena(GupArena *a, const char *file_path);
-char**         gup_file_read_lines_as_cstrs(const char *file_path);
-GupArrayString gup_file_read_lines_keep_newlines(const char *file_path);
-GupArrayString gup_file_read_lines_keep_newlines_arena(GupArena *a, const char *file_path);
-char**         gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path);
-long           gup_file_size(const char *file_path);
-bool           gup_file_write(const char *text_to_write, const char *file_path);
-bool           gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path);
+bool             gup_file_create(const char *file_path);
+bool             gup_file_delete(const char *file_path);
+bool             gup_file_is_empty(const char *file_path);
+int              gup_file_line_count(const char *file_path);
+void             gup_file_print(const char *file_path);
+void             gup_file_print_lines(const char *file_path);
+GupString        gup_file_read(const char *file_path);
+char            *gup_file_read_as_cstr(const char *file_path);
+char            *gup_file_read_as_cstr_arena(GupArena *a, const char *file_path);
+GupArrayString   gup_file_read_lines(const char *file_path);
+GupArrayString   gup_file_read_lines_arena(GupArena *a, const char *file_path);
+char           **gup_file_read_lines_as_cstrs(const char *file_path);
+GupArrayString   gup_file_read_lines_keep_newlines(const char *file_path);
+GupArrayString   gup_file_read_lines_keep_newlines_arena(GupArena *a, const char *file_path);
+char           **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path);
+long             gup_file_size(const char *file_path);
+bool             gup_file_write(const char *text_to_write, const char *file_path);
+bool             gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -400,12 +401,6 @@ void *_gup_arena_alloc(GupArena *a, size_t bytes, const char *file, int line) {
 
     return gup_arena_alloc(a, bytes);
 }
-
-// #if __has_builtin(__LINE__)
-// #define MY_MACRO(x) printf("Called from %s:%d\n", __FILE__, __LINE__); printf("Value: %d\n", x)
-// #else
-// #error "Clang does not support __LINE__"
-// #endif
 
 #ifdef GUPPY_VERBOSE
 #define gup_arena_alloc(a, bytes) _gup_arena_alloc(a, bytes, __FILE__, __LINE__)
@@ -2168,6 +2163,32 @@ defer:
     return result;
 }
 
+GupString gup_file_read_arena(GupArena *a, const char *file_path) {
+    GupString result = {0};
+
+    FILE *fp = fopen(file_path, "r");
+    if (fp == NULL) {
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to open file %s: %s\n", file_path, strerror(errno));
+        #endif
+        return result;
+    }
+
+    long file_size = gup_file_size(file_path);
+    char *buffer = (char *) gup_arena_alloc(a, file_size + 1);
+    size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
+
+    gup_assert_verbose((long)bytes_read == file_size, "Failed to read file");
+
+    buffer[file_size] = '\0';
+    result = gup_array_char_create_from_cstr_arena(a, buffer);
+    gup_defer_return(result);
+
+defer:
+    if (fp) fclose(fp);
+    return result;
+}
+
 char *gup_file_read_as_cstr(const char *file_path) {
     char *result;
     char *buffer;
@@ -2182,6 +2203,36 @@ char *gup_file_read_as_cstr(const char *file_path) {
 
     long file_size = gup_file_size(file_path);
     buffer = (char *) malloc(file_size + 1);
+
+    size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
+    if ((long)bytes_read != file_size) {
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to read file %s\n", file_path);
+        #endif
+        gup_defer_return(NULL);
+    }
+    buffer[file_size] = '\0';
+    gup_defer_return(buffer);
+
+defer:
+    fclose(fp);
+    return result;
+}
+
+char *gup_file_read_as_cstr_arena(GupArena *a, const char *file_path) {
+    char *result;
+    char *buffer;
+
+    FILE *fp = fopen(file_path, "r");
+    if (fp == NULL) {
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to open file %s\n", file_path);
+        #endif
+        return NULL;
+    }
+
+    long file_size = gup_file_size(file_path);
+    buffer = (char *) gup_arena_alloc(a, file_size + 1);
 
     size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
     if ((long)bytes_read != file_size) {

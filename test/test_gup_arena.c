@@ -55,11 +55,11 @@ void test_gup_arena_can_allocate_a_bunch_of_strings(void) {
     gup_string_append(&str, 'b');
     gup_string_append(&str, 'a');
     gup_string_append(&str, 'r');
-    gup_string_print(str);
 
     gup_arena_destroy(a);
 }
 
+// The file stuff was like spewing leaks so I put this test here
 void test_gup_arena_with_file_stuff(void) {
     GupArena a = gup_arena_create();
 
@@ -82,7 +82,6 @@ void test_gup_arena_with_file_stuff(void) {
             }
         }
     }
-    gup_string_print(out);
     
     gup_arena_destroy(a);
 }
