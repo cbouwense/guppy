@@ -81,12 +81,11 @@ typedef GupArrayPtr GupArena;
 GupArena  gup_arena_create();
 void      gup_arena_destroy(GupArena a); // Free all the allocated memory and the arena itself
 void     *gup_arena_alloc(GupArena *a, size_t bytes);
-void     *gup_arena_alloc(GupArena *a, size_t bytes);
 void      gup_arena_free(GupArena a); // Free all the allocated memory, but not the arena itself
 
 // Dynamic arrays ----------------------------------------------------------------------------------
 GupArrayBool   gup_array_bool_create();
-GupArrayBool gup_array_bool_create_arena(GupArena *a);
+GupArrayBool   gup_array_bool_create_arena(GupArena *a);
 void           gup_array_bool_destroy(GupArrayBool xs);
 GupArrayBool   gup_array_bool_create_from_array(bool xs[], const int size);
 GupArrayBool   gup_array_bool_create_from_array_arena(GupArena *a, bool xs[], const int size);
@@ -127,7 +126,9 @@ bool           gup_array_char_eq_cstr(GupArrayChar xs, const char *cstr, int cst
 bool           gup_array_char_contains(GupArrayChar xs, char x);
 void           gup_array_char_print(GupArrayChar xs);
 void           gup_array_char_append(GupArrayChar *xs, char x);
+void           gup_array_char_append_arena(GupArena *a, GupArrayChar *xs, char x);
 void           gup_array_char_prepend(GupArrayChar *xs, char x);
+void           gup_array_char_prepend_arena(GupArena *a, GupArrayChar *xs, char x);
 GupArrayChar   gup_array_char_map(GupArrayChar xs, char (*fn)(char));
 void           gup_array_char_map_in_place(GupArrayChar *xs, char (*fn)(char));
 GupArrayChar   gup_array_char_filter(GupArrayChar xs, bool (*fn)(char));
@@ -316,7 +317,9 @@ bool       gup_string_contains(GupString str, char c);
 bool       gup_string_contains_substring(GupString str_a, GupString str_b);
 void       gup_string_print(GupString str);
 void       gup_string_append(GupString *str, char c);
+void       gup_string_append_arena(GupArena *a, GupString *str, char c);
 void       gup_string_prepend(GupString *str, char c);
+void       gup_string_prepend_arena(GupArena *a, GupString *str, char c);
 GupString  gup_string_map(GupString str, char (*fn)(char));
 GupString  gup_string_map_arena(GupArena *a, GupString str, char (*fn)(char));
 void       gup_string_map_in_place(GupString str, char (*fn)(char));
@@ -332,7 +335,9 @@ GupString  gup_string_trim_fn(GupString str, bool (*fn)(char));
 void       gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
 GupString  gup_string_without_whitespace(GupString str);
 void       gup_string_without_whitespace_in_place(GupString *str);
-char      *gup_string_array_flatten(char **strings);
+char      *gup_string_array_flatten(char **strs);
+bool       gup_string_starts_with(GupString str, const char* cstr);
+bool       gup_string_ends_with(GupString str, const char* cstr);
 
 // Assert
 void gup_assert(bool pass_condition);
@@ -1233,6 +1238,21 @@ void gup_array_char_append(GupArrayChar *xs, char x) {
     xs->count++;
 }
 
+void gup_array_char_append_arena(GupArena *a, GupArrayChar *xs, char x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        char *new_data = gup_arena_alloc(a, new_capacity * sizeof(char));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
 void gup_array_double_append(GupArrayDouble *xs, double x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
@@ -1355,6 +1375,24 @@ void gup_array_char_prepend(GupArrayChar *xs, char x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(char));
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+
+void gup_array_char_prepend_arena(GupArena *a, GupArrayChar *xs, char x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        char *new_data = gup_arena_alloc(a, new_capacity * sizeof(char));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -2678,7 +2716,9 @@ void _gup_string_print(GupString str, const char* str_name) {
 #define gup_string_print(str) _gup_string_print(str, #str)
 
 #define gup_string_append gup_array_char_append
+#define gup_string_append_arena gup_array_char_append_arena
 #define gup_string_prepend gup_array_char_prepend
+#define gup_string_prepend_arena gup_array_char_prepend_arena
 #define gup_string_map gup_array_char_map
 #define gup_string_map_in_place gup_array_char_map_in_place
 #define gup_string_filter gup_array_char_filter
@@ -2832,6 +2872,22 @@ char *gup_string_array_flatten(char **strings) {
 
     return result;
 }
+
+bool gup_string_starts_with(GupString str, const char* cstr) {
+    int i = 0;
+    for (; i < str.count && cstr[i] != '\0'; i++) {
+        if (cstr[i] != str.data[i]) {
+            return false;
+        }
+    }
+
+    return cstr[i] == '\0';
+}
+
+bool gup_string_ends_with(GupString str, const char* cstr) {
+    return false;
+}
+
 
 // Settings ----------------------------------------------------------------------------------------
 

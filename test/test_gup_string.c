@@ -165,10 +165,23 @@ void test_gup_string_split(void) {
     }
 }
 
+void test_gup_string_starts_with(GupArena *a) {
+    const char *cstr = "Hello";
+    GupString str = gup_string_create_from_cstr_arena(a, cstr);
+    gup_string_append_arena(a, &str, '!');
+
+    gup_assert(gup_string_starts_with(str, cstr));
+}
+
 void test_gup_string(void) {
+    GupArena a = gup_arena_create();
+
     test_gup_string_creates_an_empty_string();
     test_creating_a_gup_string_from_a_cstr_equals_that_cstr();
     test_gup_string_array_flatten();
     test_gup_string_trim_functions();
     test_gup_string_split();
+    test_gup_string_starts_with(&a);
+
+    gup_arena_destroy(a);
 }
