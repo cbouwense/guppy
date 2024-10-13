@@ -336,7 +336,6 @@ GupString  gup_string_trim_fn(GupString str, bool (*fn)(char));
 void       gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
 GupString  gup_string_without_whitespace(GupString str);
 void       gup_string_without_whitespace_in_place(GupString *str);
-char      *gup_string_array_flatten(char **strs);
 bool       gup_string_starts_with(GupString str, GupString sub_str);
 bool       gup_string_starts_with_cstr(GupString str, const char* cstr);
 bool       gup_string_ends_with(GupString str, GupString sub_str);
@@ -346,6 +345,13 @@ bool       gup_string_ends_with_cstr(GupString str, const char* cstr);
 void gup_assert(bool pass_condition);
 void gup_assert_verbose(bool pass_condition, const char *failure_explanation);
 
+// C-string utilities
+char *gup_cstr_array_flatten_arena(GupArena *a, char **strs); // Assumes a null terminated string
+int   gup_cstr_length(const char* cstr); // Assumes a null terminated string
+bool  gup_cstr_eq(const char *a, const char* b); // TODO
+void  gup_cstr_copy(const char *a, const char *b); // TODO
+void  gup_cstr_copy_n(const char *a, const char *b, int n); // TODO
+
 // Miscellaneous
 double gup_operation_seconds(void (*fn)());
 double gup_operation_seconds(void (*fn)());
@@ -353,7 +359,6 @@ double gup_operation_seconds(void (*fn)());
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 #define GUP_RUN if (true)
 #define GUP_SKIP if (false)
-int gup_cstr_length(const char* cstr); // Assumes a null terminated string
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
@@ -2899,31 +2904,6 @@ GupArrayString gup_string_split_arena(GupArena *a, GupString str, char c) {
     return tokens;
 }
 
-// Assumes a null terminated array of strings.
-char *gup_string_array_flatten(char **strings) {
-    // Calculate the total length of all the strings.
-    int total_length = 0;
-    for (int i = 0; strings[i] != NULL; i++) {
-        total_length += strlen(strings[i]);
-    }
-
-    // Allocate a new buffer to hold the flattened string.
-    char *result = malloc(total_length + 1);
-    if (result == NULL) return NULL;
-
-    // Copy each string into the buffer.
-    int offset = 0;
-    for (int i = 0; strings[i] != NULL; i++) {
-        strcpy(result + offset, strings[i]);
-        offset += strlen(strings[i]);
-    }
-
-    // Add a null terminator to the end of the buffer.
-    result[total_length] = '\0';
-
-    return result;
-}
-
 bool gup_string_starts_with(GupString str, GupString sub_str) {
     // Don't count string as "starting with" empty strings.
     if (sub_str.count == 0) {
@@ -3072,6 +3052,42 @@ bool gup_settings_get_cstr_from_file_arena(GupArena *a, const char *key, const c
 
 // bool gup_settings_set_to_file(const char *key, const char *value, const char *file_path) {}
 
+// C-string utilities ------------------------------------------------------------------------------
+
+// Assumes a null terminated string
+int gup_cstr_length(const char *cstr) {
+    int i = 0;
+    while (cstr[i] != '\0') {
+        i++;
+    }
+    return i;
+}
+
+// Assumes a null terminated array of strings.
+char *gup_cstr_array_flatten_arena(GupArena *a, char **strings) {
+    // Calculate the total length of all the strings.
+    int total_length = 0;
+    for (int i = 0; strings[i] != NULL; i++) {
+        total_length += strlen(strings[i]);
+    }
+
+    // Allocate a new buffer to hold the flattened string.
+    char *result = gup_arena_alloc(a, total_length + 1);
+    if (result == NULL) return NULL;
+
+    // Copy each string into the buffer.
+    int offset = 0;
+    for (int i = 0; strings[i] != NULL; i++) {
+        strcpy(result + offset, strings[i]);
+        offset += strlen(strings[i]);
+    }
+
+    // Add a null terminator to the end of the buffer.
+    result[total_length] = '\0';
+
+    return result;
+}
+
 // Miscellaneous -----------------------------------------------------------------------------------
 
 // TODO: DRY this up?
@@ -3099,15 +3115,6 @@ double gup_operation_seconds_verbose(void (*fn)()) {
     printf("The operation took %f seconds to execute.\n", result);
 
     return result;
-}
-
-// Assumes a null terminated string
-int gup_cstr_length(const char *cstr) {
-    int i = 0;
-    while (cstr[i] != '\0') {
-        i++;
-    }
-    return i;
 }
 
 #endif // GUPPY_H_
