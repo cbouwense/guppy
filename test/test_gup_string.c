@@ -8,16 +8,12 @@ void test_gup_string_creates_an_empty_string(void) {
     GupString str = gup_string_create();
 
     gup_assert(gup_string_eq_cstr(str, ""));
-
-    gup_string_destroy(str);
 }
 
 void test_creating_a_gup_string_from_a_cstr_equals_that_cstr(void) {
     GupString str = gup_string_create_from_cstr("Hello World!");
     
     gup_assert(gup_string_eq_cstr(str, "Hello World!"));
-
-    gup_string_destroy(str);
 }
 
 void test_gup_string_array_flatten(void) {
@@ -26,8 +22,6 @@ void test_gup_string_array_flatten(void) {
         char *string = gup_string_array_flatten(array);
 
         gup_assert(strcmp(string, "") == 0);
-
-        free(string);
     }
 
     { // One element
@@ -35,8 +29,6 @@ void test_gup_string_array_flatten(void) {
         char *string = gup_string_array_flatten(array);
 
         gup_assert(strcmp(string, "one") == 0);
-
-        free(string);
     }
 
     { // Multiple elements
@@ -44,8 +36,6 @@ void test_gup_string_array_flatten(void) {
         char *string = gup_string_array_flatten(array);
 
         gup_assert(strcmp(string, "onetwothree") == 0);
-
-        free(string);
     }
 }
 
@@ -55,9 +45,6 @@ void test_gup_string_trim_functions(void) {
         GupString trimmed = gup_string_trim_char(str, '!');
 
         gup_assert(gup_string_eq(str, trimmed));
-
-        gup_string_destroy(str);
-        gup_string_destroy(trimmed);
     }
 
     { // Trimming takes off only those characters at the beginning and end of the string
@@ -66,9 +53,6 @@ void test_gup_string_trim_functions(void) {
         GupString trimmed = gup_string_trim_char(str, '!');
 
         gup_assert(gup_string_eq_cstr(trimmed, "He!ll!o"));
-
-        gup_string_destroy(str);
-        gup_string_destroy(trimmed);
     }
 
     { // Trimming by function unfound characters does nothing
@@ -76,9 +60,6 @@ void test_gup_string_trim_functions(void) {
         GupString trimmed = gup_string_trim_fn(str, is_bang);
 
         gup_assert(gup_string_eq(str, trimmed));
-
-        gup_string_destroy(str);
-        gup_string_destroy(trimmed);
     }
 
     { // Trimming by function takes off only those characters at the beginning and end of the string
@@ -86,9 +67,6 @@ void test_gup_string_trim_functions(void) {
         GupString trimmed = gup_string_trim_fn(str, is_bang);
 
         gup_assert(gup_string_eq_cstr(trimmed, "He!ll!o"));
-
-        gup_string_destroy(str);
-        gup_string_destroy(trimmed);
     }
 
     { // Trimming in place unfound characters does nothing
@@ -96,8 +74,6 @@ void test_gup_string_trim_functions(void) {
         gup_string_trim_char_in_place(&str, '!');
 
         gup_assert(gup_string_eq_cstr(str, "Hello"));
-
-        gup_string_destroy(str);
     }
 
     { // Trimming in place takes off only those characters at the beginning and end of the string
@@ -105,8 +81,6 @@ void test_gup_string_trim_functions(void) {
         gup_string_trim_char_in_place(&str, '!');
 
         gup_assert(gup_string_eq_cstr(str, "He!ll!o"));
-
-        gup_string_destroy(str);
     }
 
     { // Trimming by function in place unfound characters does nothing
@@ -114,8 +88,6 @@ void test_gup_string_trim_functions(void) {
         gup_string_trim_fn_in_place(&str, is_bang);
 
         gup_assert(gup_string_eq_cstr(str, "Hello"));
-
-        gup_string_destroy(str);
     }
 
     { // Trimming by function in place takes off only those characters at the beginning and end of the string
@@ -123,8 +95,6 @@ void test_gup_string_trim_functions(void) {
         gup_string_trim_fn_in_place(&str, is_bang);
 
         gup_assert(gup_string_eq_cstr(str, "He!ll!o"));
-
-        gup_string_destroy(str);
     }
 }
 
@@ -135,9 +105,6 @@ void test_gup_string_split(void) {
 
         gup_assert(gup_string_eq(str, tokens.data[0]));
         gup_assert(tokens.count == 1);
-
-        gup_array_string_destroy(tokens);
-        gup_string_destroy(str);
     }
 
     { // Some delimiters around the edges
@@ -146,9 +113,6 @@ void test_gup_string_split(void) {
 
         gup_assert(gup_string_eq_cstr(tokens.data[0], "foobar"));
         gup_assert(tokens.count == 1);
-
-        gup_array_string_destroy(tokens);
-        gup_string_destroy(str);
     }
 
     { // A bunch of delimiters
@@ -158,19 +122,137 @@ void test_gup_string_split(void) {
         GupArrayString expected = gup_array_string_create_from_cstrs(expected_array, 5);
 
         gup_assert(gup_array_string_eq(tokens, expected));
-
-        gup_array_string_destroy(expected);
-        gup_array_string_destroy(tokens);
-        gup_string_destroy(str);
     }
 }
 
 void test_gup_string_starts_with(GupArena *a) {
-    const char *cstr = "Hello";
-    GupString str = gup_string_create_from_cstr_arena(a, cstr);
-    gup_string_append_arena(a, &str, '!');
+    { // A string starts with itself 
+        GupString sub_str = gup_string_create_from_cstr_arena(a, "Hello");
+        GupString str = gup_string_copy_arena(a, sub_str);
 
-    gup_assert(gup_string_starts_with(str, cstr));
+        gup_assert(gup_string_starts_with(str, sub_str) == true);
+    }
+
+    { // Even after appending it works
+        GupString sub_str = gup_string_create_from_cstr_arena(a, "Hello");
+        GupString str = gup_string_copy_arena(a, sub_str);
+        gup_string_append_arena(a, &str, '!');
+
+        gup_assert(gup_string_starts_with(str, sub_str) == true);
+    }
+
+    { // After prepending something else it is false
+        GupString sub_str = gup_string_create_from_cstr_arena(a, "Hello");
+        GupString str = gup_string_copy_arena(a, sub_str);
+
+        gup_string_prepend_arena(a, &str, '!');
+
+        gup_assert(gup_string_starts_with(str, sub_str) == false);
+    }
+
+    { // Don't count strings as technically starting with empty strings
+        GupString sub_str = gup_string_create_from_cstr_arena(a, "");
+        GupString str = gup_string_copy_arena(a, sub_str);
+
+        gup_assert(gup_string_starts_with(str, sub_str) == false);
+    }
+}
+
+void test_gup_string_starts_with_cstr(GupArena *a) {
+    { // A string starts with itself 
+        char *cstr = "Hello";
+        GupString str = gup_string_create_from_cstr_arena(a, cstr);
+
+        gup_assert(gup_string_starts_with_cstr(str, cstr) == true);
+    }
+
+    { // Even after appending it works
+        char *cstr = "Hello";
+        GupString str = gup_string_create_from_cstr_arena(a, cstr);
+        gup_string_append_arena(a, &str, '!');
+
+        gup_assert(gup_string_starts_with_cstr(str, cstr) == true);
+    }
+
+    { // After prepending something else it is false
+        char *cstr = "Hello";
+        GupString str = gup_string_create_from_cstr_arena(a, cstr);
+
+        gup_string_prepend_arena(a, &str, '!');
+
+        gup_assert(gup_string_starts_with_cstr(str, cstr) == false);
+    }
+
+    { // Don't count strings as technically starting with empty strings
+        char *cstr = "";
+        GupString str = gup_string_create_from_cstr_arena(a, cstr);
+
+        gup_assert(gup_string_starts_with_cstr(str, cstr) == false);
+    }
+}
+
+void test_gup_string_ends_with(GupArena *a) {
+    { // A string ends with itself 
+        GupString sub_str = gup_string_create_from_cstr_arena(a, "Hello");
+        GupString str = gup_string_copy_arena(a, sub_str);
+
+        gup_assert(gup_string_ends_with(str, sub_str) == true);
+    }
+
+    { // After appending something it returns false
+        GupString sub_str = gup_string_create_from_cstr_arena(a, "Hello");
+        GupString str = gup_string_copy_arena(a, sub_str);
+        gup_string_append_arena(a, &str, '!');
+
+        gup_assert(gup_string_ends_with(str, sub_str) == false);
+    }
+
+    { // Prepending something doesn't change anything
+        GupString sub_str = gup_string_create_from_cstr_arena(a, "Hello");
+        GupString str = gup_string_copy_arena(a, sub_str);
+        gup_string_prepend_arena(a, &str, '!');
+
+        gup_assert(gup_string_ends_with(str, sub_str) == true);
+    }
+
+    { // Don't count strings as technically ending with empty strings
+        GupString sub_str = gup_string_create_from_cstr_arena(a, "");
+        GupString str = gup_string_copy_arena(a, sub_str);
+
+        gup_assert(gup_string_ends_with(str, sub_str) == false);
+    }
+}
+
+void test_gup_string_ends_with_cstr(GupArena *a) {
+    { // A string ends with itself 
+        char *cstr = "Hello";
+        GupString str = gup_string_create_from_cstr_arena(a, cstr);
+
+        gup_assert(gup_string_ends_with_cstr(str, cstr) == true);
+    }
+
+    { // After appending something it returns false
+        char *cstr = "Hello";
+        GupString str = gup_string_create_from_cstr_arena(a, cstr);
+        gup_string_append_arena(a, &str, '!');
+
+        gup_assert(gup_string_ends_with_cstr(str, cstr) == false);
+    }
+
+    { // Prepending something doesn't change anything
+        char *cstr = "Hello";
+        GupString str = gup_string_create_from_cstr_arena(a, cstr);
+        gup_string_prepend_arena(a, &str, '!');
+
+        gup_assert(gup_string_ends_with_cstr(str, cstr) == true);
+    }
+
+    { // Don't count strings as technically ending with empty strings
+        char *cstr = "";
+        GupString str = gup_string_create_from_cstr_arena(a, cstr);
+
+        gup_assert(gup_string_ends_with_cstr(str, cstr) == false);
+    }
 }
 
 void test_gup_string(void) {
@@ -182,6 +264,9 @@ void test_gup_string(void) {
     test_gup_string_trim_functions();
     test_gup_string_split();
     test_gup_string_starts_with(&a);
+    test_gup_string_starts_with_cstr(&a);
+    test_gup_string_ends_with(&a);
+    test_gup_string_ends_with_cstr(&a);
 
     gup_arena_destroy(a);
 }

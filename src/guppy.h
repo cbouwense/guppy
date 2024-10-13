@@ -279,6 +279,7 @@ char           **gup_file_read_lines_as_cstrs_arena(GupArena *a, const char *fil
 GupArrayString   gup_file_read_lines_keep_newlines(const char *file_path);
 GupArrayString   gup_file_read_lines_keep_newlines_arena(GupArena *a, const char *file_path);
 char           **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path);
+char           **gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path);
 long             gup_file_size(const char *file_path);
 bool             gup_file_write(const char *text_to_write, const char *file_path);
 bool             gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path);
@@ -336,8 +337,10 @@ void       gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
 GupString  gup_string_without_whitespace(GupString str);
 void       gup_string_without_whitespace_in_place(GupString *str);
 char      *gup_string_array_flatten(char **strs);
-bool       gup_string_starts_with(GupString str, const char* cstr);
-bool       gup_string_ends_with(GupString str, const char* cstr);
+bool       gup_string_starts_with(GupString str, GupString sub_str);
+bool       gup_string_starts_with_cstr(GupString str, const char* cstr);
+bool       gup_string_ends_with(GupString str, GupString sub_str);
+bool       gup_string_ends_with_cstr(GupString str, const char* cstr);
 
 // Assert
 void gup_assert(bool pass_condition);
@@ -345,8 +348,12 @@ void gup_assert_verbose(bool pass_condition, const char *failure_explanation);
 
 // Miscellaneous
 double gup_operation_seconds(void (*fn)());
+double gup_operation_seconds(void (*fn)());
 #define gup_array_len(a) sizeof(a)/sizeof(a[0]) 
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
+#define GUP_RUN if (true)
+#define GUP_SKIP if (false)
+int gup_cstr_length(const char* cstr); // Assumes a null terminated string
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
@@ -2119,7 +2126,7 @@ bool gup_file_is_empty(const char *file_path) {
     return line_count == 0;
 }
 
-/*
+/**
  * This will basically tell you what number you would see in a text editor on the last line.
  * So, if you have a file with 5 lines, the line count will be 5.
  * If you have a file with 5 lines, but the last line is empty, the line count will be 6.
@@ -2551,6 +2558,50 @@ defer:
     return result;
 }
 
+char **gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path) {
+    GupArrayString lines = {0};
+    char **result = NULL;
+    char *line_buffer = NULL;
+    size_t line_size = 0;
+
+    FILE *fp = fopen(file_path, "r");
+    if (fp == NULL) {
+        #ifdef GUPPY_VERBOSE
+        printf("Failed to open file %s\n", file_path);
+        #endif
+        
+        gup_defer_return(NULL);
+    }
+
+    int line_count = gup_file_line_count(file_path);
+    if (line_count == 0) {
+        #ifdef GUPPY_VERBOSE
+        printf("No lines found in file %s\n", file_path);
+        #endif
+        
+        gup_defer_return(NULL);
+    }
+
+    for (int i = 0; i < line_count; i++) {
+        ssize_t read = getline(&line_buffer, &line_size, fp);
+
+        if (read == EOF) {
+            gup_defer_return(gup_array_string_to_cstrs_arena(a, lines));
+        }
+
+        GupArrayChar line = gup_array_char_create_from_cstr_arena(a, line_buffer);
+        gup_array_string_append_arena(a, &lines, line);
+    }
+
+    gup_defer_return(gup_array_string_to_cstrs_arena(a, lines));
+
+defer:
+    free(line_buffer);
+    if (fp) fclose(fp);
+
+    return result;
+}
+
 long gup_file_size(const char *file_path) {
     FILE *fp = fopen(file_path, "rb");
     char failure_reason[1024];
@@ -2873,21 +2924,89 @@ char *gup_string_array_flatten(char **strings) {
     return result;
 }
 
-bool gup_string_starts_with(GupString str, const char* cstr) {
-    int i = 0;
-    for (; i < str.count && cstr[i] != '\0'; i++) {
+bool gup_string_starts_with(GupString str, GupString sub_str) {
+    // Don't count string as "starting with" empty strings.
+    if (sub_str.count == 0) {
+        return false;
+    }
+
+    // A string can't start with a substring that is longer than itself.
+    if (str.count < sub_str.count) {
+        return false;
+    }
+
+    for (int i = 0; i < sub_str.count; i++) {
+        if (str.data[i] != sub_str.data[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool gup_string_starts_with_cstr(GupString str, const char* cstr) {
+    const int cstr_len = gup_cstr_length(cstr);
+
+    // Don't count string as "starting with" empty strings.
+    if (cstr_len == 0) {
+        return false;
+    }
+
+    // A string can't start with a substring that is longer than itself.
+    if (cstr_len > str.count) {
+        return false;
+    }
+
+    for (int i = 0; i < cstr_len; i++) {
         if (cstr[i] != str.data[i]) {
             return false;
         }
     }
 
-    return cstr[i] == '\0';
+    return true;
 }
 
-bool gup_string_ends_with(GupString str, const char* cstr) {
-    return false;
+bool gup_string_ends_with(GupString str, GupString sub_str) {
+    // Don't count string as "ending with" empty strings.
+    if (sub_str.count == 0) {
+        return false;
+    }
+
+    // A string can't end with a substring that is longer than itself.
+    if (str.count < sub_str.count) {
+        return false;
+    }
+
+    for (int i = str.count - sub_str.count, j = 0; i < str.count; i++, j++) {
+        if (sub_str.data[j] != str.data[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
+bool gup_string_ends_with_cstr(GupString str, const char* cstr) {
+    const int cstr_len = gup_cstr_length(cstr);
+
+    // Don't count string as "ending with" empty strings.
+    if (cstr_len == 0) {
+        return false;
+    }
+
+    // A string can't end with a substring that is longer than itself.
+    if (str.count < cstr_len) {
+        return false;
+    }
+
+    for (int i = str.count - cstr_len, j = 0; i < str.count; i++, j++) {
+        if (cstr[j] != str.data[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 // Settings ----------------------------------------------------------------------------------------
 
@@ -2955,6 +3074,7 @@ bool gup_settings_get_cstr_from_file_arena(GupArena *a, const char *key, const c
 
 // Miscellaneous -----------------------------------------------------------------------------------
 
+// TODO: DRY this up?
 double gup_operation_seconds(void (*fn)()) {
     clock_t start, end;
     double cpu_seconds_used;
@@ -2979,6 +3099,15 @@ double gup_operation_seconds_verbose(void (*fn)()) {
     printf("The operation took %f seconds to execute.\n", result);
 
     return result;
+}
+
+// Assumes a null terminated string
+int gup_cstr_length(const char *cstr) {
+    int i = 0;
+    while (cstr[i] != '\0') {
+        i++;
+    }
+    return i;
 }
 
 #endif // GUPPY_H_

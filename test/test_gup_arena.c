@@ -63,7 +63,6 @@ void test_gup_arena_can_allocate_a_bunch_of_strings(void) {
 void test_gup_arena_with_file_stuff(void) {
     GupArena a = gup_arena_create();
 
-    GupString out;
     GupArrayString tokens;
     const char *key = "foo";
     GupArrayString file_lines = gup_file_read_lines_arena(&a, "./src/settings.txt");
@@ -78,7 +77,7 @@ void test_gup_arena_with_file_stuff(void) {
             GupString line_value = tokens.data[1];
 
             if (gup_string_eq_cstr(line_key, key)) {
-                out = gup_string_copy_arena(&a, line_value);
+                gup_string_copy_arena(&a, line_value);
             }
         }
     }
