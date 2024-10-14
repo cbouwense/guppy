@@ -8,7 +8,7 @@
 #include "./test_gup_array.c"
 #include "./test_gup_file.c"
 #include "./test_gup_settings.c"
-// #include "./test_gup_string.c"
+#include "./test_gup_string.c"
 #include "./test_gup_cstr.c"
 
 void _reset_settings_file(void) {
@@ -24,7 +24,7 @@ void run_all_guppy_tests(void) {
     test_gup_array();
     test_gup_file();
     test_gup_settings();
-    // GUP_SKIP test_gup_string();
+    test_gup_string();
     test_gup_cstr();
 
     _reset_settings_file();

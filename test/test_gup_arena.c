@@ -51,7 +51,7 @@ void test_gup_arena_can_be_freed_and_not_leak_memory(void) {
 void test_gup_arena_can_allocate_a_bunch_of_strings(void) {
     GupArena a = gup_arena_create();
 
-    GupString str = gup_string_create_from_cstr_arena(&a, "foo");
+    GupString str = gup_string(&a, "foo");
     gup_string_append(&str, 'b');
     gup_string_append(&str, 'a');
     gup_string_append(&str, 'r');

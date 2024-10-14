@@ -45,11 +45,67 @@ void test_gup_cstr_length(GupArena *a) {
     }
 }
 
+void test_gup_cstr_eq(GupArena *a) {
+    { // Stack allocated
+        gup_assert(true == gup_cstr_eq("", ""));
+        gup_assert(true == gup_cstr_eq("Hello", "Hello"));
+        gup_assert(true == gup_cstr_eq("", "\0"));
+        gup_assert(true == gup_cstr_eq("\0", "\0"));
+        gup_assert(true == gup_cstr_eq("foo\0bar", "foo\0baz"));
+        gup_assert(false == gup_cstr_eq("", "\n"));
+        gup_assert(false == gup_cstr_eq("", " "));
+        gup_assert(false == gup_cstr_eq("Hello", "World"));
+    }
+    
+    { // Heap allocated
+        { // Empty strings are equal.
+            char *x = gup_arena_alloc(a, 1);
+            char *y = gup_arena_alloc(a, 1);
+
+            gup_cstr_copy(x, "\0");
+            gup_cstr_copy(y, "\0");
+            
+            gup_assert(gup_cstr_eq(x, y));
+        }
+
+        { // Equivalent strings should be considered equal.
+            char *x = gup_arena_alloc(a, 6);
+            char *y = gup_arena_alloc(a, 6);
+
+            gup_cstr_copy(x, "Hello");
+            gup_cstr_copy(y, "Hello");
+            
+            gup_assert(gup_cstr_eq(x, y));
+        }
+
+        { // Different strings should not be considered equal.
+            char *x = gup_arena_alloc(a, 6);
+            char *y = gup_arena_alloc(a, 6);
+
+            gup_cstr_copy(x, "Hello");
+            gup_cstr_copy(y, "World");
+            
+            gup_assert(gup_cstr_eq(x, y) == false);
+        }
+
+        { // Different source strings, but the same slices are equal.
+            char *x = gup_arena_alloc(a, 6);
+            char *y = gup_arena_alloc(a, 6);
+
+            gup_cstr_copy(x, "Hello");
+            gup_cstr_copy_n(y, "Hello World", 5);
+
+            gup_assert(gup_cstr_eq(x, y) == true);
+        }
+    }
+}
+
 void test_gup_cstr(void) {
     GupArena a = gup_arena_create();
 
     test_gup_cstr_array_flatten(&a);
     test_gup_cstr_length(&a);
+    test_gup_cstr_eq(&a);
 
     gup_arena_destroy(a);
 }

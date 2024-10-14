@@ -246,6 +246,8 @@ GupArrayString gup_array_string_create();
 GupArrayString gup_array_string_create_arena(GupArena *a);
 void           gup_array_string_destroy(GupArrayString xs);
 GupArrayString gup_array_string_create_from_array(GupString xs[], const int size);
+GupArrayString gup_array_string_create_from_cstrs(char **cstrs, const int size);
+GupArrayString gup_array_string_create_from_cstrs_arena(GupArena *a, char **cstrs, const int size);
 GupArrayString gup_array_string_copy(GupArrayString xs);
 bool           gup_array_string_eq(GupArrayString xs, GupArrayString ys);
 bool           gup_array_string_contains(GupArrayString xs, GupString x);
@@ -309,13 +311,13 @@ GupString  gup_string_create();
 GupString  gup_string_create_arena(GupArena *a);
 void       gup_string_destroy(GupString str);
 GupString  gup_string_create_from_cstr(char str[]);
-GupString  gup_string_create_from_cstr_arena(GupArena *a, char str[]);
+GupString  gup_string_create_from_cstr_arena(GupArena *a, char str[]); // Aliased as "gup_string"
 GupString  gup_string_copy(GupString str);
 GupString  gup_string_copy_arena(GupArena *a, GupString str);
 bool       gup_string_eq(GupString str_a, GupString str_b);
 bool       gup_string_eq_cstr(GupString str, const char *cstr, int cstr_length);
 bool       gup_string_contains(GupString str, char c);
-bool       gup_string_contains_substring(GupString str_a, GupString str_b);
+bool       gup_string_contains_substring(GupString str, GupString sub_str);
 void       gup_string_print(GupString str);
 void       gup_string_append(GupString *str, char c);
 void       gup_string_append_arena(GupArena *a, GupString *str, char c);
@@ -333,6 +335,7 @@ bool       gup_string_find_arena(GupArena *a, GupString str, bool (*fn)(char), c
 GupString  gup_string_trim_char(GupString str, char c);
 void       gup_string_trim_char_in_place(GupString *str, char c);
 GupString  gup_string_trim_fn(GupString str, bool (*fn)(char));
+GupString  gup_string_trim_fn_arena(GupArena *a, GupString str, bool (*fn)(char));
 void       gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
 GupString  gup_string_without_whitespace(GupString str);
 void       gup_string_without_whitespace_in_place(GupString *str);
@@ -346,11 +349,13 @@ void gup_assert(bool pass_condition);
 void gup_assert_verbose(bool pass_condition, const char *failure_explanation);
 
 // C-string utilities
-char *gup_cstr_array_flatten_arena(GupArena *a, char **strs); // Assumes a null terminated string
-int   gup_cstr_length(const char* cstr); // Assumes a null terminated string
-bool  gup_cstr_eq(const char *a, const char* b); // TODO
-void  gup_cstr_copy(const char *a, const char *b); // TODO
-void  gup_cstr_copy_n(const char *a, const char *b, int n); // TODO
+char *gup_cstr_array_flatten_arena(GupArena *a, char **strs); // Assumes a null terminated string.
+int   gup_cstr_length(const char* cstr); // Assumes a null terminated string. Excludes the null from the length.
+int   gup_cstr_length_including_null(const char* cstr); // Assumes a null terminated string. Excludes the null from the length.
+bool  gup_cstr_eq(const char *a, const char* b);
+void  gup_cstr_copy(char *to, const char *from);
+void  gup_cstr_copy_n(char *to, const char *from, int n);
+void  gup_cstr_print(const char *cstr);
 
 // Miscellaneous
 double gup_operation_seconds(void (*fn)());
@@ -811,6 +816,16 @@ GupArrayString gup_array_string_create_from_cstrs(char **xs, const int size) {
     return new;
 }
 
+GupArrayString gup_array_string_create_from_cstrs_arena(GupArena *a, char **cstrs, const int size) {
+    GupArrayString new = gup_array_string_create_arena(a);
+    
+    for (int i = 0; i < size; i++) {
+        gup_array_string_append_arena(a, &new, gup_array_char_create_from_cstr_arena(a, cstrs[i]));
+    }
+
+    return new;
+}
+
 // Copy constructors
 GupArrayBool gup_array_bool_copy(GupArrayBool xs) {
     GupArrayBool new = {
@@ -1251,6 +1266,7 @@ void gup_array_char_append(GupArrayChar *xs, char x) {
 }
 
 void gup_array_char_append_arena(GupArena *a, GupArrayChar *xs, char x) {
+    // TODO: extract arena_realloc
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         char *new_data = gup_arena_alloc(a, new_capacity * sizeof(char));
@@ -2739,27 +2755,31 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
 #define gup_string_destroy gup_array_char_destroy
 #define gup_string_create_from_cstr gup_array_char_create_from_cstr
 #define gup_string_create_from_cstr_arena gup_array_char_create_from_cstr_arena
+#define gup_string gup_string_create_from_cstr_arena
 #define gup_string_copy gup_array_char_copy
 #define gup_string_copy_arena gup_array_char_copy_arena
 #define gup_string_eq gup_array_char_eq
 #define gup_string_eq_cstr gup_array_char_eq_cstr
 #define gup_string_contains gup_array_char_contains
 
-// TODO
-bool gup_string_contains_substring(GupString str_a, GupString str_b) {
+bool gup_string_contains_substring(GupString str, GupString sub_str) {
+    if (sub_str.count > str.count) {
+        return false;
+    }
+
+    for (int i = 0, j = 0; i < str.count; i++) {
+        if (str.data[i] == sub_str.data[j]) {
+            if (j == sub_str.count - 1) {
+                return true;
+            }
+
+            j++;
+        } else {
+            j = 0;
+        }
+    }
+
     return false;
-    
-    // if (str_a.count < str_b.count) {
-    //     return false;
-    // }
-    
-    // for (int a_start = 0; a_start < str_a.count; a_start++) {
-    //     if (str_a.data[i] == str_b.data[i]) {
-    //         for (int j = i+1; j < str_a.count; j++) {
-    //             if (str_a.data[j])
-    //         }
-    //     }
-    // }
 }
 
 void _gup_string_print(GupString str, const char* str_name) {
@@ -2827,22 +2847,47 @@ GupString gup_string_trim_fn(GupString str, bool (*fn)(char)) {
     GupString trimmed_str = gup_string_copy(str);
 
     int i = 0;
-    for (; i < trimmed_str.count && fn(trimmed_str.data[i]); i++) {}
+    while (i < trimmed_str.count && fn(trimmed_str.data[i])) {
+        i++;
+    }
     memmove(trimmed_str.data, trimmed_str.data + i, trimmed_str.count - i);
     trimmed_str.count -= i;
 
-    for (; trimmed_str.count > 0 && fn(trimmed_str.data[trimmed_str.count - 1]); trimmed_str.count--) {}
+    while (trimmed_str.count > 0 && fn(trimmed_str.data[trimmed_str.count - 1])) {
+        trimmed_str.count--;
+    }
+
+    return trimmed_str;
+}
+
+GupString gup_string_trim_fn_arena(GupArena *a, GupString str, bool (*fn)(char)) {
+    GupString trimmed_str = gup_string_copy_arena(a, str);
+
+    int i = 0;
+    while (i < trimmed_str.count && fn(trimmed_str.data[i])) {
+        i++;
+    }
+    memmove(trimmed_str.data, trimmed_str.data + i, trimmed_str.count - i);
+    trimmed_str.count -= i;
+
+    while (trimmed_str.count > 0 && fn(trimmed_str.data[trimmed_str.count - 1])) {
+        trimmed_str.count--;
+    }
 
     return trimmed_str;
 }
 
 void gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char)) {
     int i = 0;
-    for (; i < str->count && fn(str->data[i]); i++) {}
+    while (i < str->count && fn(str->data[i])) {
+        i++;
+    }
     memmove(str->data, str->data + i, str->count - i);
     str->count -= i;
 
-    for (; str->count > 0 && fn(str->data[str->count - 1]); str->count--) {}
+    while (str->count > 0 && fn(str->data[str->count - 1])) {
+        str->count--;
+    }
 }
 
 bool is_not_whitespace(char c) {
@@ -3054,14 +3099,18 @@ bool gup_settings_get_cstr_from_file_arena(GupArena *a, const char *key, const c
 
 // C-string utilities ------------------------------------------------------------------------------
 
-// Assumes a null terminated string
-int gup_cstr_length(const char *cstr) {
-    int i = 0;
-    while (cstr[i] != '\0') {
-        i++;
+// Assumes a null terminated string.
+void _gup_cstr_print(const char *cstr, const char *display_name) {
+    printf("%s: \"", display_name);
+    
+    for (int i = 0; cstr[i] != '\0'; i++) {
+        printf("%c", cstr[i]);
     }
-    return i;
+
+    printf("\"\n");
 }
+
+#define gup_cstr_print(cstr) _gup_cstr_print(cstr, #cstr)
 
 // Assumes a null terminated array of strings.
 char *gup_cstr_array_flatten_arena(GupArena *a, char **strings) {
@@ -3086,6 +3135,88 @@ char *gup_cstr_array_flatten_arena(GupArena *a, char **strings) {
     result[total_length] = '\0';
 
     return result;
+}
+
+// Assumes a null terminated string. Excludes the null terminator from the returned length.
+int gup_cstr_length(const char *cstr) {
+    int i = 0;
+    while (cstr[i] != '\0') {
+        i++;
+    }
+    return i;
+}
+
+// Assumes a null terminated string.
+int gup_cstr_length_including_null(const char *cstr) {
+    int i = 0;
+    while (cstr[i] != '\0') {
+        i++;
+    }
+    return i + 1;
+}
+
+// Assumes null terminated strings
+bool gup_cstr_eq(const char *a, const char* b) {
+    if (gup_cstr_length(a) != gup_cstr_length(b)) {
+        return false;
+    }
+
+    for (int i = 0; i < gup_cstr_length(a); i++) {
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// Assumes null terminated "from" string.
+// Assumes the "to" string has enough memory allocated to hold "from".
+// Null terminates the "to" string.
+void gup_cstr_copy(char *to, const char *from) {
+    for (int i = 0; i < gup_cstr_length_including_null(from); i++) {
+        to[i] = from[i];
+    }
+}
+
+// Assumes null terminated "from" string. Allocates space for the "to" string.
+void gup_cstr_copy_arena(GupArena *a, char *to, const char *from) {
+    const int from_len = gup_cstr_length_including_null(from);
+
+    to = gup_arena_alloc(a, from_len);
+    
+    for (int i = 0; i < from_len; i++) {
+        to[i] = from[i];
+    }
+}
+
+// Assumes the "to" string has enough memory allocated for n+1 characters (+1 for the null terminator).
+// Null terminates the "to" string.
+// Example: if you wanted to copy "Hello" you would need to pass in a pointer with 6 bytes allocated
+// but only ask copy_n to copy 5 characters.
+// ```
+//   char *to = gup_arena_alloc(a, 6);
+//   gup_cstr_copy_n(to, "Hello World", 5);
+// ```
+// this would result with `to` pointing to a chunk of memory with the contents 'H''e''l''l''o''\0'.
+//   
+void gup_cstr_copy_n(char *to, const char *from, int n) {
+    for (int i = 0; i < n; i++) {
+        to[i] = from[i];
+    }
+    to[n] = '\0';
+}
+
+// Allocates space for the "to" string.
+void gup_cstr_copy_n_arena(GupArena *a, char *to, const char *from, int n) {
+    // n+1 bytes because we need room for the null terminator.
+    to = gup_arena_alloc(a, sizeof(char) * (n+1));
+    
+    for (int i = 0; i < n; i++) {
+        to[i] = from[i];
+    }
+
+    to[n] = '\0';
 }
 
 // Miscellaneous -----------------------------------------------------------------------------------
