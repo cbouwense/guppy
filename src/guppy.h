@@ -81,7 +81,7 @@ typedef GupArrayPtr GupArena;
 GupArena  gup_arena_create();
 void      gup_arena_destroy(GupArena a); // Free all the allocated memory and the arena itself
 void     *gup_arena_alloc(GupArena *a, size_t bytes);
-void      gup_arena_free(GupArena a); // Free all the allocated memory, but not the arena itself
+void      gup_arena_free(GupArena *a); // Free all the allocated memory, but not the arena itself
 
 // Dynamic arrays ----------------------------------------------------------------------------------
 GupArrayBool   gup_array_bool_create();
@@ -94,7 +94,6 @@ GupArrayBool   gup_array_bool_copy_arena(GupArena *a, GupArrayBool xs);
 bool           gup_array_bool_eq(GupArrayBool xs, GupArrayBool ys);
 bool           gup_array_bool_eq_arena(GupArena *a, GupArrayBool xs, GupArrayBool ys);
 bool           gup_array_bool_contains(GupArrayBool xs, bool x);
-bool           gup_array_bool_contains_arena(GupArena *a, GupArrayBool xs, bool x);
 void           gup_array_bool_print(GupArrayBool xs);
 void           gup_array_bool_print_arena(GupArena *a, GupArrayBool xs);
 void           gup_array_bool_append(GupArrayBool *xs, bool x);
@@ -132,6 +131,7 @@ void           gup_array_char_prepend_arena(GupArena *a, GupArrayChar *xs, char 
 GupArrayChar   gup_array_char_map(GupArrayChar xs, char (*fn)(char));
 void           gup_array_char_map_in_place(GupArrayChar *xs, char (*fn)(char));
 GupArrayChar   gup_array_char_filter(GupArrayChar xs, bool (*fn)(char));
+GupArrayChar   gup_array_char_filter_arena(GupArena *a, GupArrayChar xs, bool (*fn)(char));
 void           gup_array_char_filter_in_place(GupArrayChar *xs, bool (*fn)(char));
 char           gup_array_char_reduce(GupArrayChar xs, char (*fn)(char, char), char start);
 bool           gup_array_char_find(GupArrayChar xs, bool (*fn)(char), char *out);
@@ -175,7 +175,7 @@ float          gup_array_float_reduce(GupArrayFloat xs, float (*fn)(float, float
 bool           gup_array_float_find(GupArrayFloat xs, bool (*fn)(float), float *out);
 
 GupArrayInt    gup_array_int_create();
-GupArrayInt gup_array_int_create_arena(GupArena *a);
+GupArrayInt    gup_array_int_create_arena(GupArena *a);
 void           gup_array_int_destroy(GupArrayInt xs);
 GupArrayInt    gup_array_int_create_from_array(int xs[], const int size);
 GupArrayInt    gup_array_int_copy(GupArrayInt xs);
@@ -192,7 +192,7 @@ int            gup_array_int_reduce(GupArrayInt xs, int (*fn)(int, int), int sta
 bool           gup_array_int_find(GupArrayInt xs, bool (*fn)(int), int *out);
 
 GupArrayLong   gup_array_long_create();
-GupArrayLong gup_array_long_create_arena(GupArena *a);
+GupArrayLong   gup_array_long_create_arena(GupArena *a);
 void           gup_array_short_destroy(GupArrayShort xs);
 GupArrayLong   gup_array_long_create_from_array(long xs[], const int size);
 GupArrayLong   gup_array_long_copy(GupArrayLong xs);
@@ -209,7 +209,7 @@ long           gup_array_long_reduce(GupArrayLong xs, long (*fn)(long, long), lo
 bool           gup_array_long_find(GupArrayLong xs, bool (*fn)(long), long *out);
 
 GupArrayPtr    gup_array_ptr_create();
-GupArrayPtr gup_array_ptr_create_arena(GupArena *a);
+GupArrayPtr    gup_array_ptr_create_arena(GupArena *a);
 void           gup_array_ptr_destroy(GupArrayPtr xs);
 GupArrayPtr    gup_array_ptr_create_from_array(void* xs[], const int size);
 GupArrayPtr    gup_array_ptr_copy(GupArrayPtr xs);
@@ -226,7 +226,7 @@ void*          gup_array_ptr_reduce(GupArrayPtr xs, void* (*fn)(void*, void*), v
 bool           gup_array_ptr_find(GupArrayPtr xs, bool (*fn)(void*), void* *out);
 
 GupArrayShort  gup_array_short_create();
-GupArrayShort gup_array_short_create_arena(GupArena *a);
+GupArrayShort  gup_array_short_create_arena(GupArena *a);
 void           gup_array_short_destroy(GupArrayShort xs);
 GupArrayShort  gup_array_short_create_from_array(short xs[], const int size);
 GupArrayShort  gup_array_short_copy(GupArrayShort xs);
@@ -255,6 +255,7 @@ void           gup_array_string_print(GupArrayString xs);
 void           gup_array_string_append(GupArrayString *xs, GupString x);
 void           gup_array_string_append_arena(GupArena *a, GupArrayString *xs, GupString x);
 void           gup_array_string_append_cstr(GupArrayString *xs, char cstr[]);
+void           gup_array_string_append_cstr_arena(GupArena *a, GupArrayString *xs, char cstr[]);
 void           gup_array_string_prepend(GupArrayString *xs, GupString x);
 void           gup_array_string_prepend_cstr(GupArrayString *xs, char cstr[]);
 GupArrayString gup_array_string_map(GupArrayString xs, GupString (*fn)(GupString));
@@ -272,6 +273,7 @@ int              gup_file_line_count(const char *file_path);
 void             gup_file_print(const char *file_path);
 void             gup_file_print_lines(const char *file_path);
 GupString        gup_file_read(const char *file_path);
+GupString        gup_file_read_arena(GupArena *a, const char *file_path);
 char            *gup_file_read_as_cstr(const char *file_path);
 char            *gup_file_read_as_cstr_arena(GupArena *a, const char *file_path);
 GupArrayString   gup_file_read_lines(const char *file_path);
@@ -283,8 +285,14 @@ GupArrayString   gup_file_read_lines_keep_newlines_arena(GupArena *a, const char
 char           **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path);
 char           **gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path);
 long             gup_file_size(const char *file_path);
-bool             gup_file_write(const char *text_to_write, const char *file_path);
-bool             gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path);
+void             gup_file_write_arena(GupArena *a, GupString text_to_write, const char *file_path);
+void             gup_file_write_cstr(const char *text_to_write, const char *file_path);
+void             gup_file_write_lines_arena(GupArena *a, GupArrayString lines_to_write, const char *file_path);
+void             gup_file_write_lines_cstrs(char **lines_to_write, const int line_count, const char *file_path);
+void             gup_file_append_line_arena(GupArena *a, GupString line_to_write, const char *file_path);
+void             gup_file_append_line_cstr(const char *line_to_write, const char *file_path);
+void             gup_file_append_lines_arena(GupArena *a, GupArrayString lines_to_write, const char *file_path);
+void             gup_file_append_lines_cstrs(char **lines_to_write, const int line_count, const char *file_path);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -307,42 +315,50 @@ bool gup_settings_set(const char *key, const char *value);
 bool gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
 
 // Strings -------------------------------------------------------------------------------------
-GupString  gup_string_create();
-GupString  gup_string_create_arena(GupArena *a);
-void       gup_string_destroy(GupString str);
-GupString  gup_string_create_from_cstr(char str[]);
-GupString  gup_string_create_from_cstr_arena(GupArena *a, char str[]); // Aliased as "gup_string"
-GupString  gup_string_copy(GupString str);
-GupString  gup_string_copy_arena(GupArena *a, GupString str);
-bool       gup_string_eq(GupString str_a, GupString str_b);
-bool       gup_string_eq_cstr(GupString str, const char *cstr, int cstr_length);
-bool       gup_string_contains(GupString str, char c);
-bool       gup_string_contains_substring(GupString str, GupString sub_str);
-void       gup_string_print(GupString str);
-void       gup_string_append(GupString *str, char c);
-void       gup_string_append_arena(GupArena *a, GupString *str, char c);
-void       gup_string_prepend(GupString *str, char c);
-void       gup_string_prepend_arena(GupArena *a, GupString *str, char c);
-GupString  gup_string_map(GupString str, char (*fn)(char));
-GupString  gup_string_map_arena(GupArena *a, GupString str, char (*fn)(char));
-void       gup_string_map_in_place(GupString str, char (*fn)(char));
-GupString  gup_string_filter(GupString str, bool (*fn)(char));
-GupString  gup_string_filter_arena(GupArena *a, GupString str, bool (*fn)(char));
-void       gup_string_filter_in_place(GupString *str, bool (*fn)(char));
-char       gup_string_reduce(GupString str, char (*fn)(char, char), char start);
-bool       gup_string_find(GupString str, bool (*fn)(char), char *out);
-bool       gup_string_find_arena(GupArena *a, GupString str, bool (*fn)(char), char *out);
-GupString  gup_string_trim_char(GupString str, char c);
-void       gup_string_trim_char_in_place(GupString *str, char c);
-GupString  gup_string_trim_fn(GupString str, bool (*fn)(char));
-GupString  gup_string_trim_fn_arena(GupArena *a, GupString str, bool (*fn)(char));
-void       gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
-GupString  gup_string_without_whitespace(GupString str);
-void       gup_string_without_whitespace_in_place(GupString *str);
-bool       gup_string_starts_with(GupString str, GupString sub_str);
-bool       gup_string_starts_with_cstr(GupString str, const char* cstr);
-bool       gup_string_ends_with(GupString str, GupString sub_str);
-bool       gup_string_ends_with_cstr(GupString str, const char* cstr);
+GupString      gup_string_create();
+GupString      gup_string_create_arena(GupArena *a);
+void           gup_string_destroy(GupString str);
+GupString      gup_string_create_from_cstr(char str[]);
+GupString      gup_string_create_from_cstr_arena(GupArena *a, char str[]); // Aliased as "gup_string"
+GupString      gup_string_copy(GupString str);
+GupString      gup_string_copy_arena(GupArena *a, GupString str);
+bool           gup_string_eq(GupString str_a, GupString str_b);
+bool           gup_string_eq_cstr(GupString str, const char *cstr, int cstr_length);
+bool           gup_string_contains(GupString str, char c);
+bool           gup_string_contains_substring(GupString str, GupString sub_str); // TODO: contains cstr
+void           gup_string_print(GupString str);
+void           gup_string_debug(GupString str);
+void           gup_string_append(GupString *str, char c);
+void           gup_string_append_arena(GupArena *a, GupString *str, char c);
+void           gup_string_append_str_arena(GupArena *a, GupString *str, GupString str_to_append);
+void           gup_string_append_cstr_arena(GupArena *a, GupString *str, const char *cstr_to_append);
+void           gup_string_prepend(GupString *str, char c);
+void           gup_string_prepend_arena(GupArena *a, GupString *str, char c);
+GupString      gup_string_map(GupString str, char (*fn)(char));
+GupString      gup_string_map_arena(GupArena *a, GupString str, char (*fn)(char));
+void           gup_string_map_in_place(GupString str, char (*fn)(char));
+GupString      gup_string_filter(GupString str, bool (*fn)(char));
+GupString      gup_string_filter_arena(GupArena *a, GupString str, bool (*fn)(char));
+void           gup_string_filter_in_place(GupString *str, bool (*fn)(char));
+char           gup_string_reduce(GupString str, char (*fn)(char, char), char start);
+bool           gup_string_find(GupString str, bool (*fn)(char), char *out);
+bool           gup_string_find_arena(GupArena *a, GupString str, bool (*fn)(char), char *out);
+GupString      gup_string_trim_char(GupString str, char c);
+void           gup_string_trim_char_in_place(GupString *str, char c);
+GupString      gup_string_trim_fn(GupString str, bool (*fn)(char));
+GupString      gup_string_trim_fn_arena(GupArena *a, GupString str, bool (*fn)(char));
+void           gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
+GupString      gup_string_without_whitespace(GupString str);
+void           gup_string_without_whitespace_in_place(GupString *str);
+bool           gup_string_starts_with(GupString str, GupString sub_str);
+bool           gup_string_starts_with_cstr(GupString str, const char* cstr);
+bool           gup_string_ends_with(GupString str, GupString sub_str);
+bool           gup_string_ends_with_cstr(GupString str, const char* cstr);
+bool           gup_string_to_int(GupString str, int *out);
+char          *gup_string_to_cstr_arena(GupArena *a, GupString str);
+// TODO: split by substring
+GupArrayString gup_string_split(GupString str, char c);
+GupArrayString gup_string_split_arena(GupArena *a, GupString str, char c);
 
 // Assert
 void gup_assert(bool pass_condition);
@@ -364,6 +380,7 @@ double gup_operation_seconds(void (*fn)());
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 #define GUP_RUN if (true)
 #define GUP_SKIP if (false)
+int gup_char_to_int(char c); // -1 means the character was not an int.
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
@@ -403,7 +420,7 @@ GupArena gup_arena_create() {
 }
 
 void gup_arena_destroy(GupArena a) {
-    gup_arena_free(a);
+    gup_arena_free(&a);
     free(a.data);
 }
 
@@ -433,10 +450,11 @@ void *_gup_arena_alloc(GupArena *a, size_t bytes, const char *file, int line) {
 #define gup_arena_alloc(a, bytes) _gup_arena_alloc(a, bytes, __FILE__, __LINE__)
 #endif // GUPPY_VERBOSE
 
-void gup_arena_free(GupArena a) {
-    for (int i = 0; i < a.count; i++) {
-        free(a.data[i]);
+void gup_arena_free(GupArena *a) {
+    for (int i = 0; i < a->count; i++) {
+        free(a->data[i]);
     }
+    a->count = 0;
 }
 
 // Dynamic Arrays ----------------------------------------------------------------------------------
@@ -1384,6 +1402,22 @@ void gup_array_string_append_cstr(GupArrayString *xs, char *cstr) {
     xs->count++;
 }
 
+void gup_array_string_append_cstr_arena(GupArena *a, GupArrayString *xs, char *cstr) {
+    // TODO: extract arena_realloc
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        GupString *new_data = gup_arena_alloc(a, new_capacity * sizeof(char));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = gup_array_char_create_from_cstr_arena(a, cstr);
+    xs->count++;
+}
+
 // Prepend
 void gup_array_bool_prepend(GupArrayBool *xs, bool x) {
     if (xs->count == xs->capacity) {
@@ -1708,6 +1742,18 @@ GupArrayChar gup_array_char_filter(GupArrayChar xs, bool (*fn)(char)) {
     for (int i = 0; i < xs.count; i++) {
         if (fn(xs.data[i])) {
             gup_array_char_append(&new, xs.data[i]);
+        }
+    }
+
+    return new;
+}
+
+GupArrayChar gup_array_char_filter_arena(GupArena *a, GupArrayChar xs, bool (*fn)(char)) {
+    GupArrayChar new = gup_array_char_create_arena(a);
+
+    for (int i = 0; i < xs.count; i++) {
+        if (fn(xs.data[i])) {
+            gup_array_char_append_arena(a, &new, xs.data[i]);
         }
     }
 
@@ -2261,12 +2307,8 @@ GupString gup_file_read_arena(GupArena *a, const char *file_path) {
     GupString result = {0};
 
     FILE *fp = fopen(file_path, "r");
-    if (fp == NULL) {
-        #ifdef GUPPY_VERBOSE
-        printf("Failed to open file %s: %s\n", file_path, strerror(errno));
-        #endif
-        return result;
-    }
+    // TODO: interpolate, in write funcs as well
+    gup_assert_verbose(fp != NULL, "Failed to open the file.");
 
     long file_size = gup_file_size(file_path);
     char *buffer = (char *) gup_arena_alloc(a, file_size + 1);
@@ -2349,6 +2391,7 @@ void _remove_trailing_newline(GupString *str) {
     }
 }
 
+// TODO: why doesn't this leak memory if I don't free it as a consumer?
 GupArrayString gup_file_read_lines(const char *file_path) {
     GupArrayString result = gup_file_read_lines_keep_newlines(file_path);
     gup_array_string_map_in_place(&result, _remove_trailing_newline);
@@ -2636,44 +2679,89 @@ long gup_file_size(const char *file_path) {
     return file_size;
 }
 
-bool gup_file_write(const char *text_to_write, const char *file_path) {
-    bool result = true;
-
+void gup_file_write_arena(GupArena *a, GupString text_to_write, const char *file_path) {
     FILE *fp = fopen(file_path, "w");
-    if (fp == NULL) {
-        printf("Failed to open file %s\n", file_path);
-        gup_defer_return(false);
-    }
+    // TODO: interpolate file name
+    gup_assert_verbose(fp != NULL, "tried opening a file to write to it, but wasn't able to.");
+
+    fprintf(fp, "%s", gup_string_to_cstr_arena(a, text_to_write));
+
+    fclose(fp);
+}
+
+void gup_file_write_cstr(const char *text_to_write, const char *file_path) {
+    FILE *fp = fopen(file_path, "w");
+    // TODO: interpolate file name
+    gup_assert_verbose(fp != NULL, "tried opening a file to write to it, but wasn't able to.");
 
     fprintf(fp, "%s", text_to_write);
 
-defer:
     fclose(fp);
-    return result;
 }
 
-bool gup_file_write_lines(const char **lines_to_write, const int line_count, const char *file_path) {
-    bool result = true;
+void gup_file_write_lines_arena(GupArena *a, GupArrayString lines_to_write, const char *file_path) {
+    FILE *fp = fopen(file_path, "w");
+    // TODO: interpolate file name
+    gup_assert_verbose(fp != NULL, "tried opening a file to write to it, but wasn't able to.");
 
-    if (!gup_file_delete(file_path)) {
-        return false;
+    for (int i = 0; i < lines_to_write.count; i++) {
+        fputs(gup_string_to_cstr_arena(a, lines_to_write.data[i]), fp);
     }
-    
-    FILE *fp = fopen(file_path, "a");
-    if (fp == NULL) {
-        printf("Failed to open file %s\n", file_path);
-        gup_defer_return(false);
-    }
+
+    fclose(fp);
+}
+
+void gup_file_write_lines_cstrs(char **lines_to_write, const int line_count, const char *file_path) {
+    FILE *fp = fopen(file_path, "w");
+    gup_assert_verbose(fp != NULL, "tried opening a file to write to it, but wasn't able to.");
 
     for (int i = 0; i < line_count; i++) {
         fputs(lines_to_write[i], fp);
-        fputs("\n", fp);
     }
 
-defer:
     fclose(fp);
-    return result;
 }
+
+void gup_file_append_line_arena(GupArena *a, GupString line_to_write, const char *file_path) {
+    FILE *fp = fopen(file_path, "a");
+    gup_assert_verbose(fp != NULL, "tried opening a file to append to it, but wasn't able to.");
+
+    fprintf(fp, "%s\n", gup_string_to_cstr_arena(a, line_to_write));
+
+    fclose(fp);
+}
+
+void gup_file_append_line_cstr(const char *line_to_write, const char *file_path) {
+    FILE *fp = fopen(file_path, "a");
+    gup_assert_verbose(fp != NULL, "tried opening a file to append to it, but wasn't able to.");
+
+    fprintf(fp, "%s\n", line_to_write);
+
+    fclose(fp);
+}
+
+void gup_file_append_lines_arena(GupArena *a, GupArrayString lines_to_write, const char *file_path) {
+    FILE *fp = fopen(file_path, "a");
+    gup_assert_verbose(fp != NULL, "tried opening a file to append to it, but wasn't able to.");
+
+    for (int i = 0; i < lines_to_write.count; i++) {
+        fprintf(fp, "%s\n", gup_string_to_cstr_arena(a, lines_to_write.data[i]));
+    }
+
+    fclose(fp);
+}
+
+void gup_file_append_lines_cstrs(char **lines_to_write, const int line_count, const char *file_path) {
+    FILE *fp = fopen(file_path, "a");
+    gup_assert_verbose(fp != NULL, "tried opening a file to append to it, but wasn't able to.");
+
+    for (int i = 0; i < line_count; i++) {
+        fprintf(fp, "%s\n", lines_to_write[i]);
+    }
+
+    fclose(fp);
+}
+
 
 // Print -------------------------------------------------------------------------------------------
 
@@ -2791,13 +2879,43 @@ void _gup_string_print(GupString str, const char* str_name) {
 }
 #define gup_string_print(str) _gup_string_print(str, #str)
 
+void _gup_string_debug(GupString str, const char* str_name) {
+    printf("%s: {\n", str_name);
+    printf("  capacity: %d\n", str.capacity);
+    printf("  count:    %d\n", str.count);
+    printf("  data:     [");
+    for (int i = 0; i < str.count; i++) {
+        printf("%c", str.data[i]);
+        if (i == str.count - 1) {
+            printf(", ");
+        }
+    }
+    printf("]\n}\n");
+}
+#define gup_string_debug(str) _gup_string_debug(str, #str)
+
 #define gup_string_append gup_array_char_append
 #define gup_string_append_arena gup_array_char_append_arena
+
+void gup_string_append_str_arena(GupArena *a, GupString *str, GupString str_to_append) {
+    for (int i = 0; i < str_to_append.count; i++) {
+        gup_array_char_append_arena(a, str, str_to_append.data[i]);
+    }
+}
+
+void gup_string_append_cstr_arena(GupArena *a, GupString *str, const char *cstr_to_append) {
+    const int cstr_len = gup_cstr_length(cstr_to_append);
+    for (int i = 0; i < cstr_len; i++) {
+        gup_array_char_append_arena(a, str, cstr_to_append[i]);
+    }
+}
+
 #define gup_string_prepend gup_array_char_prepend
 #define gup_string_prepend_arena gup_array_char_prepend_arena
 #define gup_string_map gup_array_char_map
 #define gup_string_map_in_place gup_array_char_map_in_place
 #define gup_string_filter gup_array_char_filter
+#define gup_string_filter_arena gup_array_char_filter_arena
 #define gup_string_filter_in_place gup_array_char_filter_in_place
 #define gup_string_reduce gup_array_char_reduce
 #define gup_string_find gup_array_char_find
@@ -3033,6 +3151,31 @@ bool gup_string_ends_with_cstr(GupString str, const char* cstr) {
     return true;
 }
 
+bool gup_string_to_int(GupString str, int *out) {
+    int result = 0;
+    
+    for (int i = str.count-1, j = 0; i >= 0; i--, j++) {
+        const int char_as_int = gup_char_to_int(str.data[i]) * pow(10, j);
+        if (char_as_int == -1) {
+            return false;
+        }
+        result += char_as_int;
+    }
+
+    *out = result;
+    return true;
+}
+
+char *gup_string_to_cstr_arena(GupArena *a, GupString str) {
+    // +1 because we need to allocate room for null terminator.
+    char *cstr = gup_arena_alloc(a, sizeof(char) * (str.count + 1));
+    for (int i = 0; i < str.count; i++) {
+        cstr[i] = str.data[i];
+    }
+    cstr[str.count] = '\0';
+    return cstr;
+}
+
 // Settings ----------------------------------------------------------------------------------------
 
 bool gup_settings_get_cstr(const char *key, GupString *out) {
@@ -3246,6 +3389,23 @@ double gup_operation_seconds_verbose(void (*fn)()) {
     printf("The operation took %f seconds to execute.\n", result);
 
     return result;
+}
+
+// -1 means the character was not an int.
+int gup_char_to_int(char c) {
+    switch (c) {
+        case '0': return 0;
+        case '1': return 1;
+        case '2': return 2;
+        case '3': return 3;
+        case '4': return 4;
+        case '5': return 5;
+        case '6': return 6;
+        case '7': return 7;
+        case '8': return 8;
+        case '9': return 9;
+        default:  return -1;
+    }
 }
 
 #endif // GUPPY_H_
