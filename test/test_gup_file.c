@@ -364,96 +364,89 @@ void test_gup_file_read_lines_keep_newlines_arena(GupArena *a) {
 
 void test_gup_file_read_lines_as_cstrs(void) {
     { // empty.txt
-        char *lines = NULL;
+        char **lines = NULL;
         
-        gup_assert(gup_file_read_lines_as_cstrs("./resources/empty.txt", &lines));
-
-        gup_assert(lines == NULL);
-    }
-
-    // { // one_newline.txt
-    //     lines = gup_file_read_lines_as_cstrs("./resources/one_newline.txt");
-
-    //     gup_assert(strcmp(lines[0], "") == 0);
-    //     gup_assert(lines[1] == NULL);
-
-    //     free(lines[0]);
-    //     free(lines);
-    // }
-
-    // { // foo.txt
-    //     lines = gup_file_read_lines_as_cstrs("./resources/foo.txt");
-
-    //     gup_assert(strcmp(lines[0], "one") == 0);
-    //     gup_assert(strcmp(lines[1], "twotwo") == 0);
-    //     gup_assert(strcmp(lines[2], "three three three") == 0);
-    //     gup_assert(strcmp(lines[3], "") == 0);
-    //     gup_assert(lines[4] == NULL);
-
-    //     const int line_count = gup_file_line_count("./resources/foo.txt");
-    //     for (int i = 0; i < line_count; i++) {
-    //         free(lines[i]);
-    //     }
-    //     free(lines);
-    // }
-
-    // { // settings.toml
-    //     lines = gup_file_read_lines_as_cstrs("./resources/settings.toml");
-    //     const int line_count = gup_file_line_count("./resources/settings.toml");
-
-    //     #ifdef GUPPY_VERBOSE
-    //     gup_file_print("./resources/settings.toml");
-    //     for (int i = 0; i < line_count; i++) {
-    //         printf("%s\n", lines[i]);
-    //     }
-    //     #endif
-
-    //     gup_assert(strcmp(lines[0], "# This is a TOML file") == 0);
-    //     gup_assert(strcmp(lines[1], "") == 0);
-    //     gup_assert(strcmp(lines[2], "title = \"guppy.h\"") == 0);
-    //     gup_assert(strcmp(lines[3], "author = \"Christian Bouwense\"") == 0);
-    //     gup_assert(strcmp(lines[4], "") == 0);
-    //     gup_assert(strcmp(lines[5], "[database]") == 0);
-    //     gup_assert(strcmp(lines[6], "server = \"localhost\"") == 0);
-    //     gup_assert(strcmp(lines[7], "port = 5432") == 0);
-    //     gup_assert(lines[8] == NULL);
-
-        
-    //     for (int i = 0; i < line_count; i++) {
-    //         free(lines[i]);
-    //     }
-    //     free(lines);
-    // }
-
-}
-
-void test_gup_file_read_lines_as_cstrs_keep_newlines(void) {
-    char **lines = NULL;
-    int line_count = 0;
-
-    { // empty.txt
-        gup_assert(!gup_file_read_lines_as_cstrs_keep_newlines("./resources/empty.txt", &lines, &line_count));
-
-        gup_assert(line_count == 0);
-    
-        free(lines);
+        gup_assert(!gup_file_read_lines_as_cstrs("./resources/empty.txt", &lines));
     }
 
     { // one_newline.txt
-        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines("./resources/one_newline.txt", &lines, &line_count));
+        char **lines = NULL;
 
-        gup_assert(strcmp(lines[0], "\n") == 0);
-        printf("line_count: %d\n", line_count);
-        gup_assert(line_count == 2);
+        gup_assert(gup_file_read_lines_as_cstrs("./resources/one_newline.txt", &lines));
+
+        gup_assert(strcmp(lines[0], "") == 0);
 
         free(lines[0]);
         free(lines);
     }
 
     { // foo.txt
-        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines("./resources/foo.txt", &lines, &line_count));
+        char **lines = NULL;
+        
+        gup_assert(gup_file_read_lines_as_cstrs("./resources/foo.txt", &lines));
 
-        gup_assert(line_count == 5);
+        gup_assert(strcmp(lines[0], "one") == 0);
+        gup_assert(strcmp(lines[1], "twotwo") == 0);
+        gup_assert(strcmp(lines[2], "three three three") == 0);
+        gup_assert(strcmp(lines[3], "") == 0);
+
+        const int line_count = gup_file_line_count("./resources/foo.txt");
+        for (int i = 0; i < line_count-1; i++) {
+            free(lines[i]);
+        }
+        free(lines);
+    }
+
+    { // settings.toml
+        char **lines = NULL;
+        
+        gup_assert(gup_file_read_lines_as_cstrs("./resources/settings.toml", &lines));
+        const int line_count = gup_file_line_count("./resources/settings.toml");
+
+        #ifdef GUPPY_VERBOSE
+        gup_file_print("./resources/settings.toml");
+        for (int i = 0; i < line_count-1; i++) {
+            printf("%s\n", lines[i]);
+        }
+        #endif
+
+        gup_assert(strcmp(lines[0], "# This is a TOML file") == 0);
+        gup_assert(strcmp(lines[1], "") == 0);
+        gup_assert(strcmp(lines[2], "title = \"guppy.h\"") == 0);
+        gup_assert(strcmp(lines[3], "author = \"Christian Bouwense\"") == 0);
+        gup_assert(strcmp(lines[4], "") == 0);
+        gup_assert(strcmp(lines[5], "[database]") == 0);
+        gup_assert(strcmp(lines[6], "server = \"localhost\"") == 0);
+        gup_assert(strcmp(lines[7], "port = 5432") == 0);
+        
+        for (int i = 0; i < line_count-1; i++) {
+            free(lines[i]);
+        }
+        free(lines);
+    }
+}
+
+void test_gup_file_read_lines_as_cstrs_keep_newlines(void) {
+    char **lines = NULL;
+
+    { // empty.txt
+        gup_assert(!gup_file_read_lines_as_cstrs_keep_newlines("./resources/empty.txt", &lines));
+
+        free(lines);
+    }
+
+    { // one_newline.txt
+        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines("./resources/one_newline.txt", &lines));
+
+        gup_assert(strcmp(lines[0], "\n") == 0);
+
+        free(lines[0]);
+        free(lines);
+    }
+
+    { // foo.txt
+        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines("./resources/foo.txt", &lines));
+
         gup_assert(strcmp(lines[0], "one\n") == 0);
         gup_assert(strcmp(lines[1], "twotwo\n") == 0);
         gup_assert(strcmp(lines[2], "three three three\n") == 0);
@@ -467,9 +460,8 @@ void test_gup_file_read_lines_as_cstrs_keep_newlines(void) {
     }
 
     { // settings.toml
-        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines("./resources/settings.toml", &lines, &line_count));
+        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines("./resources/settings.toml", &lines));
 
-        gup_assert(line_count == 9);
         gup_assert(strcmp(lines[0], "# This is a TOML file\n") == 0);
         gup_assert(strcmp(lines[1], "\n") == 0);
         gup_assert(strcmp(lines[2], "title = \"guppy.h\"\n") == 0);
@@ -489,25 +481,20 @@ void test_gup_file_read_lines_as_cstrs_keep_newlines(void) {
 
 void test_gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a) {
     char **lines = NULL;
-    int line_count = 0;
 
     { // empty.txt
-        gup_assert(!gup_file_read_lines_as_cstrs_keep_newlines_arena(a, "./resources/empty.txt", &lines, &line_count));
-
-        gup_assert(line_count == 0);
+        gup_assert(!gup_file_read_lines_as_cstrs_keep_newlines_arena(a, "./resources/empty.txt", &lines));
     }
 
     { // one_newline.txt
-        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines_arena(a, "./resources/one_newline.txt", &lines, &line_count));
+        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines_arena(a, "./resources/one_newline.txt", &lines));
 
-        gup_assert(line_count == 2);
         gup_assert(strcmp(lines[0], "\n") == 0);
     }
 
     { // foo.txt
-        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines_arena(a, "./resources/foo.txt", &lines, &line_count));
+        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines_arena(a, "./resources/foo.txt", &lines));
 
-        gup_assert(line_count == 5);
         gup_assert(strcmp(lines[0], "one\n") == 0);
         gup_assert(strcmp(lines[1], "twotwo\n") == 0);
         gup_assert(strcmp(lines[2], "three three three\n") == 0);
@@ -515,9 +502,8 @@ void test_gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a) {
     }
 
     { // settings.toml
-        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines_arena(a, "./resources/settings.toml", &lines, &line_count));
+        gup_assert(gup_file_read_lines_as_cstrs_keep_newlines_arena(a, "./resources/settings.toml", &lines));
 
-        gup_assert(line_count == 9);
         gup_assert(strcmp(lines[0], "# This is a TOML file\n") == 0);
         gup_assert(strcmp(lines[1], "\n") == 0);
         gup_assert(strcmp(lines[2], "title = \"guppy.h\"\n") == 0);

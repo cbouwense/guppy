@@ -280,11 +280,11 @@ bool             gup_file_read_as_cstr(const char *file_path, char **out);
 bool             gup_file_read_as_cstr_arena(GupArena *a, const char *file_path, char **out);
 GupArrayString   gup_file_read_lines(const char *file_path);
 GupArrayString   gup_file_read_lines_arena(GupArena *a, const char *file_path);
-bool             gup_file_read_lines_as_cstrs(const char *file_path, char **out);
+bool             gup_file_read_lines_as_cstrs(const char *file_path, char ***out);
 bool             gup_file_read_lines_keep_newlines(const char *file_path, GupArrayString *out);
 bool             gup_file_read_lines_keep_newlines_arena(GupArena *a, const char *file_path, GupArrayString *out);
-bool             gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path, char ***out, int *out_length);
-bool             gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path, char ***out, int *out_length);
+bool             gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path, char ***out);
+bool             gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path, char ***out);
 bool             gup_file_size(const char *file_path, long *out);
 int              gup_file_watch(const char *file_path, void (*fn)(void));
 int              gup_file_watch_cli_command(const char *file_path, const char *cli_command);
@@ -452,9 +452,9 @@ void *_gup_arena_alloc(GupArena *a, size_t bytes, const char *file, int line) {
     return gup_arena_alloc(a, bytes);
 }
 
-#ifdef GUPPY_VERBOSE
+#ifdef GUPPY_DEBUG_MEMORY
 #define gup_arena_alloc(a, bytes) _gup_arena_alloc(a, bytes, __FILE__, __LINE__)
-#endif // GUPPY_VERBOSE
+#endif // GUPPY_DEBUG_MEMORY
 
 void gup_arena_free(GupArena *a) {
     for (int i = 0; i < a->count; i++) {
@@ -2263,34 +2263,26 @@ defer:
 void gup_file_print(const char *file_path) {
     printf("[%s]\n", file_path);
     char **file_lines = NULL;
-    if (!gup_file_read_lines_as_cstrs(file_path, file_lines)) return;
+    if (!gup_file_read_lines_as_cstrs(file_path, &file_lines)) return;
 
     const int line_count = gup_file_line_count(file_path);
-    for (int i = 0; i < line_count; i++) {
-        if (file_lines[i] != NULL) {
-            printf("%s\n", file_lines[i]);
-            free(file_lines[i]);
-        } else { // if there is an empty last line
-            printf("\n");
-        }
+    for (int i = 0; i < line_count-1; i++) {
+        printf("%s\n", file_lines[i]);
+        free(file_lines[i]);
     }
+    printf("\n");
     free(file_lines);
 }
 
 void gup_file_print_lines(const char *file_path) {
     printf("[%s]\n", file_path);
     char **file_lines = NULL;
-    if (!gup_file_read_lines_as_cstrs(file_path, file_lines)) return;
+    if (!gup_file_read_lines_as_cstrs(file_path, &file_lines)) return;
 
     const int line_count = gup_file_line_count(file_path);
-    for (int i = 0; i < line_count; i++) {
-        if (file_lines[i] != NULL) { // 
-            printf("%d %s\n", i+1, file_lines[i]);
-            free(file_lines[i]);
-        } else {
-            // if there is an empty last line
-            printf("%d", i+1);
-        }
+    for (int i = 0; i < line_count-1; i++) {
+        printf("%d %s\n", i+1, file_lines[i]);
+        free(file_lines[i]);
     }
     printf("\n");
     free(file_lines);
@@ -2304,9 +2296,7 @@ bool gup_file_read(const char *file_path, GupString *out) {
 
     if (fp == NULL) {
         #ifdef GUPPY_VERBOSE
-            char failure_reason[1024];
-            sprintf(failure_reason, "Failed to open %s: %s", file_path, strerror(errno));
-            printf(failure_reason);
+            printf("Failed to open %s: %s", file_path, strerror(errno));
         #endif // GUPPY_VERBOSE
         return false;
     }
@@ -2340,9 +2330,7 @@ bool gup_file_read_arena(GupArena *a, const char *file_path, GupString *out) {
 
     if (fp == NULL) {
         #ifdef GUPPY_VERBOSE
-            char failure_reason[1024];
-            sprintf(failure_reason, "Failed to open %s: %s", file_path, strerror(errno));
-            printf(failure_reason);
+            printf("Failed to open %s: %s", file_path, strerror(errno));
         #endif // GUPPY_VERBOSE
         return false;
     }
@@ -2354,9 +2342,7 @@ bool gup_file_read_arena(GupArena *a, const char *file_path, GupString *out) {
 
     if ((long)bytes_read != file_size) {
         #ifdef GUPPY_VERBOSE
-            char failure_reason[1024];
-            sprintf(failure_reason, "Was unable to fully read %s", file_path);
-            printf(failure_reason);
+            printf("Was unable to fully read %s", file_path);
         #endif // GUPPY_VERBOSE
         gup_defer_return(false);
     }
@@ -2502,7 +2488,7 @@ defer:
     return result;
 }
 
-bool gup_file_read_lines_as_cstrs(const char *file_path, char **out) {
+bool gup_file_read_lines_as_cstrs(const char *file_path, char ***out) {
     bool result = true;
     
     FILE *fp = fopen(file_path, "r");
@@ -2514,21 +2500,33 @@ bool gup_file_read_lines_as_cstrs(const char *file_path, char **out) {
         gup_defer_return(false);
     }
 
+    int line_count = gup_file_line_count(file_path);
+    if (line_count == 0) {
+        #ifdef GUPPY_VERBOSE
+            printf("The file you are trying to read has no lines %s\n", file_path);
+        #endif
+        
+        gup_defer_return(false);
+    }
+    char **lines = (char **) malloc(sizeof(char **) * line_count);
+
     char buffer[65536];
     for (int i = 0; fgets(buffer, 65536, fp) != NULL; i++) {
         const int line_length = gup_cstr_length(buffer);
-        // Overwrite the newline because in normal gup_read_file_lines we don't want to keep newlines.
+        lines[i] = (char *) malloc(sizeof(char *) * line_length);
+        // Overwrite the newline with a null terminator, since this function does not keep newlines.
         buffer[line_length-1] = '\0';
-
-        out[i] = buffer;
+        gup_cstr_copy(lines[i], buffer);
     }
+
+    *out = lines;
 
 defer:
     if (fp) fclose(fp);
     return result;
 }
 
-bool gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path, char ***out, int *out_length) {
+bool gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path, char ***out) {
     bool result = true;
     
     FILE *fp = fopen(file_path, "r");
@@ -2557,14 +2555,13 @@ bool gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path, char ***o
     }
 
     *out = lines;
-    *out_length = line_count;
 
 defer:
     if (fp) fclose(fp);
     return result;
 }
 
-bool gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path, char ***out, int *out_length) {
+bool gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path, char ***out) {
     bool result = true;
     
     FILE *fp = fopen(file_path, "r");
@@ -2593,7 +2590,6 @@ bool gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *f
     }
 
     *out = lines;
-    *out_length = line_count;
 
 defer:
     if (fp) fclose(fp);
@@ -2606,7 +2602,7 @@ bool gup_file_size(const char *file_path, long *out) {
     FILE *fp = fopen(file_path, "rb");
     if (fp == NULL) {
         #ifdef GUPPY_VERBOSE
-            printf(failure_reason, "Failed to open %s: %s", file_path, strerror(errno));
+            printf("Failed to open %s: %s", file_path, strerror(errno));
         #endif // GUPPY_VERBOSE
         gup_defer_return(false);
     }
@@ -2719,9 +2715,7 @@ bool gup_file_write_cstr(const char *text_to_write, const char *file_path) {
     FILE *fp = fopen(file_path, "w");
     if (fp == NULL) {
         #ifdef GUPPY_VERBOSE
-            char failure_reason[1024];
-            sprintf(failure_reason, "Failed to open %s: %s", file_path, strerror(errno));
-            printf(failure_reason);
+            printf("Failed to open %s: %s", file_path, strerror(errno));
         #endif // GUPPY_VERBOSE
         gup_defer_return(false);
     }
