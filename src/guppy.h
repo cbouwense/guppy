@@ -283,8 +283,8 @@ GupArrayString   gup_file_read_lines_arena(GupArena *a, const char *file_path);
 bool             gup_file_read_lines_as_cstrs(const char *file_path, char **out);
 bool             gup_file_read_lines_keep_newlines(const char *file_path, GupArrayString *out);
 bool             gup_file_read_lines_keep_newlines_arena(GupArena *a, const char *file_path, GupArrayString *out);
-char           **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path);
-char           **gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path);
+bool             gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path, char ***out, int *out_length);
+bool             gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path, char ***out, int *out_length);
 bool             gup_file_size(const char *file_path, long *out);
 int              gup_file_watch(const char *file_path, void (*fn)(void));
 int              gup_file_watch_cli_command(const char *file_path, const char *cli_command);
@@ -2528,93 +2528,75 @@ defer:
     return result;
 }
 
-char **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path) {
-    GupArrayString lines = {0};
-    char **result = NULL;
-    char *line_buffer = NULL;
-    size_t line_size = 0;
-
+bool gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path, char ***out, int *out_length) {
+    bool result = true;
+    
     FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
         #ifdef GUPPY_VERBOSE
-        printf("Failed to open file %s\n", file_path);
+            printf("Failed to open file %s\n", file_path);
         #endif
         
-        gup_defer_return(NULL);
+        gup_defer_return(false);
     }
 
     int line_count = gup_file_line_count(file_path);
     if (line_count == 0) {
         #ifdef GUPPY_VERBOSE
-        printf("No lines found in file %s\n", file_path);
+            printf("The file you are trying to read has no lines %s\n", file_path);
         #endif
         
-        gup_defer_return(NULL);
+        gup_defer_return(false);
+    }
+    char **lines = (char **) malloc(sizeof(char **) * line_count);
+
+    char buffer[65536];
+    for (int i = 0; fgets(buffer, 65536, fp) != NULL; i++) {
+        lines[i] = (char *) malloc(sizeof(char *) * gup_cstr_length(buffer));
+        gup_cstr_copy(lines[i], buffer);
     }
 
-    for (int i = 0; i < line_count; i++) {
-        ssize_t read = getline(&line_buffer, &line_size, fp);
-
-        if (read == EOF) {
-            gup_defer_return(gup_array_string_to_cstrs(lines));
-        }
-
-        GupArrayChar line = gup_array_char_create_from_cstr(line_buffer);
-        gup_array_string_append(&lines, line);
-        free(line.data);
-    }
-
-    gup_defer_return(gup_array_string_to_cstrs(lines));
+    *out = lines;
+    *out_length = line_count;
 
 defer:
-    gup_array_string_destroy(lines);
-    free(line_buffer);
     if (fp) fclose(fp);
-
     return result;
 }
 
-char **gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path) {
-    GupArrayString lines = {0};
-    char **result = NULL;
-    char *line_buffer = NULL;
-    size_t line_size = 0;
-
+bool gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path, char ***out, int *out_length) {
+    bool result = true;
+    
     FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
         #ifdef GUPPY_VERBOSE
-        printf("Failed to open file %s\n", file_path);
+            printf("Failed to open file %s\n", file_path);
         #endif
         
-        gup_defer_return(NULL);
+        gup_defer_return(false);
     }
 
     int line_count = gup_file_line_count(file_path);
     if (line_count == 0) {
         #ifdef GUPPY_VERBOSE
-        printf("No lines found in file %s\n", file_path);
+            printf("The file you are trying to read has no lines %s\n", file_path);
         #endif
         
-        gup_defer_return(NULL);
+        gup_defer_return(false);
+    }
+    char **lines = (char **) gup_arena_alloc(a, sizeof(char **) * line_count);
+
+    char buffer[65536];
+    for (int i = 0; fgets(buffer, 65536, fp) != NULL; i++) {
+        lines[i] = (char *) gup_arena_alloc(a, sizeof(char *) * gup_cstr_length(buffer));
+        gup_cstr_copy(lines[i], buffer);
     }
 
-    for (int i = 0; i < line_count; i++) {
-        ssize_t read = getline(&line_buffer, &line_size, fp);
-
-        if (read == EOF) {
-            gup_defer_return(gup_array_string_to_cstrs_arena(a, lines));
-        }
-
-        GupArrayChar line = gup_array_char_create_from_cstr_arena(a, line_buffer);
-        gup_array_string_append_arena(a, &lines, line);
-    }
-
-    gup_defer_return(gup_array_string_to_cstrs_arena(a, lines));
+    *out = lines;
+    *out_length = line_count;
 
 defer:
-    free(line_buffer);
     if (fp) fclose(fp);
-
     return result;
 }
 
