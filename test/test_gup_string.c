@@ -289,5 +289,5 @@ void test_gup_string(void) {
     test_gup_string_ends_with_cstr(&a);
     test_gup_string_contains_substring(&a);
 
-    gup_arena_destroy(a);
+    gup_arena_destroy(&a);
 }

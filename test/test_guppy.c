@@ -12,9 +12,7 @@
 #include "./test_gup_cstr.c"
 
 void _reset_settings_file(void) {
-    const bool result = gup_file_write("# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n", "./resources/settings.toml");
-
-    gup_assert_verbose(result, "Encountered an error while resetting the settings file.\n");
+    gup_file_write_cstr("# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n", "./resources/settings.toml");
 }
 
 void run_all_guppy_tests(void) {

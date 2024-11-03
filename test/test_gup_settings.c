@@ -17,7 +17,7 @@ void test_gup_settings_get_and_set(void) {
     gup_assert(gup_string_eq_cstr(bar, "bar"));
     gup_assert(gup_string_eq_cstr(baz, "true"));
 
-    gup_arena_destroy(a);
+    gup_arena_destroy(&a);
 }
 
 void test_gup_settings(void) {

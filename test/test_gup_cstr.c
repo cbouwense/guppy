@@ -107,5 +107,5 @@ void test_gup_cstr(void) {
     test_gup_cstr_length(&a);
     test_gup_cstr_eq(&a);
 
-    gup_arena_destroy(a);
+    gup_arena_destroy(&a);
 }

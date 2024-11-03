@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -79,7 +80,7 @@ typedef GupArrayPtr GupArena;
 
 // Arena -------------------------------------------------------------------------------------------
 GupArena  gup_arena_create();
-void      gup_arena_destroy(GupArena a); // Free all the allocated memory and the arena itself
+void      gup_arena_destroy(GupArena *a); // Free all the allocated memory and the arena itself
 void     *gup_arena_alloc(GupArena *a, size_t bytes);
 void      gup_arena_free(GupArena *a); // Free all the allocated memory, but not the arena itself
 
@@ -268,12 +269,13 @@ bool           gup_array_string_find(GupArrayString xs, bool (*fn)(GupString), G
 // File operations ---------------------------------------------------------------------------------
 bool             gup_file_create(const char *file_path);
 bool             gup_file_delete(const char *file_path);
+bool             gup_file_exists(const char *file_path);
 bool             gup_file_is_empty(const char *file_path);
 int              gup_file_line_count(const char *file_path);
 void             gup_file_print(const char *file_path);
 void             gup_file_print_lines(const char *file_path);
 GupString        gup_file_read(const char *file_path);
-GupString        gup_file_read_arena(GupArena *a, const char *file_path);
+bool             gup_file_read_arena(GupArena *a, const char *file_path, GupString *out);
 char            *gup_file_read_as_cstr(const char *file_path);
 char            *gup_file_read_as_cstr_arena(GupArena *a, const char *file_path);
 GupArrayString   gup_file_read_lines(const char *file_path);
@@ -285,6 +287,8 @@ GupArrayString   gup_file_read_lines_keep_newlines_arena(GupArena *a, const char
 char           **gup_file_read_lines_as_cstrs_keep_newlines(const char *file_path);
 char           **gup_file_read_lines_as_cstrs_keep_newlines_arena(GupArena *a, const char *file_path);
 long             gup_file_size(const char *file_path);
+int              gup_file_watch(const char *file_path, void (*fn)(void));
+int              gup_file_watch_cli_command(const char *file_path, const char *cli_command);
 void             gup_file_write_arena(GupArena *a, GupString text_to_write, const char *file_path);
 void             gup_file_write_cstr(const char *text_to_write, const char *file_path);
 void             gup_file_write_lines_arena(GupArena *a, GupArrayString lines_to_write, const char *file_path);
@@ -344,6 +348,7 @@ char           gup_string_reduce(GupString str, char (*fn)(char, char), char sta
 bool           gup_string_find(GupString str, bool (*fn)(char), char *out);
 bool           gup_string_find_arena(GupArena *a, GupString str, bool (*fn)(char), char *out);
 GupString      gup_string_trim_char(GupString str, char c);
+GupString      gup_string_trim_char_arena(GupArena *a, GupString str, char c);
 void           gup_string_trim_char_in_place(GupString *str, char c);
 GupString      gup_string_trim_fn(GupString str, bool (*fn)(char));
 GupString      gup_string_trim_fn_arena(GupArena *a, GupString str, bool (*fn)(char));
@@ -419,9 +424,9 @@ GupArena gup_arena_create() {
     };
 }
 
-void gup_arena_destroy(GupArena a) {
-    gup_arena_free(&a);
-    free(a.data);
+void gup_arena_destroy(GupArena *a) {
+    gup_arena_free(a);
+    free(a->data);
 }
 
 void *gup_arena_alloc(GupArena *a, size_t bytes) {
@@ -2186,6 +2191,20 @@ bool gup_file_delete(const char *file_path) {
     return result;
 }
 
+bool gup_file_exists(const char *file_path) {
+    FILE *fp = fopen(file_path, "r");
+    if (fp == NULL) {
+        #ifdef GUPPY_VERBOSE
+        printf("Error opening file %s\n", file_path);
+        #endif
+
+        return false;
+    }
+
+    fclose(fp);
+    return true;
+}
+
 bool gup_file_is_empty(const char *file_path) {
     int line_count = gup_file_line_count(file_path);
     gup_assert_verbose(line_count != -1, "gup_file_line_count had an issue while opening the file.");
@@ -2303,22 +2322,35 @@ defer:
     return result;
 }
 
-GupString gup_file_read_arena(GupArena *a, const char *file_path) {
-    GupString result = {0};
-
+bool gup_file_read_arena(GupArena *a, const char *file_path, GupString *out) {
+    bool result = false;
     FILE *fp = fopen(file_path, "r");
-    // TODO: interpolate, in write funcs as well
-    gup_assert_verbose(fp != NULL, "Failed to open the file.");
+
+    if (fp == NULL) {
+        #ifdef GUPPY_VERBOSE
+            char failure_reason[1024];
+            sprintf(failure_reason, "Failed to open %s: %s", file_path, strerror(errno));
+            printf(failure_reason);
+        #endif // GUPPY_VERBOSE
+        return false;
+    }
 
     long file_size = gup_file_size(file_path);
     char *buffer = (char *) gup_arena_alloc(a, file_size + 1);
     size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
 
-    gup_assert_verbose((long)bytes_read == file_size, "Failed to read file");
+    if ((long)bytes_read != file_size) {
+        #ifdef GUPPY_VERBOSE
+            char failure_reason[1024];
+            sprintf(failure_reason, "Was unable to fully read %s", file_path);
+            printf(failure_reason);
+        #endif // GUPPY_VERBOSE
+        gup_defer_return(false);
+    }
 
     buffer[file_size] = '\0';
-    result = gup_array_char_create_from_cstr_arena(a, buffer);
-    gup_defer_return(result);
+    *out = gup_array_char_create_from_cstr_arena(a, buffer);
+    gup_defer_return(true);
 
 defer:
     if (fp) fclose(fp);
@@ -2679,6 +2711,64 @@ long gup_file_size(const char *file_path) {
     return file_size;
 }
 
+int gup_file_watch(const char *file_path, void (*fn)(void)) {
+    if (file_path == NULL || strcmp(file_path, "") == 0) {
+        printf("ERROR: Didn't receive a file to watch.\n");
+        exit(1);
+    }
+
+    struct stat file_stat;
+    time_t last_modified_time = 0;
+
+    while(true) {
+        gup_assert_verbose(stat(file_path, &file_stat) == 0, "Tried to read the metadata of the file you're watching, but wasn't able to for whatever reason.");
+        
+        time_t current_modified_time = file_stat.st_mtime;
+
+        bool file_was_updated_since_last_checked = current_modified_time > last_modified_time;
+        if (file_was_updated_since_last_checked) {
+            // Do the thing you wanted to do when the file is updated
+            fn();
+            printf("Last modified: %s", ctime(&file_stat.st_mtime));
+
+            last_modified_time = current_modified_time;
+        }
+
+        usleep(34000); // Should be around 30 fps
+    }
+
+    return 0;
+}
+
+int gup_file_watch_cli_command(const char *file_path, const char *cli_command) {
+    if (file_path == NULL || strcmp(file_path, "") == 0) {
+        printf("ERROR: Didn't receive a file to watch.\n");
+        exit(1);
+    }
+
+    struct stat file_stat;
+    time_t last_modified_time = 0;
+
+    while(true) {
+        gup_assert_verbose(stat(file_path, &file_stat) == 0, "Tried to read the metadata of the file you're watching, but wasn't able to for whatever reason.");
+        
+        time_t current_modified_time = file_stat.st_mtime;
+
+        bool file_was_updated_since_last_checked = current_modified_time > last_modified_time;
+        if (file_was_updated_since_last_checked) {
+            // Do the thing you wanted to do when the file is updated
+            system(cli_command);
+            printf("Last modified: %s", ctime(&file_stat.st_mtime));
+
+            last_modified_time = current_modified_time;
+        }
+
+        usleep(34000); // Should be around 30 fps
+    }
+
+    return 0;
+}
+
 void gup_file_write_arena(GupArena *a, GupString text_to_write, const char *file_path) {
     FILE *fp = fopen(file_path, "w");
     // TODO: interpolate file name
@@ -2941,7 +3031,9 @@ GupString gup_string_trim_char_arena(GupArena *a, GupString str, char c) {
     GupString trimmed_str = gup_string_copy_arena(a, str);
 
     int i = 0;
-    for (; i < trimmed_str.count && trimmed_str.data[i] == c; i++) {}
+    while (i < trimmed_str.count && trimmed_str.data[i] == c) {
+        i++;
+    }
     memmove(trimmed_str.data, trimmed_str.data + i, trimmed_str.count - i);
     trimmed_str.count -= i;
 

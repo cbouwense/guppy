@@ -7,7 +7,7 @@ void test_gup_arena_create(void) {
     gup_assert(a.count == 0);
     gup_assert(a.data != NULL);
 
-    gup_arena_destroy(a);
+    gup_arena_destroy(&a);
 }
 
 // The real test here is that AddressSanitzer doesn't say there's a leak
@@ -29,7 +29,7 @@ void test_gup_arena_can_allocate_stuff_and_not_need_to_free_it(void) {
     gup_assert(strcmp(bar, "bar") == 0);
     gup_assert(strcmp(foobar, "foobar") == 0);
 
-    gup_arena_destroy(a);
+    gup_arena_destroy(&a);
 }
 
 // The real test here is that AddressSanitzer doesn't say there's a leak
@@ -44,7 +44,7 @@ void test_gup_arena_can_be_freed_and_not_leak_memory(void) {
         *lots_of_ints[i] = i;
     }
 
-    gup_arena_free(a);
+    gup_arena_free(&a);
     free(a.data);
 }
 
@@ -56,7 +56,7 @@ void test_gup_arena_can_allocate_a_bunch_of_strings(void) {
     gup_string_append(&str, 'a');
     gup_string_append(&str, 'r');
 
-    gup_arena_destroy(a);
+    gup_arena_destroy(&a);
 }
 
 // The file stuff was like spewing leaks so I put this test here
@@ -82,7 +82,7 @@ void test_gup_arena_with_file_stuff(void) {
         }
     }
     
-    gup_arena_destroy(a);
+    gup_arena_destroy(&a);
 }
 
 void test_gup_arena(void) {
