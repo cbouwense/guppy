@@ -184,12 +184,15 @@ bool           gup_array_int_eq(GupArrayInt xs, GupArrayInt ys);
 bool           gup_array_int_contains(GupArrayInt xs, int x);
 void           gup_array_int_print(GupArrayInt xs);
 void           gup_array_int_append(GupArrayInt *xs, int x);
+void           gup_array_int_append_arena(GupArena *a, GupArrayInt *xs, int x);
 void           gup_array_int_prepend(GupArrayInt *xs, int x);
 GupArrayInt    gup_array_int_map(GupArrayInt xs, int (*fn)(int));
 void           gup_array_int_map_in_place(GupArrayInt *xs, int (*fn)(int));
 GupArrayInt    gup_array_int_filter(GupArrayInt xs, bool (*fn)(int));
 void           gup_array_int_filter_in_place(GupArrayInt *xs, bool (*fn)(int));
 int            gup_array_int_reduce(GupArrayInt xs, int (*fn)(int, int), int start);
+int            gup_array_int_remove(GupArrayInt *xs, int x, int count);
+int            gup_array_int_remove_all(GupArrayInt *xs, int x);
 bool           gup_array_int_find(GupArrayInt xs, bool (*fn)(int), int *out);
 
 GupArrayLong   gup_array_long_create();
@@ -218,6 +221,7 @@ bool           gup_array_ptr_eq(GupArrayPtr xs, GupArrayPtr ys);
 bool           gup_array_ptr_contains(GupArrayPtr xs, void* x);
 void           gup_array_ptr_print(GupArrayPtr xs);
 void           gup_array_ptr_append(GupArrayPtr *xs, void* x);
+void           gup_array_ptr_append_arena(GupArena *a, GupArrayPtr *xs, void* x);
 void           gup_array_ptr_prepend(GupArrayPtr *xs, void* x);
 GupArrayPtr    gup_array_ptr_map(GupArrayPtr xs, void* (*fn)(void*));
 void           gup_array_ptr_map_in_place(GupArrayPtr *xs, void* (*fn)(void*));
@@ -381,7 +385,6 @@ void  gup_cstr_print(const char *cstr);
 
 // Miscellaneous
 double gup_operation_seconds(void (*fn)());
-double gup_operation_seconds(void (*fn)());
 #define gup_array_len(a) sizeof(a)/sizeof(a[0]) 
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 #define GUP_RUN if (true)
@@ -428,6 +431,7 @@ GupArena gup_arena_create() {
 void gup_arena_destroy(GupArena *a) {
     gup_arena_free(a);
     free(a->data);
+    free(a);
 }
 
 void *gup_arena_alloc(GupArena *a, size_t bytes) {
@@ -1338,6 +1342,22 @@ void gup_array_int_append(GupArrayInt *xs, int x) {
     xs->count++;
 }
 
+void gup_array_int_append_arena(GupArena *a, GupArrayInt *xs, int x) {
+    // TODO: extract arena_realloc
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        int *new_data = gup_arena_alloc(a, new_capacity * sizeof(int));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
 void gup_array_long_append(GupArrayLong *xs, long x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
@@ -1353,6 +1373,22 @@ void gup_array_ptr_append(GupArrayPtr *xs, void* x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(void*));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_ptr_append_arena(GupArena *a, GupArrayPtr *xs, void* x) {
+    // TODO: extract arena_realloc
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        void **new_data = gup_arena_alloc(a, new_capacity * sizeof(void*));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -2003,6 +2039,67 @@ GupArrayChar gup_array_reduce_string(GupArrayString xs, GupArrayChar (*fn)(GupAr
         result = fn(result, xs.data[i]);
     }
     return result;
+}
+
+// TODO: fill out 
+// Remove
+int gup_array_int_remove(GupArrayInt *xs, int x, int count) {
+    int removed_count = 0;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != x) {
+            continue;
+        }
+
+        removed_count++;
+        if (removed_count == count) {
+            break;
+        }
+
+        // If the last member of the array is one that has to be removed, just decrement the count.
+        if (i == xs->count - 1) {
+            xs->count--;
+            break;
+        }
+
+        for (int j = i + 1; j < xs->count; j++) {
+            if (xs->data[j] == x) {
+                continue;
+            }
+
+            xs->data[i] = xs->data[j];
+            xs->count--;
+        }
+    }
+
+    return removed_count;
+}
+
+// TODO: fill out 
+// Remove all
+int gup_array_int_remove_all(GupArrayInt *xs, int x) {
+    int removed_count = 0;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != x) continue;
+
+        removed_count++;
+
+        // If the last member of the array is one that has to be removed, just decrement the count.
+        if (i == xs->count - 1) {
+            xs->count--;
+            break;
+        }
+
+        for (int j = i + 1; j < xs->count; j++) {
+            if (xs->data[j] == x) continue;
+
+            xs->data[i] = xs->data[j];
+            xs->count--;
+        }
+    }
+
+    return removed_count;
 }
 
 // Find
