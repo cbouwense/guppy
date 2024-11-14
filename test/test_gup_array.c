@@ -616,6 +616,61 @@ void test_gup_array_string_find(void) {
     }
 }
 
+void test_gup_array_remove() {
+    { // Remove one number
+        int   *i = malloc(sizeof(int));
+        char  *j = malloc(sizeof(char));
+        float *k = malloc(sizeof(float));
+
+        void *ptr_array[] = {i, j, k};
+        GupArrayPtr ptrs = gup_array_ptr_create_from_array(ptr_array, gup_array_len(ptr_array));
+
+        GupArrayPtr result = gup_array_ptr_remove_all(&ptrs, i);
+    
+        gup_array_ptr_eq(result, ptrs);
+
+        free(i);
+        free(j);
+        free(k);
+        free(result.data);
+        free(ptrs.data);
+    }
+
+    { // Nothing to remove
+        int   *i = malloc(sizeof(int));
+        char  *j = malloc(sizeof(char));
+        float *k = malloc(sizeof(float));
+
+        void *ptr_array[] = {i, j, k};
+        GupArrayPtr ptrs = gup_array_ptr_create_from_array(ptr_array, gup_array_len(ptr_array));
+
+        GupArrayPtr result = gup_array_ptr_remove_all(&ptrs, (void *)0x13371738);
+
+        gup_assert(result.count == 3);
+        gup_assert(result.data[0] == i);
+        gup_assert(result.data[1] == j);
+        gup_assert(result.data[2] == k);
+
+        free(i);
+        free(j);
+        free(k);
+        free(result.data);
+        free(ptrs.data);
+    }
+
+    {
+        char *string_array[] = {"Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme"};
+        GupArrayString strings = gup_array_string_create_from_cstrs(string_array, gup_array_len(string_array));
+
+        GupArrayString result = gup_array_string_remove_all_cstr(&strings, "Dontrainonme");
+
+        gup_assert(result.count == 0);
+
+        gup_array_string_destroy(strings);
+        gup_array_string_destroy(result);
+    }
+}
+
 void test_gup_array(void) {
     test_new_gup_array_has_default_capacity();
     test_new_gup_array_has_zero_count();
@@ -641,6 +696,8 @@ void test_gup_array(void) {
     test_filter_in_place_matches_none_returns_copy();
     test_filter_in_place_matches_some_only_keeps_matches();
     test_filter_in_place_matches_all_returns_copy();
+
+    test_gup_array_remove();
 
     test_gup_array_char_create_from_cstr();
 
