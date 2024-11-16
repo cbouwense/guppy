@@ -617,7 +617,7 @@ void test_gup_array_string_find(void) {
 }
 
 void test_gup_array_remove() {
-    { // Remove one number
+    { // Remove one item
         int   *i = malloc(sizeof(int));
         char  *j = malloc(sizeof(char));
         float *k = malloc(sizeof(float));
@@ -625,14 +625,12 @@ void test_gup_array_remove() {
         void *ptr_array[] = {i, j, k};
         GupArrayPtr ptrs = gup_array_ptr_create_from_array(ptr_array, gup_array_len(ptr_array));
 
-        GupArrayPtr result = gup_array_ptr_remove_all(&ptrs, i);
+        gup_array_ptr_remove_all(&ptrs, i);
     
-        gup_array_ptr_eq(result, ptrs);
+        gup_assert(ptrs.count == 2);
+        gup_assert(ptrs.data[0] == j);
+        gup_assert(ptrs.data[1] == k);
 
-        free(i);
-        free(j);
-        free(k);
-        free(result.data);
         free(ptrs.data);
     }
 
@@ -644,30 +642,25 @@ void test_gup_array_remove() {
         void *ptr_array[] = {i, j, k};
         GupArrayPtr ptrs = gup_array_ptr_create_from_array(ptr_array, gup_array_len(ptr_array));
 
-        GupArrayPtr result = gup_array_ptr_remove_all(&ptrs, (void *)0x13371738);
+        gup_array_ptr_remove_all(&ptrs, (void *)0x13371738);
 
-        gup_assert(result.count == 3);
-        gup_assert(result.data[0] == i);
-        gup_assert(result.data[1] == j);
-        gup_assert(result.data[2] == k);
+        gup_assert(ptrs.count == 3);
+        gup_assert(ptrs.data[0] == i);
+        gup_assert(ptrs.data[1] == j);
+        gup_assert(ptrs.data[2] == k);
 
-        free(i);
-        free(j);
-        free(k);
-        free(result.data);
         free(ptrs.data);
     }
 
-    {
+    { // All removed
         char *string_array[] = {"Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme"};
         GupArrayString strings = gup_array_string_create_from_cstrs(string_array, gup_array_len(string_array));
 
-        GupArrayString result = gup_array_string_remove_all_cstr(&strings, "Dontrainonme");
+        gup_array_string_remove_all_cstr(&strings, "Dontrainonme");
 
-        gup_assert(result.count == 0);
+        gup_assert(strings.count == 0);
 
         gup_array_string_destroy(strings);
-        gup_array_string_destroy(result);
     }
 }
 
