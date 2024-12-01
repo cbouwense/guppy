@@ -82,6 +82,7 @@ typedef GupArrayPtr GupArena;
 GupArena  gup_arena_create();
 void      gup_arena_destroy(GupArena *a); // Free all the allocated memory and the arena itself
 void     *gup_arena_alloc(GupArena *a, size_t bytes);
+void     *gup_arena_realloc(GupArena *a, void *ptr, size_t bytes);
 void      gup_arena_free(GupArena *a); // Free all the allocated memory, but not the arena itself
 
 // Dynamic arrays ----------------------------------------------------------------------------------
@@ -161,6 +162,7 @@ bool           gup_array_double_eq(GupArrayDouble xs, GupArrayDouble ys);
 bool           gup_array_double_contains(GupArrayDouble xs, double x);
 void           gup_array_double_print(GupArrayDouble xs);
 void           gup_array_double_append(GupArrayDouble *xs, double x);
+void           gup_array_double_append_arena(GupArena *a, GupArrayDouble *xs, double x);
 void           gup_array_double_prepend(GupArrayDouble *xs, double x);
 GupArrayDouble gup_array_double_map(GupArrayDouble xs, double (*fn)(double));
 void           gup_array_double_map_in_place(GupArrayDouble *xs, double (*fn)(double));
@@ -182,6 +184,7 @@ bool           gup_array_float_eq(GupArrayFloat xs, GupArrayFloat ys);
 bool           gup_array_float_contains(GupArrayFloat xs, float x);
 void           gup_array_float_print(GupArrayFloat xs);
 void           gup_array_float_append(GupArrayFloat *xs, float x);
+void           gup_array_float_append_arena(GupArena *a, GupArrayFloat *xs, float x);
 void           gup_array_float_prepend(GupArrayFloat *xs, float x);
 GupArrayFloat  gup_array_float_map(GupArrayFloat xs, float (*fn)(float));
 void           gup_array_float_map_in_place(GupArrayFloat *xs, float (*fn)(float));
@@ -225,6 +228,7 @@ bool           gup_array_long_eq(GupArrayLong xs, GupArrayLong ys);
 bool           gup_array_long_contains(GupArrayLong xs, long x);
 void           gup_array_long_print(GupArrayLong xs);
 void           gup_array_long_append(GupArrayLong *xs, long x);
+void           gup_array_long_append_arena(GupArena *a, GupArrayLong *xs, long x);
 void           gup_array_long_prepend(GupArrayLong *xs, long x);
 GupArrayLong   gup_array_long_map(GupArrayLong xs, long (*fn)(long));
 void           gup_array_long_map_in_place(GupArrayLong *xs, long (*fn)(long));
@@ -268,6 +272,7 @@ bool           gup_array_short_eq(GupArrayShort xs, GupArrayShort ys);
 bool           gup_array_short_contains(GupArrayShort xs, short x);
 void           gup_array_short_print(GupArrayShort xs);
 void           gup_array_short_append(GupArrayShort *xs, short x);
+void           gup_array_short_append_arena(GupArena *a, GupArrayShort *xs, short x);
 void           gup_array_short_prepend(GupArrayShort *xs, short x);
 GupArrayShort  gup_array_short_map(GupArrayShort xs, short (*fn)(short));
 void           gup_array_short_map_in_place(GupArrayShort *xs, short (*fn)(short));
@@ -465,7 +470,7 @@ GupArena gup_arena_create() {
     return (GupArena) {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
         .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void*)),
+        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void *)),
     };
 }
 
@@ -488,6 +493,12 @@ void *gup_arena_alloc(GupArena *a, size_t bytes) {
     a->count++;
 
     return ptr;
+}
+
+void *gup_arena_realloc(GupArena *a, void *ptr, size_t bytes) {
+    int *new_data = gup_arena_alloc(a, bytes);
+    memcpy(ptr, ptr, bytes);
+    return new_data;
 }
 
 void *_gup_arena_alloc(GupArena *a, size_t bytes, const char *file, int line) {
@@ -1323,14 +1334,9 @@ void gup_array_bool_append(GupArrayBool *xs, bool x) {
 }
 
 void gup_array_bool_append_arena(GupArena *a, GupArrayBool *xs, bool x) {
-    // TODO: extract arena_realloc
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        bool *new_data = gup_arena_alloc(a, new_capacity * sizeof(bool));
-        for (int i = 0; i < xs->count; i++) {
-            new_data[i] = xs->data[i];
-        }
-        xs->data = new_data;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(bool));
         xs->capacity = new_capacity;
     }
 
@@ -1350,14 +1356,9 @@ void gup_array_char_append(GupArrayChar *xs, char x) {
 }
 
 void gup_array_char_append_arena(GupArena *a, GupArrayChar *xs, char x) {
-    // TODO: extract arena_realloc
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        char *new_data = gup_arena_alloc(a, new_capacity * sizeof(char));
-        for (int i = 0; i < xs->count; i++) {
-            new_data[i] = xs->data[i];
-        }
-        xs->data = new_data;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(char));
         xs->capacity = new_capacity;
     }
 
@@ -1376,10 +1377,32 @@ void gup_array_double_append(GupArrayDouble *xs, double x) {
     xs->count++;
 }
 
+void gup_array_double_append_arena(GupArena *a, GupArrayDouble *xs, double x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(double));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
 void gup_array_float_append(GupArrayFloat *xs, float x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(float));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_float_append_arena(GupArena *a, GupArrayFloat *xs, float x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(float));
         xs->capacity = new_capacity;
     }
 
@@ -1399,14 +1422,9 @@ void gup_array_int_append(GupArrayInt *xs, int x) {
 }
 
 void gup_array_int_append_arena(GupArena *a, GupArrayInt *xs, int x) {
-    // TODO: extract arena_realloc
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        int *new_data = gup_arena_alloc(a, new_capacity * sizeof(int));
-        for (int i = 0; i < xs->count; i++) {
-            new_data[i] = xs->data[i];
-        }
-        xs->data = new_data;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(int));
         xs->capacity = new_capacity;
     }
 
@@ -1418,6 +1436,17 @@ void gup_array_long_append(GupArrayLong *xs, long x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(long));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_long_append_arena(GupArena *a, GupArrayLong *xs, long x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(long));
         xs->capacity = new_capacity;
     }
 
@@ -1437,14 +1466,9 @@ void gup_array_ptr_append(GupArrayPtr *xs, void* x) {
 }
 
 void gup_array_ptr_append_arena(GupArena *a, GupArrayPtr *xs, void* x) {
-    // TODO: extract arena_realloc
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        void **new_data = gup_arena_alloc(a, new_capacity * sizeof(void*));
-        for (int i = 0; i < xs->count; i++) {
-            new_data[i] = xs->data[i];
-        }
-        xs->data = new_data;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(void*));
         xs->capacity = new_capacity;
     }
 
@@ -1456,6 +1480,17 @@ void gup_array_short_append(GupArrayShort *xs, short x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         xs->data = realloc(xs->data, new_capacity * sizeof(short));
+        xs->capacity = new_capacity;
+    }
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_short_append_arena(GupArena *a, GupArrayShort *xs, short x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(short));
         xs->capacity = new_capacity;
     }
 
@@ -1477,11 +1512,7 @@ void gup_array_string_append(GupArrayString *xs, GupArrayChar x) {
 void gup_array_string_append_arena(GupArena *a, GupArrayString *xs, GupArrayChar x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        GupArrayChar *new_data = gup_arena_alloc(a, new_capacity * sizeof(GupArrayChar));
-        for (int i = 0; i < xs->count; i++) {
-            new_data[i] = xs->data[i];
-        }
-        xs->data = new_data;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(GupArrayChar));;
         xs->capacity = new_capacity;
     }
 
@@ -1501,14 +1532,9 @@ void gup_array_string_append_cstr(GupArrayString *xs, char *cstr) {
 }
 
 void gup_array_string_append_cstr_arena(GupArena *a, GupArrayString *xs, char *cstr) {
-    // TODO: extract arena_realloc
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        GupString *new_data = gup_arena_alloc(a, new_capacity * sizeof(char));
-        for (int i = 0; i < xs->count; i++) {
-            new_data[i] = xs->data[i];
-        }
-        xs->data = new_data;
+        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(char));;
         xs->capacity = new_capacity;
     }
 
@@ -2670,7 +2696,7 @@ GupArrayChar gup_array_char_sort(GupArrayChar xs) {
     GupArrayChar right  = gup_array_char_create();
 
     // Choose the last item as the pivot for no particular reason.
-    const char pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const char pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -2705,12 +2731,12 @@ GupArrayChar gup_array_char_sort(GupArrayChar xs) {
 GupArrayChar gup_array_char_sort_arena(GupArena *a, GupArrayChar xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayChar sorted = gup_array_char_create(a);
-    GupArrayChar left   = gup_array_char_create(a);
-    GupArrayChar right  = gup_array_char_create(a);
+    GupArrayChar sorted = gup_array_char_create_arena(a);
+    GupArrayChar left   = gup_array_char_create_arena(a);
+    GupArrayChar right  = gup_array_char_create_arena(a);
 
     // Choose the last item as the pivot for no particular reason.
-    const char pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const char pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -2750,7 +2776,7 @@ GupArrayDouble gup_array_double_sort(GupArrayDouble xs) {
     GupArrayDouble right  = gup_array_double_create();
 
     // Choose the last item as the pivot for no particular reason.
-    const double pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const double pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -2785,12 +2811,12 @@ GupArrayDouble gup_array_double_sort(GupArrayDouble xs) {
 GupArrayDouble gup_array_double_sort_arena(GupArena *a, GupArrayDouble xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayDouble sorted = gup_array_double_create(a);
-    GupArrayDouble left   = gup_array_double_create(a);
-    GupArrayDouble right  = gup_array_double_create(a);
+    GupArrayDouble sorted = gup_array_double_create_arena(a);
+    GupArrayDouble left   = gup_array_double_create_arena(a);
+    GupArrayDouble right  = gup_array_double_create_arena(a);
 
     // Choose the last item as the pivot for no particular reason.
-    const double pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const double pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -2830,7 +2856,7 @@ GupArrayFloat gup_array_float_sort(GupArrayFloat xs) {
     GupArrayFloat right  = gup_array_float_create();
 
     // Choose the last item as the pivot for no particular reason.
-    const float pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const float pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -2865,12 +2891,12 @@ GupArrayFloat gup_array_float_sort(GupArrayFloat xs) {
 GupArrayFloat gup_array_float_sort_arena(GupArena *a, GupArrayFloat xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayFloat sorted = gup_array_float_create(a);
-    GupArrayFloat left   = gup_array_float_create(a);
-    GupArrayFloat right  = gup_array_float_create(a);
+    GupArrayFloat sorted = gup_array_float_create_arena(a);
+    GupArrayFloat left   = gup_array_float_create_arena(a);
+    GupArrayFloat right  = gup_array_float_create_arena(a);
 
     // Choose the last item as the pivot for no particular reason.
-    const float pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const float pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -2945,9 +2971,9 @@ GupArrayInt gup_array_int_sort(GupArrayInt xs) {
 GupArrayInt gup_array_int_sort_arena(GupArena *a, GupArrayInt xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayInt sorted = gup_array_int_create(a);
-    GupArrayInt left   = gup_array_int_create(a);
-    GupArrayInt right  = gup_array_int_create(a);
+    GupArrayInt sorted = gup_array_int_create_arena(a);
+    GupArrayInt left   = gup_array_int_create_arena(a);
+    GupArrayInt right  = gup_array_int_create_arena(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
@@ -2990,7 +3016,7 @@ GupArrayLong gup_array_long_sort(GupArrayLong xs) {
     GupArrayLong right  = gup_array_long_create();
 
     // Choose the last item as the pivot for no particular reason.
-    const long pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const long pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -3025,12 +3051,12 @@ GupArrayLong gup_array_long_sort(GupArrayLong xs) {
 GupArrayLong gup_array_long_sort_arena(GupArena *a, GupArrayLong xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayLong sorted = gup_array_long_create(a);
-    GupArrayLong left   = gup_array_long_create(a);
-    GupArrayLong right  = gup_array_long_create(a);
+    GupArrayLong sorted = gup_array_long_create_arena(a);
+    GupArrayLong left   = gup_array_long_create_arena(a);
+    GupArrayLong right  = gup_array_long_create_arena(a);
 
     // Choose the last item as the pivot for no particular reason.
-    const long pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const long pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -3070,8 +3096,8 @@ GupArrayPtr gup_array_ptr_sort(GupArrayPtr xs) {
     GupArrayPtr right  = gup_array_ptr_create();
 
     // Choose the last item as the pivot for no particular reason.
-    const void* pivot_idx = xs.count - 1;
-    const void* pivot = xs.data[pivot_idx];
+    const int pivot_idx = xs.count - 1;
+    void* pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
         // Don't include the pivot.
@@ -3105,13 +3131,13 @@ GupArrayPtr gup_array_ptr_sort(GupArrayPtr xs) {
 GupArrayPtr gup_array_ptr_sort_arena(GupArena *a, GupArrayPtr xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayPtr sorted = gup_array_ptr_create(a);
-    GupArrayPtr left   = gup_array_ptr_create(a);
-    GupArrayPtr right  = gup_array_ptr_create(a);
+    GupArrayPtr sorted = gup_array_ptr_create_arena(a);
+    GupArrayPtr left   = gup_array_ptr_create_arena(a);
+    GupArrayPtr right  = gup_array_ptr_create_arena(a);
 
     // Choose the last item as the pivot for no particular reason.
-    const void* pivot_idx = xs.count - 1;
-    const void* pivot = xs.data[pivot_idx];
+    const int pivot_idx = xs.count - 1;
+    void* pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
         // Don't include the pivot.
@@ -3150,7 +3176,7 @@ GupArrayShort gup_array_short_sort(GupArrayShort xs) {
     GupArrayShort right  = gup_array_short_create();
 
     // Choose the last item as the pivot for no particular reason.
-    const short pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const short pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -3185,12 +3211,12 @@ GupArrayShort gup_array_short_sort(GupArrayShort xs) {
 GupArrayShort gup_array_short_sort_arena(GupArena *a, GupArrayShort xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayShort sorted = gup_array_short_create(a);
-    GupArrayShort left   = gup_array_short_create(a);
-    GupArrayShort right  = gup_array_short_create(a);
+    GupArrayShort sorted = gup_array_short_create_arena(a);
+    GupArrayShort left   = gup_array_short_create_arena(a);
+    GupArrayShort right  = gup_array_short_create_arena(a);
 
     // Choose the last item as the pivot for no particular reason.
-    const short pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const short pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -3230,7 +3256,7 @@ GupArrayString gup_array_string_sort(GupArrayString xs) {
     GupArrayString right  = gup_array_string_create();
 
     // Choose the last item as the pivot for no particular reason.
-    const GupString pivot_idx = xs.count - 1;
+    const int pivot_idx = xs.count - 1;
     const GupString pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
@@ -3265,37 +3291,37 @@ GupArrayString gup_array_string_sort(GupArrayString xs) {
 GupArrayString gup_array_string_sort_arena(GupArena *a, GupArrayString xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayString sorted = gup_array_string_create();
-    GupArrayString left   = gup_array_string_create();
-    GupArrayString right  = gup_array_string_create();
+    GupArrayString sorted = gup_array_string_create_arena(a);
+    GupArrayString left   = gup_array_string_create_arena(a);
+    GupArrayString right  = gup_array_string_create_arena(a);
 
     // Choose the last item as the pivot for no particular reason.
-    const char* pivot_idx = xs.count - 1;
-    const char* pivot = xs.data[pivot_idx];
+    const int pivot_idx = xs.count - 1;
+    const GupString pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
         if (gup_string_compare_arena(a, xs.data[i], pivot) <= 0) {
-            gup_array_string_append(&left, xs.data[i]);
+            gup_array_string_append_arena(a, &left, xs.data[i]);
         } else {
-            gup_array_string_append(&right, xs.data[i]);
+            gup_array_string_append_arena(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayString sorted_left = gup_array_string_sort(left);
-    GupArrayString sorted_right = gup_array_string_sort(right);
+    GupArrayString sorted_left = gup_array_string_sort_arena(a, left);
+    GupArrayString sorted_right = gup_array_string_sort_arena(a, right);
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_string_append(&sorted, sorted_left.data[i]);
+            gup_array_string_append_arena(a, &sorted, sorted_left.data[i]);
         }
 
-        gup_array_string_append(&sorted, pivot);
+        gup_array_string_append_arena(a, &sorted, pivot);
 
         for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_string_append(&sorted, sorted_right.data[i]);
+            gup_array_string_append_arena(a, &sorted, sorted_right.data[i]);
         }
     }
 
@@ -4095,12 +4121,12 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
 #define gup_string_contains gup_array_char_contains
 
 int gup_string_compare(GupString x, GupString y) {
-    const char *x_cstr = gup_string_to_cstr(x);
-    const char *y_cstr = gup_string_to_cstr(y);
+    char *x_cstr = gup_string_to_cstr(x);
+    char *y_cstr = gup_string_to_cstr(y);
 
     int result = strcmp(x_cstr, y_cstr);
 
-    free(x_cstr)
+    free(x_cstr);
     free(y_cstr);
     return result;
 }

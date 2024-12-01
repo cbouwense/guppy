@@ -1,320 +1,66 @@
-GupArrayChar gup_array_char_sort_arena(GupArena *a, GupArrayChar xs) {
-    if (xs.count <= 1) return xs;
-
-    GupArrayChar sorted = gup_array_char_create(a);
-    GupArrayChar left   = gup_array_char_create(a);
-    GupArrayChar right  = gup_array_char_create(a);
-
-    // Choose the last item as the pivot for no particular reason.
-    const char pivot_idx = xs.count - 1;
-    const char pivot = xs.data[pivot_idx];
-
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-        if (xs.data[i] <= pivot) {
-            gup_array_char_append_arena(a, &left, xs.data[i]);
-        } else {
-            gup_array_char_append_arena(a, &right, xs.data[i]);
-        }
+void gup_array_double_append_arena(GupArena *a, GupArrayDouble *xs, double x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, new_capacity * sizeof(double));
+        xs->capacity = new_capacity;
     }
 
-    GupArrayChar sorted_left = gup_array_char_sort_arena(a, left);
-    GupArrayChar sorted_right = gup_array_char_sort_arena(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_char_append_arena(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_char_append_arena(a, &sorted, pivot);
-
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_char_append_arena(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-GupArrayDouble gup_array_double_sort_arena(GupArena *a, GupArrayDouble xs) {
-    if (xs.count <= 1) return xs;
-
-    GupArrayDouble sorted = gup_array_double_create(a);
-    GupArrayDouble left   = gup_array_double_create(a);
-    GupArrayDouble right  = gup_array_double_create(a);
-
-    // Choose the last item as the pivot for no particular reason.
-    const double pivot_idx = xs.count - 1;
-    const double pivot = xs.data[pivot_idx];
-
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-        if (xs.data[i] <= pivot) {
-            gup_array_double_append_arena(a, &left, xs.data[i]);
-        } else {
-            gup_array_double_append_arena(a, &right, xs.data[i]);
-        }
+void gup_array_float_append_arena(GupArena *a, GupArrayFloat *xs, float x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, new_capacity * sizeof(float));
+        xs->capacity = new_capacity;
     }
 
-    GupArrayDouble sorted_left = gup_array_double_sort_arena(a, left);
-    GupArrayDouble sorted_right = gup_array_double_sort_arena(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_double_append_arena(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_double_append_arena(a, &sorted, pivot);
-
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_double_append_arena(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-GupArrayFloat gup_array_float_sort_arena(GupArena *a, GupArrayFloat xs) {
-    if (xs.count <= 1) return xs;
-
-    GupArrayFloat sorted = gup_array_float_create(a);
-    GupArrayFloat left   = gup_array_float_create(a);
-    GupArrayFloat right  = gup_array_float_create(a);
-
-    // Choose the last item as the pivot for no particular reason.
-    const float pivot_idx = xs.count - 1;
-    const float pivot = xs.data[pivot_idx];
-
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-        if (xs.data[i] <= pivot) {
-            gup_array_float_append_arena(a, &left, xs.data[i]);
-        } else {
-            gup_array_float_append_arena(a, &right, xs.data[i]);
-        }
+void gup_array_long_append_arena(GupArena *a, GupArrayLong *xs, long x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, new_capacity * sizeof(long));
+        xs->capacity = new_capacity;
     }
 
-    GupArrayFloat sorted_left = gup_array_float_sort_arena(a, left);
-    GupArrayFloat sorted_right = gup_array_float_sort_arena(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_float_append_arena(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_float_append_arena(a, &sorted, pivot);
-
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_float_append_arena(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-GupArrayInt gup_array_int_sort_arena(GupArena *a, GupArrayInt xs) {
-    if (xs.count <= 1) return xs;
-
-    GupArrayInt sorted = gup_array_int_create(a);
-    GupArrayInt left   = gup_array_int_create(a);
-    GupArrayInt right  = gup_array_int_create(a);
-
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const int pivot = xs.data[pivot_idx];
-
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-        if (xs.data[i] <= pivot) {
-            gup_array_int_append_arena(a, &left, xs.data[i]);
-        } else {
-            gup_array_int_append_arena(a, &right, xs.data[i]);
-        }
+void gup_array_ptr_append_arena(GupArena *a, GupArrayPtr *xs, void* x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, new_capacity * sizeof(void*));
+        xs->capacity = new_capacity;
     }
 
-    GupArrayInt sorted_left = gup_array_int_sort_arena(a, left);
-    GupArrayInt sorted_right = gup_array_int_sort_arena(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_int_append_arena(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_int_append_arena(a, &sorted, pivot);
-
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_int_append_arena(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-GupArrayLong gup_array_long_sort_arena(GupArena *a, GupArrayLong xs) {
-    if (xs.count <= 1) return xs;
-
-    GupArrayLong sorted = gup_array_long_create(a);
-    GupArrayLong left   = gup_array_long_create(a);
-    GupArrayLong right  = gup_array_long_create(a);
-
-    // Choose the last item as the pivot for no particular reason.
-    const long pivot_idx = xs.count - 1;
-    const long pivot = xs.data[pivot_idx];
-
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-        if (xs.data[i] <= pivot) {
-            gup_array_long_append_arena(a, &left, xs.data[i]);
-        } else {
-            gup_array_long_append_arena(a, &right, xs.data[i]);
-        }
+void gup_array_short_append_arena(GupArena *a, GupArrayShort *xs, short x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, new_capacity * sizeof(short));
+        xs->capacity = new_capacity;
     }
 
-    GupArrayLong sorted_left = gup_array_long_sort_arena(a, left);
-    GupArrayLong sorted_right = gup_array_long_sort_arena(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_long_append_arena(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_long_append_arena(a, &sorted, pivot);
-
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_long_append_arena(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-GupArrayPtr gup_array_ptr_sort_arena(GupArena *a, GupArrayPtr xs) {
-    if (xs.count <= 1) return xs;
-
-    GupArrayPtr sorted = gup_array_ptr_create(a);
-    GupArrayPtr left   = gup_array_ptr_create(a);
-    GupArrayPtr right  = gup_array_ptr_create(a);
-
-    // Choose the last item as the pivot for no particular reason.
-    const void* pivot_idx = xs.count - 1;
-    const void* pivot = xs.data[pivot_idx];
-
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-        if (xs.data[i] <= pivot) {
-            gup_array_ptr_append_arena(a, &left, xs.data[i]);
-        } else {
-            gup_array_ptr_append_arena(a, &right, xs.data[i]);
-        }
+void gup_array_string_append_arena(GupArena *a, GupArrayString *xs, GupString x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        xs->data = gup_arena_realloc(a, new_capacity * sizeof(GupString));
+        xs->capacity = new_capacity;
     }
 
-    GupArrayPtr sorted_left = gup_array_ptr_sort_arena(a, left);
-    GupArrayPtr sorted_right = gup_array_ptr_sort_arena(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_ptr_append_arena(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_ptr_append_arena(a, &sorted, pivot);
-
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_ptr_append_arena(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
-}
-
-GupArrayShort gup_array_short_sort_arena(GupArena *a, GupArrayShort xs) {
-    if (xs.count <= 1) return xs;
-
-    GupArrayShort sorted = gup_array_short_create(a);
-    GupArrayShort left   = gup_array_short_create(a);
-    GupArrayShort right  = gup_array_short_create(a);
-
-    // Choose the last item as the pivot for no particular reason.
-    const short pivot_idx = xs.count - 1;
-    const short pivot = xs.data[pivot_idx];
-
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-        if (xs.data[i] <= pivot) {
-            gup_array_short_append_arena(a, &left, xs.data[i]);
-        } else {
-            gup_array_short_append_arena(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayShort sorted_left = gup_array_short_sort_arena(a, left);
-    GupArrayShort sorted_right = gup_array_short_sort_arena(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_short_append_arena(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_short_append_arena(a, &sorted, pivot);
-
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_short_append_arena(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
-}
-
-GupArrayString gup_array_string_sort_arena(GupArena *a, GupArrayString xs) {
-    if (xs.count <= 1) return xs;
-
-    GupArrayString sorted = gup_array_string_create(a);
-    GupArrayString left   = gup_array_string_create(a);
-    GupArrayString right  = gup_array_string_create(a);
-
-    // Choose the last item as the pivot for no particular reason.
-    const GupString pivot_idx = xs.count - 1;
-    const GupString pivot = xs.data[pivot_idx];
-
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-        if (xs.data[i] <= pivot) {
-            gup_array_string_append_arena(a, &left, xs.data[i]);
-        } else {
-            gup_array_string_append_arena(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayString sorted_left = gup_array_string_sort_arena(a, left);
-    GupArrayString sorted_right = gup_array_string_sort_arena(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_string_append_arena(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_string_append_arena(a, &sorted, pivot);
-
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_string_append_arena(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
