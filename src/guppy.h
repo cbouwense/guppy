@@ -8,6 +8,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -74,6 +75,11 @@ typedef struct {
 // TODO: is there a way to have an interface for an allocator maybe?
 typedef GupArrayPtr GupArena;
 
+typedef struct {
+    bool has_false;
+    bool has_true;
+} GupSetBool;
+
 /**************************************************************************************************
  * Public API                                                                                     *
  **************************************************************************************************/
@@ -85,8 +91,6 @@ void     *gup_arena_alloc(GupArena *a, size_t bytes);
 void      gup_arena_free(GupArena *a); // Free all the allocated memory, but not the arena itself
 
 // Dynamic arrays ----------------------------------------------------------------------------------
-// TODO: sort methods
-
 GupArrayBool   gup_array_bool_create();
 GupArrayBool   gup_array_bool_create_arena(GupArena *a);
 void           gup_array_bool_destroy(GupArrayBool xs);
@@ -343,6 +347,14 @@ void             gup_file_append_line_arena(GupArena *a, GupString line_to_write
 void             gup_file_append_line_cstr(const char *line_to_write, const char *file_path);
 void             gup_file_append_lines_arena(GupArena *a, GupArrayString lines_to_write, const char *file_path);
 void             gup_file_append_lines_cstrs(char **lines_to_write, const int line_count, const char *file_path);
+
+// Sets --------------------------------------------------------------------------------------------
+GupSetBool gup_set_bool_create();
+GupSetBool gup_set_bool_create_from_array(bool bools[], const int size);
+bool       gup_set_bool_contains(GupSetBool set, bool b);
+void       gup_set_bool_insert(GupSetBool *set, bool b);
+void       gup_set_bool_remove(GupSetBool *set, bool b);
+int        gup_set_bool_size(GupSetBool set);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -4066,6 +4078,54 @@ void gup_file_append_lines_cstrs(char **lines_to_write, const int line_count, co
     fclose(fp);
 }
 
+// Sets --------------------------------------------------------------------------------------------
+
+GupSetBool gup_set_bool_create() {
+    return (GupSetBool) {
+        .has_false = false,
+        .has_true = false,
+    };
+}
+
+GupSetBool gup_set_bool_create_from_array(bool bools[], const int size) {
+    GupSetBool set = gup_set_bool_create();
+
+    for (int i = 0; i < size; i++) {
+        gup_set_bool_insert(&set, bools[i]);
+    }
+
+    return set;
+}
+
+bool gup_set_bool_contains(GupSetBool set, bool b) {
+    if (b == false) {
+        return set.has_false;
+    } else {
+        return set.has_true;
+    }
+}
+
+void gup_set_bool_insert(GupSetBool *set, bool b) {
+    if (b == false) {
+        set->has_false = true;
+    } else {
+        set->has_true = true;
+    }
+}
+
+void gup_set_bool_remove(GupSetBool *set, bool b) {
+    if (b == false) {
+        set->has_false = false;
+    } else {
+        set->has_true = false;
+    }
+}
+
+int gup_set_bool_size(GupSetBool set) {
+    if (set.has_false && set.has_true) return 2;
+    if (set.has_false || set.has_true) return 1;
+    return 0;
+}
 
 // Print -------------------------------------------------------------------------------------------
 
@@ -4801,6 +4861,18 @@ int gup_char_to_int(char c) {
         case '9': return 9;
         default:  return -1;
     }
+}
+
+uint32_t _fnv1a_hash(const char* str) {
+    uint32_t hash = 2166136261; // FNV-1a initial hash value
+    uint32_t prime = 16777219; // FNV-1a prime number
+
+    while (*str != '\0') {
+        hash = (hash ^ *str) * prime;
+        str++;
+    }
+
+    return hash;
 }
 
 #endif // GUPPY_H_

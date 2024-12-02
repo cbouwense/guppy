@@ -7,6 +7,7 @@
 #include "./test_gup_arena.c"
 #include "./test_gup_array.c"
 #include "./test_gup_file.c"
+#include "./test_gup_set.c"
 #include "./test_gup_settings.c"
 #include "./test_gup_string.c"
 #include "./test_gup_cstr.c"
@@ -26,6 +27,7 @@ int main(void) {
 
     test_gup_arena();
     test_gup_array();
+    test_gup_set();
     test_gup_file();
     test_gup_settings();
     test_gup_string();
