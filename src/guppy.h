@@ -80,6 +80,42 @@ typedef struct {
     bool has_true;
 } GupSetBool;
 
+typedef struct {
+
+} GupSetChar;
+
+typedef struct {
+
+} GupSetDouble;
+
+typedef struct {
+
+} GupSetFloat;
+
+typedef struct {
+
+} GupSetInt;
+
+typedef struct {
+
+} GupSetLong;
+
+typedef struct {
+
+} GupSetPtr;
+
+typedef struct {
+
+} GupSetShort;
+
+typedef struct {
+
+} GupSetString;
+
+
+
+
+
 /**************************************************************************************************
  * Public API                                                                                     *
  **************************************************************************************************/
@@ -350,11 +386,67 @@ void             gup_file_append_lines_cstrs(char **lines_to_write, const int li
 
 // Sets --------------------------------------------------------------------------------------------
 GupSetBool gup_set_bool_create();
-GupSetBool gup_set_bool_create_from_array(bool bools[], const int size);
-bool       gup_set_bool_contains(GupSetBool set, bool b);
-void       gup_set_bool_insert(GupSetBool *set, bool b);
-void       gup_set_bool_remove(GupSetBool *set, bool b);
+GupSetBool gup_set_bool_create_from_array(bool xs[], const int size);
+bool       gup_set_bool_contains(GupSetBool set, bool x);
+void       gup_set_bool_insert(GupSetBool *set, bool x);
+void       gup_set_bool_remove(GupSetBool *set, bool x);
 int        gup_set_bool_size(GupSetBool set);
+
+GupSetChar gup_set_char_create();
+GupSetChar gup_set_char_create_from_array(char xs[], const int size);
+bool       gup_set_char_contains(GupSetChar set, char x);
+void       gup_set_char_insert(GupSetChar *set, char x);
+void       gup_set_char_remove(GupSetChar *set, char x);
+int        gup_set_char_size(GupSetChar set);
+
+GupSetDouble gup_set_double_create();
+GupSetDouble gup_set_double_create_from_array(double xs[], const int size);
+bool         gup_set_double_contains(GupSetDouble set, double x);
+void         gup_set_double_insert(GupSetDouble *set, double x);
+void         gup_set_double_remove(GupSetDouble *set, double x);
+int          gup_set_double_size(GupSetDouble set);
+
+GupSetFloat gup_set_float_create();
+GupSetFloat gup_set_float_create_from_array(float xs[], const int size);
+bool        gup_set_float_contains(GupSetFloat set, float x);
+void        gup_set_float_insert(GupSetFloat *set, float x);
+void        gup_set_float_remove(GupSetFloat *set, float x);
+int         gup_set_float_size(GupSetFloat set);
+
+GupSetInt gup_set_int_create();
+GupSetInt gup_set_int_create_from_array(int xs[], const int size);
+bool      gup_set_int_contains(GupSetInt set, int x);
+void      gup_set_int_insert(GupSetInt *set, int x);
+void      gup_set_int_remove(GupSetInt *set, int x);
+int       gup_set_int_size(GupSetInt set);
+
+GupSetLong gup_set_long_create();
+GupSetLong gup_set_long_create_from_array(long xs[], const int size);
+bool       gup_set_long_contains(GupSetLong set, long x);
+void       gup_set_long_insert(GupSetLong *set, long x);
+void       gup_set_long_remove(GupSetLong *set, long x);
+int        gup_set_long_size(GupSetLong set);
+
+GupSetPtr gup_set_ptr_create();
+GupSetPtr gup_set_ptr_create_from_array(void* xs[], const int size);
+bool      gup_set_ptr_contains(GupSetPtr set, void* x);
+void      gup_set_ptr_insert(GupSetPtr *set, void* x);
+void      gup_set_ptr_remove(GupSetPtr *set, void* x);
+int       gup_set_ptr_size(GupSetPtr set);
+
+GupSetShort gup_set_short_create();
+GupSetShort gup_set_short_create_from_array(short xs[], const int size);
+bool        gup_set_short_contains(GupSetShort set, short x);
+void        gup_set_short_insert(GupSetShort *set, short x);
+void        gup_set_short_remove(GupSetShort *set, short x);
+int         gup_set_short_size(GupSetShort set);
+
+GupSetString gup_set_string_create();
+GupSetString gup_set_string_create_from_array(GupString xs[], const int size);
+bool         gup_set_string_contains(GupSetString set, GupString x);
+void         gup_set_string_insert(GupSetString *set, GupString x);
+void         gup_set_string_remove(GupSetString *set, GupString x);
+int          gup_set_string_size(GupSetString set);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);

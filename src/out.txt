@@ -1,66 +1,36 @@
-void gup_array_double_append_arena(GupArena *a, GupArrayDouble *xs, double x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, new_capacity * sizeof(double));
-        xs->capacity = new_capacity;
-    }
+typedef struct {
 
-    xs->data[xs->count] = x;
-    xs->count++;
-}
+} GupSetBool;
 
-void gup_array_float_append_arena(GupArena *a, GupArrayFloat *xs, float x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, new_capacity * sizeof(float));
-        xs->capacity = new_capacity;
-    }
+typedef struct {
 
-    xs->data[xs->count] = x;
-    xs->count++;
-}
+} GupSetChar;
 
-void gup_array_long_append_arena(GupArena *a, GupArrayLong *xs, long x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, new_capacity * sizeof(long));
-        xs->capacity = new_capacity;
-    }
+typedef struct {
 
-    xs->data[xs->count] = x;
-    xs->count++;
-}
+} GupSetDouble;
 
-void gup_array_ptr_append_arena(GupArena *a, GupArrayPtr *xs, void* x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, new_capacity * sizeof(void*));
-        xs->capacity = new_capacity;
-    }
+typedef struct {
 
-    xs->data[xs->count] = x;
-    xs->count++;
-}
+} GupSetFloat;
 
-void gup_array_short_append_arena(GupArena *a, GupArrayShort *xs, short x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, new_capacity * sizeof(short));
-        xs->capacity = new_capacity;
-    }
+typedef struct {
 
-    xs->data[xs->count] = x;
-    xs->count++;
-}
+} GupSetInt;
 
-void gup_array_string_append_arena(GupArena *a, GupArrayString *xs, GupString x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, new_capacity * sizeof(GupString));
-        xs->capacity = new_capacity;
-    }
+typedef struct {
 
-    xs->data[xs->count] = x;
-    xs->count++;
-}
+} GupSetLong;
+
+typedef struct {
+
+} GupSetPtr;
+
+typedef struct {
+
+} GupSetShort;
+
+typedef struct {
+
+} GupSetString;
 
