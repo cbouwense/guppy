@@ -82,7 +82,6 @@ typedef GupArrayPtr GupArena;
 GupArena  gup_arena_create();
 void      gup_arena_destroy(GupArena *a); // Free all the allocated memory and the arena itself
 void     *gup_arena_alloc(GupArena *a, size_t bytes);
-void     *gup_arena_realloc(GupArena *a, void *ptr, size_t bytes);
 void      gup_arena_free(GupArena *a); // Free all the allocated memory, but not the arena itself
 
 // Dynamic arrays ----------------------------------------------------------------------------------
@@ -493,12 +492,6 @@ void *gup_arena_alloc(GupArena *a, size_t bytes) {
     a->count++;
 
     return ptr;
-}
-
-void *gup_arena_realloc(GupArena *a, void *ptr, size_t bytes) {
-    int *new_data = gup_arena_alloc(a, bytes);
-    memcpy(ptr, ptr, bytes);
-    return new_data;
 }
 
 void *_gup_arena_alloc(GupArena *a, size_t bytes, const char *file, int line) {
@@ -1336,7 +1329,12 @@ void gup_array_bool_append(GupArrayBool *xs, bool x) {
 void gup_array_bool_append_arena(GupArena *a, GupArrayBool *xs, bool x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(bool));
+        bool *new_data = gup_arena_alloc(a, new_capacity * sizeof(bool));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1358,7 +1356,11 @@ void gup_array_char_append(GupArrayChar *xs, char x) {
 void gup_array_char_append_arena(GupArena *a, GupArrayChar *xs, char x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(char));
+        char *new_data = gup_arena_alloc(a, new_capacity * sizeof(char));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1380,7 +1382,11 @@ void gup_array_double_append(GupArrayDouble *xs, double x) {
 void gup_array_double_append_arena(GupArena *a, GupArrayDouble *xs, double x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(double));
+        double *new_data = gup_arena_alloc(a, new_capacity * sizeof(double));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1402,7 +1408,11 @@ void gup_array_float_append(GupArrayFloat *xs, float x) {
 void gup_array_float_append_arena(GupArena *a, GupArrayFloat *xs, float x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(float));
+        float *new_data = gup_arena_alloc(a, new_capacity * sizeof(float));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1424,7 +1434,11 @@ void gup_array_int_append(GupArrayInt *xs, int x) {
 void gup_array_int_append_arena(GupArena *a, GupArrayInt *xs, int x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(int));
+        int *new_data = gup_arena_alloc(a, new_capacity * sizeof(int));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1446,7 +1460,11 @@ void gup_array_long_append(GupArrayLong *xs, long x) {
 void gup_array_long_append_arena(GupArena *a, GupArrayLong *xs, long x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(long));
+        long *new_data = gup_arena_alloc(a, new_capacity * sizeof(long));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1468,7 +1486,11 @@ void gup_array_ptr_append(GupArrayPtr *xs, void* x) {
 void gup_array_ptr_append_arena(GupArena *a, GupArrayPtr *xs, void* x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(void*));
+        void **new_data = gup_arena_alloc(a, new_capacity * sizeof(void *));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1490,7 +1512,11 @@ void gup_array_short_append(GupArrayShort *xs, short x) {
 void gup_array_short_append_arena(GupArena *a, GupArrayShort *xs, short x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(short));
+        short *new_data = gup_arena_alloc(a, new_capacity * sizeof(short));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1498,10 +1524,10 @@ void gup_array_short_append_arena(GupArena *a, GupArrayShort *xs, short x) {
     xs->count++;
 }
 
-void gup_array_string_append(GupArrayString *xs, GupArrayChar x) {
+void gup_array_string_append(GupArrayString *xs, GupString x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(GupArrayChar));
+        xs->data = realloc(xs->data, new_capacity * sizeof(GupString));
         xs->capacity = new_capacity;
     }
 
@@ -1509,10 +1535,14 @@ void gup_array_string_append(GupArrayString *xs, GupArrayChar x) {
     xs->count++;
 }
 
-void gup_array_string_append_arena(GupArena *a, GupArrayString *xs, GupArrayChar x) {
+void gup_array_string_append_arena(GupArena *a, GupArrayString *xs, GupString x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(GupArrayChar));;
+        GupString *new_data = gup_arena_alloc(a, new_capacity * sizeof(GupString));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
@@ -1523,7 +1553,7 @@ void gup_array_string_append_arena(GupArena *a, GupArrayString *xs, GupArrayChar
 void gup_array_string_append_cstr(GupArrayString *xs, char *cstr) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = realloc(xs->data, new_capacity * sizeof(char *));
+        xs->data = realloc(xs->data, new_capacity * sizeof(GupString));
         xs->capacity = new_capacity;
     }
 
@@ -1534,7 +1564,11 @@ void gup_array_string_append_cstr(GupArrayString *xs, char *cstr) {
 void gup_array_string_append_cstr_arena(GupArena *a, GupArrayString *xs, char *cstr) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        xs->data = gup_arena_realloc(a, xs, new_capacity * sizeof(char));;
+        GupString *new_data = gup_arena_alloc(a, new_capacity * sizeof(GupString));
+        for (int i = 0; i < xs->count; i++) {
+            new_data[i] = xs->data[i];
+        }
+        xs->data = new_data;
         xs->capacity = new_capacity;
     }
 
