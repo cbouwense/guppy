@@ -80,10 +80,16 @@ typedef struct {
     bool has_true;
 } GupSetBool;
 
+// TODO: type union?
 typedef struct {
-    int    capacity;
-    int    count;
-    char **data;
+    char value;
+    uint32_t hash; // -1 means "no hash"
+} GupSetCharData;
+
+typedef struct {
+    int capacity;
+    int count;
+    GupSetCharData *data;
 } GupSetChar;
 
 typedef struct {
@@ -4221,11 +4227,12 @@ GupSetChar gup_set_char_create() {
     GupSetChar xs = (GupSetChar) {
         .capacity = GUP_SET_DEFAULT_CAPACITY,
         .count = 0,
-        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(char *)),
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetCharData)),
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i] = NULL;
+        xs.data[i].hash = 0;
+        xs.data[i].value = '\0'; // This doesn't really matter.
     }
 
     return xs;
@@ -4235,11 +4242,12 @@ GupSetChar gup_set_char_create_arena(GupArena *a) {
     GupSetChar xs = (GupSetChar) {
         .capacity = GUP_SET_DEFAULT_CAPACITY,
         .count = 0,
-        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(char)),
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetCharData)),
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i] = NULL;
+        xs.data[i].hash = 0;
+        xs.data[i].value = '\0'; // This value doesn't really matter I don't think.
     }
 
     return xs;
@@ -4483,10 +4491,6 @@ GupSetString gup_set_string_create_from_array(GupString xs[], const int size) {
 // Destroy
 
 void gup_set_char_destroy(GupSetChar set) {
-    for (int i = 0; i < set.capacity; i++) {
-        if (set.data[i] == NULL) continue;
-        free(set.data[i]);
-    }
     free(set.data);
 }
 
@@ -4509,8 +4513,8 @@ bool gup_set_char_has(GupSetChar set, char x) {
 
     printf("x: %c, hash: %d\nindex: %d\n", x, hash, index);
     
-    if (set.data[index] == NULL) return false;
-    return *(set.data[index]) == x;
+    if (set.data[index].hash == 0) return false;
+    return set.data[index].value == x;
 }
 
 // Insert
@@ -4532,15 +4536,8 @@ void gup_set_char_insert(GupSetChar *set, char x) {
 
     // TODO: Check for collision. If so, resize array and try again
     
-    // TODO: So it isn't great that I have to allocate memory here. The reason I'm doing this is I couldn't figure out
-    // how the has method will work. More specifically, if we want to insert '\0' into this Set, and the Set is zero
-    // initialized, how will we check if '\0' is already in the Set? As far as I can tell, there is no sentinel value I
-    // could possibly use to initialize the Set, because I want to be able to use every value for each type. So, if we
-    // implement them with pointers, the sentinel value will be NULL. Plus, we can dereference the pointer to check for
-    // collisions. This is a todo comment because this smells funny to me. It feels slow to have to get memory for this.
-    // I have a hunch that this is absolutely not a good idea. I'll ask around some discord servers or something.
-    set->data[index] = malloc(sizeof(char));
-    *(set->data[index]) = x;
+    set->data[index].hash = hash;
+    set->data[index].value = x;
     set->count++;
 }
 

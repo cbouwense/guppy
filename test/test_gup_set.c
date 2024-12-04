@@ -115,6 +115,7 @@ void test_sets_general_functionality(void) {
     gup_assert_verbose(gup_set_char_has(set, 'a'), "A Set doesn't realize it has 'a' after it was inserted.");
     gup_assert_verbose(gup_set_char_has(set, 'b'), "A Set doesn't realize it has 'b' after it was inserted.");
     gup_assert_verbose(!gup_set_char_has(set, 'c'), "A Set thinks it has has 'c' but it was never inserted.");
+    gup_assert(gup_set_char_size(set) == 2);
 
     gup_set_char_destroy(set);
 }
