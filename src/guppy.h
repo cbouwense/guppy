@@ -55,6 +55,12 @@ typedef struct {
 } GupArrayLong;
 
 typedef struct {
+    int capacity;
+    int count;
+    void **data;
+} GupArrayPtr;
+
+typedef struct {
     int    capacity;
     int    count;
     short *data;
@@ -66,12 +72,6 @@ typedef struct {
     GupArrayChar *data;
 } GupArrayString;
 
-typedef struct {
-    int capacity;
-    int count;
-    void **data;
-} GupArrayPtr;
-
 // TODO: is there a way to have an interface for an allocator maybe?
 typedef GupArrayPtr GupArena;
 
@@ -81,40 +81,58 @@ typedef struct {
 } GupSetBool;
 
 typedef struct {
-
+    int    capacity;
+    int    count;
+    char **data;
 } GupSetChar;
 
 typedef struct {
-
+    int     capacity;
+    int     count;
+    double *data;
 } GupSetDouble;
 
 typedef struct {
-
+    int    capacity;
+    int    count;
+    float *data;
 } GupSetFloat;
 
 typedef struct {
-
+    int  capacity;
+    int  count;
+    int *data;
 } GupSetInt;
 
 typedef struct {
-
+    int   capacity;
+    int   count;
+    long *data;
 } GupSetLong;
 
 typedef struct {
-
+    int capacity;
+    int count;
+    void **data;
 } GupSetPtr;
 
 typedef struct {
-
+    int    capacity;
+    int    count;
+    short *data;
 } GupSetShort;
 
 typedef struct {
+    int    capacity;
+    int    count;
+    char **data;
+} GupSetCstr;
 
+typedef struct {
+    int capacity;
+    int count;
+    GupArrayChar *data;
 } GupSetString;
-
-
-
-
 
 /**************************************************************************************************
  * Public API                                                                                     *
@@ -385,65 +403,82 @@ void             gup_file_append_lines_arena(GupArena *a, GupArrayString lines_t
 void             gup_file_append_lines_cstrs(char **lines_to_write, const int line_count, const char *file_path);
 
 // Sets --------------------------------------------------------------------------------------------
-GupSetBool gup_set_bool_create();
-GupSetBool gup_set_bool_create_from_array(bool xs[], const int size);
-bool       gup_set_bool_contains(GupSetBool set, bool x);
-void       gup_set_bool_insert(GupSetBool *set, bool x);
-void       gup_set_bool_remove(GupSetBool *set, bool x);
-int        gup_set_bool_size(GupSetBool set);
+GupSetBool   gup_set_bool_create();
+GupSetBool   gup_set_bool_create_from_array(bool xs[], const int size);
+bool         gup_set_bool_has(GupSetBool set, bool x);
+void         gup_set_bool_insert(GupSetBool *set, bool x);
+void         gup_set_bool_remove(GupSetBool *set, bool x);
+int          gup_set_bool_size(GupSetBool set);
 
-GupSetChar gup_set_char_create();
-GupSetChar gup_set_char_create_from_array(char xs[], const int size);
-bool       gup_set_char_contains(GupSetChar set, char x);
-void       gup_set_char_insert(GupSetChar *set, char x);
-void       gup_set_char_remove(GupSetChar *set, char x);
-int        gup_set_char_size(GupSetChar set);
+GupSetChar   gup_set_char_create();
+GupSetChar   gup_set_char_create_arena(GupArena *a);
+GupSetChar   gup_set_char_create_from_array(char xs[], const int size);
+void         gup_set_char_destroy(GupSetChar set);
+bool         gup_set_char_has(GupSetChar set, char x);
+void         gup_set_char_insert(GupSetChar *set, char x);
+void         gup_set_char_remove(GupSetChar *set, char x);
+int          gup_set_char_size(GupSetChar set);
 
 GupSetDouble gup_set_double_create();
+GupSetDouble gup_set_double_create_arena(GupArena *a);
 GupSetDouble gup_set_double_create_from_array(double xs[], const int size);
-bool         gup_set_double_contains(GupSetDouble set, double x);
+bool         gup_set_double_has(GupSetDouble set, double x);
 void         gup_set_double_insert(GupSetDouble *set, double x);
 void         gup_set_double_remove(GupSetDouble *set, double x);
 int          gup_set_double_size(GupSetDouble set);
 
-GupSetFloat gup_set_float_create();
-GupSetFloat gup_set_float_create_from_array(float xs[], const int size);
-bool        gup_set_float_contains(GupSetFloat set, float x);
-void        gup_set_float_insert(GupSetFloat *set, float x);
-void        gup_set_float_remove(GupSetFloat *set, float x);
-int         gup_set_float_size(GupSetFloat set);
+GupSetFloat  gup_set_float_create();
+GupSetFloat  gup_set_float_create_arena(GupArena *a);
+GupSetFloat  gup_set_float_create_from_array(float xs[], const int size);
+bool         gup_set_float_has(GupSetFloat set, float x);
+void         gup_set_float_insert(GupSetFloat *set, float x);
+void         gup_set_float_remove(GupSetFloat *set, float x);
+int          gup_set_float_size(GupSetFloat set);
 
-GupSetInt gup_set_int_create();
-GupSetInt gup_set_int_create_from_array(int xs[], const int size);
-bool      gup_set_int_contains(GupSetInt set, int x);
-void      gup_set_int_insert(GupSetInt *set, int x);
-void      gup_set_int_remove(GupSetInt *set, int x);
-int       gup_set_int_size(GupSetInt set);
+GupSetInt    gup_set_int_create();
+GupSetInt    gup_set_int_create_arena(GupArena *a);
+GupSetInt    gup_set_int_create_from_array(int xs[], const int size);
+bool         gup_set_int_has(GupSetInt set, int x);
+void         gup_set_int_insert(GupSetInt *set, int x);
+void         gup_set_int_remove(GupSetInt *set, int x);
+int          gup_set_int_size(GupSetInt set);
 
-GupSetLong gup_set_long_create();
-GupSetLong gup_set_long_create_from_array(long xs[], const int size);
-bool       gup_set_long_contains(GupSetLong set, long x);
-void       gup_set_long_insert(GupSetLong *set, long x);
-void       gup_set_long_remove(GupSetLong *set, long x);
-int        gup_set_long_size(GupSetLong set);
+GupSetLong   gup_set_long_create();
+GupSetLong   gup_set_long_create_arena(GupArena *a);
+GupSetLong   gup_set_long_create_from_array(long xs[], const int size);
+bool         gup_set_long_has(GupSetLong set, long x);
+void         gup_set_long_insert(GupSetLong *set, long x);
+void         gup_set_long_remove(GupSetLong *set, long x);
+int          gup_set_long_size(GupSetLong set);
 
-GupSetPtr gup_set_ptr_create();
-GupSetPtr gup_set_ptr_create_from_array(void* xs[], const int size);
-bool      gup_set_ptr_contains(GupSetPtr set, void* x);
-void      gup_set_ptr_insert(GupSetPtr *set, void* x);
-void      gup_set_ptr_remove(GupSetPtr *set, void* x);
-int       gup_set_ptr_size(GupSetPtr set);
+GupSetPtr    gup_set_ptr_create();
+GupSetPtr    gup_set_ptr_create_arena(GupArena *a);
+GupSetPtr    gup_set_ptr_create_from_array(void* xs[], const int size);
+bool         gup_set_ptr_has(GupSetPtr set, void* x);
+void         gup_set_ptr_insert(GupSetPtr *set, void* x);
+void         gup_set_ptr_remove(GupSetPtr *set, void* x);
+int          gup_set_ptr_size(GupSetPtr set);
 
-GupSetShort gup_set_short_create();
-GupSetShort gup_set_short_create_from_array(short xs[], const int size);
-bool        gup_set_short_contains(GupSetShort set, short x);
-void        gup_set_short_insert(GupSetShort *set, short x);
-void        gup_set_short_remove(GupSetShort *set, short x);
-int         gup_set_short_size(GupSetShort set);
+GupSetShort  gup_set_short_create();
+GupSetShort  gup_set_short_create_arena(GupArena *a);
+GupSetShort  gup_set_short_create_from_array(short xs[], const int size);
+bool         gup_set_short_has(GupSetShort set, short x);
+void         gup_set_short_insert(GupSetShort *set, short x);
+void         gup_set_short_remove(GupSetShort *set, short x);
+int          gup_set_short_size(GupSetShort set);
+
+GupSetCstr   gup_set_cstr_create();
+GupSetCstr   gup_set_cstr_create_arena(GupArena *a); 
+GupSetCstr   gup_set_cstr_create_from_array(char *xs[], const int size);
+bool         gup_set_cstr_has(GupSetCstr set, char *x);
+void         gup_set_cstr_insert(GupSetCstr *set, char *x);
+void         gup_set_cstr_remove(GupSetCstr *set, char *x);
+int          gup_set_cstr_size(GupSetCstr set);
 
 GupSetString gup_set_string_create();
+GupSetString gup_set_string_create_arena(GupArena *a); 
 GupSetString gup_set_string_create_from_array(GupString xs[], const int size);
-bool         gup_set_string_contains(GupSetString set, GupString x);
+bool         gup_set_string_has(GupSetString set, GupString x);
 void         gup_set_string_insert(GupSetString *set, GupString x);
 void         gup_set_string_remove(GupSetString *set, GupString x);
 int          gup_set_string_size(GupSetString set);
@@ -539,12 +574,14 @@ double gup_operation_seconds(void (*fn)());
 #define GUP_RUN if (true)
 #define GUP_SKIP if (false)
 int gup_char_to_int(char c); // -1 means the character was not an int.
+uint32_t gup_fnv1a_hash(const char *s);
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
 #define GUP_ARRAY_DEFAULT_CAPACITY 256
+#define GUP_SET_DEFAULT_CAPACITY 8192
 
 // Assert ------------------------------------------------------------------------------------------
 
@@ -4172,6 +4209,7 @@ void gup_file_append_lines_cstrs(char **lines_to_write, const int line_count, co
 
 // Sets --------------------------------------------------------------------------------------------
 
+// Create
 GupSetBool gup_set_bool_create() {
     return (GupSetBool) {
         .has_false = false,
@@ -4179,17 +4217,281 @@ GupSetBool gup_set_bool_create() {
     };
 }
 
-GupSetBool gup_set_bool_create_from_array(bool bools[], const int size) {
+GupSetChar gup_set_char_create() {
+    GupSetChar xs = (GupSetChar) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(char *)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = NULL;
+    }
+
+    return xs;
+}
+
+GupSetChar gup_set_char_create_arena(GupArena *a) {
+    GupSetChar xs = (GupSetChar) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(char)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = NULL;
+    }
+
+    return xs;
+}
+
+GupSetDouble gup_set_double_create() {
+    GupSetDouble xs = (GupSetDouble) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(double)),
+    };
+    return xs;
+}
+
+GupSetDouble gup_set_double_create_arena(GupArena *a) {
+    GupSetDouble xs = (GupSetDouble) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(double)),
+    };
+    return xs;
+}
+
+GupSetFloat gup_set_float_create() {
+    GupSetFloat xs = (GupSetFloat) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(float)),
+    };
+    return xs;
+}
+
+GupSetFloat gup_set_float_create_arena(GupArena *a) {
+    GupSetFloat xs = (GupSetFloat) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(float)),
+    };
+    return xs;
+}
+
+GupSetInt gup_set_int_create() {
+    GupSetInt xs = (GupSetInt) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(int)),
+    };
+    return xs;
+}
+
+GupSetInt gup_set_int_create_arena(GupArena *a) {
+    GupSetInt xs = (GupSetInt) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(int)),
+    };
+    return xs;
+}
+
+GupSetLong gup_set_long_create() {
+    GupSetLong xs = (GupSetLong) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(long)),
+    };
+    return xs;
+}
+
+GupSetLong gup_set_long_create_arena(GupArena *a) {
+    GupSetLong xs = (GupSetLong) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(long)),
+    };
+    return xs;
+}
+
+GupSetPtr gup_set_ptr_create() {
+    GupSetPtr xs = (GupSetPtr) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(void*)),
+    };
+    return xs;
+}
+
+GupSetPtr gup_set_ptr_create_arena(GupArena *a) {
+    GupSetPtr xs = (GupSetPtr) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(void*)),
+    };
+    return xs;
+}
+
+GupSetShort gup_set_short_create() {
+    GupSetShort xs = (GupSetShort) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(short)),
+    };
+    return xs;
+}
+
+GupSetShort gup_set_short_create_arena(GupArena *a) {
+    GupSetShort xs = (GupSetShort) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(short)),
+    };
+    return xs;
+}
+
+GupSetCstr gup_set_cstr_create() {
+    GupSetCstr xs = (GupSetCstr) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(char *)),
+    };
+    return xs;
+}
+
+GupSetCstr gup_set_cstr_create_arena(GupArena *a) {
+    GupSetCstr xs = (GupSetCstr) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(char *)),
+    };
+    return xs;
+}
+
+GupSetString gup_set_string_create() {
+    GupSetString xs = (GupSetString) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupString)),
+    };
+    return xs;
+}
+
+GupSetString gup_set_string_create_arena(GupArena *a) {
+    GupSetString xs = (GupSetString) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupString)),
+    };
+    return xs;
+}
+
+// Create from array
+GupSetBool gup_set_bool_create_from_array(bool xs[], const int size) {
     GupSetBool set = gup_set_bool_create();
 
     for (int i = 0; i < size; i++) {
-        gup_set_bool_insert(&set, bools[i]);
+        gup_set_bool_insert(&set, xs[i]);
     }
 
     return set;
 }
 
-bool gup_set_bool_contains(GupSetBool set, bool b) {
+GupSetChar gup_set_char_create_from_array(char xs[], const int size) {
+    GupSetChar set = gup_set_char_create();
+
+    for (int i = 0; i < size; i++) {
+        gup_set_char_insert(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetDouble gup_set_double_create_from_array(double xs[], const int size) {
+    GupSetDouble set = gup_set_double_create();
+
+    for (int i = 0; i < size; i++) {
+        // gup_set_double_insert(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetFloat gup_set_float_create_from_array(float xs[], const int size) {
+    GupSetFloat set = gup_set_float_create();
+
+    for (int i = 0; i < size; i++) {
+        // gup_set_float_insert(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetInt gup_set_int_create_from_array(int xs[], const int size) {
+    GupSetInt set = gup_set_int_create();
+
+    for (int i = 0; i < size; i++) {
+        // gup_set_int_insert(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetLong gup_set_long_create_from_array(long xs[], const int size) {
+    GupSetLong set = gup_set_long_create();
+
+    for (int i = 0; i < size; i++) {
+        // gup_set_long_insert(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetPtr gup_set_ptr_create_from_array(void* xs[], const int size) {
+    GupSetPtr set = gup_set_ptr_create();
+
+    for (int i = 0; i < size; i++) {
+        // gup_set_ptr_insert(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetShort gup_set_short_create_from_array(short xs[], const int size) {
+    GupSetShort set = gup_set_short_create();
+
+    for (int i = 0; i < size; i++) {
+        // gup_set_short_insert(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetString gup_set_string_create_from_array(GupString xs[], const int size) {
+    GupSetString set = gup_set_string_create();
+
+    for (int i = 0; i < size; i++) {
+        // gup_set_string_insert(&set, xs[i]);
+    }
+
+    return set;
+}
+
+// Destroy
+
+void gup_set_char_destroy(GupSetChar set) {
+    for (int i = 0; i < set.capacity; i++) {
+        if (set.data[i] == NULL) continue;
+        free(set.data[i]);
+    }
+    free(set.data);
+}
+
+// Has
+bool gup_set_bool_has(GupSetBool set, bool b) {
     if (b == false) {
         return set.has_false;
     } else {
@@ -4197,6 +4499,21 @@ bool gup_set_bool_contains(GupSetBool set, bool b) {
     }
 }
 
+bool gup_set_char_has(GupSetChar set, char x) {
+    if (set.count == 0) return false;
+    
+    char input_cstr[1024];
+    sprintf(input_cstr, "%c", x);
+    const int hash = gup_fnv1a_hash(input_cstr);
+    const int index = hash % set.capacity;
+
+    printf("x: %c, hash: %d\nindex: %d\n", x, hash, index);
+    
+    if (set.data[index] == NULL) return false;
+    return *(set.data[index]) == x;
+}
+
+// Insert
 void gup_set_bool_insert(GupSetBool *set, bool b) {
     if (b == false) {
         set->has_false = true;
@@ -4205,6 +4522,29 @@ void gup_set_bool_insert(GupSetBool *set, bool b) {
     }
 }
 
+void gup_set_char_insert(GupSetChar *set, char x) {
+    if (gup_set_char_has(*set, x)) return;
+    
+    char input_cstr[1024];
+    sprintf(input_cstr, "%c", x);
+    const int hash = gup_fnv1a_hash(input_cstr);
+    const int index = hash % set->capacity;
+
+    // TODO: Check for collision. If so, resize array and try again
+    
+    // TODO: So it isn't great that I have to allocate memory here. The reason I'm doing this is I couldn't figure out
+    // how the has method will work. More specifically, if we want to insert '\0' into this Set, and the Set is zero
+    // initialized, how will we check if '\0' is already in the Set? As far as I can tell, there is no sentinel value I
+    // could possibly use to initialize the Set, because I want to be able to use every value for each type. So, if we
+    // implement them with pointers, the sentinel value will be NULL. Plus, we can dereference the pointer to check for
+    // collisions. This is a todo comment because this smells funny to me. It feels slow to have to get memory for this.
+    // I have a hunch that this is absolutely not a good idea. I'll ask around some discord servers or something.
+    set->data[index] = malloc(sizeof(char));
+    *(set->data[index]) = x;
+    set->count++;
+}
+
+// Remove
 void gup_set_bool_remove(GupSetBool *set, bool b) {
     if (b == false) {
         set->has_false = false;
@@ -4213,10 +4553,43 @@ void gup_set_bool_remove(GupSetBool *set, bool b) {
     }
 }
 
+// Size
 int gup_set_bool_size(GupSetBool set) {
     if (set.has_false && set.has_true) return 2;
     if (set.has_false || set.has_true) return 1;
     return 0;
+}
+
+int gup_set_char_size(GupSetChar set) {
+    return set.count;
+}
+
+int gup_set_double_size(GupSetDouble set) {
+    return set.count;
+}
+
+int gup_set_float_size(GupSetFloat set) {
+    return set.count;
+}
+
+int gup_set_int_size(GupSetInt set) {
+    return set.count;
+}
+
+int gup_set_long_size(GupSetLong set) {
+    return set.count;
+}
+
+int gup_set_ptr_size(GupSetPtr set) {
+    return set.count;
+}
+
+int gup_set_short_size(GupSetShort set) {
+    return set.count;
+}
+
+int gup_set_string_size(GupSetString set) {
+    return set.count;
 }
 
 // Print -------------------------------------------------------------------------------------------
@@ -4889,7 +5262,7 @@ void gup_cstr_copy_arena(GupArena *a, char *to, const char *from) {
 //   gup_cstr_copy_n(to, "Hello World", 5);
 // ```
 // this would result with `to` pointing to a chunk of memory with the contents 'H''e''l''l''o''\0'.
-//   
+//
 void gup_cstr_copy_n(char *to, const char *from, int n) {
     for (int i = 0; i < n; i++) {
         to[i] = from[i];
@@ -4955,7 +5328,7 @@ int gup_char_to_int(char c) {
     }
 }
 
-uint32_t _fnv1a_hash(const char* str) {
+uint32_t gup_fnv1a_hash(const char* str) {
     uint32_t hash = 2166136261; // FNV-1a initial hash value
     uint32_t prime = 16777219; // FNV-1a prime number
 

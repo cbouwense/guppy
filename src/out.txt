@@ -1,36 +1,162 @@
-typedef struct {
+GupSetChar gup_set_char_create() {
+    GupSetChar xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(char)),
+    };
+    return xs;
+}
 
-} GupSetBool;
+GupSetChar gup_set_char_create_arena(GupArena *a) {
+    GupSetChar xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(char)),
+    };
+    return xs;
+}
 
-typedef struct {
+GupSetDouble gup_set_double_create() {
+    GupSetDouble xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(double)),
+    };
+    return xs;
+}
 
-} GupSetChar;
+GupSetDouble gup_set_double_create_arena(GupArena *a) {
+    GupSetDouble xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(double)),
+    };
+    return xs;
+}
 
-typedef struct {
+GupSetFloat gup_set_float_create() {
+    GupSetFloat xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(float)),
+    };
+    return xs;
+}
 
-} GupSetDouble;
+GupSetFloat gup_set_float_create_arena(GupArena *a) {
+    GupSetFloat xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(float)),
+    };
+    return xs;
+}
 
-typedef struct {
+GupSetInt gup_set_int_create() {
+    GupSetInt xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(int)),
+    };
+    return xs;
+}
 
-} GupSetFloat;
+GupSetInt gup_set_int_create_arena(GupArena *a) {
+    GupSetInt xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(int)),
+    };
+    return xs;
+}
 
-typedef struct {
+GupSetLong gup_set_long_create() {
+    GupSetLong xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(long)),
+    };
+    return xs;
+}
 
-} GupSetInt;
+GupSetLong gup_set_long_create_arena(GupArena *a) {
+    GupSetLong xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(long)),
+    };
+    return xs;
+}
 
-typedef struct {
+GupSetPtr gup_set_ptr_create() {
+    GupSetPtr xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(void*)),
+    };
+    return xs;
+}
 
-} GupSetLong;
+GupSetPtr gup_set_ptr_create_arena(GupArena *a) {
+    GupSetPtr xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(void*)),
+    };
+    return xs;
+}
 
-typedef struct {
+GupSetShort gup_set_short_create() {
+    GupSetShort xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(short)),
+    };
+    return xs;
+}
 
-} GupSetPtr;
+GupSetShort gup_set_short_create_arena(GupArena *a) {
+    GupSetShort xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(short)),
+    };
+    return xs;
+}
 
-typedef struct {
+GupSetString gup_set_string_create() {
+    GupSetString xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupString)),
+    };
+    return xs;
+}
 
-} GupSetShort;
+GupSetString gup_set_string_create_arena(GupArena *a) {
+    GupSetString xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupString)),
+    };
+    return xs;
+}
 
-typedef struct {
+GupSetString gup_set_string_create() {
+    GupSetString xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(char*)),
+    };
+    return xs;
+}
 
-} GupSetString;
+GupSetString gup_set_string_create_arena(GupArena *a) {
+    GupSetString xs = {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(char*)),
+    };
+    return xs;
+}
 

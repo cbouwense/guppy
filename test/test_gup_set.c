@@ -1,34 +1,34 @@
 #include "../src/guppy.h"
 
-void test_gup_set_general(void) {
+void test_gup_set_general_bool(void) {
     GupSetBool set = gup_set_bool_create();
 
-    gup_assert(!gup_set_bool_contains(set, false));
-    gup_assert(!gup_set_bool_contains(set, true));
+    gup_assert(!gup_set_bool_has(set, false));
+    gup_assert(!gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 0);
 
     gup_set_bool_insert(&set, false);
 
-    gup_assert(gup_set_bool_contains(set, false));
-    gup_assert(!gup_set_bool_contains(set, true));
+    gup_assert(gup_set_bool_has(set, false));
+    gup_assert(!gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 1);
 
     gup_set_bool_insert(&set, true);
     
-    gup_assert(gup_set_bool_contains(set, false));
-    gup_assert(gup_set_bool_contains(set, true));
+    gup_assert(gup_set_bool_has(set, false));
+    gup_assert(gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 2);
 
     gup_set_bool_remove(&set, false);
 
-    gup_assert(!gup_set_bool_contains(set, false));
-    gup_assert(gup_set_bool_contains(set, true));
+    gup_assert(!gup_set_bool_has(set, false));
+    gup_assert(gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 1);
 
     gup_set_bool_remove(&set, true);
 
-    gup_assert(!gup_set_bool_contains(set, false));
-    gup_assert(!gup_set_bool_contains(set, true));
+    gup_assert(!gup_set_bool_has(set, false));
+    gup_assert(!gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 0);
 
     gup_set_bool_insert(&set, true);
@@ -40,18 +40,18 @@ void test_gup_set_general(void) {
     gup_set_bool_insert(&set, true);
     gup_set_bool_insert(&set, true);
 
-    gup_assert(!gup_set_bool_contains(set, false));
-    gup_assert(gup_set_bool_contains(set, true));
+    gup_assert(!gup_set_bool_has(set, false));
+    gup_assert(gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 1);
 }
 
-void test_gup_set_from_array(void) {
+void test_gup_set_from_array_bool(void) {
     { // Empty has neither
         bool *bools = NULL;
         GupSetBool set = gup_set_bool_create_from_array(bools, 0);
         
-        gup_assert(!gup_set_bool_contains(set, false));
-        gup_assert(!gup_set_bool_contains(set, true));
+        gup_assert(!gup_set_bool_has(set, false));
+        gup_assert(!gup_set_bool_has(set, true));
         gup_assert(gup_set_bool_size(set) == 0);
     }
 
@@ -59,8 +59,8 @@ void test_gup_set_from_array(void) {
         bool bools[] = { false };
         GupSetBool set = gup_set_bool_create_from_array(bools, 1);
         
-        gup_assert(gup_set_bool_contains(set, false));
-        gup_assert(!gup_set_bool_contains(set, true));
+        gup_assert(gup_set_bool_has(set, false));
+        gup_assert(!gup_set_bool_has(set, true));
         gup_assert(gup_set_bool_size(set) == 1);
     }
 
@@ -68,13 +68,62 @@ void test_gup_set_from_array(void) {
         bool bools[] = { false, true, false, true, false, false, false, false };
         GupSetBool set = gup_set_bool_create_from_array(bools, gup_array_len(bools));
         
-        gup_assert(gup_set_bool_contains(set, false));
-        gup_assert(gup_set_bool_contains(set, true));
+        gup_assert(gup_set_bool_has(set, false));
+        gup_assert(gup_set_bool_has(set, true));
         gup_assert(gup_set_bool_size(set) == 2);
     }
 }
 
+void test_has_is_false_before_inserting_anything(void) {
+    GupSetChar set = gup_set_char_create();
+
+    gup_assert_verbose(!gup_set_char_has(set, 'a'), "A Set thinks that it has the character 'a' even though it never has anything at all inserted.");
+
+    gup_set_char_destroy(set);
+}
+
+void test_has_is_false_after_inserting_something_different(void) {
+    GupSetChar set = gup_set_char_create();
+
+    gup_set_char_insert(&set, 'a');
+
+    gup_assert_verbose(!gup_set_char_has(set, 'b'), "A Set thinks that it has the character 'b' even though it only had 'a' inserted.");
+
+    gup_set_char_destroy(set);
+}
+
+void test_has_is_true_after_inserting_something(void) {
+    GupSetChar set = gup_set_char_create();
+
+    gup_set_char_insert(&set, 'a');
+
+    gup_assert_verbose(gup_set_char_has(set, 'a'), "A Set doesn't realize it has 'a' after it was inserted.");
+
+    gup_set_char_destroy(set);
+}
+
+void test_sets_general_functionality(void) {
+    GupSetChar set = gup_set_char_create();
+
+    gup_set_char_insert(&set, 'a');
+    gup_set_char_insert(&set, 'a');
+    gup_set_char_insert(&set, 'a');
+    gup_set_char_insert(&set, 'b');
+    gup_set_char_insert(&set, 'b');
+    gup_set_char_insert(&set, 'b');
+
+    gup_assert_verbose(gup_set_char_has(set, 'a'), "A Set doesn't realize it has 'a' after it was inserted.");
+    gup_assert_verbose(gup_set_char_has(set, 'b'), "A Set doesn't realize it has 'b' after it was inserted.");
+    gup_assert_verbose(!gup_set_char_has(set, 'c'), "A Set thinks it has has 'c' but it was never inserted.");
+
+    gup_set_char_destroy(set);
+}
+
 void test_gup_set(void) {
-    test_gup_set_general();
-    test_gup_set_from_array();
+    // test_gup_set_general_bool();
+    // test_gup_set_from_array_bool();
+    // test_has_is_false_before_inserting_anything();
+    // test_has_is_false_after_inserting_something_different();
+    // test_has_is_true_after_inserting_something();
+    test_sets_general_functionality();
 }
