@@ -4541,7 +4541,6 @@ void gup_set_char_insert(GupSetChar *set, char x) {
     gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
 
     if (set->data[index].occupied) {
-        printf("SAME HASH!!\n");
         if (set->data[index].value != x) {
             printf("COLLISION!!! existing: '%c' (%d), candidate: '%c' (%d)\n", set->data[index].value, set->data[index].value, x, x);
             
@@ -4573,7 +4572,6 @@ void gup_set_char_insert(GupSetChar *set, char x) {
         set->data[index].occupied = true;
         set->data[index].value = x;
         set->count++;
-        // printf("new value: '%c' (%d)\n", set->data[index].value, set->data[index].value);
     }
 }
 
@@ -4584,6 +4582,22 @@ void gup_set_bool_remove(GupSetBool *set, bool b) {
     } else {
         set->has_true = false;
     }
+}
+
+void gup_set_char_remove(GupSetChar *set, char x) {
+    // TODO: DRY
+    char input_cstr[1024];
+    sprintf(input_cstr, "%c", x);
+    const uint32_t hash = gup_fnv1a_hash(input_cstr);
+    const int index = hash % set->capacity;
+    // printf("count: %d\ncapacity: %d\n", set->count, set->capacity);
+    // printf("index: %d\n", index);
+    gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
+
+    if (set->data[index].occupied) {
+        set->count--;
+    }
+    set->data[index].occupied = false;
 }
 
 // Size

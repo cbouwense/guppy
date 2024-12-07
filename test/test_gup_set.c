@@ -117,6 +117,25 @@ void test_sets_general_functionality(void) {
     gup_assert_verbose(!gup_set_char_has(set, 'c'), "A Set thinks it has has 'c' but it was never inserted.");
     gup_assert(gup_set_char_size(set) == 2);
 
+    gup_set_char_remove(&set, 'a');
+
+    gup_assert_verbose(!gup_set_char_has(set, 'a'), "A Set thinks it still has 'a' after it was removed.");
+    gup_assert_verbose(gup_set_char_has(set, 'b'), "A Set doesn't realize it has 'b' after it was inserted.");
+    gup_assert_verbose(!gup_set_char_has(set, 'c'), "A Set thinks it has has 'c' but it was never inserted.");
+    gup_assert(gup_set_char_size(set) == 1);
+
+    gup_set_char_remove(&set, 'a');
+    gup_set_char_remove(&set, 'a');
+    gup_set_char_remove(&set, 'a');
+    gup_set_char_remove(&set, 'b');
+    gup_set_char_remove(&set, 'b');
+    gup_set_char_remove(&set, 'b');
+
+    gup_assert_verbose(!gup_set_char_has(set, 'a'), "A Set thinks it still has 'a' after it was removed.");
+    gup_assert_verbose(!gup_set_char_has(set, 'b'), "A Set thinks it still has 'b' after it was removed.");
+    gup_assert_verbose(!gup_set_char_has(set, 'c'), "A Set thinks it has has 'c' but it was never inserted.");
+    gup_assert(gup_set_char_size(set) == 0);
+
     gup_set_char_destroy(set);
 }
 
@@ -144,13 +163,27 @@ void test_sets_huge_mode_double(void) {
     for (char c = 0; c < 127; c++) {
         gup_set_char_insert(&set, c);
     }
+
+    for (char c = 0; c < 127; c++) {
+        gup_set_char_insert(&set, c);
+    }
     
     gup_assert(gup_set_char_size(set) == 127);
 
     for (char c = 0; c < 127; c++) {
         char reason[1024];
-        sprintf(reason, "set claims to not contain %c (%d)", c, c);
+        sprintf(reason, "set claims to not contain '%c' (%d)", c, c);
         gup_assert_verbose(gup_set_char_has(set, c), reason);
+    }
+
+    for (char c = 0; c < 127; c++) {
+        gup_set_char_remove(&set, c);
+    }
+
+    for (char c = 0; c < 127; c++) {
+        char reason[1024];
+        sprintf(reason, "set thinks it still has '%c' (%d) after it was removed", c, c);
+        gup_assert_verbose(!gup_set_char_has(set, c), reason);
     }
 
     gup_set_char_destroy(set);
@@ -164,4 +197,5 @@ void test_gup_set(void) {
     test_has_is_true_after_inserting_something();
     test_sets_general_functionality();
     test_sets_huge_mode();
+    test_sets_huge_mode_double();
 }
