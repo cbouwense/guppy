@@ -542,55 +542,55 @@ bool gup_settings_set(const char *key, const char *value);
 bool gup_settings_set_to_file(const char *key, const char *value, const char *file_path);
 
 // Strings -------------------------------------------------------------------------------------
-GupString      gup_string_create();
-GupString      gup_string_create_arena(GupArena *a);
-void           gup_string_destroy(GupString str);
-GupString      gup_string_create_from_cstr(char str[]);
-GupString      gup_string_create_from_cstr_arena(GupArena *a, char str[]); // Aliased as "gup_string"
-GupString      gup_string_copy(GupString str);
-GupString      gup_string_copy_arena(GupArena *a, GupString str);
-bool           gup_string_eq(GupString str_a, GupString str_b);
-bool           gup_string_eq_cstr(GupString str, const char *cstr, int cstr_length);
-int            gup_string_compare(GupString x, GupString y); // Returns negative if x < y, 0 if x == y, positive if x > y (think strcmp).
-int            gup_string_compare_arena(GupArena *a, GupString x, GupString y); // Returns negative if x < y, 0 if x == y, positive if x > y (think strcmp).
-bool           gup_string_contains(GupString str, char c);
-bool           gup_string_contains_substring(GupString str, GupString sub_str); // TODO: contains cstr
-void           gup_string_print(GupString str);
-void           gup_string_debug(GupString str);
-void           gup_string_append(GupString *str, char c);
-void           gup_string_append_arena(GupArena *a, GupString *str, char c);
-void           gup_string_append_str_arena(GupArena *a, GupString *str, GupString str_to_append);
-void           gup_string_append_cstr_arena(GupArena *a, GupString *str, const char *cstr_to_append);
-void           gup_string_prepend(GupString *str, char c);
-void           gup_string_prepend_arena(GupArena *a, GupString *str, char c);
-GupString      gup_string_map(GupString str, char (*fn)(char));
-GupString      gup_string_map_arena(GupArena *a, GupString str, char (*fn)(char));
-void           gup_string_map_in_place(GupString str, char (*fn)(char));
-GupString      gup_string_filter(GupString str, bool (*fn)(char));
-GupString      gup_string_filter_arena(GupArena *a, GupString str, bool (*fn)(char));
-void           gup_string_filter_in_place(GupString *str, bool (*fn)(char));
-char           gup_string_reduce(GupString str, char (*fn)(char, char), char start);
-bool           gup_string_find(GupString str, bool (*fn)(char), char *out);
-bool           gup_string_find_arena(GupArena *a, GupString str, bool (*fn)(char), char *out);
-GupString      gup_string_trim_char(GupString str, char c);
-GupString      gup_string_trim_char_arena(GupArena *a, GupString str, char c);
-void           gup_string_trim_char_in_place(GupString *str, char c);
-GupString      gup_string_trim_fn(GupString str, bool (*fn)(char));
-GupString      gup_string_trim_fn_arena(GupArena *a, GupString str, bool (*fn)(char));
-void           gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
-GupString      gup_string_without_whitespace(GupString str);
-void           gup_string_without_whitespace_in_place(GupString *str);
-bool           gup_string_starts_with(GupString str, GupString sub_str);
-bool           gup_string_starts_with_cstr(GupString str, const char* cstr);
-bool           gup_string_ends_with(GupString str, GupString sub_str);
-bool           gup_string_ends_with_cstr(GupString str, const char* cstr);
-bool           gup_string_to_int(GupString str, int *out);
-char          *gup_string_to_cstr(GupString str);
-char          *gup_string_to_cstr_arena(GupArena *a, GupString str);
-GupArrayString gup_string_split(GupString str, char c);
-GupArrayString gup_string_split_arena(GupArena *a, GupString str, char c);
-GupArrayString gup_string_split_by_cstr(GupString str, char *sub_str);
-GupArrayString gup_string_split_by_cstr_arena(GupArena *a, GupString str, char *sub_str);
+GupString       gup_string_create();
+GupString       gup_string_create_arena(GupArena *a);
+void            gup_string_destroy(GupString str);
+GupString       gup_string_create_from_cstr(char str[]);
+GupString       gup_string_create_from_cstr_arena(GupArena *a, char str[]); // Aliased as "gup_string"
+GupString       gup_string_copy(GupString str);
+GupString       gup_string_copy_arena(GupArena *a, GupString str);
+bool            gup_string_eq(GupString str_a, GupString str_b);
+bool            gup_string_eq_cstr(GupString str, const char *cstr, int cstr_length);
+int             gup_string_compare(GupString x, GupString y); // Returns negative if x < y, 0 if x == y, positive if x > y (think strcmp).
+int             gup_string_compare_arena(GupArena *a, GupString x, GupString y); // Returns negative if x < y, 0 if x == y, positive if x > y (think strcmp).
+bool            gup_string_contains(GupString str, char c);
+bool            gup_string_contains_substring(GupString str, GupString sub_str); // TODO: contains cstr
+void            gup_string_print(GupString str);
+void            gup_string_debug(GupString str);
+void            gup_string_append(GupString *str, char c);
+void            gup_string_append_arena(GupArena *a, GupString *str, char c);
+void            gup_string_append_str_arena(GupArena *a, GupString *str, GupString str_to_append);
+void            gup_string_append_cstr_arena(GupArena *a, GupString *str, const char *cstr_to_append);
+void            gup_string_prepend(GupString *str, char c);
+void            gup_string_prepend_arena(GupArena *a, GupString *str, char c);
+GupString       gup_string_map(GupString str, char (*fn)(char));
+GupString       gup_string_map_arena(GupArena *a, GupString str, char (*fn)(char));
+void            gup_string_map_in_place(GupString str, char (*fn)(char));
+GupString       gup_string_filter(GupString str, bool (*fn)(char));
+GupString       gup_string_filter_arena(GupArena *a, GupString str, bool (*fn)(char));
+void            gup_string_filter_in_place(GupString *str, bool (*fn)(char));
+char            gup_string_reduce(GupString str, char (*fn)(char, char), char start);
+bool            gup_string_find(GupString str, bool (*fn)(char), char *out);
+bool            gup_string_find_arena(GupArena *a, GupString str, bool (*fn)(char), char *out);
+GupString       gup_string_trim_char(GupString str, char c);
+GupString       gup_string_trim_char_arena(GupArena *a, GupString str, char c);
+void            gup_string_trim_char_in_place(GupString *str, char c);
+GupString       gup_string_trim_fn(GupString str, bool (*fn)(char));
+GupString       gup_string_trim_fn_arena(GupArena *a, GupString str, bool (*fn)(char));
+void            gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
+GupString       gup_string_without_whitespace(GupString str);
+void            gup_string_without_whitespace_in_place(GupString *str);
+bool            gup_string_starts_with(GupString str, GupString sub_str);
+bool            gup_string_starts_with_cstr(GupString str, const char* cstr);
+bool            gup_string_ends_with(GupString str, GupString sub_str);
+bool            gup_string_ends_with_cstr(GupString str, const char* cstr);
+bool            gup_string_to_int(GupString str, int *out);
+char           *gup_string_to_cstr(GupString str);
+char           *gup_string_to_cstr_arena(GupArena *a, GupString str);
+GupArrayString  gup_string_split(GupString str, char c);
+GupArrayString  gup_string_split_arena(GupArena *a, GupString str, char c);
+GupArrayString  gup_string_split_by_cstr(GupString str, char *sub_str);
+GupArrayString  gup_string_split_by_cstr_arena(GupArena *a, GupString str, char *sub_str);
 
 // Assert
 void gup_assert(bool pass_condition);
