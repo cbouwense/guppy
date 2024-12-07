@@ -7,13 +7,13 @@ void test_gup_set_general_bool(void) {
     gup_assert(!gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 0);
 
-    gup_set_bool_insert(&set, false);
+    gup_set_bool_add(&set, false);
 
     gup_assert(gup_set_bool_has(set, false));
     gup_assert(!gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 1);
 
-    gup_set_bool_insert(&set, true);
+    gup_set_bool_add(&set, true);
     
     gup_assert(gup_set_bool_has(set, false));
     gup_assert(gup_set_bool_has(set, true));
@@ -31,14 +31,14 @@ void test_gup_set_general_bool(void) {
     gup_assert(!gup_set_bool_has(set, true));
     gup_assert(gup_set_bool_size(set) == 0);
 
-    gup_set_bool_insert(&set, true);
-    gup_set_bool_insert(&set, true);
-    gup_set_bool_insert(&set, true);
-    gup_set_bool_insert(&set, true);
-    gup_set_bool_insert(&set, true);
-    gup_set_bool_insert(&set, true);
-    gup_set_bool_insert(&set, true);
-    gup_set_bool_insert(&set, true);
+    gup_set_bool_add(&set, true);
+    gup_set_bool_add(&set, true);
+    gup_set_bool_add(&set, true);
+    gup_set_bool_add(&set, true);
+    gup_set_bool_add(&set, true);
+    gup_set_bool_add(&set, true);
+    gup_set_bool_add(&set, true);
+    gup_set_bool_add(&set, true);
 
     gup_assert(!gup_set_bool_has(set, false));
     gup_assert(gup_set_bool_has(set, true));
@@ -74,7 +74,7 @@ void test_gup_set_from_array_bool(void) {
     }
 }
 
-void test_has_is_false_before_inserting_anything(void) {
+void test_has_is_false_before_adding_anything(void) {
     GupSetChar set = gup_set_char_create();
 
     gup_assert_verbose(!gup_set_char_has(set, 'a'), "A Set thinks that it has the character 'a' even though it never has anything at all inserted.");
@@ -82,20 +82,20 @@ void test_has_is_false_before_inserting_anything(void) {
     gup_set_char_destroy(set);
 }
 
-void test_has_is_false_after_inserting_something_different(void) {
+void test_has_is_false_after_adding_something_different(void) {
     GupSetChar set = gup_set_char_create();
 
-    gup_set_char_insert(&set, 'a');
+    gup_set_char_add(&set, 'a');
 
     gup_assert_verbose(!gup_set_char_has(set, 'b'), "A Set thinks that it has the character 'b' even though it only had 'a' inserted.");
 
     gup_set_char_destroy(set);
 }
 
-void test_has_is_true_after_inserting_something(void) {
+void test_has_is_true_after_adding_something(void) {
     GupSetChar set = gup_set_char_create();
 
-    gup_set_char_insert(&set, 'a');
+    gup_set_char_add(&set, 'a');
 
     gup_assert_verbose(gup_set_char_has(set, 'a'), "A Set doesn't realize it has 'a' after it was inserted.");
 
@@ -105,12 +105,12 @@ void test_has_is_true_after_inserting_something(void) {
 void test_sets_general_functionality(void) {
     GupSetChar set = gup_set_char_create();
 
-    gup_set_char_insert(&set, 'a');
-    gup_set_char_insert(&set, 'a');
-    gup_set_char_insert(&set, 'a');
-    gup_set_char_insert(&set, 'b');
-    gup_set_char_insert(&set, 'b');
-    gup_set_char_insert(&set, 'b');
+    gup_set_char_add(&set, 'a');
+    gup_set_char_add(&set, 'a');
+    gup_set_char_add(&set, 'a');
+    gup_set_char_add(&set, 'b');
+    gup_set_char_add(&set, 'b');
+    gup_set_char_add(&set, 'b');
 
     gup_assert_verbose(gup_set_char_has(set, 'a'), "A Set doesn't realize it has 'a' after it was inserted.");
     gup_assert_verbose(gup_set_char_has(set, 'b'), "A Set doesn't realize it has 'b' after it was inserted.");
@@ -143,7 +143,7 @@ void test_sets_huge_mode(void) {
     GupSetChar set = gup_set_char_create();
 
     for (char c = 0; c < 127; c++) {
-        gup_set_char_insert(&set, c);
+        gup_set_char_add(&set, c);
     }
 
     gup_assert(gup_set_char_size(set) == 127);
@@ -161,11 +161,11 @@ void test_sets_huge_mode_double(void) {
     GupSetChar set = gup_set_char_create();
 
     for (char c = 0; c < 127; c++) {
-        gup_set_char_insert(&set, c);
+        gup_set_char_add(&set, c);
     }
 
     for (char c = 0; c < 127; c++) {
-        gup_set_char_insert(&set, c);
+        gup_set_char_add(&set, c);
     }
     
     gup_assert(gup_set_char_size(set) == 127);
@@ -192,9 +192,9 @@ void test_sets_huge_mode_double(void) {
 void test_gup_set(void) {
     test_gup_set_general_bool();
     test_gup_set_from_array_bool();
-    test_has_is_false_before_inserting_anything();
-    test_has_is_false_after_inserting_something_different();
-    test_has_is_true_after_inserting_something();
+    test_has_is_false_before_adding_anything();
+    test_has_is_false_after_adding_something_different();
+    test_has_is_true_after_adding_something();
     test_sets_general_functionality();
     test_sets_huge_mode();
     test_sets_huge_mode_double();
