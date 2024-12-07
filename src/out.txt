@@ -1,99 +1,70 @@
-GupSetBool   gup_set_bool_create();
-GupSetBool   gup_set_bool_create_arena(GupArena *a);
-GupSetBool   gup_set_bool_create_from_array(bool xs[], const int size);
-void         gup_set_bool_destroy(GupSetBool set);
-bool         gup_set_bool_has(GupSetBool set, bool x);
-void         gup_set_bool_add(GupSetBool *set, bool x);
-void         gup_set_bool_remove(GupSetBool *set, bool x);
-int          gup_set_bool_size(GupSetBool set);
-void         gup_set_bool_print(GupSetBool set);
-void         gup_set_bool_debug(GupSetBool set);
+GupSet gup_set_long_create() {
+    GupSet xs = (GupSet) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
+    };
 
-GupSetDouble   gup_set_double_create();
-GupSetDouble   gup_set_double_create_arena(GupArena *a);
-GupSetDouble   gup_set_double_create_from_array(double xs[], const int size);
-void         gup_set_double_destroy(GupSetDouble set);
-bool         gup_set_double_has(GupSetDouble set, double x);
-void         gup_set_double_add(GupSetDouble *set, double x);
-void         gup_set_double_remove(GupSetDouble *set, double x);
-int          gup_set_double_size(GupSetDouble set);
-void         gup_set_double_print(GupSetDouble set);
-void         gup_set_double_debug(GupSetDouble set);
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i].occupied = false;
+    }
 
-GupSetFloat   gup_set_float_create();
-GupSetFloat   gup_set_float_create_arena(GupArena *a);
-GupSetFloat   gup_set_float_create_from_array(float xs[], const int size);
-void         gup_set_float_destroy(GupSetFloat set);
-bool         gup_set_float_has(GupSetFloat set, float x);
-void         gup_set_float_add(GupSetFloat *set, float x);
-void         gup_set_float_remove(GupSetFloat *set, float x);
-int          gup_set_float_size(GupSetFloat set);
-void         gup_set_float_print(GupSetFloat set);
-void         gup_set_float_debug(GupSetFloat set);
+    return xs;
+}
 
-GupSetInt   gup_set_int_create();
-GupSetInt   gup_set_int_create_arena(GupArena *a);
-GupSetInt   gup_set_int_create_from_array(int xs[], const int size);
-void         gup_set_int_destroy(GupSetInt set);
-bool         gup_set_int_has(GupSetInt set, int x);
-void         gup_set_int_add(GupSetInt *set, int x);
-void         gup_set_int_remove(GupSetInt *set, int x);
-int          gup_set_int_size(GupSetInt set);
-void         gup_set_int_print(GupSetInt set);
-void         gup_set_int_debug(GupSetInt set);
+GupSet gup_set_ptr_create() {
+    GupSet xs = (GupSet) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
+    };
 
-GupSetLong   gup_set_long_create();
-GupSetLong   gup_set_long_create_arena(GupArena *a);
-GupSetLong   gup_set_long_create_from_array(long xs[], const int size);
-void         gup_set_long_destroy(GupSetLong set);
-bool         gup_set_long_has(GupSetLong set, long x);
-void         gup_set_long_add(GupSetLong *set, long x);
-void         gup_set_long_remove(GupSetLong *set, long x);
-int          gup_set_long_size(GupSetLong set);
-void         gup_set_long_print(GupSetLong set);
-void         gup_set_long_debug(GupSetLong set);
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i].occupied = false;
+    }
 
-GupSetPtr   gup_set_ptr_create();
-GupSetPtr   gup_set_ptr_create_arena(GupArena *a);
-GupSetPtr   gup_set_ptr_create_from_array(void* xs[], const int size);
-void         gup_set_ptr_destroy(GupSetPtr set);
-bool         gup_set_ptr_has(GupSetPtr set, void* x);
-void         gup_set_ptr_add(GupSetPtr *set, void* x);
-void         gup_set_ptr_remove(GupSetPtr *set, void* x);
-int          gup_set_ptr_size(GupSetPtr set);
-void         gup_set_ptr_print(GupSetPtr set);
-void         gup_set_ptr_debug(GupSetPtr set);
+    return xs;
+}
 
-GupSetShort   gup_set_short_create();
-GupSetShort   gup_set_short_create_arena(GupArena *a);
-GupSetShort   gup_set_short_create_from_array(short xs[], const int size);
-void         gup_set_short_destroy(GupSetShort set);
-bool         gup_set_short_has(GupSetShort set, short x);
-void         gup_set_short_add(GupSetShort *set, short x);
-void         gup_set_short_remove(GupSetShort *set, short x);
-int          gup_set_short_size(GupSetShort set);
-void         gup_set_short_print(GupSetShort set);
-void         gup_set_short_debug(GupSetShort set);
+GupSet gup_set_short_create() {
+    GupSet xs = (GupSet) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
+    };
 
-GupSetString   gup_set_string_create();
-GupSetString   gup_set_string_create_arena(GupArena *a);
-GupSetString   gup_set_string_create_from_array(GupString xs[], const int size);
-void         gup_set_string_destroy(GupSetString set);
-bool         gup_set_string_has(GupSetString set, GupString x);
-void         gup_set_string_add(GupSetString *set, GupString x);
-void         gup_set_string_remove(GupSetString *set, GupString x);
-int          gup_set_string_size(GupSetString set);
-void         gup_set_string_print(GupSetString set);
-void         gup_set_string_debug(GupSetString set);
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i].occupied = false;
+    }
 
-GupSetCstr   gup_set_cstr_create();
-GupSetCstr   gup_set_cstr_create_arena(GupArena *a);
-GupSetCstr   gup_set_cstr_create_from_array(char * xs[], const int size);
-void         gup_set_cstr_destroy(GupSetCstr set);
-bool         gup_set_cstr_has(GupSetCstr set, char * x);
-void         gup_set_cstr_add(GupSetCstr *set, char * x);
-void         gup_set_cstr_remove(GupSetCstr *set, char * x);
-int          gup_set_cstr_size(GupSetCstr set);
-void         gup_set_cstr_print(GupSetCstr set);
-void         gup_set_cstr_debug(GupSetCstr set);
+    return xs;
+}
+
+GupSet gup_set_string_create() {
+    GupSet xs = (GupSet) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i].occupied = false;
+    }
+
+    return xs;
+}
+
+GupSet gup_set_cstr_create() {
+    GupSet xs = (GupSet) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .count = 0,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i].occupied = false;
+    }
+
+    return xs;
+}
 
