@@ -1,70 +1,130 @@
-GupSet gup_set_long_create() {
-    GupSet xs = (GupSet) {
-        .capacity = GUP_SET_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
-    };
-
+#define gup_set_bool_print(xs) _gup_set_bool_print(xs, #xs)
+void _gup_set_bool_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].occupied = false;
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%d", xs.data[i].value.v_bool);
+        preceeding_comma = true;
     }
-
-    return xs;
+    printf("]\n");
 }
 
-GupSet gup_set_ptr_create() {
-    GupSet xs = (GupSet) {
-        .capacity = GUP_SET_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
-    };
-
+#define gup_set_char_print(xs) _gup_set_char_print(xs, #xs)
+void _gup_set_char_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].occupied = false;
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%c", xs.data[i].value.v_char);
+        preceeding_comma = true;
     }
-
-    return xs;
+    printf("]\n");
 }
 
-GupSet gup_set_short_create() {
-    GupSet xs = (GupSet) {
-        .capacity = GUP_SET_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
-    };
-
+#define gup_set_double_print(xs) _gup_set_double_print(xs, #xs)
+void _gup_set_double_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].occupied = false;
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%f", xs.data[i].value.v_double);
+        preceeding_comma = true;
     }
-
-    return xs;
+    printf("]\n");
 }
 
-GupSet gup_set_string_create() {
-    GupSet xs = (GupSet) {
-        .capacity = GUP_SET_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
-    };
-
+#define gup_set_float_print(xs) _gup_set_float_print(xs, #xs)
+void _gup_set_float_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].occupied = false;
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%f", xs.data[i].value.v_float);
+        preceeding_comma = true;
     }
-
-    return xs;
+    printf("]\n");
 }
 
-GupSet gup_set_cstr_create() {
-    GupSet xs = (GupSet) {
-        .capacity = GUP_SET_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetData)),
-    };
-
+#define gup_set_int_print(xs) _gup_set_int_print(xs, #xs)
+void _gup_set_int_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].occupied = false;
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%d", xs.data[i].value.v_int);
+        preceeding_comma = true;
     }
+    printf("]\n");
+}
 
-    return xs;
+#define gup_set_long_print(xs) _gup_set_long_print(xs, #xs)
+void _gup_set_long_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%ld", xs.data[i].value.v_long);
+        preceeding_comma = true;
+    }
+    printf("]\n");
+}
+
+#define gup_set_ptr_print(xs) _gup_set_ptr_print(xs, #xs)
+void _gup_set_ptr_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%p", xs.data[i].value.v_ptr);
+        preceeding_comma = true;
+    }
+    printf("]\n");
+}
+
+#define gup_set_short_print(xs) _gup_set_short_print(xs, #xs)
+void _gup_set_short_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%hd", xs.data[i].value.v_short);
+        preceeding_comma = true;
+    }
+    printf("]\n");
+}
+
+#define gup_set_string_print(xs) _gup_set_string_print(xs, #xs)
+void _gup_set_string_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("TODO", xs.data[i].value.v_string);
+        preceeding_comma = true;
+    }
+    printf("]\n");
+}
+
+#define gup_set_cstr_print(xs) _gup_set_cstr_print(xs, #xs)
+void _gup_set_cstr_print(GupSet xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("%s", xs.data[i].value.v_cstr);
+        preceeding_comma = true;
+    }
+    printf("]\n");
 }
 
