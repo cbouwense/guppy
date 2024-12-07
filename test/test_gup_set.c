@@ -120,11 +120,48 @@ void test_sets_general_functionality(void) {
     gup_set_char_destroy(set);
 }
 
+void test_sets_huge_mode(void) {
+    GupSetChar set = gup_set_char_create();
+
+    for (char c = 0; c < 127; c++) {
+        gup_set_char_insert(&set, c);
+    }
+
+    gup_assert(gup_set_char_size(set) == 127);
+
+    for (char c = 0; c < 127; c++) {
+        char reason[1024];
+        sprintf(reason, "set claims to not contain %c (%d)", c, c);
+        gup_assert_verbose(gup_set_char_has(set, c), reason);
+    }
+
+    gup_set_char_destroy(set);
+}
+
+void test_sets_huge_mode_double(void) {
+    GupSetChar set = gup_set_char_create();
+
+    for (char c = 0; c < 127; c++) {
+        gup_set_char_insert(&set, c);
+    }
+    
+    gup_assert(gup_set_char_size(set) == 127);
+
+    for (char c = 0; c < 127; c++) {
+        char reason[1024];
+        sprintf(reason, "set claims to not contain %c (%d)", c, c);
+        gup_assert_verbose(gup_set_char_has(set, c), reason);
+    }
+
+    gup_set_char_destroy(set);
+}
+
 void test_gup_set(void) {
-    // test_gup_set_general_bool();
-    // test_gup_set_from_array_bool();
-    // test_has_is_false_before_inserting_anything();
-    // test_has_is_false_after_inserting_something_different();
-    // test_has_is_true_after_inserting_something();
+    test_gup_set_general_bool();
+    test_gup_set_from_array_bool();
+    test_has_is_false_before_inserting_anything();
+    test_has_is_false_after_inserting_something_different();
+    test_has_is_true_after_inserting_something();
     test_sets_general_functionality();
+    test_sets_huge_mode();
 }

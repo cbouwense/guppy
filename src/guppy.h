@@ -80,10 +80,12 @@ typedef struct {
     bool has_true;
 } GupSetBool;
 
-// TODO: type union?
 typedef struct {
-    char value;
-    uint32_t hash; // -1 means "no hash"
+    char value; // TODO: type union?
+    bool occupied;
+    // the hash function is FNV-1a, which outputs unsigned 32 bit integers. Here we store a signed
+    // 64 bit integer so that we can have a sentinel value of -1 to mean "no hash".
+    // int64_t hash;
 } GupSetCharData;
 
 typedef struct {
@@ -424,6 +426,8 @@ bool         gup_set_char_has(GupSetChar set, char x);
 void         gup_set_char_insert(GupSetChar *set, char x);
 void         gup_set_char_remove(GupSetChar *set, char x);
 int          gup_set_char_size(GupSetChar set);
+void         gup_set_char_print(GupSetChar set);
+void         gup_set_char_debug(GupSetChar set);
 
 GupSetDouble gup_set_double_create();
 GupSetDouble gup_set_double_create_arena(GupArena *a);
@@ -564,6 +568,7 @@ GupArrayString gup_string_split_by_cstr_arena(GupArena *a, GupString str, char *
 void gup_assert(bool pass_condition);
 void gup_assert_verbose(bool pass_condition, const char *failure_explanation);
 
+
 // C-string utilities
 char *gup_cstr_array_flatten_arena(GupArena *a, char **strs); // Assumes a null terminated string.
 int   gup_cstr_length(const char* cstr); // Assumes a null terminated string. Excludes the null from the length.
@@ -591,20 +596,20 @@ uint32_t gup_fnv1a_hash(const char *s);
 
 // Assert ------------------------------------------------------------------------------------------
 
-void _gup_assert_verbose(bool pass_condition, const char *failure_explanation, const char *readable_pass_condition, const char *file_path, int line_number) {
+void _gup_assert_verbose(bool pass_condition, const char *failure_explanation, const char *literal_pass_condition, const char *file_path, int line_number) {
     if (!pass_condition) {
         printf("[%s:%d] Failed assertion!\n", file_path, line_number);
-        printf("---> %s <---\n", readable_pass_condition);
+        printf("---> %s <---\n", literal_pass_condition);
         printf("%s\n", failure_explanation);
         exit(1);
     }
 }
 #define gup_assert_verbose(pass_condition, failure_explanation) _gup_assert_verbose(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
 
-void _gup_assert(bool pass_condition, const char *readable_pass_condition, const char *file_path, int line_number) {
+void _gup_assert(bool pass_condition, const char *literal_pass_condition, const char *file_path, int line_number) {
     if (!pass_condition) {
         printf("[%s:%d] Failed assertion!\n", file_path, line_number);
-        printf("---> %s <---\n", readable_pass_condition);
+        printf("---> %s <---\n", literal_pass_condition);
         exit(1);
     }
 }
@@ -4231,7 +4236,8 @@ GupSetChar gup_set_char_create() {
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].hash = 0;
+        
+        xs.data[i].occupied = false;
         xs.data[i].value = '\0'; // This doesn't really matter.
     }
 
@@ -4246,7 +4252,7 @@ GupSetChar gup_set_char_create_arena(GupArena *a) {
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].hash = 0;
+        xs.data[i].occupied = false;
         xs.data[i].value = '\0'; // This value doesn't really matter I don't think.
     }
 
@@ -4508,13 +4514,12 @@ bool gup_set_char_has(GupSetChar set, char x) {
     
     char input_cstr[1024];
     sprintf(input_cstr, "%c", x);
-    const int hash = gup_fnv1a_hash(input_cstr);
+    const uint32_t hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % set.capacity;
+    gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
 
-    printf("x: %c, hash: %d\nindex: %d\n", x, hash, index);
-    
-    if (set.data[index].hash == 0) return false;
-    return set.data[index].value == x;
+    const GupSetCharData entry = set.data[index];
+    return entry.occupied && entry.value == x;
 }
 
 // Insert
@@ -4527,18 +4532,49 @@ void gup_set_bool_insert(GupSetBool *set, bool b) {
 }
 
 void gup_set_char_insert(GupSetChar *set, char x) {
-    if (gup_set_char_has(*set, x)) return;
-    
     char input_cstr[1024];
     sprintf(input_cstr, "%c", x);
-    const int hash = gup_fnv1a_hash(input_cstr);
+    const uint32_t hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % set->capacity;
+    // printf("count: %d\ncapacity: %d\n", set->count, set->capacity);
+    // printf("index: %d\n", index);
+    gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
 
-    // TODO: Check for collision. If so, resize array and try again
-    
-    set->data[index].hash = hash;
-    set->data[index].value = x;
-    set->count++;
+    if (set->data[index].occupied) {
+        printf("SAME HASH!!\n");
+        if (set->data[index].value != x) {
+            printf("COLLISION!!! existing: '%c' (%d), candidate: '%c' (%d)\n", set->data[index].value, set->data[index].value, x, x);
+            
+            const int new_capacity = set->capacity * 2;
+            GupSetCharData *new_data = malloc(new_capacity * sizeof(GupSetCharData));
+
+            for (int i = 0; i < set->capacity; i++) {
+                if (!set->data[i].occupied) {
+                    new_data[i].occupied = false;
+                };
+
+                // TODO: DRY?
+                char input_cstr[1024];
+                sprintf(input_cstr, "%c", set->data[i].value);
+                const uint32_t hash = gup_fnv1a_hash(input_cstr);
+                const int index = hash % new_capacity;
+                gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
+
+                new_data[index].occupied = true;
+                new_data[index].value = set->data[i].value;
+            }
+
+            free(set->data);
+            set->data = new_data;
+
+            gup_set_char_insert(set, x);
+        }
+    } else {
+        set->data[index].occupied = true;
+        set->data[index].value = x;
+        set->count++;
+        // printf("new value: '%c' (%d)\n", set->data[index].value, set->data[index].value);
+    }
 }
 
 // Remove
@@ -4589,6 +4625,29 @@ int gup_set_string_size(GupSetString set) {
     return set.count;
 }
 
+// Print
+#define gup_set_char_print(xs) _gup_set_char_print(xs, #xs)
+void _gup_set_char_print(GupSetChar xs, const char *xs_name) {
+    printf("%s: [", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        if (!xs.data[i].occupied) continue;
+        if (preceeding_comma) printf(", ");
+        printf("'%c'", xs.data[i].value);
+        preceeding_comma = true;
+    }
+    printf("]\n");
+}
+
+// Debug
+#define gup_set_char_debug(xs) _gup_set_char_debug(xs, #xs)
+void _gup_set_char_debug(GupSetChar xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("     count: %d\n", xs.count);
+    printf("      data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
 // Print -------------------------------------------------------------------------------------------
 
 void gup_print_cwd(void) {
@@ -5334,6 +5393,7 @@ uint32_t gup_fnv1a_hash(const char* str) {
         str++;
     }
 
+    gup_assert_verbose(hash >= 0, "Got a negative hash from FNV-1a");
     return hash;
 }
 

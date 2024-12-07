@@ -18,10 +18,6 @@ void reset_settings_file(void) {
     gup_assert_verbose(result, "Encountered an error while resetting the settings file.\n");
 }
 
-void run_all_guppy_tests(void) {
-    
-}
-
 int main(void) {
     reset_settings_file();
 
