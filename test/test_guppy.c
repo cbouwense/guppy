@@ -1,7 +1,7 @@
 #include <float.h>
 #include <limits.h>
 
-// #define GUPPY_VERBOSE
+#define GUPPY_VERBOSE
 #include "../src/guppy.h"
 
 #include "./test_gup_arena.c"
