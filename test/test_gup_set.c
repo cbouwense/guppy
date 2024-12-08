@@ -150,45 +150,34 @@ void test_sets_huge_mode(void) {
     gup_assert(gup_set_int_size(set) == size);
 
     for (int i = 0; i < size; i++) {
-        char reason[1024];
-        sprintf(reason, "set claims to not contain %d", i);
-        gup_assert_verbose(gup_set_int_has(set, i), reason);
+        // printf("i: %d\n", i);
+        gup_assert_verbose(gup_set_int_has(set, i), "its as shrimple as that");
     }
 
     gup_set_int_destroy(set);
 }
 
-// void test_sets_huge_mode_double(void) {
-//     GupSet set = gup_set_char_create();
+void test_sets_huge_mode_default_size(void) {
+    const int size = 8192 * 255;
+    GupSetInt set = gup_set_int_create();
 
-//     for (char c = 0; c < 127; c++) {
-//         gup_set_char_add(&set, c);
-//     }
+    for (int i = 0; i < size; i += 2) {
+        gup_set_int_add(&set, i);
+    }
 
-//     for (char c = 0; c < 127; c++) {
-//         gup_set_char_add(&set, c);
-//     }
-    
-//     gup_assert(gup_set_char_size(set) == 127);
+    gup_assert(gup_set_int_size(set) == size / 2);
 
-//     for (char c = 0; c < 127; c++) {
-//         char reason[1024];
-//         sprintf(reason, "set claims to not contain '%c' (%d)", c, c);
-//         gup_assert_verbose(gup_set_char_has(set, c), reason);
-//     }
+    for (int i = 0; i < size; i++) {
+        if (i % 2 == 0)
+            gup_assert_verbose(gup_set_int_has(set, i), "its as shrimple as that");
+        else
+            gup_assert_verbose(!gup_set_int_has(set, i), "its as shrimple as that");
+    }
 
-//     for (char c = 0; c < 127; c++) {
-//         gup_set_char_remove(&set, c);
-//     }
+    // gup_set_int_print(set);
 
-//     for (char c = 0; c < 127; c++) {
-//         char reason[1024];
-//         sprintf(reason, "set thinks it still has '%c' (%d) after it was removed", c, c);
-//         gup_assert_verbose(!gup_set_char_has(set, c), reason);
-//     }
-
-//     gup_set_char_destroy(set);
-// }
+    gup_set_int_destroy(set);
+}
 
 void test_gup_set(void) {
     // test_gup_set_general_bool();
@@ -198,5 +187,5 @@ void test_gup_set(void) {
     // test_has_is_true_after_adding_something();
     // test_sets_general_functionality();
     test_sets_huge_mode();
-    // test_sets_huge_mode_double();
+    test_sets_huge_mode_default_size();
 }

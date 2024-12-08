@@ -96,11 +96,6 @@ typedef struct {
 } GupSetDataFloat;
 
 typedef struct {
-    int value;
-    bool occupied;
-} GupSetDataInt;
-
-typedef struct {
     long value;
     bool occupied;
 } GupSetDataLong;
@@ -145,8 +140,7 @@ typedef struct {
 
 typedef struct {
     int capacity;
-    int count;
-    GupSetDataInt *data;
+    GupArrayInt *data;
 } GupSetInt;
 
 typedef struct {
@@ -299,6 +293,7 @@ bool           gup_array_float_find(GupArrayFloat xs, bool (*fn)(float), float *
 GupArrayFloat  gup_array_float_sort(GupArrayFloat xs);
 GupArrayFloat  gup_array_float_sort_arena(GupArena *a, GupArrayFloat xs);
 
+// TODO: gup_array_int_create_size();
 GupArrayInt    gup_array_int_create();
 GupArrayInt    gup_array_int_create_arena(GupArena *a);
 void           gup_array_int_destroy(GupArrayInt xs);
@@ -4918,12 +4913,11 @@ GupSetBool gup_set_bool_create() {
 GupSetInt gup_set_int_create() {
     GupSetInt xs = (GupSetInt) {
         .capacity = GUP_SET_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupSetDataInt)),
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayInt)),
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].occupied = false;
+        xs.data[i] = gup_array_int_create();
     }
 
     return xs;
@@ -4932,12 +4926,11 @@ GupSetInt gup_set_int_create() {
 GupSetInt gup_set_int_create_arena(GupArena *a) {
     GupSetInt xs = (GupSetInt) {
         .capacity = GUP_SET_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(int)),
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayInt *)),
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].occupied = false;
+        xs.data[i] = gup_array_int_create_arena(a);
     }
 
     return xs;
@@ -4946,12 +4939,11 @@ GupSetInt gup_set_int_create_arena(GupArena *a) {
 GupSetInt gup_set_int_create_size(int capacity) {
     GupSetInt xs = (GupSetInt) {
         .capacity = capacity,
-        .count = 0,
-        .data = malloc(capacity * sizeof(GupSetDataInt)),
+        .data = malloc(capacity * sizeof(GupArrayInt)),
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.data[i].occupied = false;
+        xs.data[i] = gup_array_int_create();
     }
 
     return xs;
@@ -5132,6 +5124,9 @@ GupSetInt gup_set_int_create_from_array(int xs[], const int size) {
 // }
 
 void gup_set_int_destroy(GupSetInt set) {
+    for (int i = 0; i < set.capacity; i++) {
+        gup_array_int_destroy(set.data[i]);
+    }
     free(set.data);
 }
 
@@ -5195,19 +5190,10 @@ void gup_set_int_destroy(GupSetInt set) {
 // }
 
 bool gup_set_int_has(GupSetInt set, int x) {
-    if (set.count == 0) return false;
-    
-    const int index = _gup_hash_int_get_index(x, set.capacity);
+    int index = x % set.capacity;
+    const GupArrayInt entries = set.data[index];
 
-    const GupSetDataInt entry = set.data[index];
-
-    if (!entry.occupied) return false;
-    if (entry.value == x) return true;
-
-    for (int i = index + 1; i != index; i = (i + 1) % set.capacity) {
-       if (set.data[i].value == x) return true;
-    }
-    return false;
+    return gup_array_int_contains(entries, x);
 }
 
 // bool gup_set_long_has(GupSet set, long x) {
@@ -5369,76 +5355,36 @@ bool gup_set_int_has(GupSetInt set, int x) {
 // }
 
 void gup_set_int_add(GupSetInt *set, int x) {
-    if (set->count == set->capacity) {
-        // Multiply by 4 and not the natural 2 because I believe multiplying by 2 will not change the index when modulo'ing by the capacity.
-        // At least, that is what I've found in practice.
-        const int new_capacity = set->capacity * 4;
-        printf("Resizing from %d to %d\n", set->capacity, new_capacity);
-        GupSetInt new_set = (GupSetInt) {
-            .capacity = new_capacity,
-            .count    = 0,
-            .data     = malloc(new_capacity * sizeof(GupSetDataInt)),
-        };
+    // Resize if we've hit our capacity.
+    // if (set->count == set->capacity) {
+    //     // Multiply by 4 and not the natural 2 because I believe multiplying by 2 will not change the index when modulo'ing by the capacity.
+    //     // At least, that is what I've found in practice.
+    //     const int new_capacity = set->capacity * 4;
+    //     printf("Resizing from %d to %d\n", set->capacity, new_capacity);
+    //     GupSetInt new_set = (GupSetInt) {
+    //         .capacity = new_capacity,
+    //         .count    = 0,
+    //         .data     = malloc(new_capacity * sizeof(GupArrayInt)),
+    //     };
 
-        for (int i = 0; i < set->capacity; i++) {
-            if (!set->data[i].occupied) {
-                new_set.data[i].occupied = false;
-            } else {
-                gup_set_int_add(&new_set, set->data[i].value);
-            }
-        }
+    //     for (int i = 0; i < set->capacity; i++) {
+    //         const GupArrayInt old_entries = set->data[i];
+    //         for (int j = 0; j < old_entries.count; j++) {
+    //             gup_set_int_add(&new_set, old_entries.data[j]);
+    //         }
+    //     }
 
-        free(set->data);
-        *set = new_set;
-        printf("Finished copying old Set to new one\n");
-    }
+    //     free(set->data);
+    //     *set = new_set;
+    //     printf("Finished copying old Set to new one\n");
+    // }
 
-    const int landing_index = _gup_hash_int_get_index(x, set->capacity);
+    const int index = x % set->capacity;
 
-    // If the landing site is unoccupied we're good to go.
-    if (!set->data[landing_index].occupied) {
-        set->data[landing_index].occupied = true;
-        set->data[landing_index].value = x;
-        set->count++;
+    // If the entry already exists in the set we don't need to add another.
+    if (gup_array_int_contains(set->data[index], x)) return;
 
-        return;
-    }
-
-    // If the landing site is occupied, it can either mean that the Set already contains the value
-    // in which case we have nothing left to do. If it is not the same value that we're trying to
-    // add then we have a true collision and we need to find an open spot to put it. 
-    int i = landing_index + 1;
-    for ( ; set->data[i].occupied; i = (i + 1) % set->capacity) {
-        if (set->data[i].value == x) {
-            #ifdef GUPPY_VERBOSE
-            printf("Set already has %d", x);
-            #endif // GUPPY_VERBOSE
-            
-            return;
-        }
-
-        #ifdef GUPPY_VERBOSE
-        // printf("Collision while trying to add %d to the Set. %d was already in the spot.\n", x, set->data[i].value);
-        // char tmp[1024];
-        // sprintf(tmp, "%d", x);
-        // printf("%d hash: %u\tindex: %d\n", x, gup_fnv1a_hash(tmp), i);
-
-        // sprintf(tmp, "%d", set->data[i].value);
-        // printf("%d hash: %u\tindex: %d\n", set->data[i].value, gup_fnv1a_hash(tmp), _gup_hash_int_get_index(set->data[i].value, set->capacity));
-        #endif // GUPPY_VERBOSE
-
-        // Found an unoccupied spot after linear searching from the landing spot.
-        if (set->data[i].value == x) {
-            #ifdef GUPPY_VERBOSE
-            printf("Found a spot to add %d %d steps away from the landing site\n", x, i);
-            #endif // GUPPY_VERBOSE
-            return;
-        }
-    }
-
-    set->data[i].occupied = true;
-    set->data[i].value = x;
-    set->count++;
+    gup_array_int_append(&(set->data[index]), x);
 }
 
 // void gup_set_long_add(GupSet *set, long x) {
@@ -5629,6 +5575,15 @@ void gup_set_int_add(GupSetInt *set, int x) {
 //     set->data[index].occupied = false;
 // }
 
+void gup_set_int_remove(GupSetInt *set, int x) {
+    const int index = x % set->capacity;
+    GupArrayInt entries = set->data[index];
+    if (entries.count == 0) return;
+    if (!gup_array_int_contains(entries, x)) return;
+
+    gup_array_int_remove_all(&entries, x);
+}
+
 // // Size
 // int gup_set_bool_size(GupSetBool set) {
 //     if (set.has_false && set.has_true) return 2;
@@ -5649,7 +5604,13 @@ void gup_set_int_add(GupSetInt *set, int x) {
 // }
 
 int gup_set_int_size(GupSetInt set) {
-    return set.count;
+    int size = 0;
+
+    for (int i = 0; i < set.capacity; i++) {
+        size += set.data[i].count;
+    }
+
+    return size;
 }
 
 // int gup_set_long_size(GupSet set) {
@@ -5719,13 +5680,12 @@ int gup_set_int_size(GupSetInt set) {
 
 #define gup_set_int_print(xs) _gup_set_int_print(xs, #xs)
 void _gup_set_int_print(GupSetInt xs, const char *xs_name) {
-    printf("%s: [", xs_name);
-    bool preceeding_comma = false;
+    printf("%s: [\n", xs_name);
+    // bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
-        if (!xs.data[i].occupied) continue;
-        if (preceeding_comma) printf(", ");
-        printf("%d", xs.data[i].value);
-        preceeding_comma = true;
+        // if (preceeding_comma) printf(", ");
+        gup_array_int_print(xs.data[i]);
+        // preceeding_comma = true;
     }
     printf("]\n");
 }
