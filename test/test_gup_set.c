@@ -155,15 +155,12 @@ void test_char_sets_exhaustively(void) {
     GupSetChar signed_set = gup_set_char_create();
 
     for (int i = 0; i < 256; i++) {
-        printf("Adding '%c' (%d)\n", i, i);
         gup_set_char_add(&signed_set, i);
     }
 
     for (int i = 0; i < 256; i++) {
         gup_assert(gup_set_char_has(signed_set, i));
     }
-
-    gup_set_char_print(signed_set);
 
     gup_set_char_destroy(signed_set);
     gup_set_char_destroy(unsigned_set);

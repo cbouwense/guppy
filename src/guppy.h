@@ -399,117 +399,139 @@ void           gup_file_append_lines_arena(GupArena *a, GupArrayString lines_to_
 void           gup_file_append_lines_cstrs(char **lines_to_write, const int line_count, const char *file_path);
 
 // Sets --------------------------------------------------------------------------------------------
-GupSetBool gup_set_bool_create();
-GupSetBool gup_set_bool_create_arena(GupArena *a);
-GupSetBool gup_set_bool_create_from_array(bool xs[], const int size);
-void       gup_set_bool_destroy(GupSetBool set);
-bool       gup_set_bool_has(GupSetBool set, bool x);
-void       gup_set_bool_add(GupSetBool *set, bool x);
-void       gup_set_bool_remove(GupSetBool *set, bool x);
-int        gup_set_bool_size(GupSetBool set);
-void       gup_set_bool_print(GupSetBool set);
-void       gup_set_bool_debug(GupSetBool set);
+GupSetBool   gup_set_bool_create();
+GupSetBool   gup_set_bool_create_arena(GupArena *a);
+GupSetBool   gup_set_bool_create_from_array(bool xs[], const int size);
+void         gup_set_bool_destroy(GupSetBool set);
+bool         gup_set_bool_has(GupSetBool set, bool x);
+void         gup_set_bool_add(GupSetBool *set, bool x);
+void         gup_set_bool_remove(GupSetBool *set, bool x);
+int          gup_set_bool_size(GupSetBool set);
+void         gup_set_bool_print(GupSetBool set);
+void         gup_set_bool_debug(GupSetBool set);
 
-GupSetChar gup_set_char_create();
-GupSetChar gup_set_char_create_arena(GupArena *a);
-GupSetChar gup_set_char_create_from_array(char xs[], const int size);
-void       gup_set_char_destroy(GupSetChar set);
-bool       gup_set_char_has(GupSetChar set, char x);
-void       gup_set_char_add(GupSetChar *set, char x);
-void       gup_set_char_remove(GupSetChar *set, char x);
-int        gup_set_char_size(GupSetChar set);
-void       gup_set_char_print(GupSetChar set);
-void       gup_set_char_debug(GupSetChar set);
+GupSetChar   gup_set_char_create();
+GupSetChar   gup_set_char_create_arena(GupArena *a);
+GupSetChar   gup_set_char_create_from_array(char xs[], const int size);
+void         gup_set_char_destroy(GupSetChar set);
+bool         gup_set_char_has(GupSetChar set, char x);
+void         gup_set_char_add(GupSetChar *set, char x);
+void         gup_set_char_remove(GupSetChar *set, char x);
+int          gup_set_char_size(GupSetChar set);
+void         gup_set_char_print(GupSetChar set);
+void         gup_set_char_debug(GupSetChar set);
 
-// GupSet gup_set_double_create();
-// GupSet gup_set_double_create_arena(GupArena *a);
-// GupSet gup_set_double_create_from_array(double xs[], const int size);
-// void         gup_set_double_destroy(GupSet set);
-// bool         gup_set_double_has(GupSet set, double x);
-// void         gup_set_double_add(GupSet *set, double x);
-// void         gup_set_double_remove(GupSet *set, double x);
-// int          gup_set_double_size(GupSet set);
-// void         gup_set_double_print(GupSet set);
-// void         gup_set_double_debug(GupSet set);
+GupSetDouble gup_set_double_create();
+GupSetDouble gup_set_double_create_arena(GupArena *a);
+GupSetDouble gup_set_double_create_size(int size);
+GupSetDouble gup_set_double_create_size_arena(GupArena *a, int size);
+GupSetDouble gup_set_double_create_from_array(double xs[], const int size);
+void         gup_set_double_destroy(GupSetDouble set);
+bool         gup_set_double_has(GupSetDouble set, double x);
+void         gup_set_double_add(GupSetDouble *set, double x);
+void         gup_set_double_add_arena(GupArena *a, GupSetDouble *set, double x);
+void         gup_set_double_remove(GupSetDouble *set, double x);
+int          gup_set_double_size(GupSetDouble set);
+void         gup_set_double_print(GupSetDouble set);
+void         gup_set_double_debug(GupSetDouble set);
 
-// GupSet gup_set_float_create();
-// GupSet gup_set_float_create_arena(GupArena *a);
-// GupSet gup_set_float_create_from_array(float xs[], const int size);
-// void   gup_set_float_destroy(GupSet set);
-// bool   gup_set_float_has(GupSet set, float x);
-// void   gup_set_float_add(GupSet *set, float x);
-// void   gup_set_float_remove(GupSet *set, float x);
-// int    gup_set_float_size(GupSet set);
-// void   gup_set_float_print(GupSet set);
-// void   gup_set_float_debug(GupSet set);
+GupSetFloat  gup_set_float_create();
+GupSetFloat  gup_set_float_create_arena(GupArena *a);
+GupSetFloat  gup_set_float_create_size(int size);
+GupSetFloat  gup_set_float_create_size_arena(GupArena *a, int size);
+GupSetFloat  gup_set_float_create_from_array(float xs[], const int size);
+void         gup_set_float_destroy(GupSetFloat set);
+bool         gup_set_float_has(GupSetFloat set, float x);
+void         gup_set_float_add(GupSetFloat *set, float x);
+void         gup_set_float_add_arena(GupArena *a, GupSetFloat *set, float x);
+void         gup_set_float_remove(GupSetFloat *set, float x);
+int          gup_set_float_size(GupSetFloat set);
+void         gup_set_float_print(GupSetFloat set);
+void         gup_set_float_debug(GupSetFloat set);
 
-GupSetInt gup_set_int_create();
-GupSetInt gup_set_int_create_arena(GupArena *a);
-GupSetInt gup_set_int_create_size(int capacity);
-GupSetInt gup_set_int_create_size_arena(GupArena *a, int capacity);
-GupSetInt gup_set_int_create_from_array(int xs[], const int size);
-void      gup_set_int_destroy(GupSetInt set);
-bool      gup_set_int_has(GupSetInt set, int x);
-void      gup_set_int_add(GupSetInt *set, int x);
-void      gup_set_int_remove(GupSetInt *set, int x);
-int       gup_set_int_size(GupSetInt set);
-void      gup_set_int_print(GupSetInt set);
-void      gup_set_int_debug(GupSetInt set);
+GupSetInt    gup_set_int_create();
+GupSetInt    gup_set_int_create_arena(GupArena *a);
+GupSetInt    gup_set_int_create_size(int capacity);
+GupSetInt    gup_set_int_create_size_arena(GupArena *a, int capacity);
+GupSetInt    gup_set_int_create_from_array(int xs[], const int size);
+void         gup_set_int_destroy(GupSetInt set);
+bool         gup_set_int_has(GupSetInt set, int x);
+void         gup_set_int_add(GupSetInt *set, int x);
+void         gup_set_int_add_arena(GupArena *a, GupSetInt *set, int x);
+void         gup_set_int_remove(GupSetInt *set, int x);
+int          gup_set_int_size(GupSetInt set);
+void         gup_set_int_print(GupSetInt set);
+void         gup_set_int_debug(GupSetInt set);
 
-// GupSet   gup_set_long_create();
-// GupSet   gup_set_long_create_arena(GupArena *a);
-// GupSet   gup_set_long_create_from_array(long xs[], const int size);
-// void         gup_set_long_destroy(GupSet set);
-// bool         gup_set_long_has(GupSet set, long x);
-// void         gup_set_long_add(GupSet *set, long x);
-// void         gup_set_long_remove(GupSet *set, long x);
-// int          gup_set_long_size(GupSet set);
-// void         gup_set_long_print(GupSet set);
-// void         gup_set_long_debug(GupSet set);
+GupSetLong   gup_set_long_create();
+GupSetLong   gup_set_long_create_arena(GupArena *a);
+GupSetLong   gup_set_long_create_size(int size);
+GupSetLong   gup_set_long_create_size_arena(GupArena *a, int size);
+GupSetLong   gup_set_long_create_from_array(long xs[], const int size);
+void         gup_set_long_destroy(GupSetLong set);
+bool         gup_set_long_has(GupSetLong set, long x);
+void         gup_set_long_add(GupSetLong *set, long x);
+void         gup_set_long_add_arena(GupArena *a, GupSetLong *set, long x);
+void         gup_set_long_remove(GupSetLong *set, long x);
+int          gup_set_long_size(GupSetLong set);
+void         gup_set_long_print(GupSetLong set);
+void         gup_set_long_debug(GupSetLong set);
 
-// GupSet    gup_set_ptr_create();
-// GupSet    gup_set_ptr_create_arena(GupArena *a);
-// GupSet    gup_set_ptr_create_from_array(void* xs[], const int size);
-// void         gup_set_ptr_destroy(GupSet set);
-// bool         gup_set_ptr_has(GupSet set, void* x);
-// void         gup_set_ptr_add(GupSet *set, void* x);
-// void         gup_set_ptr_remove(GupSet *set, void* x);
-// int          gup_set_ptr_size(GupSet set);
-// void         gup_set_ptr_print(GupSet set);
-// void         gup_set_ptr_debug(GupSet set);
+GupSetPtr    gup_set_ptr_create();
+GupSetPtr    gup_set_ptr_create_arena(GupArena *a);
+GupSetPtr    gup_set_ptr_create_size(int size);
+GupSetPtr    gup_set_ptr_create_size_arena(GupArena *a, int size);
+GupSetPtr    gup_set_ptr_create_from_array(void* xs[], const int size);
+void         gup_set_ptr_destroy(GupSetPtr set);
+bool         gup_set_ptr_has(GupSetPtr set, void* x);
+void         gup_set_ptr_add(GupSetPtr *set, void* x);
+void         gup_set_ptr_add_arena(GupArena *a, GupSetPtr *set, void* x);
+void         gup_set_ptr_remove(GupSetPtr *set, void* x);
+int          gup_set_ptr_size(GupSetPtr set);
+void         gup_set_ptr_print(GupSetPtr set);
+void         gup_set_ptr_debug(GupSetPtr set);
 
-// GupSet  gup_set_short_create();
-// GupSet  gup_set_short_create_arena(GupArena *a);
-// GupSet  gup_set_short_create_from_array(short xs[], const int size);
-// void         gup_set_short_destroy(GupSet set);
-// bool         gup_set_short_has(GupSet set, short x);
-// void         gup_set_short_add(GupSet *set, short x);
-// void         gup_set_short_remove(GupSet *set, short x);
-// int          gup_set_short_size(GupSet set);
-// void         gup_set_short_print(GupSet set);
-// void         gup_set_short_debug(GupSet set);
+GupSetShort  gup_set_short_create();
+GupSetShort  gup_set_short_create_arena(GupArena *a);
+GupSetShort  gup_set_short_create_size(int size);
+GupSetShort  gup_set_short_create_size_arena(GupArena *a, int size);
+GupSetShort  gup_set_short_create_from_array(short xs[], const int size);
+void         gup_set_short_destroy(GupSetShort set);
+bool         gup_set_short_has(GupSetShort set, short x);
+void         gup_set_short_add(GupSetShort *set, short x);
+void         gup_set_short_add_arena(GupArena *a, GupSetShort *set, short x);
+void         gup_set_short_remove(GupSetShort *set, short x);
+int          gup_set_short_size(GupSetShort set);
+void         gup_set_short_print(GupSetShort set);
+void         gup_set_short_debug(GupSetShort set);
 
-// GupSet gup_set_string_create();
-// GupSet gup_set_string_create_arena(GupArena *a);
-// GupSet gup_set_string_create_from_array(GupString xs[], const int size);
-// void         gup_set_string_destroy(GupSet set);
-// bool         gup_set_string_has(GupSet set, GupString x);
-// void         gup_set_string_add(GupSet *set, GupString x);
-// void         gup_set_string_remove(GupSet *set, GupString x);
-// int          gup_set_string_size(GupSet set);
-// void         gup_set_string_print(GupSet set);
-// void         gup_set_string_debug(GupSet set);
+GupSetString gup_set_string_create();
+GupSetString gup_set_string_create_arena(GupArena *a);
+GupSetString gup_set_string_create_size(int size);
+GupSetString gup_set_string_create_size_arena(GupArena *a, int size);
+GupSetString gup_set_string_create_from_array(GupString xs[], const int size);
+void         gup_set_string_destroy(GupSetString set);
+bool         gup_set_string_has(GupSetString set, GupString x);
+void         gup_set_string_add(GupSetString *set, GupString x);
+void         gup_set_string_add_arena(GupArena *a, GupSetString *set, GupString x);
+void         gup_set_string_remove(GupSetString *set, GupString x);
+int          gup_set_string_size(GupSetString set);
+void         gup_set_string_print(GupSetString set);
+void         gup_set_string_debug(GupSetString set);
 
-// GupSet   gup_set_cstr_create();
-// GupSet   gup_set_cstr_create_arena(GupArena *a);
-// GupSet   gup_set_cstr_create_from_array(char *xs[], const int size);
-// void         gup_set_cstr_destroy(GupSet set);
-// bool         gup_set_cstr_has(GupSet set, char *x);
-// void         gup_set_cstr_add(GupSet *set, char *x);
-// void         gup_set_cstr_remove(GupSet *set, char *x);
-// int          gup_set_cstr_size(GupSet set);
-// void         gup_set_cstr_print(GupSet set);
-// void         gup_set_cstr_debug(GupSet set);
+// TODO?
+// GupSetCstr   gup_set_string_create();
+// GupSetCstr   gup_set_string_create_arena(GupArena *a);
+// GupSetCstr   gup_set_string_create_size(int size);
+// GupSetCstr   gup_set_string_create_size_arena(GupArena *a, int size);
+// GupSetCstr   gup_set_string_create_from_array(char *xs[], const int size);
+// void         gup_set_string_destroy(GupSetCstr set);
+// bool         gup_set_string_has(GupSetCstr set, char *x);
+// void         gup_set_string_add(GupSetCstr *set, char *x);
+// void         gup_set_string_remove(GupSetCstr *set, char *x);
+// int          gup_set_string_size(GupSetCstr set);
+// void         gup_set_string_print(GupSetCstr set);
+// void         gup_set_string_debug(GupSetCstr set);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -4683,7 +4705,7 @@ int _gup_set_char_index(const char x) {
     return x < 0 ? 127 + (x * -1) : x;
 }
 
-int _gup_hash_double_get_index(const double key, const int modulo) {
+int _gup_set_double_index(const double key, const int modulo) {
     char input_cstr[1024];
     sprintf(input_cstr, "%f", key);
     
@@ -4695,7 +4717,7 @@ int _gup_hash_double_get_index(const double key, const int modulo) {
     return index;
 }
 
-int _gup_hash_float_get_index(const float key, const int modulo) {
+int _gup_set_float_index(const float key, const int modulo) {
     char input_cstr[1024];
     sprintf(input_cstr, "%f", key);
     
@@ -4707,31 +4729,7 @@ int _gup_hash_float_get_index(const float key, const int modulo) {
     return index;
 }
 
-int _gup_hash_int_get_index(const int key, const int modulo) {
-    char input_cstr[1024];
-    sprintf(input_cstr, "%d", key);
-    
-    const uint32_t hash = gup_fnv1a_hash(input_cstr);
-    const int index = hash % modulo;
-    
-    gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
-
-    return index;
-}
-
-int _gup_hash_long_get_index(const long key, const int modulo) {
-    char input_cstr[1024];
-    sprintf(input_cstr, "%ld", key);
-    
-    const uint32_t hash = gup_fnv1a_hash(input_cstr);
-    const int index = hash % modulo;
-    
-    gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
-
-    return index;
-}
-
-int _gup_hash_ptr_get_index(const void* key, const int modulo) {
+int _gup_set_ptr_index(const void* key, const int modulo) {
     char input_cstr[1024];
     sprintf(input_cstr, "%p", key);
     
@@ -4743,32 +4741,11 @@ int _gup_hash_ptr_get_index(const void* key, const int modulo) {
     return index;
 }
 
-int _gup_hash_short_get_index(const short key, const int modulo) {
-    char input_cstr[1024];
-    sprintf(input_cstr, "%hd", key);
-    
-    const uint32_t hash = gup_fnv1a_hash(input_cstr);
-    const int index = hash % modulo;
-    
-    gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
-
-    return index;
-}
-
-int _gup_hash_string_get_index(const GupString key, const int modulo) {
+int _gup_set_string_index(const GupString key, const int modulo) {
     char *input_cstr = gup_string_to_cstr(key);
     
     const uint32_t hash = gup_fnv1a_hash(input_cstr);
     free(input_cstr);
-    const int index = hash % modulo;
-    
-    gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
-
-    return index;
-}
-
-int _gup_hash_cstr_get_index(const char *key, const int modulo) {   
-    const uint32_t hash = gup_fnv1a_hash(key);
     const int index = hash % modulo;
     
     gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
@@ -4812,6 +4789,84 @@ GupSetChar gup_set_char_create_arena(GupArena *a) {
     return xs;
 }
 
+GupSetDouble gup_set_double_create() {
+    GupSetDouble xs = (GupSetDouble) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayDouble)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_double_create();
+    }
+
+    return xs;
+}
+
+GupSetDouble gup_set_double_create_arena(GupArena *a) {
+    GupSetDouble xs = (GupSetDouble) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayDouble)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_double_create_arena(a);
+    }
+
+    return xs;
+}
+
+GupSetDouble gup_set_double_create_size(int capacity) {
+    GupSetDouble xs = (GupSetDouble) {
+        .capacity = capacity,
+        .data = malloc(capacity * sizeof(GupArrayDouble)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_double_create();
+    }
+
+    return xs;
+}
+
+GupSetFloat gup_set_float_create() {
+    GupSetFloat xs = (GupSetFloat) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayFloat)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_float_create();
+    }
+
+    return xs;
+}
+
+GupSetFloat gup_set_float_create_arena(GupArena *a) {
+    GupSetFloat xs = (GupSetFloat) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayFloat)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_float_create_arena(a);
+    }
+
+    return xs;
+}
+
+GupSetFloat gup_set_float_create_size(int capacity) {
+    GupSetFloat xs = (GupSetFloat) {
+        .capacity = capacity,
+        .data = malloc(capacity * sizeof(GupArrayFloat)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_float_create();
+    }
+
+    return xs;
+}
+
 GupSetInt gup_set_int_create() {
     GupSetInt xs = (GupSetInt) {
         .capacity = GUP_SET_DEFAULT_CAPACITY,
@@ -4828,7 +4883,7 @@ GupSetInt gup_set_int_create() {
 GupSetInt gup_set_int_create_arena(GupArena *a) {
     GupSetInt xs = (GupSetInt) {
         .capacity = GUP_SET_DEFAULT_CAPACITY,
-        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayInt *)),
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayInt)),
     };
 
     for (int i = 0; i < xs.capacity; i++) {
@@ -4846,6 +4901,162 @@ GupSetInt gup_set_int_create_size(int capacity) {
 
     for (int i = 0; i < xs.capacity; i++) {
         xs.data[i] = gup_array_int_create();
+    }
+
+    return xs;
+}
+
+GupSetLong gup_set_long_create() {
+    GupSetLong xs = (GupSetLong) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayLong)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_long_create();
+    }
+
+    return xs;
+}
+
+GupSetLong gup_set_long_create_arena(GupArena *a) {
+    GupSetLong xs = (GupSetLong) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayLong)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_long_create_arena(a);
+    }
+
+    return xs;
+}
+
+GupSetLong gup_set_long_create_size(int capacity) {
+    GupSetLong xs = (GupSetLong) {
+        .capacity = capacity,
+        .data = malloc(capacity * sizeof(GupArrayLong)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_long_create();
+    }
+
+    return xs;
+}
+
+GupSetPtr gup_set_ptr_create() {
+    GupSetPtr xs = (GupSetPtr) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayPtr)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_ptr_create();
+    }
+
+    return xs;
+}
+
+GupSetPtr gup_set_ptr_create_arena(GupArena *a) {
+    GupSetPtr xs = (GupSetPtr) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayPtr)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_ptr_create_arena(a);
+    }
+
+    return xs;
+}
+
+GupSetPtr gup_set_ptr_create_size(int capacity) {
+    GupSetPtr xs = (GupSetPtr) {
+        .capacity = capacity,
+        .data = malloc(capacity * sizeof(GupArrayPtr)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_ptr_create();
+    }
+
+    return xs;
+}
+
+GupSetShort gup_set_short_create() {
+    GupSetShort xs = (GupSetShort) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayShort)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_short_create();
+    }
+
+    return xs;
+}
+
+GupSetShort gup_set_short_create_arena(GupArena *a) {
+    GupSetShort xs = (GupSetShort) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayShort)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_short_create_arena(a);
+    }
+
+    return xs;
+}
+
+GupSetShort gup_set_short_create_size(int capacity) {
+    GupSetShort xs = (GupSetShort) {
+        .capacity = capacity,
+        .data = malloc(capacity * sizeof(GupArrayShort)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_short_create();
+    }
+
+    return xs;
+}
+
+GupSetString gup_set_string_create() {
+    GupSetString xs = (GupSetString) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = malloc(GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayString)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_string_create();
+    }
+
+    return xs;
+}
+
+GupSetString gup_set_string_create_arena(GupArena *a) {
+    GupSetString xs = (GupSetString) {
+        .capacity = GUP_SET_DEFAULT_CAPACITY,
+        .data = gup_arena_alloc(a, GUP_SET_DEFAULT_CAPACITY * sizeof(GupArrayString)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_string_create_arena(a);
+    }
+
+    return xs;
+}
+
+GupSetString gup_set_string_create_size(int capacity) {
+    GupSetString xs = (GupSetString) {
+        .capacity = capacity,
+        .data = malloc(capacity * sizeof(GupArrayString)),
+    };
+
+    for (int i = 0; i < xs.capacity; i++) {
+        xs.data[i] = gup_array_string_create();
     }
 
     return xs;
@@ -4882,11 +5093,141 @@ GupSetChar gup_set_char_create_from_array_arena(GupArena *a, char xs[], const in
     return set;
 }
 
+GupSetDouble gup_set_double_create_from_array(double xs[], const int size) {
+    GupSetDouble set = gup_set_double_create();
+
+    for (int i = 0; i < size; i++) {
+        gup_set_double_add(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetDouble gup_set_double_create_from_array_arena(GupArena *a, double xs[], const int size) {
+    GupSetDouble set = gup_set_double_create_arena(a);
+
+    for (int i = 0; i < size; i++) {
+        gup_set_double_add_arena(a, &set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetFloat gup_set_float_create_from_array(float xs[], const int size) {
+    GupSetFloat set = gup_set_float_create();
+
+    for (int i = 0; i < size; i++) {
+        gup_set_float_add(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetFloat gup_set_float_create_from_array_arena(GupArena *a, float xs[], const int size) {
+    GupSetFloat set = gup_set_float_create_arena(a);
+
+    for (int i = 0; i < size; i++) {
+        gup_set_float_add_arena(a, &set, xs[i]);
+    }
+
+    return set;
+}
+
 GupSetInt gup_set_int_create_from_array(int xs[], const int size) {
     GupSetInt set = gup_set_int_create();
 
     for (int i = 0; i < size; i++) {
         gup_set_int_add(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetInt gup_set_int_create_from_array_arena(GupArena *a, int xs[], const int size) {
+    GupSetInt set = gup_set_int_create_arena(a);
+
+    for (int i = 0; i < size; i++) {
+        gup_set_int_add_arena(a, &set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetLong gup_set_long_create_from_array(long xs[], const int size) {
+    GupSetLong set = gup_set_long_create();
+
+    for (int i = 0; i < size; i++) {
+        gup_set_long_add(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetLong gup_set_long_create_from_array_arena(GupArena *a, long xs[], const int size) {
+    GupSetLong set = gup_set_long_create_arena(a);
+
+    for (int i = 0; i < size; i++) {
+        gup_set_long_add_arena(a, &set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetPtr gup_set_ptr_create_from_array(void* xs[], const int size) {
+    GupSetPtr set = gup_set_ptr_create();
+
+    for (int i = 0; i < size; i++) {
+        gup_set_ptr_add(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetPtr gup_set_ptr_create_from_array_arena(GupArena *a, void* xs[], const int size) {
+    GupSetPtr set = gup_set_ptr_create_arena(a);
+
+    for (int i = 0; i < size; i++) {
+        gup_set_ptr_add_arena(a, &set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetShort gup_set_short_create_from_array(short xs[], const int size) {
+    GupSetShort set = gup_set_short_create();
+
+    for (int i = 0; i < size; i++) {
+        gup_set_short_add(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetShort gup_set_short_create_from_array_arena(GupArena *a, short xs[], const int size) {
+    GupSetShort set = gup_set_short_create_arena(a);
+
+    for (int i = 0; i < size; i++) {
+        gup_set_short_add_arena(a, &set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetString gup_set_string_create_from_array(GupString xs[], const int size) {
+    GupSetString set = gup_set_string_create();
+
+    for (int i = 0; i < size; i++) {
+        gup_set_string_add(&set, xs[i]);
+    }
+
+    return set;
+}
+
+GupSetString gup_set_string_create_from_array_arena(GupArena *a, GupString xs[], const int size) {
+    GupSetString set = gup_set_string_create_arena(a);
+
+    for (int i = 0; i < size; i++) {
+        gup_set_string_add_arena(a, &set, xs[i]);
     }
 
     return set;
@@ -4935,13 +5276,44 @@ void gup_set_bool_add(GupSetBool *set, bool b) {
 
 void gup_set_char_add(GupSetChar *set, char x) {
     const int index = _gup_set_char_index(x);
-    printf("index: %d\n", index);
 
     if (!set->occupied[index]) {
         set->count++;
     }
 
     set->occupied[index] = true;
+}
+
+void gup_set_double_add(GupSetDouble *set, double x) {
+    const int index = _gup_set_double_index(x, set->capacity);
+
+    if (gup_array_double_contains(set->data[index], x)) return;
+
+    gup_array_double_append(&(set->data[index]), x);
+}
+
+void gup_set_double_add_arena(GupArena *a, GupSetDouble *set, double x) {
+    const int index = _gup_set_double_index(x, set->capacity);
+
+    if (gup_array_double_contains(set->data[index], x)) return;
+
+    gup_array_double_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_float_add(GupSetFloat *set, float x) {
+    const int index = _gup_set_float_index(x, set->capacity);
+
+    if (gup_array_float_contains(set->data[index], x)) return;
+
+    gup_array_float_append(&(set->data[index]), x);
+}
+
+void gup_set_float_add_arena(GupArena *a, GupSetFloat *set, float x) {
+    const int index = _gup_set_float_index(x, set->capacity);
+
+    if (gup_array_float_contains(set->data[index], x)) return;
+
+    gup_array_float_append_arena(a, &(set->data[index]), x);
 }
 
 void gup_set_int_add(GupSetInt *set, int x) {
@@ -4952,7 +5324,79 @@ void gup_set_int_add(GupSetInt *set, int x) {
     gup_array_int_append(&(set->data[index]), x);
 }
 
-// // Remove
+void gup_set_int_add_arena(GupArena *a, GupSetInt *set, int x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_int_contains(set->data[index], x)) return;
+
+    gup_array_int_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_long_add(GupSetLong *set, long x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_long_contains(set->data[index], x)) return;
+
+    gup_array_long_append(&(set->data[index]), x);
+}
+
+void gup_set_long_add_arena(GupArena *a, GupSetLong *set, long x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_long_contains(set->data[index], x)) return;
+
+    gup_array_long_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_ptr_add(GupSetPtr *set, void *x) {
+    const int index = _gup_set_ptr_index(x, set->capacity);
+
+    if (gup_array_ptr_contains(set->data[index], x)) return;
+
+    gup_array_ptr_append(&(set->data[index]), x);
+}
+
+void gup_set_ptr_add_arena(GupArena *a, GupSetPtr *set, void *x) {
+    const int index = _gup_set_ptr_index(x, set->capacity);
+
+    if (gup_array_ptr_contains(set->data[index], x)) return;
+
+    gup_array_ptr_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_short_add(GupSetShort *set, short x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_short_contains(set->data[index], x)) return;
+
+    gup_array_short_append(&(set->data[index]), x);
+}
+
+void gup_set_short_add_arena(GupArena *a, GupSetShort *set, short x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_short_contains(set->data[index], x)) return;
+
+    gup_array_short_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_string_add(GupSetString *set, GupString x) {
+    const int index = _gup_set_string_index(x, set->capacity);
+
+    if (gup_array_string_contains(set->data[index], x)) return;
+
+    gup_array_string_append(&(set->data[index]), x);
+}
+
+void gup_set_string_add_arena(GupArena *a, GupSetString *set, GupString x) {
+    const int index = _gup_set_string_index(x, set->capacity);
+
+    if (gup_array_string_contains(set->data[index], x)) return;
+
+    gup_array_string_append_arena(a, &(set->data[index]), x);
+}
+
+// Remove
 void gup_set_bool_remove(GupSetBool *set, bool b) {
     if (b == false) {
         set->has_false = false;

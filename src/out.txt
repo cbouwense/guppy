@@ -1,54 +1,96 @@
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataChar *data;
-} GupSetChar;
+void gup_set_double_add(GupSetDouble *set, double x) {
+    const int index = x % set->capacity;
 
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataDouble *data;
-} GupSetDouble;
+    if (gup_array_double_contains(set->data[index], x)) return;
 
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataFloat *data;
-} GupSetFloat;
+    gup_array_double_append_arena(&(set->data[index]), x);
+}
 
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataInt *data;
-} GupSetInt;
+void gup_set_double_add_arena(GupArena *a, GupSetDouble *set, double x) {
+    const int index = x % set->capacity;
 
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataLong *data;
-} GupSetLong;
+    if (gup_array_double_contains(set->data[index], x)) return;
 
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataPtr *data;
-} GupSetPtr;
+    gup_array_double_append_arena(a, &(set->data[index]), x);
+}
 
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataShort *data;
-} GupSetShort;
+void gup_set_float_add(GupSetFloat *set, float x) {
+    const int index = x % set->capacity;
 
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataString *data;
-} GupSetString;
+    if (gup_array_float_contains(set->data[index], x)) return;
 
-typedef struct {
-    int capacity;
-    int count;
-    GupSetDataCstr *data;
-} GupSetCstr;
+    gup_array_float_append_arena(&(set->data[index]), x);
+}
+
+void gup_set_float_add_arena(GupArena *a, GupSetFloat *set, float x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_float_contains(set->data[index], x)) return;
+
+    gup_array_float_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_long_add(GupSetLong *set, long x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_long_contains(set->data[index], x)) return;
+
+    gup_array_long_append_arena(&(set->data[index]), x);
+}
+
+void gup_set_long_add_arena(GupArena *a, GupSetLong *set, long x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_long_contains(set->data[index], x)) return;
+
+    gup_array_long_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_ptr_add(GupSetPtr *set, void* x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_ptr_contains(set->data[index], x)) return;
+
+    gup_array_ptr_append_arena(&(set->data[index]), x);
+}
+
+void gup_set_ptr_add_arena(GupArena *a, GupSetPtr *set, void* x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_ptr_contains(set->data[index], x)) return;
+
+    gup_array_ptr_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_short_add(GupSetShort *set, short x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_short_contains(set->data[index], x)) return;
+
+    gup_array_short_append_arena(&(set->data[index]), x);
+}
+
+void gup_set_short_add_arena(GupArena *a, GupSetShort *set, short x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_short_contains(set->data[index], x)) return;
+
+    gup_array_short_append_arena(a, &(set->data[index]), x);
+}
+
+void gup_set_string_add(GupSetString *set, GupString x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_string_contains(set->data[index], x)) return;
+
+    gup_array_string_append_arena(&(set->data[index]), x);
+}
+
+void gup_set_string_add_arena(GupArena *a, GupSetString *set, GupString x) {
+    const int index = x % set->capacity;
+
+    if (gup_array_string_contains(set->data[index], x)) return;
+
+    gup_array_string_append_arena(a, &(set->data[index]), x);
+}
 
