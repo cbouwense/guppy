@@ -1,3 +1,0 @@
-[test/./test_gup_set.c:153] Failed assertion!
----> gup_set_int_has(set, i) <---
-its as shrimple as that
