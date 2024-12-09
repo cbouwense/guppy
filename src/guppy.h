@@ -898,9 +898,6 @@ void gup_array_short_destroy(GupArrayShort xs) {
 }
 
 void gup_array_ptr_destroy(GupArrayPtr xs) {
-    for (int i = 0; i < xs.count; i++) {
-        free(xs.data[i]);
-    }
     free(xs.data);
 }
 
@@ -5238,9 +5235,51 @@ void gup_set_char_destroy(GupSetChar set) {
     free(set.occupied);
 }
 
+void gup_set_double_destroy(GupSetDouble set) {
+    for (int i = 0; i < set.capacity; i++) {
+        gup_array_double_destroy(set.data[i]);
+    }
+    free(set.data);
+}
+
+void gup_set_float_destroy(GupSetFloat set) {
+    for (int i = 0; i < set.capacity; i++) {
+        gup_array_float_destroy(set.data[i]);
+    }
+    free(set.data);
+}
+
 void gup_set_int_destroy(GupSetInt set) {
     for (int i = 0; i < set.capacity; i++) {
         gup_array_int_destroy(set.data[i]);
+    }
+    free(set.data);
+}
+
+void gup_set_long_destroy(GupSetLong set) {
+    for (int i = 0; i < set.capacity; i++) {
+        gup_array_long_destroy(set.data[i]);
+    }
+    free(set.data);
+}
+
+void gup_set_ptr_destroy(GupSetPtr set) {
+    for (int i = 0; i < set.capacity; i++) {
+        gup_array_ptr_destroy(set.data[i]);
+    }
+    free(set.data);
+}
+
+void gup_set_short_destroy(GupSetShort set) {
+    for (int i = 0; i < set.capacity; i++) {
+        gup_array_short_destroy(set.data[i]);
+    }
+    free(set.data);
+}
+
+void gup_set_string_destroy(GupSetString set) {
+    for (int i = 0; i < set.capacity; i++) {
+        gup_array_string_destroy(set.data[i]);
     }
     free(set.data);
 }
@@ -5258,11 +5297,53 @@ bool gup_set_char_has(GupSetChar set, char x) {
     return set.occupied[_gup_set_char_index(x)];
 }
 
+bool gup_set_double_has(GupSetDouble set, double x) {
+    int index = _gup_set_double_index(x, set.capacity);
+    const GupArrayDouble entries = set.data[index];
+
+    return gup_array_double_contains(entries, x);
+}
+
+bool gup_set_float_has(GupSetFloat set, float x) {
+    int index = _gup_set_float_index(x, set.capacity);
+    const GupArrayFloat entries = set.data[index];
+
+    return gup_array_float_contains(entries, x);
+}
+
 bool gup_set_int_has(GupSetInt set, int x) {
     int index = x % set.capacity;
     const GupArrayInt entries = set.data[index];
 
     return gup_array_int_contains(entries, x);
+}
+
+bool gup_set_long_has(GupSetLong set, long x) {
+    int index = x % set.capacity;
+    const GupArrayLong entries = set.data[index];
+
+    return gup_array_long_contains(entries, x);
+}
+
+bool gup_set_ptr_has(GupSetPtr set, void* x) {
+    int index = _gup_set_ptr_index(x, set.capacity);
+    const GupArrayPtr entries = set.data[index];
+
+    return gup_array_ptr_contains(entries, x);
+}
+
+bool gup_set_short_has(GupSetShort set, short x) {
+    int index = x % set.capacity;
+    const GupArrayShort entries = set.data[index];
+
+    return gup_array_short_contains(entries, x);
+}
+
+bool gup_set_string_has(GupSetString set, GupString x) {
+    int index = _gup_set_string_index(x, set.capacity);
+    const GupArrayString entries = set.data[index];
+
+    return gup_array_string_contains(entries, x);
 }
 
 // Add
@@ -5491,14 +5572,79 @@ void _gup_set_char_print(GupSetChar xs, const char *xs_name) {
     printf("]\n");
 }
 
+#define gup_set_double_print(xs) _gup_set_double_print(xs, #xs)
+void _gup_set_double_print(GupSetDouble xs, const char *xs_name) {
+    printf("%s: [\n", xs_name);
+    for (int i = 0; i < xs.capacity; i++) {
+        if (xs.data[i].count > 0) {
+            gup_array_double_print(xs.data[i]);
+        }
+    }
+    printf("]\n");
+}
+
+#define gup_set_float_print(xs) _gup_set_float_print(xs, #xs)
+void _gup_set_float_print(GupSetFloat xs, const char *xs_name) {
+    printf("%s: [\n", xs_name);
+    for (int i = 0; i < xs.capacity; i++) {
+        if (xs.data[i].count > 0) {
+            gup_array_float_print(xs.data[i]);
+        }
+    }
+    printf("]\n");
+}
+
 #define gup_set_int_print(xs) _gup_set_int_print(xs, #xs)
 void _gup_set_int_print(GupSetInt xs, const char *xs_name) {
     printf("%s: [\n", xs_name);
-    // bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
-        // if (preceeding_comma) printf(", ");
-        gup_array_int_print(xs.data[i]);
-        // preceeding_comma = true;
+        if (xs.data[i].count > 0) {
+            gup_array_int_print(xs.data[i]);
+        }
+    }
+    printf("]\n");
+}
+
+#define gup_set_long_print(xs) _gup_set_long_print(xs, #xs)
+void _gup_set_long_print(GupSetLong xs, const char *xs_name) {
+    printf("%s: [\n", xs_name);
+    for (int i = 0; i < xs.capacity; i++) {
+        if (xs.data[i].count > 0) {
+            gup_array_long_print(xs.data[i]);
+        }
+    }
+    printf("]\n");
+}
+
+#define gup_set_ptr_print(xs) _gup_set_ptr_print(xs, #xs)
+void _gup_set_ptr_print(GupSetPtr xs, const char *xs_name) {
+    printf("%s: [\n", xs_name);
+    for (int i = 0; i < xs.capacity; i++) {
+        if (xs.data[i].count > 0) {
+            gup_array_ptr_print(xs.data[i]);
+        }
+    }
+    printf("]\n");
+}
+
+#define gup_set_short_print(xs) _gup_set_short_print(xs, #xs)
+void _gup_set_short_print(GupSetShort xs, const char *xs_name) {
+    printf("%s: [\n", xs_name);
+    for (int i = 0; i < xs.capacity; i++) {
+        if (xs.data[i].count > 0) {
+            gup_array_short_print(xs.data[i]);
+        }
+    }
+    printf("]\n");
+}
+
+#define gup_set_string_print(xs) _gup_set_string_print(xs, #xs)
+void _gup_set_string_print(GupSetString xs, const char *xs_name) {
+    printf("%s: [\n", xs_name);
+    for (int i = 0; i < xs.capacity; i++) {
+        if (xs.data[i].count > 0) {
+            gup_array_string_print(xs.data[i]);
+        }
     }
     printf("]\n");
 }

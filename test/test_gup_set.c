@@ -164,7 +164,61 @@ void test_char_sets_exhaustively(void) {
 
     gup_set_char_destroy(signed_set);
     gup_set_char_destroy(unsigned_set);
-} 
+}
+
+void test_float_sets(void) {
+    GupSetFloat set = gup_set_float_create();
+
+    gup_set_float_add(&set, 13.37);
+    gup_set_float_add(&set, 0.42);
+    gup_set_float_add(&set, 9000.1);
+    
+    gup_assert(gup_set_float_has(set, 13.37));
+    gup_assert(gup_set_float_has(set, 0.42));
+    gup_assert(gup_set_float_has(set, 9000.1));
+
+    gup_assert(!gup_set_float_has(set, 13.370001));
+    gup_assert(!gup_set_float_has(set, 9000.2));
+
+    gup_set_float_destroy(set);
+}
+
+void test_ptr_sets(void) {
+    GupSetPtr set = gup_set_ptr_create();
+
+    int a, b, c;
+    
+    gup_set_ptr_add(&set, &a);
+    gup_set_ptr_add(&set, &c);
+
+    gup_assert(gup_set_ptr_has(set, &a));
+    gup_assert(!gup_set_ptr_has(set, &b));
+    gup_assert(gup_set_ptr_has(set, &c));
+
+    gup_set_ptr_print(set);
+
+    gup_set_ptr_destroy(set);
+}
+
+void test_string_set(void) {
+    GupArena a = gup_arena_create();
+    GupSetString set = gup_set_string_create_arena(&a);
+    
+    GupString str1 = gup_string(&a, "drink");
+    GupString str2 = gup_string(&a, "da");
+    GupString str3 = gup_string(&a, "poopie");
+
+    gup_set_string_add_arena(&a, &set, str1);
+    gup_set_string_add_arena(&a, &set, str3);
+
+    gup_assert(gup_set_string_has(set, str1));
+    gup_assert(!gup_set_string_has(set, str2));
+    gup_assert(gup_set_string_has(set, str3));
+
+    gup_set_string_print(set);
+
+    gup_arena_destroy(&a);
+}
 
 void test_sets_huge_mode(void) {
     const int size = 1000000;
@@ -211,6 +265,9 @@ void test_gup_set(void) {
     test_has_is_true_after_adding_something();
     test_sets_general_functionality();
     test_char_sets_exhaustively();
+    test_float_sets();
+    test_ptr_sets();
+    test_string_set();
     test_sets_huge_mode();
     test_sets_huge_mode_default_size();
 }
