@@ -129,6 +129,17 @@ typedef struct {
     GupArrayString *data;
 } GupSetString;
 
+typedef struct {
+    bool occupied;
+    GupString key;
+    int value;
+} GupHashmapIntEntry;
+
+typedef struct {
+    int capacity;
+    GupHashmapIntEntry *data;
+} GupHashmapInt;
+
 /**************************************************************************************************
  * Public API                                                                                     *
  **************************************************************************************************/
@@ -520,19 +531,19 @@ int          gup_set_string_size(GupSetString set);
 void         gup_set_string_print(GupSetString set);
 void         gup_set_string_debug(GupSetString set);
 
-// TODO?
-// GupSetCstr   gup_set_string_create();
-// GupSetCstr   gup_set_string_create_arena(GupArena *a);
-// GupSetCstr   gup_set_string_create_size(int size);
-// GupSetCstr   gup_set_string_create_size_arena(GupArena *a, int size);
-// GupSetCstr   gup_set_string_create_from_array(char *xs[], const int size);
-// void         gup_set_string_destroy(GupSetCstr set);
-// bool         gup_set_string_has(GupSetCstr set, char *x);
-// void         gup_set_string_add(GupSetCstr *set, char *x);
-// void         gup_set_string_remove(GupSetCstr *set, char *x);
-// int          gup_set_string_size(GupSetCstr set);
-// void         gup_set_string_print(GupSetCstr set);
-// void         gup_set_string_debug(GupSetCstr set);
+// TODO: GupSetCstr?
+
+// Hashmap
+GupHashmapInt gup_hashmap_int_create();
+GupHashmapInt gup_hashmap_int_create_arena(GupArena *a);
+void          gup_hashmap_int_destroy(GupHashmapInt hashmap);
+bool          gup_hashmap_int_get(GupHashmapInt hashmap, GupString key);
+bool          gup_hashmap_int_set(GupHashmapInt *hashmap, GupString key, int value);
+void          gup_hashmap_int_set_arena(GupArena *a, GupHashmapInt *hashmap, GupString key, int value);
+void          gup_hashmap_int_remove(GupHashmapInt *hashmap, GupString key);
+int           gup_hashmap_int_size(GupHashmapInt hashmap);
+void          gup_hashmap_int_print(GupHashmapInt hashmap);
+void          gup_hashmap_int_debug(GupHashmapInt hashmap);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -634,6 +645,7 @@ uint32_t gup_fnv1a_hash(const char *s);
 
 #define GUP_ARRAY_DEFAULT_CAPACITY 256
 #define GUP_SET_DEFAULT_CAPACITY 8192
+#define GUP_HASHMAP_DEFAULT_CAPACITY 8192
 
 // Assert ------------------------------------------------------------------------------------------
 
@@ -5498,11 +5510,11 @@ void gup_set_char_remove(GupSetChar *set, char x) {
 
 void gup_set_int_remove(GupSetInt *set, int x) {
     const int index = x % set->capacity;
-    GupArrayInt entries = set->data[index];
-    if (entries.count == 0) return;
-    if (!gup_array_int_contains(entries, x)) return;
 
-    gup_array_int_remove_all(&entries, x);
+    if (set->data[index].count == 0) return;
+    if (!gup_array_int_contains(set->data[index], x)) return;
+
+    gup_array_int_remove_all(&(set->data[index]), x);
 }
 
 // Size
@@ -5661,6 +5673,51 @@ void _gup_set_int_debug(GupSetInt xs, const char *xs_name) {
     }
     printf("}\n");
 }
+
+// Hashmaps ----------------------------------------------------------------------------------------
+GupHashmapInt gup_hashmap_int_create() {
+    GupHashmapInt hashmap = (GupHashmapInt) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .data = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupHashmapIntEntry)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.data[i].occupied = false;
+    }
+
+    return hashmap;
+}
+
+GupHashmapInt gup_hashmap_int_create_arena(GupArena *a) {
+    GupHashmapInt hashmap = (GupHashmapInt) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .data = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupHashmapIntEntry)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.data[i].occupied = false;
+    }
+
+    return hashmap;
+}
+
+void gup_hashmap_int_destroy(GupHashmapInt hashmap) {
+    free(hashmap.data);
+}
+
+// bool gup_hashmap_int_get(GupHashmapInt hashmap, GupString key) {
+//     int index = _gup_set_string_index(key, hashmap.capacity); // TODO: not _set
+//     const GupHashmapIntEntry *entries = hashmap.data[index];
+
+//     for (int i = 0; i < )
+// }
+
+void gup_hashmap_int_add(GupHashmapInt *hashmap, GupString key, int value);
+void gup_hashmap_int_add_arena(GupArena *a, GupHashmapInt *hashmap, GupString key, int value);
+void gup_hashmap_int_remove(GupHashmapInt *hashmap, GupString key);
+int gup_hashmap_int_size(GupHashmapInt hashmap);
+void gup_hashmap_int_print(GupHashmapInt hashmap);
+void gup_hashmap_int_debug(GupHashmapInt hashmap);
 
 // Print -------------------------------------------------------------------------------------------
 

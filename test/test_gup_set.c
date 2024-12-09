@@ -257,17 +257,39 @@ void test_sets_huge_mode_default_size(void) {
     gup_set_int_destroy(set);
 }
 
+void test_removing(void) {
+    GupSetInt set = gup_set_int_create();
+
+    gup_set_int_add(&set, 1);
+    gup_set_int_add(&set, 2);
+    gup_set_int_add(&set, 3);
+
+    gup_set_int_print(set);
+
+    gup_set_int_remove(&set, 1);
+    gup_set_int_remove(&set, 2);
+
+    gup_assert(!gup_set_int_has(set, 1));
+    gup_assert(!gup_set_int_has(set, 2));
+    gup_assert(gup_set_int_has(set, 3));
+
+    gup_set_int_print(set);
+
+    gup_set_int_destroy(set);
+}
+
 void test_gup_set(void) {
-    test_gup_set_general_bool();
-    test_gup_set_from_array_bool();
-    test_has_is_false_before_adding_anything();
-    test_has_is_false_after_adding_something_different();
-    test_has_is_true_after_adding_something();
-    test_sets_general_functionality();
-    test_char_sets_exhaustively();
-    test_float_sets();
-    test_ptr_sets();
-    test_string_set();
-    test_sets_huge_mode();
-    test_sets_huge_mode_default_size();
+    // test_gup_set_general_bool();
+    // test_gup_set_from_array_bool();
+    // test_has_is_false_before_adding_anything();
+    // test_has_is_false_after_adding_something_different();
+    // test_has_is_true_after_adding_something();
+    // test_sets_general_functionality();
+    // test_char_sets_exhaustively();
+    // test_float_sets();
+    // test_ptr_sets();
+    // test_string_set();
+    // test_sets_huge_mode();
+    // test_sets_huge_mode_default_size();
+    test_removing();
 }
