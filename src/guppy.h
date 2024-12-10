@@ -130,14 +130,9 @@ typedef struct {
 } GupSetString;
 
 typedef struct {
-    bool occupied;
-    GupString key;
-    int value;
-} GupHashmapIntEntry;
-
-typedef struct {
     int capacity;
-    GupHashmapIntEntry *data;
+    GupArrayString *keys;
+    GupArrayInt *values;
 } GupHashmapInt;
 
 /**************************************************************************************************
@@ -537,8 +532,8 @@ void         gup_set_string_debug(GupSetString set);
 GupHashmapInt gup_hashmap_int_create();
 GupHashmapInt gup_hashmap_int_create_arena(GupArena *a);
 void          gup_hashmap_int_destroy(GupHashmapInt hashmap);
-bool          gup_hashmap_int_get(GupHashmapInt hashmap, GupString key);
-bool          gup_hashmap_int_set(GupHashmapInt *hashmap, GupString key, int value);
+bool          gup_hashmap_int_get(GupHashmapInt hashmap, char *key, int *out);
+void          gup_hashmap_int_set(GupHashmapInt *hashmap, char *key, int value);
 void          gup_hashmap_int_set_arena(GupArena *a, GupHashmapInt *hashmap, GupString key, int value);
 void          gup_hashmap_int_remove(GupHashmapInt *hashmap, GupString key);
 int           gup_hashmap_int_size(GupHashmapInt hashmap);
@@ -4763,6 +4758,15 @@ int _gup_set_string_index(const GupString key, const int modulo) {
     return index;
 }
 
+int _gup_set_cstr_index(const char *key, const int modulo) {
+    const uint32_t hash = gup_fnv1a_hash(key);
+    const int index = hash % modulo;
+    
+    gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
+
+    return index;
+}
+
 // Create
 GupSetBool gup_set_bool_create() {
     return (GupSetBool) {
@@ -5678,11 +5682,13 @@ void _gup_set_int_debug(GupSetInt xs, const char *xs_name) {
 GupHashmapInt gup_hashmap_int_create() {
     GupHashmapInt hashmap = (GupHashmapInt) {
         .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
-        .data = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupHashmapIntEntry)),
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayString)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayInt)),
     };
 
     for (int i = 0; i < hashmap.capacity; i++) {
-        hashmap.data[i].occupied = false;
+        hashmap.keys[i]   = gup_array_string_create();
+        hashmap.values[i] = gup_array_int_create();
     }
 
     return hashmap;
@@ -5691,31 +5697,64 @@ GupHashmapInt gup_hashmap_int_create() {
 GupHashmapInt gup_hashmap_int_create_arena(GupArena *a) {
     GupHashmapInt hashmap = (GupHashmapInt) {
         .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
-        .data = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupHashmapIntEntry)),
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayString)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayInt)),
     };
 
     for (int i = 0; i < hashmap.capacity; i++) {
-        hashmap.data[i].occupied = false;
+        hashmap.keys[i]   = gup_array_string_create_arena(a);
+        hashmap.values[i] = gup_array_int_create_arena(a);
     }
 
     return hashmap;
 }
 
 void gup_hashmap_int_destroy(GupHashmapInt hashmap) {
-    free(hashmap.data);
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_string_destroy(hashmap.keys[i]);
+        gup_array_int_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
 }
 
-// bool gup_hashmap_int_get(GupHashmapInt hashmap, GupString key) {
-//     int index = _gup_set_string_index(key, hashmap.capacity); // TODO: not _set
-//     const GupHashmapIntEntry *entries = hashmap.data[index];
+bool gup_hashmap_int_get(GupHashmapInt hashmap, char *key, int *out) {
+    const int index = _gup_set_cstr_index(key, hashmap.capacity); // TODO: not _set
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (gup_string_eq_cstr(hashmap.keys[index].data[i], key)) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
 
-//     for (int i = 0; i < )
-// }
+    return false;
+}
 
-void gup_hashmap_int_add(GupHashmapInt *hashmap, GupString key, int value);
+void gup_hashmap_int_set(GupHashmapInt *hashmap, char *key, int value) {
+    const int index = _gup_set_cstr_index(key, hashmap->capacity); // TODO: not _set
+
+    // TODO: just have a cstr array
+    GupString gup_string_key = gup_string_create_from_cstr(key);
+    if (gup_array_string_contains(hashmap->keys[index], gup_string_key)) return;
+
+    gup_array_string_append(&(hashmap->keys[index]), gup_string_key);
+    gup_array_int_append(&(hashmap->values[index]), value);
+}
+
 void gup_hashmap_int_add_arena(GupArena *a, GupHashmapInt *hashmap, GupString key, int value);
 void gup_hashmap_int_remove(GupHashmapInt *hashmap, GupString key);
-int gup_hashmap_int_size(GupHashmapInt hashmap);
+
+int gup_hashmap_int_size(GupHashmapInt hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
 void gup_hashmap_int_print(GupHashmapInt hashmap);
 void gup_hashmap_int_debug(GupHashmapInt hashmap);
 

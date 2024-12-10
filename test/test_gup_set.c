@@ -279,17 +279,17 @@ void test_removing(void) {
 }
 
 void test_gup_set(void) {
-    // test_gup_set_general_bool();
-    // test_gup_set_from_array_bool();
-    // test_has_is_false_before_adding_anything();
-    // test_has_is_false_after_adding_something_different();
-    // test_has_is_true_after_adding_something();
-    // test_sets_general_functionality();
-    // test_char_sets_exhaustively();
-    // test_float_sets();
-    // test_ptr_sets();
-    // test_string_set();
-    // test_sets_huge_mode();
-    // test_sets_huge_mode_default_size();
+    test_gup_set_general_bool();
+    test_gup_set_from_array_bool();
+    test_has_is_false_before_adding_anything();
+    test_has_is_false_after_adding_something_different();
+    test_has_is_true_after_adding_something();
+    test_sets_general_functionality();
+    test_char_sets_exhaustively();
+    test_float_sets();
+    test_ptr_sets();
+    test_string_set();
+    test_sets_huge_mode();
+    test_sets_huge_mode_default_size();
     test_removing();
 }
