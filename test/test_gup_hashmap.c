@@ -24,6 +24,9 @@ void test_gup_hashmap_general(void) {
     gup_assert(answer == 42);
     gup_assert(gup_hashmap_int_size(hashmap) == 2);
 
+    gup_hashmap_int_remove(&hashmap, "leet");
+    gup_assert(gup_hashmap_int_size(hashmap) == 1);
+
     gup_hashmap_int_destroy(hashmap);
 }
 

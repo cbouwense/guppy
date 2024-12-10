@@ -195,8 +195,6 @@ void test_ptr_sets(void) {
     gup_assert(!gup_set_ptr_has(set, &b));
     gup_assert(gup_set_ptr_has(set, &c));
 
-    gup_set_ptr_print(set);
-
     gup_set_ptr_destroy(set);
 }
 
@@ -214,8 +212,6 @@ void test_string_set(void) {
     gup_assert(gup_set_string_has(set, str1));
     gup_assert(!gup_set_string_has(set, str2));
     gup_assert(gup_set_string_has(set, str3));
-
-    gup_set_string_print(set);
 
     gup_arena_destroy(&a);
 }
