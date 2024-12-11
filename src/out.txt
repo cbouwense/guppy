@@ -1,54 +1,54 @@
-#define gup_set_double_print(xs) _gup_set_double_print(xs, #xs)
-void _gup_set_double_print(GupSetDouble xs, const char *xs_name) {
-    printf("%s: [\n", xs_name);
-    for (int i = 0; i < xs.capacity; i++) {
-        if (xs.count > 0) gup_array_double_print(xs.data[i]);
-    }
-    printf("]\n");
-}
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayBool *values;
+} GupHashmapBool;
 
-#define gup_set_float_print(xs) _gup_set_float_print(xs, #xs)
-void _gup_set_float_print(GupSetFloat xs, const char *xs_name) {
-    printf("%s: [\n", xs_name);
-    for (int i = 0; i < xs.capacity; i++) {
-        if (xs.count > 0) gup_array_float_print(xs.data[i]);
-    }
-    printf("]\n");
-}
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayChar *values;
+} GupHashmapChar;
 
-#define gup_set_long_print(xs) _gup_set_long_print(xs, #xs)
-void _gup_set_long_print(GupSetLong xs, const char *xs_name) {
-    printf("%s: [\n", xs_name);
-    for (int i = 0; i < xs.capacity; i++) {
-        if (xs.count > 0) gup_array_long_print(xs.data[i]);
-    }
-    printf("]\n");
-}
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayDouble *values;
+} GupHashmapDouble;
 
-#define gup_set_ptr_print(xs) _gup_set_ptr_print(xs, #xs)
-void _gup_set_ptr_print(GupSetPtr xs, const char *xs_name) {
-    printf("%s: [\n", xs_name);
-    for (int i = 0; i < xs.capacity; i++) {
-        if (xs.count > 0) gup_array_ptr_print(xs.data[i]);
-    }
-    printf("]\n");
-}
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayFloat *values;
+} GupHashmapFloat;
 
-#define gup_set_short_print(xs) _gup_set_short_print(xs, #xs)
-void _gup_set_short_print(GupSetShort xs, const char *xs_name) {
-    printf("%s: [\n", xs_name);
-    for (int i = 0; i < xs.capacity; i++) {
-        if (xs.count > 0) gup_array_short_print(xs.data[i]);
-    }
-    printf("]\n");
-}
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayLong *values;
+} GupHashmapLong;
 
-#define gup_set_string_print(xs) _gup_set_string_print(xs, #xs)
-void _gup_set_string_print(GupSetString xs, const char *xs_name) {
-    printf("%s: [\n", xs_name);
-    for (int i = 0; i < xs.capacity; i++) {
-        if (xs.count > 0) gup_array_string_print(xs.data[i]);
-    }
-    printf("]\n");
-}
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayPtr *values;
+} GupHashmapPtr;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayShort *values;
+} GupHashmapShort;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayString *values;
+} GupHashmapString;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayCstr *values;
+} GupHashmapCstr;
 

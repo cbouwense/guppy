@@ -138,8 +138,62 @@ typedef struct {
 typedef struct {
     int capacity;
     GupArrayCstr *keys;
+    GupArrayBool *values;
+} GupHashmapBool;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayChar *values;
+} GupHashmapChar;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayDouble *values;
+} GupHashmapDouble;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayFloat *values;
+} GupHashmapFloat;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
     GupArrayInt *values;
 } GupHashmapInt;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayLong *values;
+} GupHashmapLong;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayPtr *values;
+} GupHashmapPtr;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayShort *values;
+} GupHashmapShort;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayString *values;
+} GupHashmapString;
+
+typedef struct {
+    int capacity;
+    GupArrayCstr *keys;
+    GupArrayCstr *values;
+} GupHashmapCstr;
 
 /**************************************************************************************************
  * Public API                                                                                     *
@@ -6082,7 +6136,14 @@ void _gup_hashmap_int_print(GupHashmapInt xs, const char *xs_name) {
     printf("}\n");
 }
 
-void gup_hashmap_int_debug(GupHashmapInt hashmap);
+#define gup_hashmap_int_debug(xs) _gup_hashmap_int_debug(xs, #xs)
+void _gup_hashmap_int_debug(GupHashmapInt xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
 
 // Print -------------------------------------------------------------------------------------------
 
