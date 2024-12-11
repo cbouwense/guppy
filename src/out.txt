@@ -1,54 +1,100 @@
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayBool *values;
-} GupHashmapBool;
+int gup_hashmap_bool_size(GupHashmapBool hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
 
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayChar *values;
-} GupHashmapChar;
+    return size;
+}
 
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayDouble *values;
-} GupHashmapDouble;
+int gup_hashmap_char_size(GupHashmapChar hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
 
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayFloat *values;
-} GupHashmapFloat;
+    return size;
+}
 
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayLong *values;
-} GupHashmapLong;
+int gup_hashmap_double_size(GupHashmapDouble hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
 
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayPtr *values;
-} GupHashmapPtr;
+    return size;
+}
 
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayShort *values;
-} GupHashmapShort;
+int gup_hashmap_float_size(GupHashmapFloat hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
 
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayString *values;
-} GupHashmapString;
+    return size;
+}
 
-typedef struct {
-    int capacity;
-    GupArrayCstr *keys;
-    GupArrayCstr *values;
-} GupHashmapCstr;
+int gup_hashmap_int_size(GupHashmapInt hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_long_size(GupHashmapLong hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_ptr_size(GupHashmapPtr hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_short_size(GupHashmapShort hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_string_size(GupHashmapString hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_cstr_size(GupHashmapCstr hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
 

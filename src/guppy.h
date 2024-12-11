@@ -612,16 +612,115 @@ void         gup_set_string_debug(GupSetString set);
 // TODO: GupSetCstr?
 
 // Hashmap
-GupHashmapInt gup_hashmap_int_create();
-GupHashmapInt gup_hashmap_int_create_arena(GupArena *a);
-void          gup_hashmap_int_destroy(GupHashmapInt hashmap);
-bool          gup_hashmap_int_get(GupHashmapInt hashmap, char *key, int *out);
-void          gup_hashmap_int_set(GupHashmapInt *hashmap, char *key, int value);
-void          gup_hashmap_int_set_arena(GupArena *a, GupHashmapInt *hashmap, char *key, int value);
-void          gup_hashmap_int_remove(GupHashmapInt *hashmap, char *key);
-int           gup_hashmap_int_size(GupHashmapInt hashmap);
-void          gup_hashmap_int_print(GupHashmapInt hashmap);
-void          gup_hashmap_int_debug(GupHashmapInt hashmap);
+GupHashmapBool   gup_hashmap_bool_create();
+GupHashmapBool   gup_hashmap_bool_create_arena(GupArena *a);
+void             gup_hashmap_bool_destroy(GupHashmapBool hashmap);
+bool             gup_hashmap_bool_get(GupHashmapBool hashmap, char *key, bool *out);
+void             gup_hashmap_bool_set(GupHashmapBool *hashmap, char *key, bool value);
+void             gup_hashmap_bool_set_arena(GupArena *a, GupHashmapBool *hashmap, char *key, bool value);
+void             gup_hashmap_bool_remove(GupHashmapBool *hashmap, char *key);
+int              gup_hashmap_bool_size(GupHashmapBool hashmap);
+void             gup_hashmap_bool_print(GupHashmapBool hashmap);
+void             gup_hashmap_bool_debug(GupHashmapBool hashmap);
+
+GupHashmapChar   gup_hashmap_char_create();
+GupHashmapChar   gup_hashmap_char_create_arena(GupArena *a);
+void             gup_hashmap_char_destroy(GupHashmapChar hashmap);
+bool             gup_hashmap_char_get(GupHashmapChar hashmap, char *key, char *out);
+void             gup_hashmap_char_set(GupHashmapChar *hashmap, char *key, char value);
+void             gup_hashmap_char_set_arena(GupArena *a, GupHashmapChar *hashmap, char *key, char value);
+void             gup_hashmap_char_remove(GupHashmapChar *hashmap, char *key);
+int              gup_hashmap_char_size(GupHashmapChar hashmap);
+void             gup_hashmap_char_print(GupHashmapChar hashmap);
+void             gup_hashmap_char_debug(GupHashmapChar hashmap);
+
+GupHashmapDouble gup_hashmap_double_create();
+GupHashmapDouble gup_hashmap_double_create_arena(GupArena *a);
+void             gup_hashmap_double_destroy(GupHashmapDouble hashmap);
+bool             gup_hashmap_double_get(GupHashmapDouble hashmap, char *key, double *out);
+void             gup_hashmap_double_set(GupHashmapDouble *hashmap, char *key, double value);
+void             gup_hashmap_double_set_arena(GupArena *a, GupHashmapDouble *hashmap, char *key, double value);
+void             gup_hashmap_double_remove(GupHashmapDouble *hashmap, char *key);
+int              gup_hashmap_double_size(GupHashmapDouble hashmap);
+void             gup_hashmap_double_print(GupHashmapDouble hashmap);
+void             gup_hashmap_double_debug(GupHashmapDouble hashmap);
+
+GupHashmapFloat  gup_hashmap_float_create();
+GupHashmapFloat  gup_hashmap_float_create_arena(GupArena *a);
+void             gup_hashmap_float_destroy(GupHashmapFloat hashmap);
+bool             gup_hashmap_float_get(GupHashmapFloat hashmap, char *key, float *out);
+void             gup_hashmap_float_set(GupHashmapFloat *hashmap, char *key, float value);
+void             gup_hashmap_float_set_arena(GupArena *a, GupHashmapFloat *hashmap, char *key, float value);
+void             gup_hashmap_float_remove(GupHashmapFloat *hashmap, char *key);
+int              gup_hashmap_float_size(GupHashmapFloat hashmap);
+void             gup_hashmap_float_print(GupHashmapFloat hashmap);
+void             gup_hashmap_float_debug(GupHashmapFloat hashmap);
+
+GupHashmapInt    gup_hashmap_int_create();
+GupHashmapInt    gup_hashmap_int_create_arena(GupArena *a);
+void             gup_hashmap_int_destroy(GupHashmapInt hashmap);
+bool             gup_hashmap_int_get(GupHashmapInt hashmap, char *key, int *out);
+void             gup_hashmap_int_set(GupHashmapInt *hashmap, char *key, int value);
+void             gup_hashmap_int_set_arena(GupArena *a, GupHashmapInt *hashmap, char *key, int value);
+void             gup_hashmap_int_remove(GupHashmapInt *hashmap, char *key);
+int              gup_hashmap_int_size(GupHashmapInt hashmap);
+void             gup_hashmap_int_print(GupHashmapInt hashmap);
+void             gup_hashmap_int_debug(GupHashmapInt hashmap);
+
+GupHashmapLong   gup_hashmap_long_create();
+GupHashmapLong   gup_hashmap_long_create_arena(GupArena *a);
+void             gup_hashmap_long_destroy(GupHashmapLong hashmap);
+bool             gup_hashmap_long_get(GupHashmapLong hashmap, char *key, long *out);
+void             gup_hashmap_long_set(GupHashmapLong *hashmap, char *key, long value);
+void             gup_hashmap_long_set_arena(GupArena *a, GupHashmapLong *hashmap, char *key, long value);
+void             gup_hashmap_long_remove(GupHashmapLong *hashmap, char *key);
+int              gup_hashmap_long_size(GupHashmapLong hashmap);
+void             gup_hashmap_long_print(GupHashmapLong hashmap);
+void             gup_hashmap_long_debug(GupHashmapLong hashmap);
+
+GupHashmapPtr    gup_hashmap_ptr_create();
+GupHashmapPtr    gup_hashmap_ptr_create_arena(GupArena *a);
+void             gup_hashmap_ptr_destroy(GupHashmapPtr hashmap);
+bool             gup_hashmap_ptr_get(GupHashmapPtr hashmap, char *key, void* *out);
+void             gup_hashmap_ptr_set(GupHashmapPtr *hashmap, char *key, void* value);
+void             gup_hashmap_ptr_set_arena(GupArena *a, GupHashmapPtr *hashmap, char *key, void* value);
+void             gup_hashmap_ptr_remove(GupHashmapPtr *hashmap, char *key);
+int              gup_hashmap_ptr_size(GupHashmapPtr hashmap);
+void             gup_hashmap_ptr_print(GupHashmapPtr hashmap);
+void             gup_hashmap_ptr_debug(GupHashmapPtr hashmap);
+
+GupHashmapShort  gup_hashmap_short_create();
+GupHashmapShort  gup_hashmap_short_create_arena(GupArena *a);
+void             gup_hashmap_short_destroy(GupHashmapShort hashmap);
+bool             gup_hashmap_short_get(GupHashmapShort hashmap, char *key, short *out);
+void             gup_hashmap_short_set(GupHashmapShort *hashmap, char *key, short value);
+void             gup_hashmap_short_set_arena(GupArena *a, GupHashmapShort *hashmap, char *key, short value);
+void             gup_hashmap_short_remove(GupHashmapShort *hashmap, char *key);
+int              gup_hashmap_short_size(GupHashmapShort hashmap);
+void             gup_hashmap_short_print(GupHashmapShort hashmap);
+void             gup_hashmap_short_debug(GupHashmapShort hashmap);
+
+GupHashmapString gup_hashmap_string_create();
+GupHashmapString gup_hashmap_string_create_arena(GupArena *a);
+void             gup_hashmap_string_destroy(GupHashmapString hashmap);
+bool             gup_hashmap_string_get(GupHashmapString hashmap, char *key, GupString *out);
+void             gup_hashmap_string_set(GupHashmapString *hashmap, char *key, GupString value);
+void             gup_hashmap_string_set_arena(GupArena *a, GupHashmapString *hashmap, char *key, GupString value);
+void             gup_hashmap_string_remove(GupHashmapString *hashmap, char *key);
+int              gup_hashmap_string_size(GupHashmapString hashmap);
+void             gup_hashmap_string_print(GupHashmapString hashmap);
+void             gup_hashmap_string_debug(GupHashmapString hashmap);
+
+GupHashmapCstr   gup_hashmap_cstr_create();
+GupHashmapCstr   gup_hashmap_cstr_create_arena(GupArena *a);
+void             gup_hashmap_cstr_destroy(GupHashmapCstr hashmap);
+bool             gup_hashmap_cstr_get(GupHashmapCstr hashmap, char *key, char * *out);
+void             gup_hashmap_cstr_set(GupHashmapCstr *hashmap, char *key, char * value);
+void             gup_hashmap_cstr_set_arena(GupArena *a, GupHashmapCstr *hashmap, char *key, char * value);
+void             gup_hashmap_cstr_remove(GupHashmapCstr *hashmap, char *key);
+int              gup_hashmap_cstr_size(GupHashmapCstr hashmap);
+void             gup_hashmap_cstr_print(GupHashmapCstr hashmap);
+void             gup_hashmap_cstr_debug(GupHashmapCstr hashmap);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -6034,6 +6133,128 @@ void _gup_hash_int_debug(GupSetInt xs, const char *xs_name) {
 }
 
 // Hashmaps ----------------------------------------------------------------------------------------
+
+// Create
+GupHashmapBool gup_hashmap_bool_create() {
+    GupHashmapBool hashmap = (GupHashmapBool) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayBool)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_bool_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapBool gup_hashmap_bool_create_arena(GupArena *a) {
+    GupHashmapBool hashmap = (GupHashmapBool) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayBool)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_bool_create_arena(a);
+    }
+
+    return hashmap;
+}
+
+GupHashmapChar gup_hashmap_char_create() {
+    GupHashmapChar hashmap = (GupHashmapChar) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayChar)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_char_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapChar gup_hashmap_char_create_arena(GupArena *a) {
+    GupHashmapChar hashmap = (GupHashmapChar) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayChar)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_char_create_arena(a);
+    }
+
+    return hashmap;
+}
+
+GupHashmapDouble gup_hashmap_double_create() {
+    GupHashmapDouble hashmap = (GupHashmapDouble) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayDouble)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_double_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapDouble gup_hashmap_double_create_arena(GupArena *a) {
+    GupHashmapDouble hashmap = (GupHashmapDouble) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayDouble)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_double_create_arena(a);
+    }
+
+    return hashmap;
+}
+
+GupHashmapFloat gup_hashmap_float_create() {
+    GupHashmapFloat hashmap = (GupHashmapFloat) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayFloat)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_float_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapFloat gup_hashmap_float_create_arena(GupArena *a) {
+    GupHashmapFloat hashmap = (GupHashmapFloat) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayFloat)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_float_create_arena(a);
+    }
+
+    return hashmap;
+}
+
 GupHashmapInt gup_hashmap_int_create() {
     GupHashmapInt hashmap = (GupHashmapInt) {
         .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
@@ -6064,6 +6285,193 @@ GupHashmapInt gup_hashmap_int_create_arena(GupArena *a) {
     return hashmap;
 }
 
+GupHashmapLong gup_hashmap_long_create() {
+    GupHashmapLong hashmap = (GupHashmapLong) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayLong)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_long_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapLong gup_hashmap_long_create_arena(GupArena *a) {
+    GupHashmapLong hashmap = (GupHashmapLong) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayLong)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_long_create_arena(a);
+    }
+
+    return hashmap;
+}
+
+GupHashmapPtr gup_hashmap_ptr_create() {
+    GupHashmapPtr hashmap = (GupHashmapPtr) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayPtr)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_ptr_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapPtr gup_hashmap_ptr_create_arena(GupArena *a) {
+    GupHashmapPtr hashmap = (GupHashmapPtr) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayPtr)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_ptr_create_arena(a);
+    }
+
+    return hashmap;
+}
+
+GupHashmapShort gup_hashmap_short_create() {
+    GupHashmapShort hashmap = (GupHashmapShort) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayShort)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_short_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapShort gup_hashmap_short_create_arena(GupArena *a) {
+    GupHashmapShort hashmap = (GupHashmapShort) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayShort)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_short_create_arena(a);
+    }
+
+    return hashmap;
+}
+
+GupHashmapString gup_hashmap_string_create() {
+    GupHashmapString hashmap = (GupHashmapString) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayString)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_string_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapString gup_hashmap_string_create_arena(GupArena *a) {
+    GupHashmapString hashmap = (GupHashmapString) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayString)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_string_create_arena(a);
+    }
+
+    return hashmap;
+}
+
+GupHashmapCstr gup_hashmap_cstr_create() {
+    GupHashmapCstr hashmap = (GupHashmapCstr) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = malloc(GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create();
+        hashmap.values[i] = gup_array_cstr_create();
+    }
+
+    return hashmap;
+}
+
+GupHashmapCstr gup_hashmap_cstr_create_arena(GupArena *a) {
+    GupHashmapCstr hashmap = (GupHashmapCstr) {
+        .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
+        .keys     = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+        .values   = gup_arena_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
+    };
+
+    for (int i = 0; i < hashmap.capacity; i++) {
+        hashmap.keys[i]   = gup_array_cstr_create_arena(a);
+        hashmap.values[i] = gup_array_cstr_create_arena(a);
+    }
+
+    return hashmap;
+}
+
+// Destroy
+void gup_hashmap_bool_destroy(GupHashmapBool hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_bool_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
+void gup_hashmap_char_destroy(GupHashmapChar hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_char_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
+void gup_hashmap_double_destroy(GupHashmapDouble hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_double_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
+void gup_hashmap_float_destroy(GupHashmapFloat hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_float_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
 void gup_hashmap_int_destroy(GupHashmapInt hashmap) {
     for (int i = 0; i < hashmap.capacity; i++) {
         gup_array_cstr_destroy(hashmap.keys[i]);
@@ -6071,6 +6479,104 @@ void gup_hashmap_int_destroy(GupHashmapInt hashmap) {
     }
     free(hashmap.keys);
     free(hashmap.values);
+}
+
+void gup_hashmap_long_destroy(GupHashmapLong hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_long_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
+void gup_hashmap_ptr_destroy(GupHashmapPtr hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_ptr_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
+void gup_hashmap_short_destroy(GupHashmapShort hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_short_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
+void gup_hashmap_string_destroy(GupHashmapString hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_string_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
+void gup_hashmap_cstr_destroy(GupHashmapCstr hashmap) {
+    for (int i = 0; i < hashmap.capacity; i++) {
+        gup_array_cstr_destroy(hashmap.keys[i]);
+        gup_array_cstr_destroy(hashmap.values[i]);
+    }
+    free(hashmap.keys);
+    free(hashmap.values);
+}
+
+// Get
+bool gup_hashmap_bool_get(GupHashmapBool hashmap, char *key, bool *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool gup_hashmap_char_get(GupHashmapChar hashmap, char *key, char *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool gup_hashmap_double_get(GupHashmapDouble hashmap, char *key, double *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool gup_hashmap_float_get(GupHashmapFloat hashmap, char *key, float *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool gup_hashmap_int_get(GupHashmapInt hashmap, char *key, int *out) {
@@ -6084,6 +6590,144 @@ bool gup_hashmap_int_get(GupHashmapInt hashmap, char *key, int *out) {
     }
 
     return false;
+}
+
+bool gup_hashmap_long_get(GupHashmapLong hashmap, char *key, long *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool gup_hashmap_ptr_get(GupHashmapPtr hashmap, char *key, void* *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool gup_hashmap_short_get(GupHashmapShort hashmap, char *key, short *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool gup_hashmap_string_get(GupHashmapString hashmap, char *key, GupString *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool gup_hashmap_cstr_get(GupHashmapCstr hashmap, char *key, char * *out) {
+    const int index = _gup_hash_cstr_index(key, hashmap.capacity);
+    
+    for (int i = 0; i < hashmap.keys[index].count; i++) {
+        if (strcmp(hashmap.keys[index].data[i], key) == 0) {
+            *out = hashmap.values[index].data[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Set
+void gup_hashmap_bool_set(GupHashmapBool *hashmap, char *key, bool value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_bool_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_bool_set_arena(GupArena *a, GupHashmapBool *hashmap, char *key, bool value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_bool_append_arena(a, &(hashmap->values[index]), value);
+}
+
+void gup_hashmap_char_set(GupHashmapChar *hashmap, char *key, char value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_char_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_char_set_arena(GupArena *a, GupHashmapChar *hashmap, char *key, char value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_char_append_arena(a, &(hashmap->values[index]), value);
+}
+
+void gup_hashmap_double_set(GupHashmapDouble *hashmap, char *key, double value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_double_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_double_set_arena(GupArena *a, GupHashmapDouble *hashmap, char *key, double value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_double_append_arena(a, &(hashmap->values[index]), value);
+}
+
+void gup_hashmap_float_set(GupHashmapFloat *hashmap, char *key, float value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_float_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_float_set_arena(GupArena *a, GupHashmapFloat *hashmap, char *key, float value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_float_append_arena(a, &(hashmap->values[index]), value);
 }
 
 void gup_hashmap_int_set(GupHashmapInt *hashmap, char *key, int value) {
@@ -6104,6 +6748,137 @@ void gup_hashmap_int_set_arena(GupArena *a, GupHashmapInt *hashmap, char *key, i
     gup_array_int_append_arena(a, &(hashmap->values[index]), value);
 }
 
+void gup_hashmap_long_set(GupHashmapLong *hashmap, char *key, long value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_long_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_long_set_arena(GupArena *a, GupHashmapLong *hashmap, char *key, long value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_long_append_arena(a, &(hashmap->values[index]), value);
+}
+
+void gup_hashmap_ptr_set(GupHashmapPtr *hashmap, char *key, void* value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_ptr_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_ptr_set_arena(GupArena *a, GupHashmapPtr *hashmap, char *key, void* value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_ptr_append_arena(a, &(hashmap->values[index]), value);
+}
+
+void gup_hashmap_short_set(GupHashmapShort *hashmap, char *key, short value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_short_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_short_set_arena(GupArena *a, GupHashmapShort *hashmap, char *key, short value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_short_append_arena(a, &(hashmap->values[index]), value);
+}
+
+void gup_hashmap_string_set(GupHashmapString *hashmap, char *key, GupString value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_string_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_string_set_arena(GupArena *a, GupHashmapString *hashmap, char *key, GupString value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_string_append_arena(a, &(hashmap->values[index]), value);
+}
+
+void gup_hashmap_cstr_set(GupHashmapCstr *hashmap, char *key, char *value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append(&(hashmap->keys[index]), key);
+    gup_array_cstr_append(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_cstr_set_arena(GupArena *a, GupHashmapCstr *hashmap, char *key, char *value) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+
+    gup_array_cstr_append_arena(a, &(hashmap->keys[index]), key);
+    gup_array_cstr_append_arena(a, &(hashmap->values[index]), value);
+}
+
+// Remove
+void gup_hashmap_bool_remove(GupHashmapBool *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    bool value = false;
+    if (!gup_hashmap_bool_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_bool_remove_all(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_char_remove(GupHashmapChar *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    char value = '\0';
+    if (!gup_hashmap_char_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_char_remove_all(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_double_remove(GupHashmapDouble *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    double value = 0;
+    if (!gup_hashmap_double_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_double_remove_all(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_float_remove(GupHashmapFloat *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    float value = 0;
+    if (!gup_hashmap_float_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_float_remove_all(&(hashmap->values[index]), value);
+}
+
 void gup_hashmap_int_remove(GupHashmapInt *hashmap, char *key) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
@@ -6112,6 +6887,97 @@ void gup_hashmap_int_remove(GupHashmapInt *hashmap, char *key) {
 
     gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
     gup_array_int_remove_all(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_long_remove(GupHashmapLong *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    long value = 0;
+    if (!gup_hashmap_long_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_long_remove_all(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_ptr_remove(GupHashmapPtr *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    void* value = NULL;
+    if (!gup_hashmap_ptr_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_ptr_remove_all(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_short_remove(GupHashmapShort *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    short value = 0;
+    if (!gup_hashmap_short_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_short_remove_all(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_string_remove(GupHashmapString *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    GupString value = {0};
+    if (!gup_hashmap_string_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_string_remove_all(&(hashmap->values[index]), value);
+}
+
+void gup_hashmap_cstr_remove(GupHashmapCstr *hashmap, char *key) {
+    const int index = _gup_hash_cstr_index(key, hashmap->capacity);
+
+    char *value = NULL;
+    if (!gup_hashmap_cstr_get(*hashmap, key, &value)) return;
+
+    gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
+    gup_array_cstr_remove_all(&(hashmap->values[index]), value);
+}
+
+// Size
+int gup_hashmap_bool_size(GupHashmapBool hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_char_size(GupHashmapChar hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_double_size(GupHashmapDouble hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_float_size(GupHashmapFloat hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
 }
 
 int gup_hashmap_int_size(GupHashmapInt hashmap) {
@@ -6124,24 +6990,108 @@ int gup_hashmap_int_size(GupHashmapInt hashmap) {
     return size;
 }
 
-#define gup_hashmap_int_print(xs) _gup_hashmap_int_print(xs, #xs)
-void _gup_hashmap_int_print(GupHashmapInt xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.keys[i].count; j++) {
-            printf("  \"%s\": ", xs.keys[i].data[j]);
-            printf("%d,\n", xs.values[i].data[j]);
-        }
+int gup_hashmap_long_size(GupHashmapLong hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
     }
-    printf("}\n");
+
+    return size;
 }
 
+int gup_hashmap_ptr_size(GupHashmapPtr hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_short_size(GupHashmapShort hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_string_size(GupHashmapString hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+int gup_hashmap_cstr_size(GupHashmapCstr hashmap) {
+    int size = 0;
+    
+    for (int i = 0; i < hashmap.capacity; i++) {
+        size += hashmap.keys[i].count;
+    }
+
+    return size;
+}
+
+// Print
+// #define gup_hashmap_print(hashmap) _gup_hashmap_print(hashmap, #hashmap)
+// void _gup_hashmap_print(GupHashmap hashmap, const char *xs_name) {    
+//     printf("%s: {\n", xs_name);
+//     for (int i = 0; i < xs.capacity; i++) {
+//         for (int j = 0; j < xs.keys[i].count; j++) {
+//             printf("  \"%s\": ", xs.keys[i].data[j]);
+//             switch (hashmap.type) {
+//                 case TYPE_Bool: {
+//                     break;
+//                 }
+//                 case TYPE_Char: {
+//                     break;
+//                 }
+//                 case TYPE_Double: {
+//                     break;
+//                 }
+//                 case TYPE_Float: {
+//                     break;
+//                 }
+//                 case TYPE_Int: {
+//                     break;
+//                 }
+//                 case TYPE_Long: {
+//                     break;
+//                 }
+//                 case TYPE_Ptr: {
+//                     break;
+//                 }
+//                 case TYPE_Short: {
+//                     break;
+//                 }
+//                 case TYPE_String: {
+//                     break;
+//                 }
+//                 case TYPE_Cstr: {
+//                     printf("%d,\n", xs.values[i].data[j]);
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+//     printf("}\n");
+// }
+
+// Debug
 #define gup_hashmap_int_debug(xs) _gup_hashmap_int_debug(xs, #xs)
 void _gup_hashmap_int_debug(GupHashmapInt xs, const char *xs_name) {
     printf("%s: {\n", xs_name);
     printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
+    printf("  keys:     %p\n", (void *)(xs.keys));
+    printf("  values:   %p\n", (void *)(xs.values));
     printf("}\n");
 }
 

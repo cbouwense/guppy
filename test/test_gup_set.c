@@ -260,16 +260,12 @@ void test_removing(void) {
     gup_set_int_add(&set, 2);
     gup_set_int_add(&set, 3);
 
-    gup_set_int_print(set);
-
     gup_set_int_remove(&set, 1);
     gup_set_int_remove(&set, 2);
 
     gup_assert(!gup_set_int_has(set, 1));
     gup_assert(!gup_set_int_has(set, 2));
     gup_assert(gup_set_int_has(set, 3));
-
-    gup_set_int_print(set);
 
     gup_set_int_destroy(set);
 }
