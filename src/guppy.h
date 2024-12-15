@@ -91,7 +91,7 @@ typedef struct {
 typedef struct {
     int capacity;
     int count;
-    bool *occupied; // pigeon hole
+    bool *data; // pigeon hole
 } GupSetChar;
 
 typedef struct {
@@ -134,6 +134,12 @@ typedef struct {
     int count;
     GupArrayString *data;
 } GupSetString;
+
+typedef struct {
+    int capacity;
+    int count;
+    GupArrayCstr *data;
+} GupSetCstr;
 
 typedef struct {
     int capacity;
@@ -5220,11 +5226,11 @@ GupSetChar gup_set_char_create() {
     GupSetChar xs = (GupSetChar) {
         .capacity = 256,
         .count = 0,
-        .occupied = malloc(256 * sizeof(bool)),
+        .data = malloc(256 * sizeof(bool)),
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.occupied[i] = false;
+        xs.data[i] = false;
     }
 
     return xs;
@@ -5234,11 +5240,11 @@ GupSetChar gup_set_char_create_arena(GupArena *a) {
     GupSetChar xs = (GupSetChar) {
         .capacity = 256,
         .count = 0,
-        .occupied = gup_arena_alloc(a, 256 * sizeof(bool)),
+        .data = gup_arena_alloc(a, 256 * sizeof(bool)),
     };
 
     for (int i = 0; i < xs.capacity; i++) {
-        xs.occupied[i] = false;
+        xs.data[i] = false;
     }
 
     return xs;
@@ -5690,7 +5696,7 @@ GupSetString gup_set_string_create_from_array_arena(GupArena *a, GupString xs[],
 
 // Destroy
 void gup_set_char_destroy(GupSetChar set) {
-    free(set.occupied);
+    free(set.data);
 }
 
 void gup_set_double_destroy(GupSetDouble set) {
@@ -5752,7 +5758,7 @@ bool gup_set_bool_has(GupSetBool set, bool b) {
 }
 
 bool gup_set_char_has(GupSetChar set, char x) {
-    return set.occupied[_gup_hash_char_index(x)];
+    return set.data[_gup_hash_char_index(x)];
 }
 
 bool gup_set_double_has(GupSetDouble set, double x) {
@@ -5816,11 +5822,11 @@ void gup_set_bool_add(GupSetBool *set, bool b) {
 void gup_set_char_add(GupSetChar *set, char x) {
     const int index = _gup_hash_char_index(x);
 
-    if (!set->occupied[index]) {
+    if (!set->data[index]) {
         set->count++;
     }
 
-    set->occupied[index] = true;
+    set->data[index] = true;
 }
 
 void gup_set_double_add(GupSetDouble *set, double x) {
@@ -5947,10 +5953,10 @@ void gup_set_bool_remove(GupSetBool *set, bool b) {
 void gup_set_char_remove(GupSetChar *set, char x) {
     const int index = _gup_hash_char_index(x);
 
-    if (set->occupied[index]) {
+    if (set->data[index]) {
         set->count--;
     }
-    set->occupied[index] = false;
+    set->data[index] = false;
 }
 
 void gup_set_int_remove(GupSetInt *set, int x) {
@@ -6022,9 +6028,9 @@ void _gup_set_char_print(GupSetChar xs, const char *xs_name) {
     printf("%s: {", xs_name);
     bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
-        if (!xs.occupied[i]) continue;
+        if (!xs.data[i]) continue;
         if (preceeding_comma) printf(", ");
-        printf("'%c' (%d)", i, i);
+        printf("%c (%d)", i, i);
         preceeding_comma = true;
     }
     printf("}\n");
@@ -6045,13 +6051,15 @@ void _gup_set_double_print(GupSetDouble xs, const char *xs_name) {
 #define gup_set_float_print(xs) _gup_set_float_print(xs, #xs)
 void _gup_set_float_print(GupSetFloat xs, const char *xs_name) {
     printf("%s: {", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
         for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
             printf("%f", xs.data[i].data[j]);
-            if (j != xs.data[i].count-1) printf(", ");
+            preceeding_comma = true;
         }
     }
-    printf("]\n");
+    printf("}\n");
 }
 
 #define gup_set_int_print(xs) _gup_set_int_print(xs, #xs)
@@ -6064,60 +6072,80 @@ void _gup_set_int_print(GupSetInt xs, const char *xs_name) {
             printf("%d", xs.data[i].data[j]);
             preceeding_comma = true;
         }
-    } // TODO: do all sets with preceeding_comma logic
+    }
     printf("}\n");
 }
 
 #define gup_set_long_print(xs) _gup_set_long_print(xs, #xs)
 void _gup_set_long_print(GupSetLong xs, const char *xs_name) {
-    printf("%s: [", xs_name);
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
         for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
             printf("%ld", xs.data[i].data[j]);
-            if (j != xs.data[i].count-1) printf(", ");
+            preceeding_comma = true;
         }
     }
-    printf("]\n");
+    printf("}\n");
 }
 
 #define gup_set_ptr_print(xs) _gup_set_ptr_print(xs, #xs)
 void _gup_set_ptr_print(GupSetPtr xs, const char *xs_name) {
-    printf("%s: [", xs_name);
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
         for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
             printf("%p", xs.data[i].data[j]);
-            if (j != xs.data[i].count-1) printf(", ");
+            preceeding_comma = true;
         }
     }
-    printf("]\n");
+    printf("}\n");
 }
 
 #define gup_set_short_print(xs) _gup_set_short_print(xs, #xs)
 void _gup_set_short_print(GupSetShort xs, const char *xs_name) {
-    printf("%s: [", xs_name);
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
         for (int j = 0; j < xs.data[i].count; j++) {
-            printf("%d", xs.data[i].data[j]);
-            if (j != xs.data[i].count-1) printf(", ");
+            if (preceeding_comma) printf(", ");
+            printf("%hd", xs.data[i].data[j]);
+            preceeding_comma = true;
         }
     }
-    printf("]\n");
+    printf("}\n");
 }
 
 #define gup_set_string_print(xs) _gup_set_string_print(xs, #xs)
 void _gup_set_string_print(GupSetString xs, const char *xs_name) {
-    printf("%s: [", xs_name);
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
     for (int i = 0; i < xs.capacity; i++) {
         for (int j = 0; j < xs.data[i].count; j++) {
-            printf("\"");
+            if (preceeding_comma) printf(", ");
             for (int k = 0; k < xs.data[i].data[j].count; k++) {
-                printf("%c", xs.data[i].data[j].data[k]);
+                printf("%c", xs.data[i].data[j].data[j]);
             }
-            printf("\"");
-            if (j != xs.data[i].count-1) printf(", ");
+            preceeding_comma = true;
         }
     }
-    printf("]\n");
+    printf("}\n");
+}
+
+#define gup_set_cstr_print(xs) _gup_set_cstr_print(xs, #xs)
+void _gup_set_cstr_print(GupSetCstr xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%s", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
+    }
+    printf("}\n");
 }
 
 // Debug

@@ -1,90 +1,130 @@
-#define gup_hashmap_bool_debug(hashmap) _gup_hashmap_bool_debug(hashmap, #hashmap)
-void _gup_hashmap_bool_debug(GupHashmapBool hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_bool_print(xs) _gup_set_bool_print(xs, #xs)
+void _gup_set_bool_print(GupSetBool xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%d", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_char_debug(hashmap) _gup_hashmap_char_debug(hashmap, #hashmap)
-void _gup_hashmap_char_debug(GupHashmapChar hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_char_print(xs) _gup_set_char_print(xs, #xs)
+void _gup_set_char_print(GupSetChar xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%c", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_double_debug(hashmap) _gup_hashmap_double_debug(hashmap, #hashmap)
-void _gup_hashmap_double_debug(GupHashmapDouble hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_double_print(xs) _gup_set_double_print(xs, #xs)
+void _gup_set_double_print(GupSetDouble xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%f", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_float_debug(hashmap) _gup_hashmap_float_debug(hashmap, #hashmap)
-void _gup_hashmap_float_debug(GupHashmapFloat hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_float_print(xs) _gup_set_float_print(xs, #xs)
+void _gup_set_float_print(GupSetFloat xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%f", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_int_debug(hashmap) _gup_hashmap_int_debug(hashmap, #hashmap)
-void _gup_hashmap_int_debug(GupHashmapInt hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_int_print(xs) _gup_set_int_print(xs, #xs)
+void _gup_set_int_print(GupSetInt xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%d", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_long_debug(hashmap) _gup_hashmap_long_debug(hashmap, #hashmap)
-void _gup_hashmap_long_debug(GupHashmapLong hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_long_print(xs) _gup_set_long_print(xs, #xs)
+void _gup_set_long_print(GupSetLong xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%ld", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_ptr_debug(hashmap) _gup_hashmap_ptr_debug(hashmap, #hashmap)
-void _gup_hashmap_ptr_debug(GupHashmapPtr hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_ptr_print(xs) _gup_set_ptr_print(xs, #xs)
+void _gup_set_ptr_print(GupSetPtr xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%p", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_short_debug(hashmap) _gup_hashmap_short_debug(hashmap, #hashmap)
-void _gup_hashmap_short_debug(GupHashmapShort hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_short_print(xs) _gup_set_short_print(xs, #xs)
+void _gup_set_short_print(GupSetShort xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%hd", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_string_debug(hashmap) _gup_hashmap_string_debug(hashmap, #hashmap)
-void _gup_hashmap_string_debug(GupHashmapString hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_string_print(xs) _gup_set_string_print(xs, #xs)
+void _gup_set_string_print(GupSetString xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("TODO", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
-#define gup_hashmap_cstr_debug(hashmap) _gup_hashmap_cstr_debug(hashmap, #hashmap)
-void _gup_hashmap_cstr_debug(GupHashmapCstr hashmap, const char *hashmap_name) {
-    printf("%s: {\n", hashmap_name);
-    printf("  capacity: %d\n", hashmap.capacity);
-    printf("  keys:     %p\n", (void *)(hashmap.keys));
-    printf("  values:   %p\n", (void *)(hashmap.values));
+#define gup_set_cstr_print(xs) _gup_set_cstr_print(xs, #xs)
+void _gup_set_cstr_print(GupSetCstr xs, const char *xs_name) {
+    printf("%s: {", xs_name);
+    bool preceeding_comma = false;
+    for (int i = 0; i < xs.capacity; i++) {
+        for (int j = 0; j < xs.data[i].count; j++) {
+            if (preceeding_comma) printf(", ");
+            printf("%s", xs.data[i].data[j]);
+            preceeding_comma = true;
+        }
     printf("}\n");
 }
 
