@@ -1,100 +1,90 @@
-int gup_hashmap_bool_size(GupHashmapBool hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_bool_debug(hashmap) _gup_hashmap_bool_debug(hashmap, #hashmap)
+void _gup_hashmap_bool_debug(GupHashmapBool hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_char_size(GupHashmapChar hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_char_debug(hashmap) _gup_hashmap_char_debug(hashmap, #hashmap)
+void _gup_hashmap_char_debug(GupHashmapChar hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_double_size(GupHashmapDouble hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_double_debug(hashmap) _gup_hashmap_double_debug(hashmap, #hashmap)
+void _gup_hashmap_double_debug(GupHashmapDouble hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_float_size(GupHashmapFloat hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_float_debug(hashmap) _gup_hashmap_float_debug(hashmap, #hashmap)
+void _gup_hashmap_float_debug(GupHashmapFloat hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_int_size(GupHashmapInt hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_int_debug(hashmap) _gup_hashmap_int_debug(hashmap, #hashmap)
+void _gup_hashmap_int_debug(GupHashmapInt hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_long_size(GupHashmapLong hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_long_debug(hashmap) _gup_hashmap_long_debug(hashmap, #hashmap)
+void _gup_hashmap_long_debug(GupHashmapLong hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_ptr_size(GupHashmapPtr hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_ptr_debug(hashmap) _gup_hashmap_ptr_debug(hashmap, #hashmap)
+void _gup_hashmap_ptr_debug(GupHashmapPtr hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_short_size(GupHashmapShort hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_short_debug(hashmap) _gup_hashmap_short_debug(hashmap, #hashmap)
+void _gup_hashmap_short_debug(GupHashmapShort hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_string_size(GupHashmapString hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_string_debug(hashmap) _gup_hashmap_string_debug(hashmap, #hashmap)
+void _gup_hashmap_string_debug(GupHashmapString hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
-int gup_hashmap_cstr_size(GupHashmapCstr hashmap) {
-    int size = 0;
-    
-    for (int i = 0; i < hashmap.capacity; i++) {
-        size += hashmap.keys[i].count;
-    }
-
-    return size;
+#define gup_hashmap_cstr_debug(hashmap) _gup_hashmap_cstr_debug(hashmap, #hashmap)
+void _gup_hashmap_cstr_debug(GupHashmapCstr hashmap, const char *hashmap_name) {
+    printf("%s: {\n", hashmap_name);
+    printf("  capacity: %d\n", hashmap.capacity);
+    printf("  keys:     %p\n", (void *)(hashmap.keys));
+    printf("  values:   %p\n", (void *)(hashmap.values));
+    printf("}\n");
 }
 
