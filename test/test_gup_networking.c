@@ -1,5 +1,3 @@
-#include <sys/socket.h>
-
 #include "../src/guppy_networking.h"
 
 #define SENDER_PORT 1337
@@ -18,8 +16,10 @@ int main(int argc, char **argv) {
     GupServer server = gup_server_udp_create("127.0.0.1", RECEIVER_PORT);
 
     char message[1024];
-    gup_server_udp_receive(server, message, sizeof(message));
-    printf("%s\n", message);
+    for (int i = 0; i < 3; i++) {
+      gup_server_udp_receive(server, message, sizeof(message));
+      printf("%s\n", message);
+    }
     
     gup_server_udp_destroy(server);
   }
