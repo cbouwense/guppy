@@ -798,9 +798,9 @@ GupArrayString  gup_string_split_by_cstr(GupString str, char *sub_str);
 GupArrayString  gup_string_split_by_cstr_arena(GupArena *a, GupString str, char *sub_str);
 
 // Assert
-void gup_assert(bool pass_condition);
-void gup_assert_verbose(bool pass_condition, const char *failure_explanation);
 
+#define gup_assert(pass_condition) _gup_assert(pass_condition, #pass_condition, __FILE__, __LINE__)
+#define gup_assert_verbose(pass_condition, failure_explanation) _gup_assert_verbose(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
 
 // C-string utilities
 char *gup_cstr_array_flatten_arena(GupArena *a, char **strs); // Assumes a null terminated string.
@@ -824,11 +824,21 @@ uint32_t gup_fnv1a_hash(const char *s);
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
+#ifdef GUPPY_IMPLEMENTATION
+
 #define GUP_ARRAY_DEFAULT_CAPACITY 256
 #define GUP_SET_DEFAULT_CAPACITY 8192
 #define GUP_HASHMAP_DEFAULT_CAPACITY 8192
 
 // Assert ------------------------------------------------------------------------------------------
+
+void _gup_assert(bool pass_condition, const char *literal_pass_condition, const char *file_path, int line_number) {
+    if (!pass_condition) {
+        printf("[%s:%d] Failed assertion!\n", file_path, line_number);
+        printf("---> %s <---\n", literal_pass_condition);
+        exit(1);
+    }
+}
 
 void _gup_assert_verbose(bool pass_condition, const char *failure_explanation, const char *literal_pass_condition, const char *file_path, int line_number) {
     if (!pass_condition) {
@@ -838,16 +848,6 @@ void _gup_assert_verbose(bool pass_condition, const char *failure_explanation, c
         exit(1);
     }
 }
-#define gup_assert_verbose(pass_condition, failure_explanation) _gup_assert_verbose(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
-
-void _gup_assert(bool pass_condition, const char *literal_pass_condition, const char *file_path, int line_number) {
-    if (!pass_condition) {
-        printf("[%s:%d] Failed assertion!\n", file_path, line_number);
-        printf("---> %s <---\n", literal_pass_condition);
-        exit(1);
-    }
-}
-#define gup_assert(pass_condition) _gup_assert(pass_condition, #pass_condition, __FILE__, __LINE__)
 
 // Arena -------------------------------------------------------------------------------------------
 
@@ -7599,4 +7599,5 @@ uint32_t gup_fnv1a_hash(const char* str) {
     return hash;
 }
 
+#endif // GUPPY_IMPLEMENTATION
 #endif // GUPPY_H_

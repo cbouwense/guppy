@@ -2,6 +2,7 @@
 #include <limits.h>
 
 // #define GUPPY_VERBOSE
+#define GUPPY_IMPLEMENTATION
 #include "../src/guppy.h"
 
 #include "./test_gup_arena.c"
