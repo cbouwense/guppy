@@ -3,9 +3,8 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <float.h>
-#include <math.h>
-#include <stdbool.h>
+#include <limits.h>
+// #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -13,6 +12,25 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+
+// Boolean -------------------------------------------------------------------------------------------------------------
+#define TRUE 1
+#define FALSE 0
+#define true 1
+#define false 0
+typedef unsigned char bool;
+
+// Primitive types -----------------------------------------------------------------------------------------------------
+typedef unsigned char u8;
+typedef signed char i8;
+typedef unsigned short u16;
+typedef signed short i16;
+typedef unsigned int u32;
+typedef signed int i32;
+typedef unsigned long u64;
+typedef signed long i64;
+typedef float f32;
+typedef double f64;
 
 // TODO: flexible array members
 typedef struct {
@@ -811,6 +829,18 @@ void  gup_cstr_copy(char *to, const char *from);
 void  gup_cstr_copy_n(char *to, const char *from, int n);
 void  gup_cstr_print(const char *cstr);
 
+// Math
+u8 gup_pow_u8(u8 x, u8 y);
+i8 gup_pow_i8(i8 x, i8 y);
+u16 gup_pow_u16(u16 x, u16 y);
+i16 gup_pow_i16(i16 x, i16 y);
+u32 gup_pow_u32(u32 x, u32 y);
+i32 gup_pow_i32(i32 x, i32 y);
+u64 gup_pow_u64(u64 x, u64 y);
+i64 gup_pow_i64(i64 x, i64 y);
+f32 gup_pow_f32(f32 x, f32 y);
+f64 gup_pow_f64(f64 x, f64 y);
+
 // Miscellaneous
 double gup_operation_seconds(void (*fn)());
 #define gup_array_len(a) sizeof(a)/sizeof(a[0]) 
@@ -819,6 +849,7 @@ double gup_operation_seconds(void (*fn)());
 #define GUP_SKIP if (false)
 int gup_char_to_int(char c); // -1 means the character was not an int.
 uint32_t gup_fnv1a_hash(const char *s);
+
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
@@ -5119,7 +5150,7 @@ bool gup_string_to_int(GupString str, int *out) {
     int result = 0;
     
     for (int i = str.count-1, j = 0; i >= 0; i--, j++) {
-        const int char_as_int = gup_char_to_int(str.data[i]) * pow(10, j);
+        const int char_as_int = gup_char_to_int(str.data[i]) * gup_pow_i32(10, j);
         if (char_as_int == -1) {
             return false;
         }
@@ -7539,6 +7570,89 @@ void gup_cstr_copy_n_arena(GupArena *a, char *to, const char *from, int n) {
 
     to[n] = '\0';
 }
+
+// Math ----------------------------------------------------------------------------------------------------------------
+
+inline u8 gup_pow_u8(u8 x, u8 y) {
+    u8 result = 1;
+    for (u8 i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline i8 gup_pow_i8(i8 x, i8 y) {
+    i8 result = 1;
+    for (i8 i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline u16 gup_pow_u16(u16 x, u16 y) {
+    u16 result = 1;
+    for (u16 i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline i16 gup_pow_i16(i16 x, i16 y) {
+    i16 result = 1;
+    for (i16 i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline u32 gup_pow_u32(u32 x, u32 y) {
+    u32 result = 1;
+    for (u32 i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline i32 gup_pow_i32(i32 x, i32 y) {
+    i32 result = 1;
+    for (i32 i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline u64 gup_pow_u64(u64 x, u64 y) {
+    u64 result = 1;
+    for (u64 i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline i64 gup_pow_i64(i64 x, i64 y) {
+    i64 result = 1;
+    for (i64 i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline f32 gup_pow_f32(f32 x, f32 y) {
+    f32 result = 1;
+    for (f32 f = 0; f < y; f++) {
+        result *= x;
+    }
+    return result;
+}
+
+inline f64 gup_pow_f64(f64 x, f64 y) {
+    f64 result = 1;
+    for (f64 f = 0; f < y; f++) {
+        result *= x;
+    }
+    return result;
+}
+
 
 // Miscellaneous -----------------------------------------------------------------------------------
 

@@ -276,6 +276,14 @@ void test_gup_string_contains_substring(GupArena *a) {
     }
 }
 
+void test_gup_string_to_int(GupArena *a) {
+    int actual = 0;
+    GupString str = gup_string(a, "1337");
+
+    gup_assert_verbose(gup_string_to_int(str, &actual), "Should've been able to parse an int from the string but couldn't");
+    gup_assert_verbose(actual == 1337, "Didn't successfully parse 1337 from the string that was \"1337\"");
+}
+
 void test_gup_string(void) {
     GupArena a = gup_arena_create();
 
@@ -288,6 +296,7 @@ void test_gup_string(void) {
     test_gup_string_ends_with(&a);
     test_gup_string_ends_with_cstr(&a);
     test_gup_string_contains_substring(&a);
+    test_gup_string_to_int(&a);
 
     gup_arena_destroy(&a);
 }
