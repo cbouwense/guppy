@@ -1,12 +1,11 @@
 #ifndef GUPPY_H_
 #define GUPPY_H_
 
+// TODO: windows includes
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-// #include <math.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -21,16 +20,16 @@
 typedef unsigned char bool;
 
 // Primitive types -----------------------------------------------------------------------------------------------------
-typedef unsigned char u8;
-typedef signed char i8;
+typedef unsigned char   u8;
+typedef signed char     i8;
 typedef unsigned short u16;
-typedef signed short i16;
-typedef unsigned int u32;
-typedef signed int i32;
-typedef unsigned long u64;
-typedef signed long i64;
-typedef float f32;
-typedef double f64;
+typedef signed short   i16;
+typedef unsigned int   u32;
+typedef signed int     i32;
+typedef unsigned long  u64;
+typedef signed long    i64;
+typedef float          f32;
+typedef double         f64;
 
 // TODO: flexible array members
 typedef struct {
@@ -848,7 +847,7 @@ double gup_operation_seconds(void (*fn)());
 #define GUP_RUN if (true)
 #define GUP_SKIP if (false)
 int gup_char_to_int(char c); // -1 means the character was not an int.
-uint32_t gup_fnv1a_hash(const char *s);
+u32 gup_fnv1a_hash(const char *s);
 
 
 /**************************************************************************************************
@@ -5190,7 +5189,7 @@ int _gup_hash_double_index(const double key, const int modulo) {
     char input_cstr[1024];
     sprintf(input_cstr, "%f", key);
     
-    const uint32_t hash = gup_fnv1a_hash(input_cstr);
+    const u32 hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % modulo;
     
     gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
@@ -5202,7 +5201,7 @@ int _gup_hash_float_index(const float key, const int modulo) {
     char input_cstr[1024];
     sprintf(input_cstr, "%f", key);
     
-    const uint32_t hash = gup_fnv1a_hash(input_cstr);
+    const u32 hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % modulo;
     
     gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
@@ -5214,7 +5213,7 @@ int _gup_hash_ptr_index(const void* key, const int modulo) {
     char input_cstr[1024];
     sprintf(input_cstr, "%p", key);
     
-    const uint32_t hash = gup_fnv1a_hash(input_cstr);
+    const u32 hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % modulo;
     
     gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
@@ -5225,7 +5224,7 @@ int _gup_hash_ptr_index(const void* key, const int modulo) {
 int _gup_hash_string_index(const GupString key, const int modulo) {
     char *input_cstr = gup_string_to_cstr(key);
     
-    const uint32_t hash = gup_fnv1a_hash(input_cstr);
+    const u32 hash = gup_fnv1a_hash(input_cstr);
     free(input_cstr);
     const int index = hash % modulo;
     
@@ -5235,7 +5234,7 @@ int _gup_hash_string_index(const GupString key, const int modulo) {
 }
 
 int _gup_hash_cstr_index(const char *key, const int modulo) {
-    const uint32_t hash = gup_fnv1a_hash(key);
+    const u32 hash = gup_fnv1a_hash(key);
     const int index = hash % modulo;
     
     gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
@@ -7700,9 +7699,9 @@ int gup_char_to_int(char c) {
     }
 }
 
-uint32_t gup_fnv1a_hash(const char* str) {
-    uint32_t hash = 2166136261; // FNV-1a initial hash value
-    uint32_t prime = 16777219; // FNV-1a prime number
+u32 gup_fnv1a_hash(const char* str) {
+    u32 hash = 2166136261; // FNV-1a initial hash value
+    u32 prime = 16777219; // FNV-1a prime number
 
     while (*str != '\0') {
         hash = (hash ^ *str) * prime;
