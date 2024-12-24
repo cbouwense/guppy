@@ -10,7 +10,9 @@
 #elif defined(__APPLE__) || defined(__linux__)
     #include <sys/socket.h>
     #include <arpa/inet.h>
-
+    #include <stdlib.h>
+    #include <string.h>
+    #include <unistd.h>
 // -----------------------------------------------------------------------------------------------------------------------------
 
 #endif
