@@ -1,130 +1,171 @@
-#define gup_set_bool_print(xs) _gup_set_bool_print(xs, #xs)
-void _gup_set_bool_print(GupSetBool xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%d", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+void gup_array_bool_prepend(GupAllocator *a, GupArrayBool *xs, bool x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        bool *new_data = gup_alloc(a, new_capacity * sizeof(bool));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
+
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-#define gup_set_char_print(xs) _gup_set_char_print(xs, #xs)
-void _gup_set_char_print(GupSetChar xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%c", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+void gup_array_char_prepend(GupAllocator *a, GupArrayChar *xs, char x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        char *new_data = gup_alloc(a, new_capacity * sizeof(char));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
+
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-#define gup_set_double_print(xs) _gup_set_double_print(xs, #xs)
-void _gup_set_double_print(GupSetDouble xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%f", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+void gup_array_double_prepend(GupAllocator *a, GupArrayDouble *xs, double x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        double *new_data = gup_alloc(a, new_capacity * sizeof(double));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
+
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-#define gup_set_float_print(xs) _gup_set_float_print(xs, #xs)
-void _gup_set_float_print(GupSetFloat xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%f", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+void gup_array_float_prepend(GupAllocator *a, GupArrayFloat *xs, float x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        float *new_data = gup_alloc(a, new_capacity * sizeof(float));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
+
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-#define gup_set_int_print(xs) _gup_set_int_print(xs, #xs)
-void _gup_set_int_print(GupSetInt xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%d", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+void gup_array_int_prepend(GupAllocator *a, GupArrayInt *xs, int x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        int *new_data = gup_alloc(a, new_capacity * sizeof(int));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
+
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-#define gup_set_long_print(xs) _gup_set_long_print(xs, #xs)
-void _gup_set_long_print(GupSetLong xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%ld", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+void gup_array_long_prepend(GupAllocator *a, GupArrayLong *xs, long x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        long *new_data = gup_alloc(a, new_capacity * sizeof(long));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
+
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-#define gup_set_ptr_print(xs) _gup_set_ptr_print(xs, #xs)
-void _gup_set_ptr_print(GupSetPtr xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%p", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+void gup_array_ptr_prepend(GupAllocator *a, GupArrayPtr *xs, void * x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        void * *new_data = gup_alloc(a, new_capacity * sizeof(void *));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
+
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-#define gup_set_short_print(xs) _gup_set_short_print(xs, #xs)
-void _gup_set_short_print(GupSetShort xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%hd", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+void gup_array_str_prepend(GupAllocator *a, GupArrayString *xs, GupArrayChar x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        GupArrayChar *new_data = gup_alloc(a, new_capacity * sizeof(GupArrayChar));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
+
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
-#define gup_set_string_print(xs) _gup_set_string_print(xs, #xs)
-void _gup_set_string_print(GupSetString xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("TODO", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
-}
+void gup_array_cstr_prepend(GupAllocator *a, GupArrayCstr *xs, char * x) {
+    if (xs->count == xs->capacity) {
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
+        char * *new_data = gup_alloc(a, new_capacity * sizeof(char *));
+        
+        memcpy(new_data, xs->data, xs->count);
+        gup_free(a, xs->data);
 
-#define gup_set_cstr_print(xs) _gup_set_cstr_print(xs, #xs)
-void _gup_set_cstr_print(GupSetCstr xs, const char *xs_name) {
-    printf("%s: {", xs_name);
-    bool preceeding_comma = false;
-    for (int i = 0; i < xs.capacity; i++) {
-        for (int j = 0; j < xs.data[i].count; j++) {
-            if (preceeding_comma) printf(", ");
-            printf("%s", xs.data[i].data[j]);
-            preceeding_comma = true;
-        }
-    printf("}\n");
+        xs->data = new_data;
+        xs->capacity = new_capacity;
+    }
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[xs->count] = x;
+    xs->count++;
 }
 
