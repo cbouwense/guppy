@@ -72,7 +72,7 @@ GupServer gup_server_udp_create(const char *address, const short port) {
     addr.sin_port = htons(port);
 
     if (bind(socket_descriptor, (SOCKADDR *)&addr, sizeof(addr))) {
-        printf("bind failed wiht error %d\n", WSAGetLastError());
+        printf("bind failed with error %d\n", WSAGetLastError());
         exit(1);
     }
 
@@ -151,6 +151,7 @@ void gup_server_udp_send(GupServer s, const char *message, const char *address, 
     server_addr.sin_addr.s_addr = inet_addr(address);
 
     if (sendto(s.socket_descriptor, message, strlen(message), 0, (struct sockaddr*)&(server_addr), sizeof(server_addr)) < 0) {
+        perror("Error sending datagram\n");
         exit(1);
     }
 // -----------------------------------------------------------------------------------------------------------------------------

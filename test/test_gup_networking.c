@@ -1,8 +1,8 @@
 #include "../src/guppy_networking.h"
 
-#define SENDER_ADDR "192.168.0.206"
+#define SENDER_ADDR "192.168.0.42"
 #define SENDER_PORT 1337
-#define RECEIVER_ADDR "192.168.0.42"
+#define RECEIVER_ADDR "192.168.138.80"
 #define RECEIVER_PORT 1338
 
 int main(int argc, char **argv) {
