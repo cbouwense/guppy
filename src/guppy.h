@@ -108,8 +108,8 @@ typedef struct {
 } GupAllocator;
 
 typedef struct {
-    GupAllocator head;
-    GupArrayPtr  arena;
+    GupAllocator  head;
+    GupArrayPtr  *data;
 } GupArena;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -267,7 +267,7 @@ GupArrayChar   gup_array_char_create(GupAllocator *a);
 void           gup_array_char_destroy(GupArrayChar xs);
 GupArrayChar   gup_array_char_create_from_array(GupAllocator *a, char xs[], const int size);
 GupArrayChar   gup_array_char_create_from_cstr(GupAllocator *a, char xs[]);
-GupArrayChar   gup_array_char_copy(GupArrayChar xs);
+GupArrayChar   gup_array_char_copy(GupAllocator *a, GupArrayChar xs);
 bool           gup_array_char_equals(GupArrayChar xs, GupArrayChar ys);
 bool           gup_array_char_eq_cstr(GupArrayChar xs, const char *cstr, int cstr_length);
 bool           gup_array_char_contains(GupArrayChar xs, char x);
@@ -283,12 +283,12 @@ GupArrayChar   gup_array_char_sort(GupAllocator *a, GupArrayChar xs);
 GupArrayDouble gup_array_double_create(GupAllocator *a);
 void           gup_array_double_destroy(GupArrayDouble xs);
 GupArrayDouble gup_array_double_create_from_array(GupAllocator *a, double xs[], const int size);
-GupArrayDouble gup_array_double_copy(GupArrayDouble xs);
+GupArrayDouble gup_array_double_copy(GupAllocator *a, GupArrayDouble xs);
 bool           gup_array_double_equals(GupArrayDouble xs, GupArrayDouble ys);
 bool           gup_array_double_contains(GupArrayDouble xs, double x);
 void           gup_array_double_print(GupArrayDouble xs);
 void           gup_array_double_append(GupAllocator *a, GupArrayDouble *xs, double x);
-void           gup_array_double_prepend(GupArrayDouble *xs, double x);
+void           gup_array_double_prepend(GupAllocator *a, GupArrayDouble *xs, double x);
 void           gup_array_double_remove(GupArrayDouble *xs, double x, int count_to_remove);
 void           gup_array_double_remove_all(GupArrayDouble *xs, double x);
 GupArrayDouble gup_array_double_sort(GupAllocator *a, GupArrayDouble xs);
@@ -296,12 +296,12 @@ GupArrayDouble gup_array_double_sort(GupAllocator *a, GupArrayDouble xs);
 GupArrayFloat  gup_array_float_create(GupAllocator *a);
 void           gup_array_float_destroy(GupArrayFloat xs);
 GupArrayFloat  gup_array_float_create_from_array(GupAllocator *a, float xs[], const int size);
-GupArrayFloat  gup_array_float_copy(GupArrayFloat xs);
+GupArrayFloat  gup_array_float_copy(GupAllocator *a, GupArrayFloat xs);
 bool           gup_array_float_equals(GupArrayFloat xs, GupArrayFloat ys);
 bool           gup_array_float_contains(GupArrayFloat xs, float x);
 void           gup_array_float_print(GupArrayFloat xs);
 void           gup_array_float_append(GupAllocator *a, GupArrayFloat *xs, float x);
-void           gup_array_float_prepend(GupArrayFloat *xs, float x);
+void           gup_array_float_prepend(GupAllocator *a, GupArrayFloat *xs, float x);
 void           gup_array_float_remove(GupArrayFloat *xs, float x, int count_to_remove);
 void           gup_array_float_remove_all(GupArrayFloat *xs, float x);
 GupArrayFloat  gup_array_float_sort(GupAllocator *a, GupArrayFloat xs);
@@ -310,13 +310,13 @@ GupArrayFloat  gup_array_float_sort(GupAllocator *a, GupArrayFloat xs);
 GupArrayInt    gup_array_int_create(GupAllocator *a);
 void           gup_array_int_destroy(GupArrayInt xs);
 GupArrayInt    gup_array_int_create_from_array(GupAllocator *a, int xs[], const int size);
-GupArrayInt    gup_array_int_copy(GupArrayInt xs);
+GupArrayInt    gup_array_int_copy(GupAllocator *a, GupArrayInt xs);
 bool           gup_array_int_equals(GupArrayInt xs, GupArrayInt ys);
 bool           gup_array_int_contains(GupArrayInt xs, int x);
 void           gup_array_int_print(GupArrayInt xs);
 void           gup_array_int_debug(GupArrayInt xs);
 void           gup_array_int_append(GupAllocator *a, GupArrayInt *xs, int x);
-void           gup_array_int_prepend(GupArrayInt *xs, int x);
+void           gup_array_int_prepend(GupAllocator *a, GupArrayInt *xs, int x);
 void           gup_array_int_remove(GupArrayInt *xs, int x, int count_to_remove);
 void           gup_array_int_remove_all(GupArrayInt *xs, int x);
 GupArrayInt    gup_array_int_sort(GupAllocator *a, GupArrayInt xs);
@@ -324,12 +324,12 @@ GupArrayInt    gup_array_int_sort(GupAllocator *a, GupArrayInt xs);
 GupArrayLong   gup_array_long_create(GupAllocator *a);
 void           gup_array_short_destroy(GupArrayShort xs);
 GupArrayLong   gup_array_long_create_from_array(GupAllocator *a, long xs[], const int size);
-GupArrayLong   gup_array_long_copy(GupArrayLong xs);
+GupArrayLong   gup_array_long_copy(GupAllocator *a, GupArrayLong xs);
 bool           gup_array_long_equals(GupArrayLong xs, GupArrayLong ys);
 bool           gup_array_long_contains(GupArrayLong xs, long x);
 void           gup_array_long_print(GupArrayLong xs);
 void           gup_array_long_append(GupAllocator *a, GupArrayLong *xs, long x);
-void           gup_array_long_prepend(GupArrayLong *xs, long x);
+void           gup_array_long_prepend(GupAllocator *a, GupArrayLong *xs, long x);
 void           gup_array_long_remove(GupArrayLong *xs, long x, int count_to_remove);
 void           gup_array_long_remove_all(GupArrayLong *xs, long x);
 GupArrayLong   gup_array_long_sort(GupAllocator *a, GupArrayLong xs);
@@ -337,23 +337,23 @@ GupArrayLong   gup_array_long_sort(GupAllocator *a, GupArrayLong xs);
 GupArrayPtr    gup_array_ptr_create(GupAllocator *a);
 void           gup_array_ptr_destroy(GupArrayPtr xs);
 GupArrayPtr    gup_array_ptr_create_from_array(GupAllocator *a, void* xs[], const int size);
-GupArrayPtr    gup_array_ptr_copy(GupArrayPtr xs);
+GupArrayPtr    gup_array_ptr_copy(GupAllocator *a, GupArrayPtr xs);
 bool           gup_array_ptr_contains(GupArrayPtr xs, void* x);
 void           gup_array_ptr_print(GupArrayPtr xs);
 void           gup_array_ptr_append(GupAllocator *a, GupArrayPtr *xs, void* x);
-void           gup_array_ptr_prepend(GupArrayPtr *xs, void* x);
+void           gup_array_ptr_prepend(GupAllocator *a, GupArrayPtr *xs, void* x);
 void           gup_array_ptr_remove(GupArrayPtr *xs, void* x, int count_to_remove);
 void           gup_array_ptr_remove_all(GupArrayPtr *xs, void* x);
 
 GupArrayShort  gup_array_short_create(GupAllocator *a);
 void           gup_array_short_destroy(GupArrayShort xs);
 GupArrayShort  gup_array_short_create_from_array(GupAllocator *a, short xs[], const int size);
-GupArrayShort  gup_array_short_copy(GupArrayShort xs);
+GupArrayShort  gup_array_short_copy(GupAllocator *a, GupArrayShort xs);
 bool           gup_array_short_equals(GupArrayShort xs, GupArrayShort ys);
 bool           gup_array_short_contains(GupArrayShort xs, short x);
 void           gup_array_short_print(GupArrayShort xs);
 void           gup_array_short_append(GupAllocator *a, GupArrayShort *xs, short x);
-void           gup_array_short_prepend(GupArrayShort *xs, short x);
+void           gup_array_short_prepend(GupAllocator *a, GupArrayShort *xs, short x);
 void           gup_array_short_remove(GupArrayShort *xs, short x, int count_to_remove);
 void           gup_array_short_remove_all(GupArrayShort *xs, short x);
 GupArrayShort  gup_array_short_sort(GupAllocator *a, GupArrayShort xs);
@@ -362,13 +362,13 @@ GupArrayString gup_array_string_create(GupAllocator *a);
 void           gup_array_string_destroy(GupArrayString xs);
 GupArrayString gup_array_string_create_from_array(GupAllocator *a, GupString xs[], const int size);
 GupArrayString gup_array_string_create_from_cstrs(GupAllocator *a, char **cstrs, const int size);
-GupArrayString gup_array_string_copy(GupArrayString xs);
+GupArrayString gup_array_string_copy(GupAllocator *a, GupArrayString xs);
 bool           gup_array_string_equals(GupArrayString xs, GupArrayString ys);
 bool           gup_array_string_contains(GupArrayString xs, GupString x);
 void           gup_array_string_print(GupArrayString xs);
 void           gup_array_string_append(GupAllocator *a, GupArrayString *xs, GupString x);
 void           gup_array_string_append_cstr(GupAllocator *a, GupArrayString *xs, char cstr[]);
-void           gup_array_string_prepend(GupArrayString *xs, GupString x);
+void           gup_array_string_prepend(GupAllocator *a, GupArrayString *xs, GupString x);
 void           gup_array_string_prepend_cstr(GupArrayString *xs, char cstr[]);
 void           gup_array_string_remove(GupArrayString *xs, GupArrayChar x, int count_to_remove);
 void           gup_array_string_remove_all(GupArrayString *xs, GupString x);
@@ -378,7 +378,7 @@ GupArrayString gup_array_string_sort(GupAllocator *a, GupArrayString xs);
 GupArrayCstr   gup_array_cstr_create(GupAllocator *a);
 void           gup_array_cstr_destroy(GupArrayCstr xs);
 GupArrayCstr   gup_array_cstr_create_from_array(GupAllocator *a, char *xs[], const int size);
-GupArrayCstr   gup_array_cstr_copy(GupArrayCstr xs);
+GupArrayCstr   gup_array_cstr_copy(GupAllocator *a, GupArrayCstr xs);
 bool           gup_array_cstr_equals(GupArrayCstr xs, GupArrayCstr ys);
 bool           gup_array_cstr_contains(GupArrayCstr xs, char *x);
 void           gup_array_cstr_print(GupArrayCstr xs);
@@ -657,19 +657,14 @@ void            gup_string_append_str(GupAllocator *a, GupString *str, GupString
 void            gup_string_append_cstr(GupAllocator *a, GupString *str, const char *cstr_to_append);
 void            gup_string_prepend(GupString *str, char c);
 void            gup_string_prepend(GupAllocator *a, GupString *str, char c);
-GupString       gup_string_map(GupString str, char (*fn)(char));
 GupString       gup_string_map(GupAllocator *a, GupString str, char (*fn)(char));
 void            gup_string_map_in_place(GupString str, char (*fn)(char));
-GupString       gup_string_filter(GupString str, bool (*fn)(char));
 GupString       gup_string_filter(GupAllocator *a, GupString str, bool (*fn)(char));
 void            gup_string_filter_in_place(GupString *str, bool (*fn)(char));
 char            gup_string_reduce(GupString str, char (*fn)(char, char), char start);
-bool            gup_string_find(GupString str, bool (*fn)(char), char *out);
 bool            gup_string_find(GupAllocator *a, GupString str, bool (*fn)(char), char *out);
-GupString       gup_string_trim_char(GupString str, char c);
 GupString       gup_string_trim_char(GupAllocator *a, GupString str, char c);
 void            gup_string_trim_char_in_place(GupString *str, char c);
-GupString       gup_string_trim_fn(GupString str, bool (*fn)(char));
 GupString       gup_string_trim_fn(GupAllocator *a, GupString str, bool (*fn)(char));
 void            gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char));
 GupString       gup_string_without_whitespace(GupString str);
@@ -679,11 +674,8 @@ bool            gup_string_starts_with_cstr(GupString str, const char* cstr);
 bool            gup_string_ends_with(GupString str, GupString sub_str);
 bool            gup_string_ends_with_cstr(GupString str, const char* cstr);
 bool            gup_string_to_int(GupString str, int *out);
-char           *gup_string_to_cstr(GupString str);
 char           *gup_string_to_cstr(GupAllocator *a, GupString str);
-GupArrayString  gup_string_split(GupString str, char c);
 GupArrayString  gup_string_split(GupAllocator *a, GupString str, char c);
-GupArrayString  gup_string_split_by_cstr(GupString str, char *sub_str);
 GupArrayString  gup_string_split_by_cstr(GupAllocator *a, GupString str, char *sub_str);
 
 // Assert
@@ -759,9 +751,8 @@ void *gup_alloc(GupAllocator *head, size_t bytes) {
         case GUP_ALLOCATOR_TYPE_MALLOC: {
             return malloc(bytes);
         } break;
-        case GUP_ALLOCATOR_TYPE_ARENA: { 
-            GupArena *arena_head = (GupArena *)head;
-            return gup_arena_alloc(arena_head->arena, bytes);
+        case GUP_ALLOCATOR_TYPE_ARENA: { ;
+            return gup_arena_alloc((GupArena *)head, bytes);
         } break;
         default: {
             printf("ERROR: unknown allocator type.\n");
@@ -788,49 +779,42 @@ void gup_free(GupAllocator *head, void *ptr) {
 // Arena ---------------------------------------------------------------------------------------------------------------
 
 GupArena gup_arena_create() {
+    GupAllocator head = (GupAllocator) {
+        .type = GUP_ALLOCATOR_TYPE_ARENA,
+    };
+
     return (GupArena) {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = malloc(GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void *)),
+        .head  = head,
+        .arena = &(gup_array_ptr_create(&head)),
     };
 }
 
 void gup_arena_destroy(GupArena *a) {
-    gup_arena_free(a);
-    free(a->data);
+    // gup_arena_free(a);
+    gup_array_ptr_destroy(*a->data);
 }
 
 void *gup_arena_alloc(GupArena *a, size_t bytes) {
-    if (a->count == a->capacity) {
-        const int new_capacity = a->capacity == 0 ? 1 : a->capacity * 2;
-        a->data = realloc(a->data, new_capacity * sizeof(void *));
-        a->capacity = new_capacity;
+    if (a->data->count == a->data->capacity) {
+        const int new_capacity = a->data->capacity == 0 ? 1 : a->data->capacity * 2;
+        a->data->data = realloc(a->data->data, new_capacity * sizeof(void *));
+        a->data->capacity = new_capacity;
     }
 
     void *ptr = malloc(bytes);
     gup_assert(ptr != NULL);
 
-    a->data[a->count] = ptr;
-    a->count++;
+    a->data->data[a->data->count] = ptr;
+    a->data->count++;
 
     return ptr;
 }
 
-void *_gup_arena_alloc(GupArena *a, size_t bytes, const char *file, int line) {
-    printf("Allocation of %zu bytes from %s:%d\n", bytes, file, line);
-
-    return gup_arena_alloc(a, bytes);
-}
-
-#ifdef GUPPY_DEBUG_MEMORY
-#define gup_arena_alloc(a, bytes) _gup_arena_alloc(a, bytes, __FILE__, __LINE__)
-#endif // GUPPY_DEBUG_MEMORY
-
 void gup_arena_free(GupArena *a) {
-    for (int i = 0; i < a->count; i++) {
-        free(a->data[i]);
+    for (int i = 0; i < a->data->count; i++) {
+        free(a->data->data[i]);
     }
-    a->count = 0;
+    a->data->count = 0;
 }
 
 // Dynamic Arrays ----------------------------------------------------------------------------------
@@ -1049,7 +1033,7 @@ GupArrayLong gup_array_long_create_from_array(GupAllocator *a, long xs[], const 
     return new;
 }
 
-GupArrayPtr gup_array_ptr_create_from_array(GupAllocator *a, ptr xs[], const int size) {
+GupArrayPtr gup_array_ptr_create_from_array(GupAllocator *a, void *xs[], const int size) {
     int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
 
     GupArrayPtr new = {
@@ -1063,13 +1047,13 @@ GupArrayPtr gup_array_ptr_create_from_array(GupAllocator *a, ptr xs[], const int
     return new;
 }
 
-GupArrayString gup_array_str_create_from_array(GupAllocator *a, str xs[], const int size) {
+GupArrayString gup_array_str_create_from_array(GupAllocator *a, GupArrayChar xs[], const int size) {
     int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
 
     GupArrayString new = {
         .capacity = size_to_alloc,
-        .count = size,
-        .data = gup_alloc(a, size_to_alloc * sizeof(GupArrayChar)),
+        .count    = size,
+        .data     = gup_alloc(a, size_to_alloc * sizeof(GupArrayChar)),
     };
 
     memcpy(new.data, xs, size);
@@ -1081,13 +1065,13 @@ GupArrayString gup_array_string_create_from_cstrs(GupAllocator *a, char **cstrs,
     GupArrayString new = gup_array_string_create(a);
     
     for (int i = 0; i < size; i++) {
-        gup_array_string_append(a, &new, gup_array_char_create_from_cstr_arena(a, cstrs[i]));
+        gup_array_string_append(a, &new, gup_array_char_create_from_cstr(a, cstrs[i]));
     }
 
     return new;
 }
 
-GupArrayCstr gup_array_cstr_create_from_array(GupAllocator *a, cstr xs[], const int size) {
+GupArrayCstr gup_array_cstr_create_from_array(GupAllocator *a, char *xs[], const int size) {
     int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
 
     GupArrayCstr new = {
@@ -1675,7 +1659,7 @@ void gup_array_string_append_cstr(GupAllocator *a, GupArrayString *xs, char *cst
         xs->capacity = new_capacity;
     }
 
-    xs->data[xs->count] = gup_array_char_create_from_cstr_arena(a, cstr);
+    xs->data[xs->count] = gup_array_char_create_from_cstr(a, cstr);
     xs->count++;
 }
 
@@ -3233,7 +3217,7 @@ bool gup_file_write_lines(GupAllocator *a, GupArrayString lines_to_write, const 
     }
 
     for (int i = 0; i < lines_to_write.count; i++) {
-        fputs(gup_string_to_cstr_arena(a, lines_to_write.data[i]), fp);
+        fputs(gup_string_to_cstr(a, lines_to_write.data[i]), fp);
         fputs("\n", fp);
     }
 
@@ -3267,7 +3251,7 @@ void gup_file_append_line(GupAllocator *a, GupString line_to_write, const char *
     FILE *fp = fopen(file_path, "a");
     gup_assert_verbose(fp != NULL, "tried opening a file to append to it, but wasn't able to.");
 
-    fprintf(fp, "%s\n", gup_string_to_cstr_arena(a, line_to_write));
+    fprintf(fp, "%s\n", gup_string_to_cstr(a, line_to_write));
 
     fclose(fp);
 }
@@ -3286,7 +3270,7 @@ void gup_file_append_lines(GupAllocator *a, GupArrayString lines_to_write, const
     gup_assert_verbose(fp != NULL, "tried opening a file to append to it, but wasn't able to.");
 
     for (int i = 0; i < lines_to_write.count; i++) {
-        fprintf(fp, "%s\n", gup_string_to_cstr_arena(a, lines_to_write.data[i]));
+        fprintf(fp, "%s\n", gup_string_to_cstr(a, lines_to_write.data[i]));
     }
 
     fclose(fp);
@@ -3319,8 +3303,8 @@ void gup_file_append_lines_cstrs(char **lines_to_write, const int line_count, co
 
 // TODO: do not allocate memory for this lol
 int gup_string_compare(GupAllocator *a, GupString x, GupString y) {
-    const char *x_cstr = gup_string_to_cstr_arena(a, x);
-    const char *y_cstr = gup_string_to_cstr_arena(a, y);
+    const char *x_cstr = gup_string_to_cstr(a, x);
+    const char *y_cstr = gup_string_to_cstr(a, y);
     
     return strcmp(x_cstr, y_cstr);
 }
@@ -5338,7 +5322,7 @@ bool gup_settings_get_cstr(const char *key, GupString *out) {
 }
 
 bool gup_settings_get_cstr(GupAllocator *a, const char *key, GupString *out) {
-    return gup_settings_get_cstr_from_file_arena(a, key, "src/settings.txt", out);
+    return gup_settings_get_cstr_from_file(a, key, "src/settings.txt", out);
 }
 
 bool gup_settings_get_cstr_from_file(const char *key, const char *file_path, GupString *out) {
@@ -5370,11 +5354,11 @@ defer:
 
 bool gup_settings_get_cstr_from_file(GupAllocator *a, const char *key, const char *file_path, GupString *out) {
     GupArrayString tokens;
-    GupArrayString file_lines = gup_file_read_lines_arena(a, file_path);
+    GupArrayString file_lines = gup_file_read_lines(a, file_path);
 
     for (int i = 0; i < file_lines.count; i++) {
         GupString line = file_lines.data[i];
-        tokens = gup_string_split_arena(a, line, '=');
+        tokens = gup_string_split(a, line, '=');
 
         // If we have two tokens, we define that as a key-value pair.
         if (tokens.count == 2) {
@@ -5382,7 +5366,7 @@ bool gup_settings_get_cstr_from_file(GupAllocator *a, const char *key, const cha
             GupString line_value = tokens.data[1];
 
             if (gup_string_eq_cstr(line_key, key)) {
-                *out = gup_string_copy_arena(a, line_value);
+                *out = gup_string_copy(a, line_value);
                 return true;
             }
         }
