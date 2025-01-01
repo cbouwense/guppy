@@ -3,9 +3,9 @@
 void test_gup_arena_create(void) {
     GupArena a = gup_arena_create();
 
-    gup_assert(a.capacity == 256);
-    gup_assert(a.count == 0);
-    gup_assert(a.data != NULL);
+    gup_assert(a.data->capacity == 256);
+    gup_assert(a.data->count == 0);
+    gup_assert(a.data->data != NULL);
 
     gup_arena_destroy(&a);
 }
@@ -51,10 +51,10 @@ void test_gup_arena_can_be_freed_and_not_leak_memory(void) {
 void test_gup_arena_can_allocate_a_bunch_of_strings(void) {
     GupArena a = gup_arena_create();
 
-    GupString str = gup_string(&a, "foo");
-    gup_string_append(&str, 'b');
-    gup_string_append(&str, 'a');
-    gup_string_append(&str, 'r');
+    GupString str = gup_string((GupAllocator *)&a, "foo");
+    gup_string_append((GupAllocator *)&a, &str, 'b');
+    gup_string_append((GupAllocator *)&a, &str, 'a');
+    gup_string_append((GupAllocator *)&a, &str, 'r');
 
     gup_arena_destroy(&a);
 }
@@ -65,19 +65,19 @@ void test_gup_arena_with_file_stuff(void) {
 
     GupArrayString tokens;
     const char *key = "foo";
-    GupArrayString file_lines = gup_file_read_lines_arena(&a, "./src/settings.txt");
+    GupArrayString file_lines = gup_file_read_lines(&(a.head), "./src/settings.txt");
 
     for (int i = 0; i < file_lines.count; i++) {
         GupString line = file_lines.data[i];
-        tokens = gup_string_split_arena(&a, line, '=');
+        tokens = gup_string_split(&(a.head), line, '=');
 
         // If we have two tokens, we define that as a key-value pair.
         if (tokens.count == 2) {
             GupString line_key = tokens.data[0];
             GupString line_value = tokens.data[1];
 
-            if (gup_string_eq_cstr(line_key, key)) {
-                gup_string_copy_arena(&a, line_value);
+            if (gup_string_equals_cstr(line_key, key)) {
+                gup_string_copy(&(a.head), line_value);
             }
         }
     }

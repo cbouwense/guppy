@@ -9,7 +9,11 @@
     "cerrno": "c",
     "functional": "c",
     "typeinfo": "c",
-    "unordered_map": "c"
+    "unordered_map": "c",
+    "__bit_reference": "c",
+    "__split_buffer": "c",
+    "string": "c",
+    "vector": "c"
   },
   "C_Cpp.errorSquiggles": "disabled",
   "C_Cpp_Runner.cCompilerPath": "gcc",

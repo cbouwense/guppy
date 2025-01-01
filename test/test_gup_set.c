@@ -78,8 +78,6 @@ void test_has_is_false_before_adding_anything(void) {
     GupSetChar set = gup_set_char_create();
 
     gup_assert_verbose(!gup_set_char_has(set, 'a'), "A Set thinks that it has the character 'a' even though it never has anything at all inserted.");
-
-    gup_set_char_destroy(set);
 }
 
 void test_has_is_false_after_adding_something_different(void) {
@@ -88,8 +86,6 @@ void test_has_is_false_after_adding_something_different(void) {
     gup_set_char_add(&set, 'a');
 
     gup_assert_verbose(!gup_set_char_has(set, 'b'), "A Set thinks that it has the character 'b' even though it only had 'a' inserted.");
-
-    gup_set_char_destroy(set);
 }
 
 void test_has_is_true_after_adding_something(void) {
@@ -98,8 +94,6 @@ void test_has_is_true_after_adding_something(void) {
     gup_set_char_add(&set, 'a');
 
     gup_assert_verbose(gup_set_char_has(set, 'a'), "A Set doesn't realize it has 'a' after it was inserted.");
-
-    gup_set_char_destroy(set);
 }
 
 void test_sets_general_functionality(void) {
@@ -135,8 +129,6 @@ void test_sets_general_functionality(void) {
     gup_assert_verbose(!gup_set_char_has(set, 'b'), "A Set thinks it still has 'b' after it was removed.");
     gup_assert_verbose(!gup_set_char_has(set, 'c'), "A Set thinks it has has 'c' but it was never inserted.");
     gup_assert(gup_set_char_size(set) == 0);
-
-    gup_set_char_destroy(set);
 }
 
 void test_char_sets_exhaustively(void) {
@@ -161,17 +153,14 @@ void test_char_sets_exhaustively(void) {
     for (int i = 0; i < 256; i++) {
         gup_assert(gup_set_char_has(signed_set, i));
     }
-
-    gup_set_char_destroy(signed_set);
-    gup_set_char_destroy(unsigned_set);
 }
 
 void test_float_sets(void) {
-    GupSetFloat set = gup_set_float_create();
+    GupSetFloat set = gup_set_float_create(NULL);
 
-    gup_set_float_add(&set, 13.37);
-    gup_set_float_add(&set, 0.42);
-    gup_set_float_add(&set, 9000.1);
+    gup_set_float_add(NULL, &set, 13.37);
+    gup_set_float_add(NULL, &set, 0.42);
+    gup_set_float_add(NULL, &set, 9000.1);
     
     gup_assert(gup_set_float_has(set, 13.37));
     gup_assert(gup_set_float_has(set, 0.42));
@@ -184,12 +173,12 @@ void test_float_sets(void) {
 }
 
 void test_ptr_sets(void) {
-    GupSetPtr set = gup_set_ptr_create();
+    GupSetPtr set = gup_set_ptr_create(NULL);
 
     int a, b, c;
     
-    gup_set_ptr_add(&set, &a);
-    gup_set_ptr_add(&set, &c);
+    gup_set_ptr_add(NULL, &set, &a);
+    gup_set_ptr_add(NULL, &set, &c);
 
     gup_assert(gup_set_ptr_has(set, &a));
     gup_assert(!gup_set_ptr_has(set, &b));
@@ -200,28 +189,28 @@ void test_ptr_sets(void) {
 
 void test_string_set(void) {
     GupArena a = gup_arena_create();
-    GupSetString set = gup_set_string_create_arena(&a);
+    GupSetString set = gup_set_string_create((GupAllocator *)&a);
     
-    GupString str1 = gup_string(&a, "drink");
-    GupString str2 = gup_string(&a, "da");
-    GupString str3 = gup_string(&a, "poopie");
+    GupString str1 = gup_string((GupAllocator *)&a, "drink");
+    GupString str2 = gup_string((GupAllocator *)&a, "da");
+    GupString str3 = gup_string((GupAllocator *)&a, "poopie");
 
-    gup_set_string_add_arena(&a, &set, str1);
-    gup_set_string_add_arena(&a, &set, str3);
+    gup_set_string_add((GupAllocator *)&a, &set, str1);
+    gup_set_string_add((GupAllocator *)&a, &set, str3);
 
-    gup_assert(gup_set_string_has(set, str1));
+    gup_assert( gup_set_string_has(set, str1));
     gup_assert(!gup_set_string_has(set, str2));
-    gup_assert(gup_set_string_has(set, str3));
+    gup_assert( gup_set_string_has(set, str3));
 
     gup_arena_destroy(&a);
 }
 
 void test_sets_huge_mode(void) {
     const int size = 1000000;
-    GupSetInt set = gup_set_int_create_size(size);
+    GupSetInt set = gup_set_int_create_size(NULL, size);
 
     for (int i = 0; i < size; i++) {
-        gup_set_int_add(&set, i);
+        gup_set_int_add(NULL, &set, i);
     }
 
     gup_assert(gup_set_int_size(set) == size);
@@ -235,10 +224,10 @@ void test_sets_huge_mode(void) {
 
 void test_sets_huge_mode_default_size(void) {
     const int size = 8192 * 128;
-    GupSetInt set = gup_set_int_create();
+    GupSetInt set = gup_set_int_create(NULL);
 
     for (int i = 0; i < size; i += 2) {
-        gup_set_int_add(&set, i);
+        gup_set_int_add(NULL, &set, i);
     }
 
     gup_assert(gup_set_int_size(set) == size / 2);
@@ -254,11 +243,11 @@ void test_sets_huge_mode_default_size(void) {
 }
 
 void test_removing(void) {
-    GupSetInt set = gup_set_int_create();
+    GupSetInt set = gup_set_int_create(NULL);
 
-    gup_set_int_add(&set, 1);
-    gup_set_int_add(&set, 2);
-    gup_set_int_add(&set, 3);
+    gup_set_int_add(NULL, &set, 1);
+    gup_set_int_add(NULL, &set, 2);
+    gup_set_int_add(NULL, &set, 3);
 
     gup_set_int_remove(&set, 1);
     gup_set_int_remove(&set, 2);
