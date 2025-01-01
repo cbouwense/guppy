@@ -23,17 +23,17 @@ void test_gup_cstr_array_flatten(GupAllocator *a) {
     }
 }
 
-void test_gup_cstr_length(GupAllocator *a) {
+void test_gup_cstr_length_excluding_null(GupAllocator *a) {
     { // Stack allocated cstrs
-        gup_assert(gup_cstr_length("") == 0);
-        gup_assert(gup_cstr_length("a") == 1);
-        gup_assert(gup_cstr_length("Hello, World!") == 13);
+        gup_assert(gup_cstr_length_excluding_null("") == 0);
+        gup_assert(gup_cstr_length_excluding_null("a") == 1);
+        gup_assert(gup_cstr_length_excluding_null("Hello, World!") == 13);
     }
 
     {
         char *empty_heap_cstr = gup_alloc(a, 1);
         empty_heap_cstr[0] = '\0';
-        gup_assert(gup_cstr_length(empty_heap_cstr) == 0);
+        gup_assert(gup_cstr_length_excluding_null(empty_heap_cstr) == 0);
 
         char *heap_str = gup_alloc(a, 5 * sizeof(char));
         heap_str[0] = 'a';
@@ -41,7 +41,7 @@ void test_gup_cstr_length(GupAllocator *a) {
         heap_str[2] = 'c';
         heap_str[3] = 'd';
         heap_str[4] = '\0';
-        gup_assert(gup_cstr_length(heap_str) == 4);
+        gup_assert(gup_cstr_length_excluding_null(heap_str) == 4);
     }
 }
 
@@ -59,37 +59,41 @@ void test_gup_cstr_equals(GupAllocator *a) {
     
     { // Heap allocated
         { // Empty strings are equal.
-            char *x = NULL, *y = NULL;
+            char *x = gup_alloc(a, 1);
+            char *y = gup_alloc(a, 1);
 
-            gup_cstr_copy(a, x, "\0");
-            gup_cstr_copy(a, y, "\0");
+            gup_cstr_copy(x, "\0");
+            gup_cstr_copy(y, "\0");
             
             gup_assert(gup_cstr_equals(x, y));
         }
 
         { // Equivalent strings should be considered equal.
-            char *x = NULL, *y = NULL;
+            char *x = gup_alloc(a, 6);
+            char *y = gup_alloc(a, 6);
 
-            gup_cstr_copy(a, x, "Hello");
-            gup_cstr_copy(a, y, "Hello");
+            gup_cstr_copy(x, "Hello");
+            gup_cstr_copy(y, "Hello");
             
             gup_assert(gup_cstr_equals(x, y));
         }
 
         { // Different strings should not be considered equal.
-            char *x = NULL, *y = NULL;
+            char *x = gup_alloc(a, 6);
+            char *y = gup_alloc(a, 6);
 
-            gup_cstr_copy(a, x, "Hello");
-            gup_cstr_copy(a, y, "World");
+            gup_cstr_copy(x, "Hello");
+            gup_cstr_copy(y, "World");
             
             gup_assert(gup_cstr_equals(x, y) == false);
         }
 
         { // Different source strings, but the same slices are equal.
-            char *x = NULL, *y = NULL;
+            char *x = gup_alloc(a, 6);
+            char *y = gup_alloc(a, 6);
 
-            gup_cstr_copy(a, x, "Hello");
-            gup_cstr_copy_n(a, y, "Hello World", 5);
+            gup_cstr_copy(x, "Hello");
+            gup_cstr_copy_n(y, "Hello World", 5);
 
             gup_assert(gup_cstr_equals(x, y) == true);
         }
@@ -100,7 +104,7 @@ void test_gup_cstr(void) {
     GupArena a = gup_arena_create();
 
     test_gup_cstr_array_flatten((GupAllocator *)&a);
-    test_gup_cstr_length((GupAllocator *)&a);
+    test_gup_cstr_length_excluding_null((GupAllocator *)&a);
     test_gup_cstr_equals((GupAllocator *)&a);
 
     gup_arena_destroy(&a);

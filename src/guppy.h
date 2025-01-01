@@ -664,11 +664,11 @@ GupArrayString  gup_string_split_by_cstr(GupAllocator *a, GupString str, char *s
 
 // C-string utilities
 char *gup_cstr_array_flatten(GupAllocator *a, char **strs); // Assumes a null terminated string.
-int   gup_cstr_length(const char* cstr); // Assumes a null terminated string. Excludes the null from the length.
+int   gup_cstr_length_excluding_null(const char* cstr); // Assumes a null terminated string. Excludes the null from the length.
 int   gup_cstr_length_including_null(const char* cstr); // Assumes a null terminated string. Excludes the null from the length.
 bool  gup_cstr_equals(const char *a, const char* b);
-void  gup_cstr_copy(GupAllocator *a, char *to, const char *from);
-void  gup_cstr_copy_n(GupAllocator *a, char *to, const char *from, int n);
+void  gup_cstr_copy(char *to, const char *from);
+void  gup_cstr_copy_n(char *to, const char *from, int n);
 void  gup_cstr_print(const char *cstr);
 
 // Math
@@ -744,8 +744,12 @@ void gup_free(GupAllocator *head, void *ptr) {
     if (head == NULL) free(ptr);
     
     switch (head->type) {
-        case GUP_ALLOCATOR_TYPE_MALLOC: free(ptr);
-        case GUP_ALLOCATOR_TYPE_ARENA:  printf("WARNING: Tried to free memory that is within an arena. You either don't actually want to do that, or if you do, you probably should not be using an arena to allocate that memory.\n");
+        case GUP_ALLOCATOR_TYPE_MALLOC: {
+            free(ptr);
+        } break;
+        case GUP_ALLOCATOR_TYPE_ARENA:  {
+            printf("WARNING: Tried to free memory that is within an arena. You either don't actually want to do that, or if you do, you probably should not be using an arena to allocate that memory.\n");
+        } break;
         default: {
             printf("ERROR: unknown allocator type.\n");
             exit(1);
@@ -2971,11 +2975,9 @@ bool gup_file_read_lines_as_cstrs(GupAllocator *a, const char *file_path, char *
 
     char butter[65536];
     for (int i = 0; fgets(butter, 65536, fp) != NULL; i++) {
-        const int line_length = gup_cstr_length(butter);
+        const int line_length = gup_cstr_length_excluding_null(butter);
         lines[i] = (char *) gup_alloc(a, sizeof(char *) * line_length);
-        // Overwrite the newline with a null terminator, since this function does not keep newlines.
-        butter[line_length-1] = '\0';
-        gup_cstr_copy(a, lines[i], butter);
+        gup_cstr_copy_n(lines[i], butter, line_length-1);
     }
 
     *out = lines;
@@ -3009,8 +3011,8 @@ bool gup_file_read_lines_as_cstrs_keep_newlines(GupAllocator *a, const char *fil
 
     char buffer[65536];
     for (int i = 0; fgets(buffer, 65536, fp) != NULL; i++) {
-        lines[i] = (char *) gup_alloc(a, sizeof(char *) * gup_cstr_length(buffer));
-        gup_cstr_copy(a, lines[i], buffer);
+        lines[i] = (char *) gup_alloc(a, sizeof(char *) * gup_cstr_length_excluding_null(buffer));
+        gup_cstr_copy(lines[i], buffer);
     }
 
     *out = lines;
@@ -3287,7 +3289,7 @@ void gup_string_append_str(GupAllocator *a, GupString *str, GupString str_to_app
 }
 
 void gup_string_append_cstr(GupAllocator *a, GupString *str, const char *cstr_to_append) {
-    const int cstr_len = gup_cstr_length(cstr_to_append);
+    const int cstr_len = gup_cstr_length_excluding_null(cstr_to_append);
     for (int i = 0; i < cstr_len; i++) {
         gup_array_char_append(a, str, cstr_to_append[i]);
     }
@@ -3386,14 +3388,14 @@ GupArrayString gup_string_split_by_cstr(GupAllocator *a, GupString str, char *su
         // TODO: have a macro for this, basically just making a string view
         GupString source = (GupString) {
             .capacity = str.capacity,
-            .count    = gup_cstr_length(sub_str), // TODO: slow?
+            .count    = gup_cstr_length_excluding_null(sub_str), // TODO: slow?
             .data     = str.data + i,
         };
 
         if (gup_string_equals_cstr(source, sub_str)) {
             gup_array_string_append(a, &tokens, token);
             token = gup_string_create((GupAllocator *)&local);
-            i += gup_cstr_length(sub_str) - 1;
+            i += gup_cstr_length_excluding_null(sub_str) - 1;
         } else if (i == str.count-1) {
             gup_string_append((GupAllocator *)&local, &token, str.data[i]);
             gup_array_string_append(a, &tokens, token);
@@ -3428,7 +3430,7 @@ bool gup_string_starts_with(GupString str, GupString sub_str) {
 }
 
 bool gup_string_starts_with_cstr(GupString str, const char* cstr) {
-    const int cstr_len = gup_cstr_length(cstr);
+    const int cstr_len = gup_cstr_length_excluding_null(cstr);
 
     // Don't count string as "starting with" empty strings.
     if (cstr_len == 0) {
@@ -3470,7 +3472,7 @@ bool gup_string_ends_with(GupString str, GupString sub_str) {
 }
 
 bool gup_string_ends_with_cstr(GupString str, const char* cstr) {
-    const int cstr_len = gup_cstr_length(cstr);
+    const int cstr_len = gup_cstr_length_excluding_null(cstr);
 
     // Don't count string as "ending with" empty strings.
     if (cstr_len == 0) {
@@ -3524,7 +3526,7 @@ int _gup_hash_char_index(const char x) {
 
 int _gup_hash_double_index(const double key, const int modulo) {
     char input_cstr[1024];
-    sprintf(input_cstr, "%f", key); // TODO: don't use sprintf
+    snprintf(input_cstr, 1024, "%f", key);
     
     const u32 hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % modulo;
@@ -3536,7 +3538,7 @@ int _gup_hash_double_index(const double key, const int modulo) {
 
 int _gup_hash_float_index(const float key, const int modulo) {
     char input_cstr[1024];
-    sprintf(input_cstr, "%f", key); // TODO: don't use sprintf
+    snprintf(input_cstr, 1024, "%f", key);
     
     const u32 hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % modulo;
@@ -3548,7 +3550,7 @@ int _gup_hash_float_index(const float key, const int modulo) {
 
 int _gup_hash_ptr_index(const void* key, const int modulo) {
     char input_cstr[1024];
-    sprintf(input_cstr, "%p", key); // TODO: don't use sprintf
+    snprintf(input_cstr, 1024, "%p", key);
     
     const u32 hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % modulo;
@@ -5297,7 +5299,7 @@ char *gup_cstr_array_flatten(GupAllocator *a, char **strings) {
 }
 
 // Assumes a null terminated string. Excludes the null terminator from the returned length.
-int gup_cstr_length(const char *cstr) {
+int gup_cstr_length_excluding_null(const char *cstr) {
     int i = 0;
     while (cstr[i] != '\0') {
         i++;
@@ -5316,11 +5318,11 @@ int gup_cstr_length_including_null(const char *cstr) {
 
 // Assumes null terminated strings
 bool gup_cstr_equals(const char *a, const char* b) {
-    if (gup_cstr_length(a) != gup_cstr_length(b)) {
+    if (gup_cstr_length_excluding_null(a) != gup_cstr_length_excluding_null(b)) {
         return false;
     }
 
-    for (int i = 0; i < gup_cstr_length(a); i++) {
+    for (int i = 0; i < gup_cstr_length_excluding_null(a); i++) {
         if (a[i] != b[i]) {
             return false;
         }
@@ -5329,26 +5331,29 @@ bool gup_cstr_equals(const char *a, const char* b) {
     return true;
 }
 
-// Assumes null terminated "from" string. Allocates space for the "to" string.
-void gup_cstr_copy(GupAllocator *a, char *to, const char *from) {
+/**
+ * Assumes null terminated "from" string.
+ * Assumes "to" has enough memory allocated to fit "from".
+ * Null terminates the "to" string.
+ */
+ void gup_cstr_copy(char *to, const char *from) {
     const int from_len = gup_cstr_length_including_null(from);
 
-    to = gup_alloc(a, from_len);
-    
     for (int i = 0; i < from_len; i++) {
         to[i] = from[i];
     }
 }
 
-// Allocates space for the "to" string. for n+1 characters (+1 for the null terminator).
-// Null terminates the "to" string.
-// ```
-//   gup_cstr_copy_n(a, to, "Hello World", 5);
-// ```
-// this would result with `to` pointing to a chunk of memory with the contents 'H''e''l''l''o''\0'.
-//
-void gup_cstr_copy_n(GupAllocator *a, char *to, const char *from, int n) {
-    to = gup_alloc(a, n);
+/**
+ * Assumes "to" has enough memory allocatd for for n+1 characters (+1 for the null terminator).
+ * Null terminates the "to" string.
+ * ```
+ * char *to = gup_alloc(a, 6);
+ * gup_cstr_copy_n(a, to, "Hello World", 5);
+ * ```
+ * this would result with `to` pointing to a chunk of memory with the contents 'H''e''l''l''o''\0'.
+ */
+void gup_cstr_copy_n(char *to, const char *from, int n) {
     for (int i = 0; i < n; i++) {
         to[i] = from[i];
     }
