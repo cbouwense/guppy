@@ -6,6 +6,11 @@
 #define RECEIVER_PORT 1338
 
 int main(int argc, char **argv) {
+  if (argc == 1) {
+    printf("Specify sender or receiver\n");
+    return 1;
+  }
+
   if (strcmp(argv[1], "sender") == 0) {
     GupServer server = gup_server_udp_create(SENDER_ADDR, SENDER_PORT);
 
