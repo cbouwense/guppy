@@ -172,6 +172,7 @@ void test_gup_array_string_create_from_array(void) {
     gup_array_char_destroy(hello);
     gup_array_char_destroy(world);
     gup_array_char_destroy(bang);
+    gup_array_string_destroy(strs);
 }
 
 void test_gup_array_string_copy(void) {
@@ -189,14 +190,17 @@ void test_gup_array_string_copy(void) {
     gup_array_char_destroy(world);
     gup_array_char_destroy(bang);
     gup_array_string_destroy(strs);
+    gup_array_char_destroy(strs_copy.data[0]);
+    gup_array_char_destroy(strs_copy.data[1]);
+    gup_array_char_destroy(strs_copy.data[2]);
     gup_array_string_destroy(strs_copy);
 }
 
 void test_gup_array_string_append(void) {
-    GupArrayChar hello = gup_array_char_create_from_cstr(NULL, "Hello");
-    GupArrayChar world = gup_array_char_create_from_cstr(NULL, "World");
-    GupArrayChar bang = gup_array_char_create_from_cstr(NULL,  "!");
-    GupArrayChar char_arrays[] = {hello, world, bang};
+    GupArrayChar hello              = gup_array_char_create_from_cstr(NULL, "Hello");
+    GupArrayChar world              = gup_array_char_create_from_cstr(NULL, "World");
+    GupArrayChar bang               = gup_array_char_create_from_cstr(NULL,  "!");
+    GupArrayChar char_arrays[]      = {hello, world, bang};
     GupArrayString strs_create_from = gup_array_string_create_from_array(NULL, char_arrays, gup_array_len(char_arrays));
 
     GupArrayString strs = gup_array_string_create(NULL);
@@ -206,10 +210,11 @@ void test_gup_array_string_append(void) {
 
     gup_assert(gup_array_string_equals(strs, strs_create_from));
 
-    free(hello.data);
-    free(world.data);
-    free(bang.data);
-    // free(strs_create_from.data);
+    gup_array_char_destroy(hello);
+    gup_array_char_destroy(world);
+    gup_array_char_destroy(bang);
+    gup_array_string_destroy(strs);
+    gup_array_string_destroy(strs_create_from);
 }
 
 void test_gup_array_contains(void) {
@@ -377,25 +382,29 @@ void test_gup_array_string_find(void) {
         gup_assert(result == false);
         gup_assert(found.count == 0);
 
+        gup_array_char_destroy(strings.data[0]);
+        gup_array_char_destroy(strings.data[1]);
+        gup_array_char_destroy(strings.data[2]);
         gup_array_string_destroy(strings);
     }
 
     { // Arrays with acceptable elements produce the first one
-        char *string_arr[3] = {"Hello", "world", "!"};
+        char *string_arr[3]    = {"Hello", "world", "!"};
         GupArrayString strings = gup_array_string_create_from_cstrs(NULL, string_arr, 3);
-        GupString found = {0};
+        GupString found        = {0};
 
-        bool result = gup_array_string_find(strings, is_all_undercase, &found);
-
-        gup_assert(result == true);
+        gup_assert(gup_array_string_find(strings, is_all_undercase, &found));
         gup_assert(gup_array_char_equals_cstr(found, "world"));
 
         gup_array_string_prepend_cstr(NULL, &strings, "foo");
-        result = gup_array_string_find(strings, is_all_undercase, &found);
 
-        gup_assert(result == true);
+        gup_assert(gup_array_string_find(strings, is_all_undercase, &found));
         gup_assert(gup_array_char_equals_cstr(found, "foo"));
 
+        gup_array_char_destroy(strings.data[0]);
+        gup_array_char_destroy(strings.data[1]);
+        gup_array_char_destroy(strings.data[2]);
+        gup_array_char_destroy(strings.data[3]);
         gup_array_string_destroy(strings);
     }
 }

@@ -1843,6 +1843,7 @@ void gup_array_string_prepend(GupAllocator *a, GupArrayString *xs, GupArrayChar 
     xs->count++;
 }
 
+/** Copies the cstr into the array. */
 void gup_array_string_prepend_cstr(GupAllocator *a, GupArrayString *xs, char *cstr){
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
