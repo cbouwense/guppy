@@ -2853,6 +2853,7 @@ void gup_file_print_lines(GupAllocator *a, const char *file_path) {
 }
 
 bool gup_file_read(GupAllocator *a, const char *file_path, GupString *out) {
+    GupAllocator local = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_MALLOC };
     bool result  = true;
     char *buffer = NULL;
 
@@ -2867,7 +2868,7 @@ bool gup_file_read(GupAllocator *a, const char *file_path, GupString *out) {
 
     long file_size = 0;
     gup_assert(gup_file_size(file_path, &file_size));
-    buffer = (char *) gup_alloc(a, file_size + 1);
+    buffer = (char *) gup_alloc(&local, file_size + 1);
     size_t bytes_read = fread(buffer, sizeof(char), file_size, fp);
 
     if ((long)bytes_read != file_size) {
@@ -2879,7 +2880,7 @@ bool gup_file_read(GupAllocator *a, const char *file_path, GupString *out) {
 
     buffer[file_size] = '\0';
     *out = gup_array_char_create_from_cstr(a, buffer);
-    gup_free(a, buffer);
+    gup_free(&local, buffer);
 
 defer:
     if (fp) fclose(fp);
