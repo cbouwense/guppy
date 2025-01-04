@@ -177,10 +177,10 @@ void test_gup_array_string_create_from_array(void) {
 void test_gup_array_string_copy(void) {
     GupString hello = gup_array_char_create_from_cstr(NULL, "Hello");
     GupString world = gup_array_char_create_from_cstr(NULL, "World");
-    GupString bang = gup_array_char_create_from_cstr(NULL, "!");
-    GupString cs[] = {hello, world, bang};
-    GupArrayString strs = gup_array_string_create_from_array(NULL, cs, gup_array_len(cs));
+    GupString bang  = gup_array_char_create_from_cstr(NULL, "!");
+    GupString cs[]  = {hello, world, bang};
 
+    GupArrayString strs      = gup_array_string_create_from_array(NULL, cs, gup_array_len(cs));
     GupArrayString strs_copy = gup_array_string_copy(NULL, strs);
 
     gup_assert(gup_array_string_equals(strs, strs_copy));
@@ -188,6 +188,8 @@ void test_gup_array_string_copy(void) {
     gup_array_char_destroy(hello);
     gup_array_char_destroy(world);
     gup_array_char_destroy(bang);
+    gup_array_string_destroy(strs);
+    gup_array_string_destroy(strs_copy);
 }
 
 void test_gup_array_string_append(void) {
@@ -207,6 +209,7 @@ void test_gup_array_string_append(void) {
     free(hello.data);
     free(world.data);
     free(bang.data);
+    // free(strs_create_from.data);
 }
 
 void test_gup_array_contains(void) {

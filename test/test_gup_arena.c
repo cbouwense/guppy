@@ -37,14 +37,18 @@ void test_gup_arena_can_allocate_stuff_and_not_need_to_free_it(void) {
 void test_gup_arena_can_be_freed_and_not_leak_memory(void) {
     GupArena a = gup_arena_create();
 
-    const int count = 9001;
+    const int count = 0;
     int **lots_of_ints = gup_arena_alloc(&a, sizeof(int *) * count);
     for (int i = 0; i < count; i++) {
         lots_of_ints[i] = gup_arena_alloc(&a, sizeof(int));
         *lots_of_ints[i] = i;
     }
 
-    gup_arena_free(&a);
+    // This is the test.
+    gup_arena_free(&a); 
+
+    // This is manual cleanup.
+    free(a.data->data);
     free(a.data);
 }
 

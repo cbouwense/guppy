@@ -26,7 +26,7 @@ void test_gup_file_line_count() {
 void test_gup_file_read(void) {
     GupString file_contents = {0};
 
-    { // File that does not exist should return count of 0
+    { // File that does not exist should return false
         gup_assert(!gup_file_read(NULL, "./resources/doesnotexist.txt", &file_contents));
 
         gup_string_destroy(file_contents);
@@ -125,11 +125,13 @@ void test_gup_file_read_lines(void) {
         gup_assert(lines.count == 1);
         gup_assert(lines.data[0].count == 0);
 
+        gup_array_char_destroy(lines.data[0]);
         gup_array_string_destroy(lines);
     }
 
     { // foo.txt
-        GupArrayString lines = gup_file_read_lines(NULL, "./resources/foo.txt");
+        GupArena a = gup_arena_create();
+        GupArrayString lines = gup_file_read_lines((GupAllocator *)&a, "./resources/foo.txt");
 
         gup_assert(lines.count == 4);
         gup_assert(gup_array_char_equals_cstr(lines.data[0], "one"));
@@ -137,11 +139,12 @@ void test_gup_file_read_lines(void) {
         gup_assert(gup_array_char_equals_cstr(lines.data[2], "three three three"));
         gup_assert(gup_array_char_equals_cstr(lines.data[3], ""));
 
-        gup_array_string_destroy(lines);
+        gup_arena_destroy(&a);
     }
 
     { // settings.toml
-        GupArrayString lines = gup_file_read_lines(NULL, "./resources/settings.toml");
+        GupArena a = gup_arena_create();
+        GupArrayString lines = gup_file_read_lines((GupAllocator *)&a, "./resources/settings.toml");
 
         gup_assert(lines.count == 8);
         gup_assert(gup_array_char_equals_cstr(lines.data[0], "# This is a TOML file"));
@@ -153,7 +156,7 @@ void test_gup_file_read_lines(void) {
         gup_assert(gup_array_char_equals_cstr(lines.data[6], "server = \"localhost\""));
         gup_assert(gup_array_char_equals_cstr(lines.data[7], "port = 5432"));
 
-        gup_array_string_destroy(lines);
+        gup_arena_destroy(&a);
     }
 }
 
@@ -174,6 +177,7 @@ void test_gup_file_read_lines_keep_newlines() {
         gup_assert(lines.count == 1);
         gup_assert(gup_array_char_equals_cstr(lines.data[0], "\n"));
 
+        gup_array_char_destroy(lines.data[0]);
         gup_array_string_destroy(lines);
     }
 
@@ -187,6 +191,10 @@ void test_gup_file_read_lines_keep_newlines() {
         gup_assert(gup_array_char_equals_cstr(lines.data[2], "three three three\n"));
         gup_assert(gup_array_char_equals_cstr(lines.data[3], "\n"));
 
+        gup_array_char_destroy(lines.data[0]);
+        gup_array_char_destroy(lines.data[1]);
+        gup_array_char_destroy(lines.data[2]);
+        gup_array_char_destroy(lines.data[3]);
         gup_array_string_destroy(lines);
     }
 
@@ -204,6 +212,14 @@ void test_gup_file_read_lines_keep_newlines() {
         gup_assert(gup_array_char_equals_cstr(lines.data[6], "server = \"localhost\"\n"));
         gup_assert(gup_array_char_equals_cstr(lines.data[7], "port = 5432\n"));
 
+        gup_array_char_destroy(lines.data[0]);
+        gup_array_char_destroy(lines.data[1]);
+        gup_array_char_destroy(lines.data[2]);
+        gup_array_char_destroy(lines.data[3]);
+        gup_array_char_destroy(lines.data[4]);
+        gup_array_char_destroy(lines.data[5]);
+        gup_array_char_destroy(lines.data[6]);
+        gup_array_char_destroy(lines.data[7]);
         gup_array_string_destroy(lines);
     }
 }

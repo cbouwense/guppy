@@ -741,14 +741,17 @@ void *gup_alloc(GupAllocator *head, size_t bytes) {
 // TODO: gup_realloc
 
 void gup_free(GupAllocator *head, void *ptr) {
-    if (head == NULL) free(ptr);
+    if (head == NULL) {
+        free(ptr);
+        return;
+    }
     
     switch (head->type) {
         case GUP_ALLOCATOR_TYPE_MALLOC: {
             free(ptr);
         } break;
         case GUP_ALLOCATOR_TYPE_ARENA:  {
-            printf("WARNING: Tried to free memory that is within an arena. You either don't actually want to do that, or if you do, you probably should not be using an arena to allocate that memory.\n");
+            printf("WARNING: Tried to free memory that is within an arena. You probably don't actually want to do that. If you do, you probably should not be using an arena to allocate that memory.\n");
         } break;
         default: {
             printf("ERROR: unknown allocator type.\n");
@@ -770,8 +773,9 @@ GupArena gup_arena_create() {
 }
 
 void gup_arena_destroy(GupArena *a) {
-    // gup_arena_free(a);
-    gup_array_ptr_destroy(*a->data);
+    gup_arena_free(a);
+    gup_array_ptr_destroy(*(a->data));
+    free(a->data);
 }
 
 void *gup_arena_alloc(GupArena *a, size_t bytes) {
@@ -924,14 +928,10 @@ void gup_array_ptr_destroy(GupArrayPtr xs) {
 }
 
 void gup_array_string_destroy(GupArrayString xs) {
-    for (int i = 0; i < xs.count; i++) {
-        gup_array_char_destroy(xs.data[i]);
-    }
     free(xs.data);
 }
 
 void gup_array_cstr_destroy(GupArrayCstr xs) {
-    // TODO: do we need to free the strings themselves?
     free(xs.data);
 }
 
@@ -952,6 +952,7 @@ GupArrayBool gup_array_bool_create_from_array(GupAllocator *a, bool xs[], const 
     return new;
 }
 
+/** Copies the string into the result. */
 GupArrayChar gup_array_char_create_from_array(GupAllocator *a, char xs[], const int size) {
     int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
 
@@ -1036,6 +1037,7 @@ GupArrayPtr gup_array_ptr_create_from_array(GupAllocator *a, void *xs[], const i
     return new;
 }
 
+/** Copies the GupArrayChars into the new GupArrayString. */
 GupArrayString gup_array_string_create_from_array(GupAllocator *a, GupArrayChar xs[], const int size) {
     int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
 
@@ -1162,11 +1164,13 @@ GupArrayPtr gup_array_ptr_copy(GupAllocator *a, GupArrayPtr xs) {
 GupArrayString gup_array_string_copy(GupAllocator *a, GupArrayString xs) {
     GupArrayString new = {
         .capacity = xs.capacity,
-        .count = xs.count,
-        .data = gup_alloc(a, xs.capacity * sizeof(GupArrayChar)),
-
+        .count    = xs.count,
+        .data     = gup_alloc(a, xs.capacity * sizeof(GupArrayChar)),
     };
-    memcpy(new.data, xs.data, xs.count * sizeof(GupArrayChar));
+
+    for (int i = 0; i < xs.count; i++) {
+        new.data[i] = gup_array_char_copy(a, xs.data[i]);
+    }
 
     return new;
 }
@@ -1635,6 +1639,7 @@ void gup_array_short_append(GupAllocator *a, GupArrayShort *xs, short x) {
     xs->count++;
 }
 
+/** Appends the pointer, does NOT copy. */
 void gup_array_string_append(GupAllocator *a, GupArrayString *xs, GupArrayChar x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
@@ -1652,6 +1657,7 @@ void gup_array_string_append(GupAllocator *a, GupArrayString *xs, GupArrayChar x
     xs->count++;
 }
 
+/** Copies the cstr into the array. */
 void gup_array_string_append_cstr(GupAllocator *a, GupArrayString *xs, char *cstr) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
@@ -2846,7 +2852,7 @@ void gup_file_print_lines(GupAllocator *a, const char *file_path) {
 }
 
 bool gup_file_read(GupAllocator *a, const char *file_path, GupString *out) {
-    bool result = true;
+    bool result  = true;
     char *buffer = NULL;
 
     FILE *fp = fopen(file_path, "r");
@@ -2872,6 +2878,7 @@ bool gup_file_read(GupAllocator *a, const char *file_path, GupString *out) {
 
     buffer[file_size] = '\0';
     *out = gup_array_char_create_from_cstr(a, buffer);
+    gup_free(a, buffer);
 
 defer:
     if (fp) fclose(fp);
@@ -3354,27 +3361,41 @@ void gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char)) {
     }
 }
 
+/**
+ * Returns an array of strings allocated by the GupAllocator param j.
+ * "  hello world  " -> ["hello", "world"]
+ */
 GupArrayString gup_string_split(GupAllocator *a, GupString str, char c) {
-    GupArena local = gup_arena_create();
     GupArrayString tokens = gup_array_string_create(a);
-
-    GupString token = gup_string_create((GupAllocator *)&local);
-    GupString trimmed = gup_string_trim_char((GupAllocator *)&local, str, c);
+    GupString token = gup_string_create(a);
+    // "  hello world  " -> "hello world"
+    GupString trimmed = gup_string_trim_char(a, str, c);
 
     for (int i = 0; i < trimmed.count; i++) {
+        // i (5): ' ' == ' '
         if (trimmed.data[i] == c) {
+            // tokens: [] -> ["hello"]
             gup_array_string_append(a, &tokens, token);
-            token = gup_string_create((GupAllocator *)&local);
-        } else if (i == trimmed.count-1) {
-            gup_string_append((GupAllocator *)&local, &token, trimmed.data[i]);
+            token = gup_string_create(a);
+        }
+        // Are we at the end of the string? If so, append the final token to the list. Then we're done.
+        // i (10): 10 == 11-1
+        else if (i == trimmed.count-1) {
+            // token: "worl" -> "world"
+            gup_string_append(a, &token, trimmed.data[i]);
+            // tokens: ["hello"] -> ["hello", "world"]
             gup_array_string_append(a, &tokens, token);
-            token = gup_string_create((GupAllocator *)&local);
-        } else {
-            gup_string_append((GupAllocator *)&local, &token, trimmed.data[i]);
+        }
+        // i (0): 'h' == ' ' -> token: "h"
+        // i (1): 'e' == ' ' -> token: "he"
+        // i (2): 'l' == ' ' -> token: "hel"
+        // i (3): 'l' == ' ' -> token: "hell"
+        // i (4): 'o' == ' ' -> token: "hello"
+        else {
+            gup_string_append(a, &token, trimmed.data[i]);
         }
     }
 
-    gup_arena_destroy(&local);
     return tokens;
 }
 
