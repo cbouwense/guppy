@@ -233,6 +233,8 @@ typedef struct {
     GupArrayCstr *values;
 } GupHashmapCstr;
 
+typedef GupArrayInt GupStackInt;
+
 /**************************************************************************************************
  * Public API                                                                                     *
  **************************************************************************************************/
@@ -511,7 +513,10 @@ void         gup_set_string_debug(GupSetString set);
 
 // TODO: GupSetCstr?
 
+// ---------------------------------------------------------------------------------------------------------------------
 // Hashmap
+// ---------------------------------------------------------------------------------------------------------------------
+
 GupHashmapBool   gup_hashmap_bool_create(GupAllocator *a);
 void             gup_hashmap_bool_destroy(GupHashmapBool hashmap);
 bool             gup_hashmap_bool_get(GupHashmapBool hashmap, char *key, bool *out);
@@ -600,6 +605,15 @@ void             gup_hashmap_cstr_remove(GupHashmapCstr *hashmap, char *key);
 int              gup_hashmap_cstr_size(GupHashmapCstr hashmap);
 void             gup_hashmap_cstr_print(GupHashmapCstr hashmap);
 void             gup_hashmap_cstr_debug(GupHashmapCstr hashmap);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Stacks
+// ---------------------------------------------------------------------------------------------------------------------
+
+GupStackInt gup_stack_int_create(GupAllocator *a);
+void        gup_stack_int_push(GupAllocator *a, GupStackInt *s, int x);
+bool        gup_stack_int_pop(GupStackInt *s, int *out);
+void        gup_stack_int_destroy(GupStackInt s);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -5175,6 +5189,35 @@ void _gup_hashmap_cstr_debug(GupHashmapCstr hashmap, const char *hashmap_name) {
     printf("  keys:     %p\n", (void *)(hashmap.keys));
     printf("  values:   %p\n", (void *)(hashmap.values));
     printf("}\n");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Stacks
+// ---------------------------------------------------------------------------------------------------------------------
+
+GupStackInt gup_stack_int_create(GupAllocator *a) {
+    return (GupStackInt) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(int)), 
+    };
+}
+
+void gup_stack_int_push(GupAllocator *a, GupStackInt *s, int x) {
+    gup_array_int_append(a, (GupArrayInt *)s, x);
+}
+
+bool gup_stack_int_pop(GupStackInt *s, int *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_int_destroy(GupStackInt s) {
+    free(s.data);
 }
 
 // Print -------------------------------------------------------------------------------------------
