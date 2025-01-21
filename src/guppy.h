@@ -664,8 +664,8 @@ GupArrayString  gup_string_split_by_cstr(GupAllocator *a, GupString str, char *s
 
 // C-string utilities
 char *gup_cstr_array_flatten(GupAllocator *a, char **strs); // Assumes a null terminated string.
-int   gup_cstr_length_excluding_null(const char* cstr); // Assumes a null terminated string. Excludes the null from the length.
-int   gup_cstr_length_including_null(const char* cstr); // Assumes a null terminated string. Excludes the null from the length.
+int   gup_cstr_length_excluding_null(const char* cstr); // Assumes a null terminated string.
+int   gup_cstr_length_including_null(const char* cstr); // Assumes a null terminated string.
 bool  gup_cstr_equals(const char *a, const char* b);
 void  gup_cstr_copy(char *to, const char *from);
 void  gup_cstr_copy_n(char *to, const char *from, int n);
@@ -4267,9 +4267,11 @@ void _gup_set_string_print(GupSetString xs, const char *xs_name) {
     for (int i = 0; i < xs.capacity; i++) {
         for (int j = 0; j < xs.data[i].count; j++) {
             if (preceeding_comma) printf(", ");
+            printf("\"");
             for (int k = 0; k < xs.data[i].data[j].count; k++) {
-                printf("%c", xs.data[i].data[j].data[j]);
+                printf("%c", xs.data[i].data[j].data[k]);
             }
+            printf("\"");
             preceeding_comma = true;
         }
     }
