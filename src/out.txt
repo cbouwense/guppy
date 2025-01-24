@@ -1,171 +1,90 @@
-void gup_array_bool_prepend(GupAllocator *a, GupArrayBool *xs, bool x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        bool *new_data = gup_alloc(a, new_capacity * sizeof(bool));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_bool_debug(xs) _gup_array_bool_debug(xs, #xs)
+void _gup_array_bool_debug(GupArrayBool xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 
-void gup_array_char_prepend(GupAllocator *a, GupArrayChar *xs, char x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        char *new_data = gup_alloc(a, new_capacity * sizeof(char));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_char_debug(xs) _gup_array_char_debug(xs, #xs)
+void _gup_array_char_debug(GupArrayChar xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 
-void gup_array_double_prepend(GupAllocator *a, GupArrayDouble *xs, double x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        double *new_data = gup_alloc(a, new_capacity * sizeof(double));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_double_debug(xs) _gup_array_double_debug(xs, #xs)
+void _gup_array_double_debug(GupArrayDouble xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 
-void gup_array_float_prepend(GupAllocator *a, GupArrayFloat *xs, float x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        float *new_data = gup_alloc(a, new_capacity * sizeof(float));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_float_debug(xs) _gup_array_float_debug(xs, #xs)
+void _gup_array_float_debug(GupArrayFloat xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 
-void gup_array_int_prepend(GupAllocator *a, GupArrayInt *xs, int x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        int *new_data = gup_alloc(a, new_capacity * sizeof(int));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_int_debug(xs) _gup_array_int_debug(xs, #xs)
+void _gup_array_int_debug(GupArrayInt xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 
-void gup_array_long_prepend(GupAllocator *a, GupArrayLong *xs, long x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        long *new_data = gup_alloc(a, new_capacity * sizeof(long));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_long_debug(xs) _gup_array_long_debug(xs, #xs)
+void _gup_array_long_debug(GupArrayLong xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 
-void gup_array_ptr_prepend(GupAllocator *a, GupArrayPtr *xs, void * x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        void * *new_data = gup_alloc(a, new_capacity * sizeof(void *));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_ptr_debug(xs) _gup_array_ptr_debug(xs, #xs)
+void _gup_array_ptr_debug(GupArrayPtr xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 
-void gup_array_str_prepend(GupAllocator *a, GupArrayString *xs, GupArrayChar x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        GupArrayChar *new_data = gup_alloc(a, new_capacity * sizeof(GupArrayChar));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_short_debug(xs) _gup_array_short_debug(xs, #xs)
+void _gup_array_short_debug(GupArrayShort xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 
-void gup_array_cstr_prepend(GupAllocator *a, GupArrayCstr *xs, char * x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        char * *new_data = gup_alloc(a, new_capacity * sizeof(char *));
-        
-        memcpy(new_data, xs->data, xs->count);
-        gup_free(a, xs->data);
+#define gup_array_string_debug(xs) _gup_array_string_debug(xs, #xs)
+void _gup_array_string_debug(GupArrayString xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
 
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[xs->count] = x;
-    xs->count++;
+#define gup_array_cstr_debug(xs) _gup_array_cstr_debug(xs, #xs)
+void _gup_array_cstr_debug(GupArrayCstr xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
 }
 

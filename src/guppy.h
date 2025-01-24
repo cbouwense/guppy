@@ -233,7 +233,16 @@ typedef struct {
     GupArrayCstr *values;
 } GupHashmapCstr;
 
-typedef GupArrayInt GupStackInt;
+typedef GupArrayBool   GupStackBool;
+typedef GupArrayChar   GupStackChar;
+typedef GupArrayDouble GupStackDouble;
+typedef GupArrayFloat  GupStackFloat;
+typedef GupArrayInt    GupStackInt;
+typedef GupArrayLong   GupStackLong;
+typedef GupArrayPtr    GupStackPtr;
+typedef GupArrayShort  GupStackShort;
+typedef GupArrayString GupStackString;
+typedef GupArrayCstr   GupStackCstr;
 
 /**************************************************************************************************
  * Public API                                                                                     *
@@ -610,10 +619,75 @@ void             gup_hashmap_cstr_debug(GupHashmapCstr hashmap);
 // Stacks
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupStackInt gup_stack_int_create(GupAllocator *a);
-void        gup_stack_int_push(GupAllocator *a, GupStackInt *s, int x);
-bool        gup_stack_int_pop(GupStackInt *s, int *out);
-void        gup_stack_int_destroy(GupStackInt s);
+GupStackBool   gup_stack_bool_create(GupAllocator *a);
+void           gup_stack_bool_push(GupAllocator *a, GupStackBool *s, bool x);
+bool           gup_stack_bool_pop(GupStackBool *s, bool *out);
+void           gup_stack_bool_destroy(GupStackBool s);
+void           gup_stack_bool_print(GupStackBool s);
+void           gup_stack_bool_debug(GupStackBool s);
+
+GupStackChar   gup_stack_char_create(GupAllocator *a);
+void           gup_stack_char_push(GupAllocator *a, GupStackChar *s, char x);
+bool           gup_stack_char_pop(GupStackChar *s, char *out);
+void           gup_stack_char_destroy(GupStackChar s);
+void           gup_stack_char_print(GupStackChar s);
+void           gup_stack_char_debug(GupStackChar s);
+
+GupStackDouble gup_stack_double_create(GupAllocator *a);
+void           gup_stack_double_push(GupAllocator *a, GupStackDouble *s, double x);
+bool           gup_stack_double_pop(GupStackDouble *s, double *out);
+void           gup_stack_double_destroy(GupStackDouble s);
+void           gup_stack_double_print(GupStackDouble s);
+void           gup_stack_double_debug(GupStackDouble s);
+
+GupStackFloat  gup_stack_float_create(GupAllocator *a);
+void           gup_stack_float_push(GupAllocator *a, GupStackFloat *s, float x);
+bool           gup_stack_float_pop(GupStackFloat *s, float *out);
+void           gup_stack_float_destroy(GupStackFloat s);
+void           gup_stack_float_print(GupStackFloat s);
+void           gup_stack_float_debug(GupStackFloat s);
+
+GupStackInt    gup_stack_int_create(GupAllocator *a);
+void           gup_stack_int_push(GupAllocator *a, GupStackInt *s, int x);
+bool           gup_stack_int_pop(GupStackInt *s, int *out);
+void           gup_stack_int_destroy(GupStackInt s);
+void           gup_stack_int_print(GupStackInt s);
+void           gup_stack_int_debug(GupStackInt s);
+
+GupStackLong   gup_stack_long_create(GupAllocator *a);
+void           gup_stack_long_push(GupAllocator *a, GupStackLong *s, long x);
+bool           gup_stack_long_pop(GupStackLong *s, long *out);
+void           gup_stack_long_destroy(GupStackLong s);
+void           gup_stack_long_print(GupStackLong s);
+void           gup_stack_long_debug(GupStackLong s);
+
+GupStackPtr    gup_stack_ptr_create(GupAllocator *a);
+void           gup_stack_ptr_push(GupAllocator *a, GupStackPtr *s, void* x);
+bool           gup_stack_ptr_pop(GupStackPtr *s, void* *out);
+void           gup_stack_ptr_destroy(GupStackPtr s);
+void           gup_stack_ptr_print(GupStackPtr s);
+void           gup_stack_ptr_debug(GupStackPtr s);
+
+GupStackShort  gup_stack_short_create(GupAllocator *a);
+void           gup_stack_short_push(GupAllocator *a, GupStackShort *s, short x);
+bool           gup_stack_short_pop(GupStackShort *s, short *out);
+void           gup_stack_short_destroy(GupStackShort s);
+void           gup_stack_short_print(GupStackShort s);
+void           gup_stack_short_debug(GupStackShort s);
+
+GupStackString gup_stack_string_create(GupAllocator *a);
+void           gup_stack_string_push(GupAllocator *a, GupStackString *s, GupString x);
+bool           gup_stack_string_pop(GupStackString *s, GupString *out);
+void           gup_stack_string_destroy(GupStackString s);
+void           gup_stack_string_print(GupStackString s);
+void           gup_stack_string_debug(GupStackString s);
+
+GupStackCstr   gup_stack_cstr_create(GupAllocator *a);
+void           gup_stack_cstr_push(GupAllocator *a, GupStackCstr *s, char * x);
+bool           gup_stack_cstr_pop(GupStackCstr *s, char * *out);
+void           gup_stack_cstr_destroy(GupStackCstr s);
+void           gup_stack_cstr_print(GupStackCstr s);
+void           gup_stack_cstr_debug(GupStackCstr s);
 
 // Print -------------------------------------------------------------------------------------------
 void gup_print_cwd(void);
@@ -1513,10 +1587,90 @@ void _gup_array_cstr_print(GupArrayCstr xs, const char *xs_name) {
     printf("]\n");
 }
 
-// TODO
 // Debug
+#define gup_array_bool_debug(xs) _gup_array_bool_debug(xs, #xs)
+void _gup_array_bool_debug(GupArrayBool xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
+#define gup_array_char_debug(xs) _gup_array_char_debug(xs, #xs)
+void _gup_array_char_debug(GupArrayChar xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
+#define gup_array_double_debug(xs) _gup_array_double_debug(xs, #xs)
+void _gup_array_double_debug(GupArrayDouble xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
+#define gup_array_float_debug(xs) _gup_array_float_debug(xs, #xs)
+void _gup_array_float_debug(GupArrayFloat xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
 #define gup_array_int_debug(xs) _gup_array_int_debug(xs, #xs)
 void _gup_array_int_debug(GupArrayInt xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
+#define gup_array_long_debug(xs) _gup_array_long_debug(xs, #xs)
+void _gup_array_long_debug(GupArrayLong xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
+#define gup_array_ptr_debug(xs) _gup_array_ptr_debug(xs, #xs)
+void _gup_array_ptr_debug(GupArrayPtr xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
+#define gup_array_short_debug(xs) _gup_array_short_debug(xs, #xs)
+void _gup_array_short_debug(GupArrayShort xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
+#define gup_array_string_debug(xs) _gup_array_string_debug(xs, #xs)
+void _gup_array_string_debug(GupArrayString xs, const char *xs_name) {
+    printf("%s: {\n", xs_name);
+    printf("  capacity: %d\n", xs.capacity);
+    printf("  count: %d\n", xs.count);
+    printf("  data: %p\n", (void *)(xs.data));
+    printf("}\n");
+}
+
+#define gup_array_cstr_debug(xs) _gup_array_cstr_debug(xs, #xs)
+void _gup_array_cstr_debug(GupArrayCstr xs, const char *xs_name) {
     printf("%s: {\n", xs_name);
     printf("  capacity: %d\n", xs.capacity);
     printf("  count: %d\n", xs.count);
@@ -5195,6 +5349,122 @@ void _gup_hashmap_cstr_debug(GupHashmapCstr hashmap, const char *hashmap_name) {
 // Stacks
 // ---------------------------------------------------------------------------------------------------------------------
 
+GupStackBool gup_stack_bool_create(GupAllocator *a) {
+    return (GupStackBool) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(bool)), 
+    };
+}
+
+void gup_stack_bool_push(GupAllocator *a, GupStackBool *s, bool x) {
+    gup_array_bool_append(a, (GupArrayBool *)s, x);
+}
+
+bool gup_stack_bool_pop(GupStackBool *s, bool *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_bool_destroy(GupStackBool s) {
+    free(s.data);
+}
+
+#define gup_stack_bool_print(xs) gup_array_bool_print(xs)
+
+#define gup_stack_bool_debug(xs) gup_array_bool_debug(xs)
+
+GupStackChar gup_stack_char_create(GupAllocator *a) {
+    return (GupStackChar) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(char)), 
+    };
+}
+
+void gup_stack_char_push(GupAllocator *a, GupStackChar *s, char x) {
+    gup_array_char_append(a, (GupArrayChar *)s, x);
+}
+
+bool gup_stack_char_pop(GupStackChar *s, char *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_char_destroy(GupStackChar s) {
+    free(s.data);
+}
+
+#define gup_stack_char_print(xs) gup_array_char_print(xs)
+
+#define gup_stack_char_debug(xs) gup_array_char_debug(xs)
+
+GupStackDouble gup_stack_double_create(GupAllocator *a) {
+    return (GupStackDouble) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(double)), 
+    };
+}
+
+void gup_stack_double_push(GupAllocator *a, GupStackDouble *s, double x) {
+    gup_array_double_append(a, (GupArrayDouble *)s, x);
+}
+
+bool gup_stack_double_pop(GupStackDouble *s, double *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_double_destroy(GupStackDouble s) {
+    free(s.data);
+}
+
+#define gup_stack_double_print(xs) gup_array_double_print(xs)
+
+#define gup_stack_double_debug(xs) gup_array_double_debug(xs)
+
+GupStackFloat gup_stack_float_create(GupAllocator *a) {
+    return (GupStackFloat) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(float)), 
+    };
+}
+
+void gup_stack_float_push(GupAllocator *a, GupStackFloat *s, float x) {
+    gup_array_float_append(a, (GupArrayFloat *)s, x);
+}
+
+bool gup_stack_float_pop(GupStackFloat *s, float *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_float_destroy(GupStackFloat s) {
+    free(s.data);
+}
+
+#define gup_stack_float_print(xs) gup_array_float_print(xs)
+
+#define gup_stack_float_debug(xs) gup_array_float_debug(xs)
+
 GupStackInt gup_stack_int_create(GupAllocator *a) {
     return (GupStackInt) {
         .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
@@ -5219,6 +5489,157 @@ bool gup_stack_int_pop(GupStackInt *s, int *out) {
 void gup_stack_int_destroy(GupStackInt s) {
     free(s.data);
 }
+
+#define gup_stack_int_print(xs) gup_array_int_print(xs)
+
+#define gup_stack_int_debug(xs) gup_array_int_debug(xs)
+
+GupStackLong gup_stack_long_create(GupAllocator *a) {
+    return (GupStackLong) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(long)), 
+    };
+}
+
+void gup_stack_long_push(GupAllocator *a, GupStackLong *s, long x) {
+    gup_array_long_append(a, (GupArrayLong *)s, x);
+}
+
+bool gup_stack_long_pop(GupStackLong *s, long *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_long_destroy(GupStackLong s) {
+    free(s.data);
+}
+
+#define gup_stack_long_print(xs) gup_array_long_print(xs)
+
+#define gup_stack_long_debug(xs) gup_array_long_debug(xs)
+
+GupStackPtr gup_stack_ptr_create(GupAllocator *a) {
+    return (GupStackPtr) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(void*)), 
+    };
+}
+
+void gup_stack_ptr_push(GupAllocator *a, GupStackPtr *s, void* x) {
+    gup_array_ptr_append(a, (GupArrayPtr *)s, x);
+}
+
+bool gup_stack_ptr_pop(GupStackPtr *s, void* *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_ptr_destroy(GupStackPtr s) {
+    free(s.data);
+}
+
+#define gup_stack_ptr_print(xs) gup_array_ptr_print(xs)
+
+#define gup_stack_ptr_debug(xs) gup_array_ptr_debug(xs)
+
+GupStackShort gup_stack_short_create(GupAllocator *a) {
+    return (GupStackShort) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(short)), 
+    };
+}
+
+void gup_stack_short_push(GupAllocator *a, GupStackShort *s, short x) {
+    gup_array_short_append(a, (GupArrayShort *)s, x);
+}
+
+bool gup_stack_short_pop(GupStackShort *s, short *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_short_destroy(GupStackShort s) {
+    free(s.data);
+}
+
+#define gup_stack_short_print(xs) gup_array_short_print(xs)
+
+#define gup_stack_short_debug(xs) gup_array_short_debug(xs)
+
+GupStackString gup_stack_string_create(GupAllocator *a) {
+    return (GupStackString) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(GupString)), 
+    };
+}
+
+void gup_stack_string_push(GupAllocator *a, GupStackString *s, GupString x) {
+    gup_array_string_append(a, (GupArrayString *)s, x);
+}
+
+bool gup_stack_string_pop(GupStackString *s, GupString *out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_string_destroy(GupStackString s) {
+    free(s.data);
+}
+
+#define gup_stack_string_print(xs) gup_array_string_print(xs)
+
+#define gup_stack_string_debug(xs) gup_array_string_debug(xs)
+
+GupStackCstr gup_stack_cstr_create(GupAllocator *a) {
+    return (GupStackCstr) {
+        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
+        .count    = 0,
+        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(char *)), 
+    };
+}
+
+void gup_stack_cstr_push(GupAllocator *a, GupStackCstr *s, char *x) {
+    gup_array_cstr_append(a, (GupArrayCstr *)s, x);
+}
+
+bool gup_stack_cstr_pop(GupStackCstr *s, char **out) {
+    if (s->count == 0) return false;
+
+    *out = s->data[s->count-1];
+    s->count--;
+
+    return true;
+}
+
+void gup_stack_cstr_destroy(GupStackCstr s) {
+    free(s.data);
+}
+
+#define gup_stack_cstr_print(xs) gup_array_cstr_print(xs)
+
+#define gup_stack_cstr_debug(xs) gup_array_cstr_debug(xs)
+
+
 
 // Print -------------------------------------------------------------------------------------------
 
