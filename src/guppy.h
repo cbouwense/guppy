@@ -5,19 +5,13 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
-
-// Boolean -------------------------------------------------------------------------------------------------------------
-#define TRUE 1
-#define FALSE 0
-#define true 1
-#define false 0
-typedef unsigned char bool;
 
 // Primitive types -----------------------------------------------------------------------------------------------------
 typedef unsigned char   u8;
@@ -1027,115 +1021,131 @@ void gup_array_cstr_destroy(GupArrayCstr xs) {
 #define gup_array_char_create_from_cstr(a, cstr) gup_array_char_create_from_array(a, cstr, strlen(cstr))
 
 GupArrayBool gup_array_bool_create_from_array(GupAllocator *a, bool xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity       = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(bool);
+    const int bytes_to_copy  = size * sizeof(bool);
 
     GupArrayBool new = {
-        .capacity = size_to_alloc,
-        .count = size,
-        .data = gup_alloc(a, size_to_alloc * sizeof(bool)),
+        .capacity = capacity,
+        .count    = size,
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(bool));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
 
 /** Copies the string into the result. */
 GupArrayChar gup_array_char_create_from_array(GupAllocator *a, char xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity       = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(char);
+    const int bytes_to_copy  = size * sizeof(char);
 
     GupArrayChar new = {
-        .capacity = size_to_alloc,
+        .capacity = capacity,
         .count    = size,
-        .data     = gup_alloc(a, size_to_alloc * sizeof(char)),
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(char));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
 
 GupArrayDouble gup_array_double_create_from_array(GupAllocator *a, double xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(double);
+    const int bytes_to_copy  = size * sizeof(double);
 
     GupArrayDouble new = {
-        .capacity = size_to_alloc,
+        .capacity = capacity,
         .count    = size,
-        .data     = gup_alloc(a, size_to_alloc * sizeof(double)),
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(double));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
 
 GupArrayFloat gup_array_float_create_from_array(GupAllocator *a, float xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(float);
+    const int bytes_to_copy  = size * sizeof(float);
 
     GupArrayFloat new = {
-        .capacity = size_to_alloc,
-        .count = size,
-        .data = gup_alloc(a, size_to_alloc * sizeof(float)),
+        .capacity = capacity,
+        .count    = size,
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(float));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
 
 GupArrayInt gup_array_int_create_from_array(GupAllocator *a, int xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(int);
+    const int bytes_to_copy  = size * sizeof(int);
 
     GupArrayInt new = {
-        .capacity = size_to_alloc,
-        .count = size,
-        .data = gup_alloc(a, size_to_alloc * sizeof(int)),
+        .capacity = capacity,
+        .count    = size,
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(int));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
 
 GupArrayLong gup_array_long_create_from_array(GupAllocator *a, long xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(long);
+    const int bytes_to_copy  = size * sizeof(long);
 
     GupArrayLong new = {
-        .capacity = size_to_alloc,
-        .count = size,
-        .data = gup_alloc(a, size_to_alloc * sizeof(long)),
+        .capacity = capacity,
+        .count    = size,
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(long));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
 
 GupArrayPtr gup_array_ptr_create_from_array(GupAllocator *a, void *xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(void *);
+    const int bytes_to_copy  = size * sizeof(void *);
 
     GupArrayPtr new = {
-        .capacity = size_to_alloc,
-        .count = size,
-        .data = gup_alloc(a, size_to_alloc * sizeof(void *)),
+        .capacity = capacity,
+        .count    = size,
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(void *));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
 
 /** Copies the GupArrayChars into the new GupArrayString. */
 GupArrayString gup_array_string_create_from_array(GupAllocator *a, GupArrayChar xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(GupArrayChar);
+    const int bytes_to_copy  = size * sizeof(GupArrayChar);
 
     GupArrayString new = {
-        .capacity = size_to_alloc,
+        .capacity = capacity,
         .count    = size,
-        .data     = gup_alloc(a, size_to_alloc * sizeof(GupArrayChar)),
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(GupArrayChar));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
@@ -1151,15 +1161,17 @@ GupArrayString gup_array_string_create_from_cstrs(GupAllocator *a, char **cstrs,
 }
 
 GupArrayCstr gup_array_cstr_create_from_array(GupAllocator *a, char *xs[], const int size) {
-    int size_to_alloc = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int capacity = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(char *);
+    const int bytes_to_copy  = size * sizeof(char *);
 
     GupArrayCstr new = {
-        .capacity = size_to_alloc,
-        .count = size,
-        .data = gup_alloc(a, size_to_alloc * sizeof(char *)),
+        .capacity = capacity,
+        .count    = size,
+        .data     = gup_alloc(a, bytes_to_alloc),
     };
 
-    memcpy(new.data, xs, size * sizeof(char *));
+    memcpy(new.data, xs, bytes_to_copy);
 
     return new;
 }
@@ -1684,7 +1696,7 @@ void gup_array_bool_append(GupAllocator *a, GupArrayBool *xs, bool x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         bool *new_data = gup_alloc(a, new_capacity * sizeof(bool));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(bool));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1700,7 +1712,7 @@ void gup_array_char_append(GupAllocator *a, GupArrayChar *xs, char x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         char *new_data = gup_alloc(a, new_capacity * sizeof(char));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(char));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1716,7 +1728,7 @@ void gup_array_double_append(GupAllocator *a, GupArrayDouble *xs, double x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         double *new_data = gup_alloc(a, new_capacity * sizeof(double));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(double));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1732,7 +1744,7 @@ void gup_array_float_append(GupAllocator *a, GupArrayFloat *xs, float x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         float *new_data = gup_alloc(a, new_capacity * sizeof(float));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(float));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1748,7 +1760,7 @@ void gup_array_int_append(GupAllocator *a, GupArrayInt *xs, int x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         int *new_data = gup_alloc(a, new_capacity * sizeof(int));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(int));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1764,7 +1776,7 @@ void gup_array_long_append(GupAllocator *a, GupArrayLong *xs, long x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         long *new_data = gup_alloc(a, new_capacity * sizeof(long));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(long));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1780,7 +1792,7 @@ void gup_array_ptr_append(GupAllocator *a, GupArrayPtr *xs, void * x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         void * *new_data = gup_alloc(a, new_capacity * sizeof(void *));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(void *));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1796,7 +1808,7 @@ void gup_array_short_append(GupAllocator *a, GupArrayShort *xs, short x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         short *new_data = gup_alloc(a, new_capacity * sizeof(short));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(short));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1814,7 +1826,7 @@ void gup_array_string_append(GupAllocator *a, GupArrayString *xs, GupArrayChar x
 
         // TODO: this is actually kinda like a gup_realloc
         GupArrayChar *new_data = gup_alloc(a, new_capacity * sizeof(GupArrayChar));
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(GupArrayChar));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1831,7 +1843,7 @@ void gup_array_string_append_cstr(GupAllocator *a, GupArrayString *xs, char *cst
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         GupString *new_data = gup_alloc(a, new_capacity * sizeof(GupString));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(GupString));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1847,7 +1859,7 @@ void gup_array_cstr_append(GupAllocator *a, GupArrayCstr *xs, char * x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         char **new_data = gup_alloc(a, new_capacity * sizeof(char *));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(char *));
         gup_free(a, xs->data);
 
         xs->data     = new_data;
@@ -1864,7 +1876,7 @@ void gup_array_bool_prepend(GupAllocator *a, GupArrayBool *xs, bool x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         bool *new_data = gup_alloc(a, new_capacity * sizeof(bool));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(bool));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -1883,7 +1895,7 @@ void gup_array_char_prepend(GupAllocator *a, GupArrayChar *xs, char x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         char *new_data = gup_alloc(a, new_capacity * sizeof(char));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(char));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -1902,7 +1914,7 @@ void gup_array_double_prepend(GupAllocator *a, GupArrayDouble *xs, double x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         double *new_data = gup_alloc(a, new_capacity * sizeof(double));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(double));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -1921,7 +1933,7 @@ void gup_array_float_prepend(GupAllocator *a, GupArrayFloat *xs, float x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         float *new_data = gup_alloc(a, new_capacity * sizeof(float));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(float));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -1940,7 +1952,7 @@ void gup_array_int_prepend(GupAllocator *a, GupArrayInt *xs, int x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         int *new_data = gup_alloc(a, new_capacity * sizeof(int));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(int));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -1959,7 +1971,7 @@ void gup_array_long_prepend(GupAllocator *a, GupArrayLong *xs, long x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         long *new_data = gup_alloc(a, new_capacity * sizeof(long));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(long));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -1978,7 +1990,7 @@ void gup_array_ptr_prepend(GupAllocator *a, GupArrayPtr *xs, void * x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         void * *new_data = gup_alloc(a, new_capacity * sizeof(void *));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(void *));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -1997,7 +2009,7 @@ void gup_array_string_prepend(GupAllocator *a, GupArrayString *xs, GupArrayChar 
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         GupArrayChar *new_data = gup_alloc(a, new_capacity * sizeof(GupArrayChar));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(GupArrayChar));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -2031,7 +2043,7 @@ void gup_array_cstr_prepend(GupAllocator *a, GupArrayCstr *xs, char * x) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
         char * *new_data = gup_alloc(a, new_capacity * sizeof(char *));
         
-        memcpy(new_data, xs->data, xs->count);
+        memcpy(new_data, xs->data, xs->count * sizeof(char *));
         gup_free(a, xs->data);
 
         xs->data = new_data;
@@ -3532,7 +3544,7 @@ void gup_string_trim_fn_in_place(GupString *str, bool (*fn)(char)) {
 }
 
 /**
- * Returns an array of strings allocated by the GupAllocator param j.
+ * Returns an array of strings allocated by the GupAllocator param.
  * "  hello world  " -> ["hello", "world"]
  */
 GupArrayString gup_string_split(GupAllocator *a, GupString str, char c) {
