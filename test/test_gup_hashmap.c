@@ -30,6 +30,21 @@ void test_gup_hashmap_general(void) {
     gup_hashmap_int_destroy(hashmap);
 }
 
+void test_gup_hashmap_set_multiple_time_rewrites() {
+    GupHashmapChar hashmap = gup_hashmap_char_create(NULL);
+    char result = 0;
+
+    gup_hashmap_char_set(NULL, &hashmap, "dupe", 'x');
+    gup_hashmap_char_set(NULL, &hashmap, "dupe", 'y');
+    gup_hashmap_char_set(NULL, &hashmap, "dupe", 'z');
+    gup_hashmap_char_get(hashmap, "dupe", &result);
+
+    gup_assert(result == 'z');
+
+    gup_hashmap_char_destroy(hashmap);
+}
+
 void test_gup_hashmap(void) {
     test_gup_hashmap_general();
+    test_gup_hashmap_set_multiple_time_rewrites();
 }

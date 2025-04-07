@@ -281,6 +281,8 @@ void           gup_array_char_append(GupAllocator *a, GupArrayChar *xs, char x);
 void           gup_array_char_prepend(GupAllocator *a, GupArrayChar *xs, char x);
 void           gup_array_char_remove(GupArrayChar *xs, char x, int count_to_remove);
 void           gup_array_char_remove_all(GupArrayChar *xs, char x);
+void           gup_array_char_remove_at_index_preserve_order(GupArrayChar *xs, const int index);
+void           gup_array_char_remove_at_index_no_preserve_order(GupArrayChar *xs, const int index);
 char          *gup_array_char_to_cstr(GupAllocator *a, GupArrayChar chars);
 char         **gup_array_string_to_cstrs(GupAllocator *a, GupArrayString strs);
 GupArrayChar   gup_array_char_sort(GupAllocator *a, GupArrayChar xs);
@@ -2437,6 +2439,36 @@ void gup_array_cstr_remove_all(GupArrayCstr *xs, char *x) {
     xs->count = new_data_size;
     memcpy(xs->data, new_data, new_data_size * sizeof(char *));
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Remove at index preserve order
+// ---------------------------------------------------------------------------------------------------------------------
+
+void gup_array_char_remove_at_index_preserve_order(GupArrayChar *xs, const int index) {
+    // TODO: these array assertions could probably be a function _gup_array_sanity_check 
+    gup_assert_verbose(xs != NULL,                      "You're trying to remove something from a null array.");
+    gup_assert_verbose(xs->count > 1,                   "You're trying to remove something from an empty array.");
+    gup_assert_verbose(xs->capacity > 0,                "You're trying to remove something from an array without any capacity.");
+    gup_assert_verbose(xs->count <= xs->capacity,       "You're trying to remove something from an array whose count has exceeded its capacity.");
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // REMINDER: You were creating remove_at_index functions because you need them to implement hashmap_set properly
+    char new_data[xs->count];
+
+    for (int i = 0; i < xs->count; i++) {
+        if (i != index) {
+	    new_data[i] = xs->data[i];
+	}
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(char));   
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Remove at index no preserve order 
+// ---------------------------------------------------------------------------------------------------------------------
+void gup_array_char_remove_at_index_no_preserve_order(GupArrayChar *xs, const int index);
 
 // Find
 bool gup_array_bool_find(GupArrayBool xs, bool (*fn)(bool), bool *out) {
