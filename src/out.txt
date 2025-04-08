@@ -1,90 +1,170 @@
-#define gup_array_bool_debug(xs) _gup_array_bool_debug(xs, #xs)
-void _gup_array_bool_debug(GupArrayBool xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_bool_remove_at_index_preserve_order(GupArrayBool *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    bool new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(bool));
 }
 
-#define gup_array_char_debug(xs) _gup_array_char_debug(xs, #xs)
-void _gup_array_char_debug(GupArrayChar xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_char_remove_at_index_preserve_order(GupArrayChar *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    char new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(char));
 }
 
-#define gup_array_double_debug(xs) _gup_array_double_debug(xs, #xs)
-void _gup_array_double_debug(GupArrayDouble xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_double_remove_at_index_preserve_order(GupArrayDouble *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    double new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(double));
 }
 
-#define gup_array_float_debug(xs) _gup_array_float_debug(xs, #xs)
-void _gup_array_float_debug(GupArrayFloat xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_float_remove_at_index_preserve_order(GupArrayFloat *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    float new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(float));
 }
 
-#define gup_array_int_debug(xs) _gup_array_int_debug(xs, #xs)
-void _gup_array_int_debug(GupArrayInt xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_int_remove_at_index_preserve_order(GupArrayInt *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    int new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(int));
 }
 
-#define gup_array_long_debug(xs) _gup_array_long_debug(xs, #xs)
-void _gup_array_long_debug(GupArrayLong xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_long_remove_at_index_preserve_order(GupArrayLong *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    long new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(long));
 }
 
-#define gup_array_ptr_debug(xs) _gup_array_ptr_debug(xs, #xs)
-void _gup_array_ptr_debug(GupArrayPtr xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_ptr_remove_at_index_preserve_order(GupArrayPtr *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    void* new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(void*));
 }
 
-#define gup_array_short_debug(xs) _gup_array_short_debug(xs, #xs)
-void _gup_array_short_debug(GupArrayShort xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_short_remove_at_index_preserve_order(GupArrayShort *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    short new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(short));
 }
 
-#define gup_array_string_debug(xs) _gup_array_string_debug(xs, #xs)
-void _gup_array_string_debug(GupArrayString xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_string_remove_at_index_preserve_order(GupArrayString *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    GupString new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(GupString));
 }
 
-#define gup_array_cstr_debug(xs) _gup_array_cstr_debug(xs, #xs)
-void _gup_array_cstr_debug(GupArrayCstr xs, const char *xs_name) {
-    printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
-    printf("}\n");
+void gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    char* new_data[xs->count];
+
+    for (int i = 0, j = 0; i < xs->count; i++) {
+        if (i != index) {
+            new_data[j] = xs->data[i];
+            j++;
+        }
+    }
+
+    xs->count--;
+    memcpy(xs->data, new_data, xs->count * sizeof(char*));
 }
 

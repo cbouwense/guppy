@@ -451,19 +451,41 @@ void test_gup_array_remove() {
     }
 }
 
-void test_gup_array_remove_at(void) {
-    GupArrayChar chars = gup_array_char_create(NULL);
-    gup_array_char_append(NULL, &chars, 'x');
-    gup_array_char_append(NULL, &chars, 'y');
-    gup_array_char_append(NULL, &chars, 'z');
-    
-    gup_array_char_remove_at_index_preserve_order(&chars, 1);
+void test_gup_array_remove_at_index_preserve_order(void) {
+    { // Normal
+        GupArrayChar chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, &chars, 'x');
+        gup_array_char_append(NULL, &chars, 'y');
+        gup_array_char_append(NULL, &chars, 'z');
+        
+        // Remove element in the middle
+        gup_array_char_remove_at_index_preserve_order(&chars, 1);
 
-    gup_assert(chars.count == 2);
-    gup_assert(chars.data[0] == 'x');
-    gup_assert(chars.data[1] == 'z');
+        gup_assert(chars.count == 2);
+        gup_assert(chars.data[0] == 'x');
+        gup_assert(chars.data[1] == 'z');
 
-    gup_array_char_destroy(chars);
+        // Remove element at the end
+        gup_array_char_remove_at_index_preserve_order(&chars, 1);
+
+        gup_assert(chars.count == 1);
+        gup_assert(chars.data[0] == 'x');
+
+        // Remove element at the beginning
+        gup_array_char_remove_at_index_preserve_order(&chars, 0);
+
+        gup_assert(chars.count == 0);
+
+        gup_array_char_destroy(chars);
+    }
+
+    { // Strings
+        // GupArrayString ints = gup_array_
+    }
+
+    { // Cstrs
+
+    }
 }
 
 void test_gup_array(void) {
@@ -481,7 +503,7 @@ void test_gup_array(void) {
     test_one_append_one_prepend_orders_correctly();
 
     test_gup_array_remove();
-    test_gup_array_remove_at();
+    test_gup_array_remove_at_index_preserve_order();
 
     test_gup_array_char_create_from_cstr();
 

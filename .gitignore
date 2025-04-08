@@ -1,4 +1,4 @@
 .vscode/
 build/
-src/gen.js
-src/out.txt
+# src/gen.js
+# src/out.txt

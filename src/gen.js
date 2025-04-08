@@ -1,0 +1,30 @@
+const gen = (upper, lower, type) => {
+  console.log(`void gup_array_${lower}_remove_at_index_preserve_order(GupArray${upper} *xs, const int index) {`);
+  console.log(`    _gup_array_sanity_check(xs);`); 
+  console.log(`    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");`);
+  console.log(``);
+  console.log(`    ${type} new_data[xs->count];`);
+  console.log(``);
+  console.log(`    for (int i = 0, j = 0; i < xs->count; i++) {`);
+  console.log(`        if (i != index) {`);
+  console.log(`            new_data[j] = xs->data[i];`);
+  console.log(`            j++;`);
+  console.log(`        }`);
+  console.log(`    }`);
+  console.log(``);
+  console.log(`    xs->count--;`);
+  console.log(`    memcpy(xs->data, new_data, xs->count * sizeof(${type}));`);
+  console.log(`}`);
+  console.log(``);
+};
+
+gen('Bool', 'bool', 'bool');
+gen('Char', 'char', 'char');
+gen('Double', 'double', 'double');
+gen('Float', 'float', 'float');
+gen('Int', 'int', 'int');
+gen('Long', 'long', 'long');
+gen('Ptr', 'ptr', 'void*');
+gen('Short', 'short', 'short');
+gen('String', 'string', 'GupString');
+gen('Cstr', 'cstr', 'char*');
