@@ -451,6 +451,21 @@ void test_gup_array_remove() {
     }
 }
 
+void test_gup_array_remove_at(void) {
+    GupArrayChar chars = gup_array_char_create(NULL);
+    gup_array_char_append(NULL, &chars, 'x');
+    gup_array_char_append(NULL, &chars, 'y');
+    gup_array_char_append(NULL, &chars, 'z');
+    
+    gup_array_char_remove_at_index_preserve_order(&chars, 1);
+
+    gup_assert(chars.count == 2);
+    gup_assert(chars.data[0] == 'x');
+    gup_assert(chars.data[1] == 'z');
+
+    gup_array_char_destroy(chars);
+}
+
 void test_gup_array(void) {
     test_new_gup_array_has_default_capacity();
     test_new_gup_array_has_zero_count();
@@ -466,6 +481,7 @@ void test_gup_array(void) {
     test_one_append_one_prepend_orders_correctly();
 
     test_gup_array_remove();
+    test_gup_array_remove_at();
 
     test_gup_array_char_create_from_cstr();
 

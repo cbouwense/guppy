@@ -887,6 +887,13 @@ void gup_arena_free(GupArena *a) {
 
 // Dynamic Arrays ----------------------------------------------------------------------------------
 
+#define _gup_array_sanity_check(xs) do {\
+    gup_assert_verbose(xs != NULL,                      "You're trying to remove something from a null array.");\
+    gup_assert_verbose(xs->count > 1,                   "You're trying to remove something from an empty array.");\
+    gup_assert_verbose(xs->capacity > 0,                "You're trying to remove something from an array without any capacity.");\
+    gup_assert_verbose(xs->count <= xs->capacity,       "You're trying to remove something from an array whose count has exceeded its capacity.");\
+} while (0)
+
 // Default constructors
 GupArrayBool gup_array_bool_create(GupAllocator *a) {
     GupArrayBool xs = {
@@ -2445,19 +2452,15 @@ void gup_array_cstr_remove_all(GupArrayCstr *xs, char *x) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void gup_array_char_remove_at_index_preserve_order(GupArrayChar *xs, const int index) {
-    // TODO: these array assertions could probably be a function _gup_array_sanity_check 
-    gup_assert_verbose(xs != NULL,                      "You're trying to remove something from a null array.");
-    gup_assert_verbose(xs->count > 1,                   "You're trying to remove something from an empty array.");
-    gup_assert_verbose(xs->capacity > 0,                "You're trying to remove something from an array without any capacity.");
-    gup_assert_verbose(xs->count <= xs->capacity,       "You're trying to remove something from an array whose count has exceeded its capacity.");
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+    _gup_array_sanity_check(xs); 
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");\
 
-    // REMINDER: You were creating remove_at_index functions because you need them to implement hashmap_set properly
     char new_data[xs->count];
 
-    for (int i = 0; i < xs->count; i++) {
+    for (int i = 0, j = 0; i < xs->count; i++) {
         if (i != index) {
-	    new_data[i] = xs->data[i];
+	    new_data[j] = xs->data[i];
+	    j++;
 	}
     }
 
