@@ -265,6 +265,8 @@ void           gup_array_bool_append(GupAllocator *a, GupArrayBool *xs, bool x);
 void           gup_array_bool_prepend(GupAllocator *a, GupArrayBool *xs, bool x);
 void           gup_array_bool_remove(GupArrayBool *xs, bool x, int count_to_remove);
 void           gup_array_bool_remove_all(GupArrayBool *xs, bool x);
+void           gup_array_bool_remove_at_preserve_order(GupArrayBool *xs, const int index);
+void           gup_array_bool_remove_at_no_preserve_order(GupArrayBool *xs, const int index);
 GupArrayBool   gup_array_bool_sort(GupAllocator *a, GupArrayBool xs);
 // TODO sort fn, is_sorted, sort_in_place
 
@@ -298,6 +300,8 @@ void           gup_array_double_append(GupAllocator *a, GupArrayDouble *xs, doub
 void           gup_array_double_prepend(GupAllocator *a, GupArrayDouble *xs, double x);
 void           gup_array_double_remove(GupArrayDouble *xs, double x, int count_to_remove);
 void           gup_array_double_remove_all(GupArrayDouble *xs, double x);
+void           gup_array_double_remove_at_preserve_order(GupArrayDouble *xs, const int index);
+void           gup_array_double_remove_at_no_preserve_order(GupArrayDouble *xs, const int index);
 GupArrayDouble gup_array_double_sort(GupAllocator *a, GupArrayDouble xs);
 
 GupArrayFloat  gup_array_float_create(GupAllocator *a);
@@ -311,6 +315,8 @@ void           gup_array_float_append(GupAllocator *a, GupArrayFloat *xs, float 
 void           gup_array_float_prepend(GupAllocator *a, GupArrayFloat *xs, float x);
 void           gup_array_float_remove(GupArrayFloat *xs, float x, int count_to_remove);
 void           gup_array_float_remove_all(GupArrayFloat *xs, float x);
+void           gup_array_float_remove_at_preserve_order(GupArrayFloat *xs, const int index);
+void           gup_array_float_remove_at_no_preserve_order(GupArrayFloat *xs, const int index);
 GupArrayFloat  gup_array_float_sort(GupAllocator *a, GupArrayFloat xs);
 
 // TODO: gup_array_int_create_size();
@@ -326,6 +332,8 @@ void           gup_array_int_append(GupAllocator *a, GupArrayInt *xs, int x);
 void           gup_array_int_prepend(GupAllocator *a, GupArrayInt *xs, int x);
 void           gup_array_int_remove(GupArrayInt *xs, int x, int count_to_remove);
 void           gup_array_int_remove_all(GupArrayInt *xs, int x);
+void           gup_array_int_remove_at_preserve_order(GupArrayInt *xs, const int index);
+void           gup_array_int_remove_at_no_preserve_order(GupArrayInt *xs, const int index);
 GupArrayInt    gup_array_int_sort(GupAllocator *a, GupArrayInt xs);
 
 GupArrayLong   gup_array_long_create(GupAllocator *a);
@@ -339,6 +347,8 @@ void           gup_array_long_append(GupAllocator *a, GupArrayLong *xs, long x);
 void           gup_array_long_prepend(GupAllocator *a, GupArrayLong *xs, long x);
 void           gup_array_long_remove(GupArrayLong *xs, long x, int count_to_remove);
 void           gup_array_long_remove_all(GupArrayLong *xs, long x);
+void           gup_array_long_remove_at_preserve_order(GupArrayLong *xs, const int index);
+void           gup_array_long_remove_at_no_preserve_order(GupArrayLong *xs, const int index);
 GupArrayLong   gup_array_long_sort(GupAllocator *a, GupArrayLong xs);
 
 GupArrayPtr    gup_array_ptr_create(GupAllocator *a);
@@ -360,6 +370,8 @@ void           gup_array_short_append(GupAllocator *a, GupArrayShort *xs, short 
 void           gup_array_short_prepend(GupAllocator *a, GupArrayShort *xs, short x);
 void           gup_array_short_remove(GupArrayShort *xs, short x, int count_to_remove);
 void           gup_array_short_remove_all(GupArrayShort *xs, short x);
+void           gup_array_short_remove_at_preserve_order(GupArrayShort *xs, const int index);
+void           gup_array_short_remove_at_no_preserve_order(GupArrayShort *xs, const int index);
 GupArrayShort  gup_array_short_sort(GupAllocator *a, GupArrayShort xs);
 
 GupArrayString gup_array_string_create(GupAllocator *a);
@@ -377,6 +389,8 @@ void           gup_array_string_prepend_cstr(GupAllocator *a, GupArrayString *xs
 void           gup_array_string_remove(GupArrayString *xs, GupArrayChar x, int count_to_remove);
 void           gup_array_string_remove_all(GupArrayString *xs, GupString x);
 void           gup_array_string_remove_all_cstr(GupAllocator *a, GupArrayString *xs, char *x);
+void           gup_array_string_remove_at_preserve_order(GupArrayString *xs, const int index);
+void           gup_array_string_remove_at_no_preserve_order(GupArrayString *xs, const int index);
 GupArrayString gup_array_string_sort(GupAllocator *a, GupArrayString xs);
 
 GupArrayCstr   gup_array_cstr_create(GupAllocator *a);
@@ -390,6 +404,8 @@ void           gup_array_cstr_append(GupAllocator *a, GupArrayCstr *xs, char *x)
 void           gup_array_cstr_prepend(GupAllocator *a, GupArrayCstr *xs, char *x);
 void           gup_array_cstr_remove(GupArrayCstr *xs, char *x, int count_to_remove);
 void           gup_array_cstr_remove_all(GupArrayCstr *xs, char *x);
+void           gup_array_cstr_remove_at_preserve_order(GupArrayCstr *xs, const int index);
+void           gup_array_cstr_remove_at_no_preserve_order(GupArrayCstr *xs, const int index);
 GupArrayCstr   gup_array_cstr_sort(GupAllocator *a, GupArrayCstr xs);
 
 // File operations ---------------------------------------------------------------------------------
@@ -1584,7 +1600,7 @@ void _gup_array_short_print(GupArrayShort xs, const char *xs_name) {
 
 #define gup_array_string_print(xs) _gup_array_string_print(xs, #xs)
 void _gup_array_string_print(GupArrayString xs, const char *xs_name) {
-    printf("%s: [", xs_name);
+    printf("%s: [\n", xs_name);
     for (int i = 0; i < xs.count; i++) {
         printf("  \"");
         for (int j = 0; j < xs.data[i].count; j++) {
@@ -2604,7 +2620,7 @@ void gup_array_string_remove_at_index_preserve_order(GupAllocator *a, GupArraySt
     memcpy(xs->data, new_data, xs->count * sizeof(GupString));
 }
 
-void gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr *xs, const int index) {
+void gup_array_cstr_remove_at_index_preserve_order(GupAllocator *a, GupArrayCstr *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
@@ -2612,7 +2628,9 @@ void gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr *xs, const int i
 
     for (int i = 0, j = 0; i < xs->count; i++) {
         if (i != index) {
-            strcpy(new_data[j], xs->data[i]);
+            const int string_length = gup_cstr_length_including_null(xs->data[i]);
+            new_data[j] = gup_alloc(a, string_length); 
+            strncpy(new_data[j], xs->data[i], string_length);
             j++;
         }
     }
