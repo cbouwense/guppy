@@ -522,6 +522,77 @@ void test_gup_array_remove_at_index_preserve_order(void) {
     }
 }
 
+void test_gup_array_remove_at_index_no_preserve_order(void) {
+    { // Normal
+        GupArrayChar chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, &chars, 'x');
+        gup_array_char_append(NULL, &chars, 'y');
+        gup_array_char_append(NULL, &chars, 'z');
+        
+        // Remove element in the middle
+        gup_array_char_remove_at_index_no_preserve_order(&chars, 1);
+
+        gup_assert(chars.count == 2);
+        gup_assert(chars.data[0] == 'x');
+        gup_assert(chars.data[1] == 'z');
+
+        // Remove element at the end
+        gup_array_char_remove_at_index_no_preserve_order(&chars, 1);
+
+        gup_assert(chars.count == 1);
+        gup_assert(chars.data[0] == 'x');
+
+        // Remove element at the beginning
+        gup_array_char_remove_at_index_no_preserve_order(&chars, 0);
+
+        gup_assert(chars.count == 0);
+
+        gup_array_char_destroy(chars);
+    }
+
+    { // Strings
+        GupArena a = gup_arena_create();        
+        GupArrayString strings = gup_array_string_create((GupAllocator*)&a);
+
+        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "qwer");
+        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "asdf");
+        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "zxcv");
+        
+        gup_array_string_remove_at_index_no_preserve_order((GupAllocator*)&a, &strings, 1);
+
+        gup_assert(strings.count == 2);
+        gup_assert(gup_string_equals_cstr(strings.data[0], "qwer"));
+        gup_assert(gup_string_equals_cstr(strings.data[1], "zxcv"));
+
+        gup_array_string_remove_at_index_no_preserve_order((GupAllocator*)&a, &strings, 0);
+        gup_assert(strings.count == 1);
+        gup_assert(gup_string_equals_cstr(strings.data[0], "zxcv"));
+
+        gup_arena_destroy(&a);
+    }
+
+    { // Cstrs 
+        GupArena a = gup_arena_create();        
+        GupArrayCstr cstrs = gup_array_cstr_create((GupAllocator*)&a);
+
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "qwer");
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "asdf");
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "zxcv");
+        
+        gup_array_cstr_remove_at_index_no_preserve_order((GupAllocator*)&a, &cstrs, 1);
+
+        gup_assert(cstrs.count == 2);
+        gup_assert(gup_cstr_equals(cstrs.data[0], "qwer"));
+        gup_assert(gup_cstr_equals(cstrs.data[1], "zxcv"));
+
+        gup_array_cstr_remove_at_index_no_preserve_order((GupAllocator*)&a, &cstrs, 0);
+        gup_assert(cstrs.count == 1);
+        gup_assert(gup_cstr_equals(cstrs.data[0], "zxcv"));
+
+        gup_arena_destroy(&a);
+    }
+}
+
 void test_gup_array(void) {
     test_new_gup_array_has_default_capacity();
     test_new_gup_array_has_zero_count();
@@ -538,6 +609,7 @@ void test_gup_array(void) {
 
     test_gup_array_remove();
     test_gup_array_remove_at_index_preserve_order();
+    test_gup_array_remove_at_index_no_preserve_order();
 
     test_gup_array_char_create_from_cstr();
 

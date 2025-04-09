@@ -2642,7 +2642,130 @@ void gup_array_cstr_remove_at_index_preserve_order(GupAllocator *a, GupArrayCstr
 // ---------------------------------------------------------------------------------------------------------------------
 // Remove at index no preserve order 
 // ---------------------------------------------------------------------------------------------------------------------
-void gup_array_char_remove_at_index_no_preserve_order(GupArrayChar *xs, const int index);
+void gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = xs->data[xs->count-1];
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
+void gup_array_char_remove_at_index_no_preserve_order(GupArrayChar *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = xs->data[xs->count-1];
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
+void gup_array_double_remove_at_index_no_preserve_order(GupArrayDouble *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = xs->data[xs->count-1];
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
+void gup_array_float_remove_at_index_no_preserve_order(GupArrayFloat *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = xs->data[xs->count-1];
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
+void gup_array_int_remove_at_index_no_preserve_order(GupArrayInt *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = xs->data[xs->count-1];
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
+void gup_array_long_remove_at_index_no_preserve_order(GupArrayLong *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = xs->data[xs->count-1];
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
+void gup_array_short_remove_at_index_no_preserve_order(GupArrayShort *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = xs->data[xs->count-1];
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
+void gup_array_string_remove_at_index_no_preserve_order(GupAllocator *a, GupArrayString *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = gup_array_char_copy(a, xs->data[xs->count-1]);
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
+void gup_array_cstr_remove_at_index_no_preserve_order(GupAllocator *a, GupArrayCstr *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+
+    // NOTE: I initially put a free here for the data we are overriding. I realized this assumes that the gup_array is
+    // the owner of the memory that it points to, which I do not believe I assume elsewhere. So, I have removed it for
+    // now. If there is a memory leak in this function, that really means that I either need to rethink the ownership
+    // assumptions for this function, or I forgot to free the string that this function is borrowing.
+
+    const int last_string_length = gup_cstr_length_including_null(xs->data[xs->count-1]);
+    xs->data[index] = gup_alloc(a, last_string_length);
+    gup_cstr_copy_n(xs->data[index], xs->data[xs->count-1], last_string_length-1);
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
 
 // Find
 bool gup_array_bool_find(GupArrayBool xs, bool (*fn)(bool), bool *out) {
@@ -6052,7 +6175,7 @@ bool gup_cstr_equals(const char *a, const char* b) {
 }
 
 /**
- * Assumes "to" has enough memory allocatd for for n+1 characters (+1 for the null terminator).
+ * Assumes "to" has enough memory allocated for for n+1 characters (+1 for the null terminator).
  * Null terminates the "to" string.
  * ```
  * char *to = gup_alloc(a, 6);
