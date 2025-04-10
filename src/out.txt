@@ -1,120 +1,130 @@
-void gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_bool_find_index_of(const GupArrayBool *xs, bool x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
-
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_char_remove_at_index_no_preserve_order(GupArrayChar *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_char_find_index_of(const GupArrayChar *xs, char x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_double_remove_at_index_no_preserve_order(GupArrayDouble *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_double_find_index_of(const GupArrayDouble *xs, double x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_float_remove_at_index_no_preserve_order(GupArrayFloat *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_float_find_index_of(const GupArrayFloat *xs, float x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_int_remove_at_index_no_preserve_order(GupArrayInt *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_int_find_index_of(const GupArrayInt *xs, int x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_long_remove_at_index_no_preserve_order(GupArrayLong *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_long_find_index_of(const GupArrayLong *xs, long x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_ptr_remove_at_index_no_preserve_order(GupArrayPtr *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_ptr_find_index_of(const GupArrayPtr *xs, void* x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_short_remove_at_index_no_preserve_order(GupArrayShort *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_short_find_index_of(const GupArrayShort *xs, short x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_string_remove_at_index_no_preserve_order(GupArrayString *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_string_find_index_of(const GupArrayString *xs, GupString x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
-void gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr *xs, const int index) {
-    _gup_array_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_cstr_find_index_of(const GupArrayCstr *xs, char* x) {
+  for (int i = 0; i < xs->count; i++) {
+      if (xs->data[i] == x) {
+          return i;
+      }
+  }
 
-    // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
-    xs->count--;
+  return -1;
 }
+

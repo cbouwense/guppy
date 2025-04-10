@@ -24,15 +24,16 @@ void reset_settings_file(void) {
 int main(void) {
     reset_settings_file();
 
-//    test_gup_arena();
+    // TODO: multi thread these
+    test_gup_arena();
     test_gup_array();
-//    test_gup_set();
-//    test_gup_hashmap();
-//    test_gup_file();
-//    test_gup_settings();
-//    test_gup_stack();
-//    test_gup_string();
-//    test_gup_cstr();
+    test_gup_set();
+    // test_gup_hashmap();
+    test_gup_file();
+    test_gup_settings();
+    test_gup_stack();
+    test_gup_string();
+    test_gup_cstr();
 
     reset_settings_file();
     #ifdef GUPPY_DEBUG_MEMORY

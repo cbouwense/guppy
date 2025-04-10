@@ -451,6 +451,57 @@ void test_gup_array_remove() {
     }
 }
 
+void test_gup_array_find_index_of() {
+    { // Happy path
+        GupArrayChar chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, &chars, 'a');
+        gup_array_char_append(NULL, &chars, 'b');
+        gup_array_char_append(NULL, &chars, 'c');
+
+        const int result = gup_array_char_find_index_of(&chars, 'c');
+
+        gup_assert(result == 2);
+
+        gup_array_char_destroy(chars);
+    }
+
+    { // Finds only first match
+        GupArrayChar chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, &chars, 'a');
+        gup_array_char_append(NULL, &chars, 'b');
+        gup_array_char_append(NULL, &chars, 'a');
+
+        const int result = gup_array_char_find_index_of(&chars, 'a');
+
+        gup_assert(result == 0);
+
+        gup_array_char_destroy(chars);
+    }
+
+    { // Returns -1 on no match
+        GupArrayChar chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, &chars, 'a');
+        gup_array_char_append(NULL, &chars, 'b');
+        gup_array_char_append(NULL, &chars, 'a');
+
+        const int result = gup_array_char_find_index_of(&chars, 'c');
+
+        gup_assert(result == -1);
+
+        gup_array_char_destroy(chars);
+    }
+
+    { // Returns -1 on empty array
+        GupArrayChar chars = gup_array_char_create(NULL);
+
+        const int result = gup_array_char_find_index_of(&chars, 'c');
+
+        gup_assert(result == -1);
+
+        gup_array_char_destroy(chars);
+    }
+}
+
 void test_gup_array_remove_at_index_preserve_order(void) {
     { // Normal
         GupArrayChar chars = gup_array_char_create(NULL);
@@ -621,6 +672,7 @@ void test_gup_array(void) {
     
     test_gup_array_contains();
     test_gup_array_find();
+    test_gup_array_find_index_of();
     test_gup_array_string_find();
 
     #ifdef GUPPY_VERBOSE

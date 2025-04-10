@@ -281,6 +281,7 @@ bool           gup_array_char_contains(GupArrayChar xs, char x);
 void           gup_array_char_print(GupArrayChar xs);
 void           gup_array_char_append(GupAllocator *a, GupArrayChar *xs, char x);
 void           gup_array_char_prepend(GupAllocator *a, GupArrayChar *xs, char x);
+int            gup_array_char_find_index_of(const GupArrayChar *xs, char x);
 void           gup_array_char_remove(GupArrayChar *xs, char x, int count_to_remove);
 void           gup_array_char_remove_all(GupArrayChar *xs, char x);
 void           gup_array_char_remove_at_index_preserve_order(GupArrayChar *xs, const int index);
@@ -386,6 +387,7 @@ void           gup_array_string_append(GupAllocator *a, GupArrayString *xs, GupS
 void           gup_array_string_append_cstr(GupAllocator *a, GupArrayString *xs, char cstr[]);
 void           gup_array_string_prepend(GupAllocator *a, GupArrayString *xs, GupString x);
 void           gup_array_string_prepend_cstr(GupAllocator *a, GupArrayString *xs, char cstr[]);
+bool           gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArrayChar *out)
 void           gup_array_string_remove(GupArrayString *xs, GupArrayChar x, int count_to_remove);
 void           gup_array_string_remove_all(GupArrayString *xs, GupString x);
 void           gup_array_string_remove_all_cstr(GupAllocator *a, GupArrayString *xs, char *x);
@@ -2082,6 +2084,140 @@ void gup_array_cstr_prepend(GupAllocator *a, GupArrayCstr *xs, char * x) {
     xs->count++;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Find index of element
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_bool_find_index_of(const GupArrayBool *xs, bool x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+  
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_char_find_index_of(const GupArrayChar *xs, char x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+  
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_double_find_index_of(const GupArrayDouble *xs, double x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+  
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_float_find_index_of(const GupArrayFloat *xs, float x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+  
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_int_find_index_of(const GupArrayInt *xs, int x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+  
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+void gup_array_long_find_index_of(const GupArrayLong *xs, long x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+i gup_array_ptr_find_index_of(const GupArrayPtr *xs, void* x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+int gup_array_short_find_index_of(const GupArrayShort *xs, short x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+  
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+int gup_array_string_find_index_of(const GupArrayString *xs, GupString x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (gup_string_equals(xs->data[i], x)) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+  
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+int gup_array_cstr_find_index_of(const GupArrayCstr *xs, char* x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (gup_cstr_equals(xs->data[i], x)) {
+            return i;
+        }
+    }
+  
+    return -1;
+}  
+
 // Remove
 void gup_array_bool_remove(GupArrayBool *xs, bool x, int count_to_remove) {
     bool new_data[xs->count];
@@ -2768,94 +2904,7 @@ void gup_array_cstr_remove_at_index_no_preserve_order(GupAllocator *a, GupArrayC
 }
 
 // Find
-bool gup_array_bool_find(GupArrayBool xs, bool (*fn)(bool), bool *out) {
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            *out = xs.data[i];
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool gup_array_char_find(GupArrayChar xs, bool (*fn)(char), char *out) {
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            *out = xs.data[i];
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool gup_array_double_find(GupArrayDouble xs, bool (*fn)(double), double *out) {
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            *out = xs.data[i];
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool gup_array_float_find(GupArrayFloat xs, bool (*fn)(float), float *out) {
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            *out = xs.data[i];
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool gup_array_int_find(GupArrayInt xs, bool (*fn)(int), int *out) {
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            *out = xs.data[i];
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool gup_array_long_find(GupArrayLong xs, bool (*fn)(long), long *out) {
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            *out = xs.data[i];
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool gup_array_ptr_find(GupArrayPtr xs, bool (*fn)(void*), void* *out) {
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            *out = xs.data[i];
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool gup_array_short_find(GupArrayShort xs, bool (*fn)(short), short *out) {
-    for (int i = 0; i < xs.count; i++) {
-        if (fn(xs.data[i])) {
-            *out = xs.data[i];
-            return true;
-        }
-    }
-
-    return false;
-}
-
+// TODO: this is highly suspicious code
 bool gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArrayChar *out) {
     for (int i = 0; i < xs.count; i++) {
         if (fn(xs.data[i])) {
@@ -5201,7 +5250,17 @@ void gup_hashmap_bool_set(GupAllocator *a, GupHashmapBool *hashmap, char *key, b
 void gup_hashmap_char_set(GupAllocator *a, GupHashmapChar *hashmap, char *key, char value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    gup_array_cstr_print(hashmap->keys[index]);
+    gup_array_char_print(hashmap->values[index]);
+    if (gup_array_cstr_contains(hashmap->keys[index], key)) {
+        // Technically, the order of the these arrays matters a lot. But, really only the pairing of keys to values
+        // matters, and not the overall ordering. Therefore, we can use the faster "no preserve" variant because the
+        // index is the same for both. 
+
+        // gup_array_cstr_remove_a(a, &(hashmap->keys[index]), index);
+        // gup_array_char_remove_a(&(hashmap->values[index]), index);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_char_append(a, &(hashmap->values[index]), value);
