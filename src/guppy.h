@@ -387,7 +387,7 @@ void           gup_array_string_append(GupAllocator *a, GupArrayString *xs, GupS
 void           gup_array_string_append_cstr(GupAllocator *a, GupArrayString *xs, char cstr[]);
 void           gup_array_string_prepend(GupAllocator *a, GupArrayString *xs, GupString x);
 void           gup_array_string_prepend_cstr(GupAllocator *a, GupArrayString *xs, char cstr[]);
-bool           gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArrayChar *out)
+bool           gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArrayChar *out);
 void           gup_array_string_remove(GupArrayString *xs, GupArrayChar x, int count_to_remove);
 void           gup_array_string_remove_all(GupArrayString *xs, GupString x);
 void           gup_array_string_remove_all_cstr(GupAllocator *a, GupArrayString *xs, char *x);
@@ -770,7 +770,7 @@ int   gup_cstr_length_excluding_null(const char* cstr); // Assumes a null termin
 int   gup_cstr_length_including_null(const char* cstr); // Assumes a null terminated string.
 bool  gup_cstr_equals(const char *a, const char* b);
 void  gup_cstr_copy(char *to, const char *from);
-void  gup_cstr_copy_n(char *to, const char *from, int n);
+void  gup_cstr_copy_n(char *to, const char *from, const int n);
 void  gup_cstr_print(const char *cstr);
 
 // Math
@@ -1881,13 +1881,13 @@ void gup_array_string_append_cstr(GupAllocator *a, GupArrayString *xs, char *cst
     xs->count++;
 }
 
-void gup_array_cstr_append(GupAllocator *a, GupArrayCstr *xs, char * x) {
+void gup_array_cstr_append(GupAllocator *a, GupArrayCstr *xs, char* x) {
     if (xs->count == xs->capacity) {
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        char **new_data = gup_alloc(a, new_capacity * sizeof(char *));
+        char** new_data = gup_alloc(a, new_capacity * sizeof(char*));
         
-        memcpy(new_data, xs->data, xs->count * sizeof(char *));
-        gup_free(a, xs->data);
+        memcpy(new_data, xs->data, xs->count * sizeof(char*));
+        if (a == NULL) gup_free(a, xs->data);
 
         xs->data     = new_data;
         xs->capacity = new_capacity;
@@ -2091,72 +2091,7 @@ void gup_array_cstr_prepend(GupAllocator *a, GupArrayCstr *xs, char * x) {
 /**
  * @return zero-indexed index of the element, -1 if not found.
  */
-void gup_array_bool_find_index_of(const GupArrayBool *xs, bool x) {
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] == x) {
-            return i;
-        }
-    }
-  
-    return -1;
-}
-  
-/**
- * @return zero-indexed index of the element, -1 if not found.
- */
-void gup_array_char_find_index_of(const GupArrayChar *xs, char x) {
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] == x) {
-            return i;
-        }
-    }
-  
-    return -1;
-}
-  
-/**
- * @return zero-indexed index of the element, -1 if not found.
- */
-void gup_array_double_find_index_of(const GupArrayDouble *xs, double x) {
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] == x) {
-            return i;
-        }
-    }
-  
-    return -1;
-}
-  
-/**
- * @return zero-indexed index of the element, -1 if not found.
- */
-void gup_array_float_find_index_of(const GupArrayFloat *xs, float x) {
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] == x) {
-            return i;
-        }
-    }
-  
-    return -1;
-}
-  
-/**
- * @return zero-indexed index of the element, -1 if not found.
- */
-void gup_array_int_find_index_of(const GupArrayInt *xs, int x) {
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] == x) {
-            return i;
-        }
-    }
-  
-    return -1;
-}
-  
-/**
- * @return zero-indexed index of the element, -1 if not found.
- */
-void gup_array_long_find_index_of(const GupArrayLong *xs, long x) {
+int gup_array_bool_find_index_of(const GupArrayBool *xs, bool x) {
     for (int i = 0; i < xs->count; i++) {
         if (xs->data[i] == x) {
             return i;
@@ -2169,7 +2104,72 @@ void gup_array_long_find_index_of(const GupArrayLong *xs, long x) {
 /**
  * @return zero-indexed index of the element, -1 if not found.
  */
-i gup_array_ptr_find_index_of(const GupArrayPtr *xs, void* x) {
+int gup_array_char_find_index_of(const GupArrayChar *xs, char x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+int gup_array_double_find_index_of(const GupArrayDouble *xs, double x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+int gup_array_float_find_index_of(const GupArrayFloat *xs, float x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+int gup_array_int_find_index_of(const GupArrayInt *xs, int x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+int gup_array_long_find_index_of(const GupArrayLong *xs, long x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
+    }
+  
+    return -1;
+}
+
+/**
+ * @return zero-indexed index of the element, -1 if not found.
+ */
+int gup_array_ptr_find_index_of(const GupArrayPtr *xs, void* x) {
     for (int i = 0; i < xs->count; i++) {
         if (xs->data[i] == x) {
             return i;
@@ -2191,20 +2191,20 @@ int gup_array_short_find_index_of(const GupArrayShort *xs, short x) {
   
     return -1;
 }
-  
+
 /**
  * @return zero-indexed index of the element, -1 if not found.
  */
 int gup_array_string_find_index_of(const GupArrayString *xs, GupString x) {
     for (int i = 0; i < xs->count; i++) {
-        if (gup_string_equals(xs->data[i], x)) {
+        if (gup_array_char_equals(xs->data[i], x)) {
             return i;
         }
     }
   
     return -1;
 }
-  
+
 /**
  * @return zero-indexed index of the element, -1 if not found.
  */
@@ -2886,16 +2886,28 @@ void gup_array_cstr_remove_at_index_no_preserve_order(GupAllocator *a, GupArrayC
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-
-    // NOTE: I initially put a free here for the data we are overriding. I realized this assumes that the gup_array is
-    // the owner of the memory that it points to, which I do not believe I assume elsewhere. So, I have removed it for
-    // now. If there is a memory leak in this function, that really means that I either need to rethink the ownership
-    // assumptions for this function, or I forgot to free the string that this function is borrowing.
+    // Free the element that is going to be removed
+    // [1, 2, 3, 4, 5], 1 -> [1, <freed>, 3, 4, 5]
+    // TODO:?
+    // TODO: gup_realloc
+    // if (a == NULL) {
+    //     xs->data[index] = realloc(xs->data[index], last_string_length);
+    // }
 
     const int last_string_length = gup_cstr_length_including_null(xs->data[xs->count-1]);
-    xs->data[index] = gup_alloc(a, last_string_length);
+    printf("before %p\n", (void*)xs->data[index]);
+    char* tmp = NULL;
+    if (a == NULL) {
+        tmp = realloc(xs->data[index], last_string_length);
+        if (tmp == NULL) exit(1);
+        xs->data[index] = tmp;
+    }
+    printf("after %p\n", (void*)xs->data[index]); 
+
+    // REMINDER: STRINGS ARE IMMUTABLE!!!!!!!!! you cant just do gup_cstr_copy_n
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
     gup_cstr_copy_n(xs->data[index], xs->data[xs->count-1], last_string_length-1);
 
     // Remove the last element by decrementing the count
@@ -3863,7 +3875,6 @@ void gup_string_append_cstr(GupAllocator *a, GupString *str, const char *cstr_to
 }
 
 #define gup_string_prepend gup_array_char_prepend
-#define gup_string_find gup_array_char_find
 
 GupString gup_string_trim_char(GupAllocator *a, GupString str, char c) {
     GupString trimmed_str = gup_string_copy(a, str);
@@ -5253,13 +5264,14 @@ void gup_hashmap_char_set(GupAllocator *a, GupHashmapChar *hashmap, char *key, c
     // First we need to remove the existing entry if it's there.
     gup_array_cstr_print(hashmap->keys[index]);
     gup_array_char_print(hashmap->values[index]);
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) {
+
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
         // Technically, the order of the these arrays matters a lot. But, really only the pairing of keys to values
         // matters, and not the overall ordering. Therefore, we can use the faster "no preserve" variant because the
-        // index is the same for both. 
-
-        // gup_array_cstr_remove_a(a, &(hashmap->keys[index]), index);
-        // gup_array_char_remove_a(&(hashmap->values[index]), index);
+        // index is the same for both.
+        gup_array_cstr_remove_at_index_no_preserve_order(a, &(hashmap->keys[index]), index_of_existing);
+        gup_array_char_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
     }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
@@ -6242,7 +6254,12 @@ bool gup_cstr_equals(const char *a, const char* b) {
  * ```
  * this would result with `to` pointing to a chunk of memory with the contents 'H''e''l''l''o''\0'.
  */
-void gup_cstr_copy_n(char *to, const char *from, int n) {
+void gup_cstr_copy_n(char *to, const char *from, const int n) {
+    gup_assert(to != NULL);
+    gup_assert(from != NULL);
+    gup_assert(to != from);
+    gup_assert(n > 0);
+
     for (int i = 0; i < n; i++) {
         to[i] = from[i];
     }

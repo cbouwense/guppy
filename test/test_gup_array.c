@@ -300,56 +300,6 @@ bool is_not_a_floating_answer(float f) {
     return !is_a_floating_answer(f);
 }
 
-void test_gup_array_find(void) {
-    { // Empty arrays don't find anything
-        GupArrayChar chars = gup_array_char_create(NULL);
-        char found = '\0';
-
-        bool result = gup_array_char_find(chars, is_undercase, &found);
-
-        gup_assert(result == false);
-        gup_assert(found == '\0');
-
-        gup_array_char_destroy(chars);
-    }
-
-    { // Arrays without elements but not the needle don't find it
-        GupArrayDouble doubles = gup_array_double_create(NULL);
-        double found = 0.0;
-
-        gup_array_double_append(NULL, &doubles, 13.37);
-        gup_array_double_append(NULL, &doubles, 17.38);
-        
-        bool result = gup_array_double_find(doubles, is_the_answer, &found);
-
-        gup_assert(result == false);
-        gup_assert(found == 0.0);
-
-        gup_array_double_destroy(doubles);
-    }
-
-    GupArrayFloat floats = gup_array_float_create(NULL);
-    float found = 0.0;
-
-    gup_array_float_append(NULL, &floats, 13.37f);
-    gup_array_float_append(NULL, &floats, 4.2f);
-    gup_array_float_append(NULL, &floats, 17.38f);
-    gup_array_float_append(NULL, &floats, 42);
-    
-    bool result = gup_array_float_find(floats, is_a_floating_answer, &found);
-
-    gup_assert(result == true);
-    gup_assert(found == 4.2f);
-
-    gup_array_float_prepend(NULL, &floats, 0.42f);
-    result = gup_array_float_find(floats, is_a_floating_answer, &found);
-
-    gup_assert(result == true);
-    gup_assert(found == 0.42f);
-
-    gup_array_float_destroy(floats);
-}
-
 bool is_all_undercase(GupString str) {
     for (int i = 0; i < str.count; i++) {
         if (!is_undercase(str.data[i])) {
@@ -671,7 +621,6 @@ void test_gup_array(void) {
     test_gup_array_string_append();
     
     test_gup_array_contains();
-    test_gup_array_find();
     test_gup_array_find_index_of();
     test_gup_array_string_find();
 

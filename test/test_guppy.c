@@ -28,7 +28,7 @@ int main(void) {
     test_gup_arena();
     test_gup_array();
     test_gup_set();
-    // test_gup_hashmap();
+    test_gup_hashmap();
     test_gup_file();
     test_gup_settings();
     test_gup_stack();
