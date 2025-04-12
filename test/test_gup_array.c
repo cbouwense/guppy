@@ -151,6 +151,20 @@ void test_gup_array_char_create_from_cstr(void) {
     free(ys.data);
 }
 
+void test_gup_array_appending_resizes_properly(void) {
+    GupArena a = gup_arena_create();
+    GupArrayFloat xs = gup_array_float_create((GupAllocator*)&a);
+
+    for (int i = 0; i < 1337; i++) {
+        gup_array_float_append((GupAllocator*)&a, &xs, (float)i / 2);
+    }
+
+    gup_assert(xs.capacity == 2048);
+    gup_assert(xs.count == 1337);
+
+    gup_arena_destroy(&a);
+}
+
 void test_gup_array_string_create(void) {
     GupArrayString strs = gup_array_string_create(NULL);
 
@@ -616,6 +630,9 @@ void test_gup_array(void) {
     test_gup_array_remove_at_index_no_preserve_order();
 
     test_gup_array_char_create_from_cstr();
+
+    // Appending and prepending resize
+    test_gup_array_appending_resizes_properly();
 
     // Strings
     test_gup_array_string_create();
