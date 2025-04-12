@@ -79,13 +79,13 @@ typedef struct {
 typedef struct {
     int capacity;
     int count;
-    GupArrayChar *data;
+    GupArrayChar* data;
 } GupArrayString;
 
 typedef struct {
     int capacity;
     int count;
-    char **data;
+    char** data;
 } GupArrayCstr;
 
 // Allocators ----------------------------------------------------------------------------------------------------------
@@ -265,8 +265,8 @@ void           gup_array_bool_append(GupAllocator *a, GupArrayBool *xs, bool x);
 void           gup_array_bool_prepend(GupAllocator *a, GupArrayBool *xs, bool x);
 void           gup_array_bool_remove(GupArrayBool *xs, bool x, int count_to_remove);
 void           gup_array_bool_remove_all(GupArrayBool *xs, bool x);
-void           gup_array_bool_remove_at_preserve_order(GupArrayBool *xs, const int index);
-void           gup_array_bool_remove_at_no_preserve_order(GupArrayBool *xs, const int index);
+void           gup_array_bool_remove_at_index_preserve_order(GupArrayBool *xs, const int index);
+void           gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool *xs, const int index);
 GupArrayBool   gup_array_bool_sort(GupAllocator *a, GupArrayBool xs);
 // TODO sort fn, is_sorted, sort_in_place
 
@@ -301,8 +301,8 @@ void           gup_array_double_append(GupAllocator *a, GupArrayDouble *xs, doub
 void           gup_array_double_prepend(GupAllocator *a, GupArrayDouble *xs, double x);
 void           gup_array_double_remove(GupArrayDouble *xs, double x, int count_to_remove);
 void           gup_array_double_remove_all(GupArrayDouble *xs, double x);
-void           gup_array_double_remove_at_preserve_order(GupArrayDouble *xs, const int index);
-void           gup_array_double_remove_at_no_preserve_order(GupArrayDouble *xs, const int index);
+void           gup_array_double_remove_at_index_preserve_order(GupArrayDouble *xs, const int index);
+void           gup_array_double_remove_at_index_no_preserve_order(GupArrayDouble *xs, const int index);
 GupArrayDouble gup_array_double_sort(GupAllocator *a, GupArrayDouble xs);
 
 GupArrayFloat  gup_array_float_create(GupAllocator *a);
@@ -316,8 +316,8 @@ void           gup_array_float_append(GupAllocator *a, GupArrayFloat *xs, float 
 void           gup_array_float_prepend(GupAllocator *a, GupArrayFloat *xs, float x);
 void           gup_array_float_remove(GupArrayFloat *xs, float x, int count_to_remove);
 void           gup_array_float_remove_all(GupArrayFloat *xs, float x);
-void           gup_array_float_remove_at_preserve_order(GupArrayFloat *xs, const int index);
-void           gup_array_float_remove_at_no_preserve_order(GupArrayFloat *xs, const int index);
+void           gup_array_float_remove_at_index_preserve_order(GupArrayFloat *xs, const int index);
+void           gup_array_float_remove_at_index_no_preserve_order(GupArrayFloat *xs, const int index);
 GupArrayFloat  gup_array_float_sort(GupAllocator *a, GupArrayFloat xs);
 
 // TODO: gup_array_int_create_size();
@@ -333,8 +333,8 @@ void           gup_array_int_append(GupAllocator *a, GupArrayInt *xs, int x);
 void           gup_array_int_prepend(GupAllocator *a, GupArrayInt *xs, int x);
 void           gup_array_int_remove(GupArrayInt *xs, int x, int count_to_remove);
 void           gup_array_int_remove_all(GupArrayInt *xs, int x);
-void           gup_array_int_remove_at_preserve_order(GupArrayInt *xs, const int index);
-void           gup_array_int_remove_at_no_preserve_order(GupArrayInt *xs, const int index);
+void           gup_array_int_remove_at_index_preserve_order(GupArrayInt *xs, const int index);
+void           gup_array_int_remove_at_index_no_preserve_order(GupArrayInt *xs, const int index);
 GupArrayInt    gup_array_int_sort(GupAllocator *a, GupArrayInt xs);
 
 GupArrayLong   gup_array_long_create(GupAllocator *a);
@@ -348,8 +348,8 @@ void           gup_array_long_append(GupAllocator *a, GupArrayLong *xs, long x);
 void           gup_array_long_prepend(GupAllocator *a, GupArrayLong *xs, long x);
 void           gup_array_long_remove(GupArrayLong *xs, long x, int count_to_remove);
 void           gup_array_long_remove_all(GupArrayLong *xs, long x);
-void           gup_array_long_remove_at_preserve_order(GupArrayLong *xs, const int index);
-void           gup_array_long_remove_at_no_preserve_order(GupArrayLong *xs, const int index);
+void           gup_array_long_remove_at_index_preserve_order(GupArrayLong *xs, const int index);
+void           gup_array_long_remove_at_index_no_preserve_order(GupArrayLong *xs, const int index);
 GupArrayLong   gup_array_long_sort(GupAllocator *a, GupArrayLong xs);
 
 GupArrayPtr    gup_array_ptr_create(GupAllocator *a);
@@ -357,6 +357,8 @@ void           gup_array_ptr_destroy(GupArrayPtr xs);
 GupArrayPtr    gup_array_ptr_create_from_array(GupAllocator *a, void* xs[], const int size);
 GupArrayPtr    gup_array_ptr_copy(GupAllocator *a, GupArrayPtr xs);
 void           gup_array_ptr_print(GupArrayPtr xs);
+void           gup_array_ptr_remove_at_index_preserve_order(GupArrayPtr *xs, const int index);
+void           gup_array_ptr_remove_at_index_no_preserve_order(GupArrayPtr *xs, const int index);
 void           gup_array_ptr_append(GupAllocator *a, GupArrayPtr *xs, void* x);
 void           gup_array_ptr_prepend(GupAllocator *a, GupArrayPtr *xs, void* x);
 
@@ -371,8 +373,8 @@ void           gup_array_short_append(GupAllocator *a, GupArrayShort *xs, short 
 void           gup_array_short_prepend(GupAllocator *a, GupArrayShort *xs, short x);
 void           gup_array_short_remove(GupArrayShort *xs, short x, int count_to_remove);
 void           gup_array_short_remove_all(GupArrayShort *xs, short x);
-void           gup_array_short_remove_at_preserve_order(GupArrayShort *xs, const int index);
-void           gup_array_short_remove_at_no_preserve_order(GupArrayShort *xs, const int index);
+void           gup_array_short_remove_at_index_preserve_order(GupArrayShort *xs, const int index);
+void           gup_array_short_remove_at_index_no_preserve_order(GupArrayShort *xs, const int index);
 GupArrayShort  gup_array_short_sort(GupAllocator *a, GupArrayShort xs);
 
 GupArrayString gup_array_string_create(GupAllocator *a);
@@ -391,8 +393,8 @@ bool           gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar)
 void           gup_array_string_remove(GupArrayString *xs, GupArrayChar x, int count_to_remove);
 void           gup_array_string_remove_all(GupArrayString *xs, GupString x);
 void           gup_array_string_remove_all_cstr(GupAllocator *a, GupArrayString *xs, char *x);
-void           gup_array_string_remove_at_preserve_order(GupArrayString *xs, const int index);
-void           gup_array_string_remove_at_no_preserve_order(GupArrayString *xs, const int index);
+void           gup_array_string_remove_at_index_preserve_order(GupArrayString *xs, const int index);
+void           gup_array_string_remove_at_index_no_preserve_order(GupArrayString *xs, const int index);
 GupArrayString gup_array_string_sort(GupAllocator *a, GupArrayString xs);
 
 GupArrayCstr   gup_array_cstr_create(GupAllocator *a);
@@ -406,8 +408,8 @@ void           gup_array_cstr_append(GupAllocator *a, GupArrayCstr *xs, char *x)
 void           gup_array_cstr_prepend(GupAllocator *a, GupArrayCstr *xs, char *x);
 void           gup_array_cstr_remove(GupArrayCstr *xs, char *x, int count_to_remove);
 void           gup_array_cstr_remove_all(GupArrayCstr *xs, char *x);
-void           gup_array_cstr_remove_at_preserve_order(GupArrayCstr *xs, const int index);
-void           gup_array_cstr_remove_at_no_preserve_order(GupArrayCstr *xs, const int index);
+void           gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr *xs, const int index);
+void           gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr *xs, const int index);
 GupArrayCstr   gup_array_cstr_sort(GupAllocator *a, GupArrayCstr xs);
 
 // File operations ---------------------------------------------------------------------------------
@@ -761,6 +763,7 @@ GupArrayString  gup_string_split_by_cstr(GupAllocator *a, GupString str, char *s
 
 // Assert
 
+// TODO: different matchers like gup_assert_equal(a, b) so we can report diffs in failures
 #define gup_assert(pass_condition) _gup_assert(pass_condition, #pass_condition, __FILE__, __LINE__)
 #define gup_assert_verbose(pass_condition, failure_explanation) _gup_assert_verbose(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
 
@@ -799,7 +802,6 @@ u32 gup_fnv1a_hash(const char *s);
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
-#define GUPPY_IMPLEMENTATION
 #ifdef GUPPY_IMPLEMENTATION
 
 #define GUP_ARRAY_DEFAULT_CAPACITY 256
@@ -2607,172 +2609,112 @@ void gup_array_bool_remove_at_index_preserve_order(GupArrayBool *xs, const int i
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    bool new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = xs->data[i];
-            j++;
-        }
+    for (int i = index; i < xs->count; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(bool));
 }
 
 void gup_array_char_remove_at_index_preserve_order(GupArrayChar *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    char new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = xs->data[i];
-            j++;
-        }
+    for (int i = index; i < xs->count; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(char));
 }
 
 void gup_array_double_remove_at_index_preserve_order(GupArrayDouble *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    double new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = xs->data[i];
-            j++;
-        }
+    for (int i = index; i < xs->count; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(double));
 }
 
 void gup_array_float_remove_at_index_preserve_order(GupArrayFloat *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    float new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = xs->data[i];
-            j++;
-        }
+    for (int i = index; i < xs->count; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(float));
 }
 
 void gup_array_int_remove_at_index_preserve_order(GupArrayInt *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    int new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = xs->data[i];
-            j++;
-        }
+    for (int i = index; i < xs->count; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(int));
 }
 
 void gup_array_long_remove_at_index_preserve_order(GupArrayLong *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    long new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = xs->data[i];
-            j++;
-        }
+    for (int i = index; i < xs->count; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(long));
 }
 
 void gup_array_ptr_remove_at_index_preserve_order(GupArrayPtr *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    void* new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = xs->data[i];
-            j++;
-        }
+    for (int i = index; i < xs->count; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(void*));
 }
 
 void gup_array_short_remove_at_index_preserve_order(GupArrayShort *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    short new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = xs->data[i];
-            j++;
-        }
+    for (int i = index; i < xs->count; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(short));
 }
 
-void gup_array_string_remove_at_index_preserve_order(GupAllocator *a, GupArrayString *xs, const int index) {
+// TODO: can only really do this once GupArrayStrings have an array of pointers to GupArrayChars
+void gup_array_string_remove_at_index_preserve_order(GupArrayString *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    GupString new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            new_data[j] = gup_array_char_copy(a, xs->data[i]);
-            j++;
-        }
+    for (int i = index; i < xs->count - 1; i++) {
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(GupString));
 }
 
-void gup_array_cstr_remove_at_index_preserve_order(GupAllocator *a, GupArrayCstr *xs, const int index) {
+void gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    char* new_data[xs->count];
-
-    for (int i = 0, j = 0; i < xs->count; i++) {
-        if (i != index) {
-            const int string_length = gup_cstr_length_including_null(xs->data[i]);
-            new_data[j] = gup_alloc(a, string_length); 
-            strncpy(new_data[j], xs->data[i], string_length);
-            j++;
-        }
+    for (int i = index; i < xs->count - 1; i++) {
+        printf("%p\n", (void*)&(xs->data[i]));
+        xs->data[i] = xs->data[i+i];
     }
 
     xs->count--;
-    memcpy(xs->data, new_data, xs->count * sizeof(char*));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -2856,6 +2798,19 @@ void gup_array_long_remove_at_index_no_preserve_order(GupArrayLong *xs, const in
     xs->count--;
 }
 
+void gup_array_ptr_remove_at_index_no_preserve_order(GupArrayPtr *xs, const int index) {
+    _gup_array_sanity_check(xs);
+    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+
+    // Copy the last element into the element to remove
+    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    xs->data[index] = xs->data[xs->count-1];
+
+    // Remove the last element by decrementing the count
+    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    xs->count--;
+}
+
 void gup_array_short_remove_at_index_no_preserve_order(GupArrayShort *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
@@ -2869,46 +2824,28 @@ void gup_array_short_remove_at_index_no_preserve_order(GupArrayShort *xs, const 
     xs->count--;
 }
 
-void gup_array_string_remove_at_index_no_preserve_order(GupAllocator *a, GupArrayString *xs, const int index) {
+void gup_array_string_remove_at_index_no_preserve_order(GupArrayString *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the last element into the element to remove
+    // Copy the pointer to the last element into the element to remove
     // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    xs->data[index] = gup_array_char_copy(a, xs->data[xs->count-1]);
+    xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
     // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
     xs->count--;
 }
 
-void gup_array_cstr_remove_at_index_no_preserve_order(GupAllocator *a, GupArrayCstr *xs, const int index) {
+void gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr *xs, const int index) {
     _gup_array_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Free the element that is going to be removed
-    // [1, 2, 3, 4, 5], 1 -> [1, <freed>, 3, 4, 5]
-    // TODO:?
-    // TODO: gup_realloc
-    // if (a == NULL) {
-    //     xs->data[index] = realloc(xs->data[index], last_string_length);
-    // }
-
-    const int last_string_length = gup_cstr_length_including_null(xs->data[xs->count-1]);
-    printf("before %p\n", (void*)xs->data[index]);
-    char* tmp = NULL;
-    if (a == NULL) {
-        tmp = realloc(xs->data[index], last_string_length);
-        if (tmp == NULL) exit(1);
-        xs->data[index] = tmp;
-    }
-    printf("after %p\n", (void*)xs->data[index]); 
-
-    // REMINDER: STRINGS ARE IMMUTABLE!!!!!!!!! you cant just do gup_cstr_copy_n
-
-    // Copy the last element into the element to remove
+    // printf("before %p\n", (void*)xs->data[index]); 
+    // Copy the pointer to the last element into the element to remove
     // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
-    gup_cstr_copy_n(xs->data[index], xs->data[xs->count-1], last_string_length-1);
+    xs->data[index] = xs->data[xs->count-1];
+    // printf("after  %p\n", (void*)xs->data[index]); 
 
     // Remove the last element by decrementing the count
     // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
@@ -3550,13 +3487,29 @@ bool gup_file_read_lines_as_cstrs(GupAllocator *a, const char *file_path, char *
         
         gup_defer_return(false);
     }
-    char **lines = (char **) gup_alloc(a, sizeof(char **) * line_count);
+    char **lines = (char **) gup_alloc(a, sizeof(char**) * line_count);
 
-    char butter[65536];
-    for (int i = 0; fgets(butter, 65536, fp) != NULL; i++) {
-        const int line_length = gup_cstr_length_excluding_null(butter);
+    char buffer[65536];
+    for (int i = 0; fgets(buffer, 65536, fp) != NULL; i++) {
+        /*
+         * Since this is the read lines function that does not include newlines, and since the line length is of the form:
+         * 
+         *   full_line_length = non_newline_characters + newline + null terminator
+         * 
+         * and since we only want to capture the form:
+         *
+         *   desired_line_length = non_newline_characters + null terminator
+         * 
+         * we end up with:
+         *
+         *   desired_line_length = full_line_length - 1 (subtracting the one newline).
+         * 
+         * Thus, the inclusion of the minus 1.
+         */  
+        const int line_length = gup_cstr_length_including_null(buffer) - 1;
+
         lines[i] = (char *) gup_alloc(a, sizeof(char *) * line_length);
-        gup_cstr_copy_n(lines[i], butter, line_length-1);
+        gup_cstr_copy_n(lines[i], buffer, line_length-1);
     }
 
     *out = lines;
@@ -5252,7 +5205,17 @@ bool gup_hashmap_cstr_get(GupHashmapCstr hashmap, char *key, char * *out) {
 void gup_hashmap_bool_set(GupAllocator *a, GupHashmapBool *hashmap, char *key, bool value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_bool_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_bool_append(a, &(hashmap->values[index]), value);
@@ -5262,26 +5225,35 @@ void gup_hashmap_char_set(GupAllocator *a, GupHashmapChar *hashmap, char *key, c
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
     // First we need to remove the existing entry if it's there.
-    gup_array_cstr_print(hashmap->keys[index]);
-    gup_array_char_print(hashmap->values[index]);
-
     const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
     if (index_of_existing > -1) {
-        // Technically, the order of the these arrays matters a lot. But, really only the pairing of keys to values
-        // matters, and not the overall ordering. Therefore, we can use the faster "no preserve" variant because the
-        // index is the same for both.
-        gup_array_cstr_remove_at_index_no_preserve_order(a, &(hashmap->keys[index]), index_of_existing);
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
         gup_array_char_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
     }
 
-    gup_array_cstr_append(a, &(hashmap->keys[index]), key);
+    gup_array_cstr_append(a, &(hashmap->keys[index]),   key);
     gup_array_char_append(a, &(hashmap->values[index]), value);
 }
 
 void gup_hashmap_double_set(GupAllocator *a, GupHashmapDouble *hashmap, char *key, double value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_double_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_double_append(a, &(hashmap->values[index]), value);
@@ -5290,7 +5262,17 @@ void gup_hashmap_double_set(GupAllocator *a, GupHashmapDouble *hashmap, char *ke
 void gup_hashmap_float_set(GupAllocator *a, GupHashmapFloat *hashmap, char *key, float value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_float_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_float_append(a, &(hashmap->values[index]), value);
@@ -5299,7 +5281,17 @@ void gup_hashmap_float_set(GupAllocator *a, GupHashmapFloat *hashmap, char *key,
 void gup_hashmap_int_set(GupAllocator *a, GupHashmapInt *hashmap, char *key, int value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_int_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_int_append(a, &(hashmap->values[index]), value);
@@ -5308,7 +5300,17 @@ void gup_hashmap_int_set(GupAllocator *a, GupHashmapInt *hashmap, char *key, int
 void gup_hashmap_long_set(GupAllocator *a, GupHashmapLong *hashmap, char *key, long value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_long_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_long_append(a, &(hashmap->values[index]), value);
@@ -5317,7 +5319,17 @@ void gup_hashmap_long_set(GupAllocator *a, GupHashmapLong *hashmap, char *key, l
 void gup_hashmap_ptr_set(GupAllocator *a, GupHashmapPtr *hashmap, char *key, void* value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_ptr_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_ptr_append(a, &(hashmap->values[index]), value);
@@ -5326,7 +5338,17 @@ void gup_hashmap_ptr_set(GupAllocator *a, GupHashmapPtr *hashmap, char *key, voi
 void gup_hashmap_short_set(GupAllocator *a, GupHashmapShort *hashmap, char *key, short value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_short_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_short_append(a, &(hashmap->values[index]), value);
@@ -5335,7 +5357,17 @@ void gup_hashmap_short_set(GupAllocator *a, GupHashmapShort *hashmap, char *key,
 void gup_hashmap_string_set(GupAllocator *a, GupHashmapString *hashmap, char *key, GupString value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_string_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_string_append(a, &(hashmap->values[index]), value);
@@ -5344,7 +5376,17 @@ void gup_hashmap_string_set(GupAllocator *a, GupHashmapString *hashmap, char *ke
 void gup_hashmap_cstr_set(GupAllocator *a, GupHashmapCstr *hashmap, char *key, char *value) {
     const int index = _gup_hash_cstr_index(key, hashmap->capacity);
 
-    if (gup_array_cstr_contains(hashmap->keys[index], key)) return;
+    // First we need to remove the existing entry if it's there.
+    const int index_of_existing = gup_array_cstr_find_index_of(&(hashmap->keys[index]), key);
+    if (index_of_existing > -1) {
+        // Don't be fooled by first impressions: the order of the these arrays matters a lot. More precisely, only the
+        // pairing of keys to values matters, not the overall ordering. Therefore, we can use the faster "no preserve"
+        // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
+        // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
+        // arrays themselves.
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+    }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
     gup_array_cstr_append(a, &(hashmap->values[index]), value);
@@ -6258,7 +6300,10 @@ void gup_cstr_copy_n(char *to, const char *from, const int n) {
     gup_assert(to != NULL);
     gup_assert(from != NULL);
     gup_assert(to != from);
-    gup_assert(n > 0);
+    // It's actually ok for someone to call this function where n == 0. This basically
+    // means that they're copying an empty string, but getting the guarantee that it will
+    // be null terminated.
+    gup_assert(n >= 0);
 
     for (int i = 0; i < n; i++) {
         to[i] = from[i];
