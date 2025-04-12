@@ -52,7 +52,7 @@ void push_twice_pop_twice(void) {
 
 void cstr_stacks_work(void) {
     GupStackCstr stack = gup_stack_cstr_create(NULL);
-    char *seventeen, *thirtyeight;
+    char* seventeen, *thirtyeight;
 
     gup_stack_cstr_push(NULL, &stack, "7 teen");
     gup_stack_cstr_push(NULL, &stack, "thirty 8");

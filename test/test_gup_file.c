@@ -47,7 +47,7 @@ void test_gup_file_read(void) {
     }
 
     { // foo.txt
-        const char *expected = "one\ntwotwo\nthree three three\n\n";
+        const char* expected = "one\ntwotwo\nthree three three\n\n";
 
         gup_assert(gup_file_read(NULL, "./resources/foo.txt", &file_contents));
         gup_assert(gup_array_char_equals_cstr(file_contents, expected));
@@ -56,7 +56,7 @@ void test_gup_file_read(void) {
     }
 
     { // settings.toml
-        const char *expected = "# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n";
+        const char* expected = "# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n";
 
         gup_assert(gup_file_read(NULL, "./resources/settings.toml", &file_contents));
         gup_assert(gup_array_char_equals_cstr(file_contents, expected));
@@ -67,14 +67,14 @@ void test_gup_file_read(void) {
 
 void test_gup_file_read_as_cstr(void) {   
     { // File that does not exist should return false
-        char *file_contents = NULL;
+        char* file_contents = NULL;
 
         gup_assert(!gup_file_read_as_cstr(NULL, "./resources/doesnotexist.txt", &file_contents));
         gup_assert(file_contents == NULL);
     }
 
     { // empty.txt
-        char *file_contents = NULL;
+        char* file_contents = NULL;
 
         gup_assert(gup_file_read_as_cstr(NULL, "./resources/empty.txt", &file_contents));
         gup_assert(strcmp(file_contents, "") == 0);
@@ -83,7 +83,7 @@ void test_gup_file_read_as_cstr(void) {
     }
 
     { // one_newline.txt
-        char *file_contents = NULL;
+        char* file_contents = NULL;
 
         gup_assert(gup_file_read_as_cstr(NULL, "./resources/one_newline.txt", &file_contents));
         gup_assert(strcmp(file_contents, "\n") == 0);
@@ -92,7 +92,7 @@ void test_gup_file_read_as_cstr(void) {
     }
 
     { // foo.txt
-        char *file_contents = NULL;
+        char* file_contents = NULL;
         gup_assert(gup_file_read_as_cstr(NULL, "./resources/foo.txt", &file_contents));
 
         gup_assert(strcmp(file_contents, "one\ntwotwo\nthree three three\n\n") == 0);
@@ -101,7 +101,7 @@ void test_gup_file_read_as_cstr(void) {
     }
 
     { // settings.toml
-        char *file_contents = NULL;
+        char* file_contents = NULL;
         gup_assert(gup_file_read_as_cstr(NULL, "./resources/settings.toml", &file_contents));
         
         gup_assert(strcmp(file_contents, "# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n") == 0);
@@ -226,13 +226,13 @@ void test_gup_file_read_lines_keep_newlines() {
 
 void test_gup_file_read_lines_as_cstrs(void) {
     { // empty.txt
-        char **lines = NULL;
+        char** lines = NULL;
         
         gup_assert(!gup_file_read_lines_as_cstrs(NULL, "./resources/empty.txt", &lines));
     }
 
     { // one_newline.txt
-        char **lines = NULL;
+        char** lines = NULL;
 
         gup_assert(gup_file_read_lines_as_cstrs(NULL, "./resources/one_newline.txt", &lines));
 
@@ -243,7 +243,7 @@ void test_gup_file_read_lines_as_cstrs(void) {
     }
 
     { // foo.txt
-        char **lines = NULL;
+        char** lines = NULL;
         
         gup_assert(gup_file_read_lines_as_cstrs(NULL, "./resources/foo.txt", &lines));
 
@@ -260,7 +260,7 @@ void test_gup_file_read_lines_as_cstrs(void) {
     }
 
     { // settings.toml
-        char **lines = NULL;
+        char** lines = NULL;
         
         gup_assert(gup_file_read_lines_as_cstrs(NULL, "./resources/settings.toml", &lines));
         const int line_count = gup_file_line_count("./resources/settings.toml");
@@ -289,7 +289,7 @@ void test_gup_file_read_lines_as_cstrs(void) {
 }
 
 void test_gup_file_read_lines_as_cstrs_keep_newlines(void) {
-    char **lines = NULL;
+    char** lines = NULL;
 
     { // empty.txt
         gup_assert(!gup_file_read_lines_as_cstrs_keep_newlines(NULL, "./resources/empty.txt", &lines));
@@ -341,7 +341,7 @@ void test_gup_file_read_lines_as_cstrs_keep_newlines(void) {
     }
 }
 
-void test_gup_file_write(GupAllocator *a) {
+void test_gup_file_write(GupAllocator* a) {
     gup_file_delete("./resources/empty_write.txt");
     gup_file_delete("./resources/hello.txt");
     gup_file_delete("./resources/hello_world.txt");
@@ -377,8 +377,8 @@ void test_gup_file_write(GupAllocator *a) {
     }
 }
 
-void test_gup_file_write_lines(GupAllocator *a) {
-    char *file_contents = NULL;
+void test_gup_file_write_lines(GupAllocator* a) {
+    char* file_contents = NULL;
 
     gup_file_delete("./resources/empty_write_lines.txt");
     gup_file_delete("./resources/hello_lines.txt");

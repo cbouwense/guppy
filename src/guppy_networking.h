@@ -40,16 +40,16 @@
  * Public API                                                                                     *
  **************************************************************************************************/
 
-GupServer gup_server_udp_create(const char *address, const short port);
+GupServer gup_server_udp_create(const char* address, const short port);
 void      gup_server_udp_destroy(GupServer s);
-void      gup_server_udp_send(GupServer s, const char *message, const char *address, const short port);
-void      gup_server_udp_receive(GupServer s, char *message, size_t message_size);
+void      gup_server_udp_send(GupServer s, const char* message, const char* address, const short port);
+void      gup_server_udp_receive(GupServer s, char* message, size_t message_size);
 
 /**************************************************************************************************
  * Internal implementation                                                                        *
  **************************************************************************************************/
 
-GupServer gup_server_udp_create(const char *address, const short port) {
+GupServer gup_server_udp_create(const char* address, const short port) {
 // Windows ---------------------------------------------------------------------------------------------------------------------
 #if defined(_WIN32)
     WSADATA wsadata;
@@ -99,7 +99,7 @@ GupServer gup_server_udp_create(const char *address, const short port) {
   
     int bind_res = bind(socket_descriptor, (struct sockaddr*)&server_addr, sizeof(server_addr));
     if (bind_res != 0) {
-        char *error_message = strerror(errno);
+        char* error_message = strerror(errno);
         printf("Error binding: %s\n", error_message);
         exit(1);
     }
@@ -126,7 +126,7 @@ void gup_server_udp_destroy(GupServer s) {
 #endif
 }
 
-void gup_server_udp_send(GupServer s, const char *message, const char *address, const short port) {
+void gup_server_udp_send(GupServer s, const char* message, const char* address, const short port) {
 // Windows ---------------------------------------------------------------------------------------------------------------------
 #if defined(_WIN32) 
     struct sockaddr_in receiver_addr;
@@ -159,7 +159,7 @@ void gup_server_udp_send(GupServer s, const char *message, const char *address, 
 #endif
 }
 
-void gup_server_udp_receive(GupServer s, char *message, size_t message_size) {
+void gup_server_udp_receive(GupServer s, char* message, size_t message_size) {
 // Windows ---------------------------------------------------------------------------------------------------------------------
 #if defined(_WIN32)
     int bytes_received;

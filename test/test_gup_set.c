@@ -47,7 +47,7 @@ void test_gup_set_general_bool(void) {
 
 void test_gup_set_from_array_bool(void) {
     { // Empty has neither
-        bool *bools = NULL;
+        bool* bools = NULL;
         GupSetBool set = gup_set_bool_create_from_array(bools, 0);
         
         gup_assert(!gup_set_bool_has(set, false));

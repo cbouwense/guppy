@@ -15,9 +15,9 @@ void test_gup_arena_create(void) {
 void test_gup_arena_can_allocate_stuff_and_not_need_to_free_it(void) {
     GupArena a = gup_arena_create();
 
-    char *foo = gup_arena_alloc(&a, strlen("foo") + 1);
-    char *bar = gup_arena_alloc(&a, strlen("bar") + 1);
-    char *foobar = gup_arena_alloc(&a, strlen("foo") + strlen("bar") + 1);
+    char* foo = gup_arena_alloc(&a, strlen("foo") + 1);
+    char* bar = gup_arena_alloc(&a, strlen("bar") + 1);
+    char* foobar = gup_arena_alloc(&a, strlen("foo") + strlen("bar") + 1);
     
     strcpy(foo, "foo");
     strcpy(bar, "bar");
@@ -38,7 +38,7 @@ void test_gup_arena_can_be_freed_and_not_leak_memory(void) {
     GupArena a = gup_arena_create();
 
     const int count = 0;
-    int **lots_of_ints = gup_arena_alloc(&a, sizeof(int *) * count);
+    int** lots_of_ints = gup_arena_alloc(&a, sizeof(int *) * count);
     for (int i = 0; i < count; i++) {
         lots_of_ints[i] = gup_arena_alloc(&a, sizeof(int));
         *lots_of_ints[i] = i;
@@ -68,7 +68,7 @@ void test_gup_arena_with_file_stuff(void) {
     GupArena a = gup_arena_create();
 
     GupArrayString tokens;
-    const char *key = "foo";
+    const char* key = "foo";
     GupArrayString file_lines = gup_file_read_lines(&(a.head), "./src/settings.txt");
 
     for (int i = 0; i < file_lines.count; i++) {

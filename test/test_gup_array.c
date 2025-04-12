@@ -140,7 +140,7 @@ void test_one_append_one_prepend_orders_correctly(void) {
 
 void test_gup_array_char_create_from_cstr(void) {
     char chars[] = {'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!'};
-    char *str = "Hello, World!";
+    char* str = "Hello, World!";
 
     GupArrayChar xs = gup_array_char_create_from_array(NULL, chars, gup_array_len(chars));
     GupArrayChar ys = gup_array_char_create_from_cstr(NULL, str);
@@ -323,7 +323,7 @@ void test_gup_array_string_find(void) {
     }
 
     { // Arrays without acceptable elements do not produce any find
-        char *string_arr[3] = {"Hello", "World", "!"};
+        char* string_arr[3] = {"Hello", "World", "!"};
         GupArrayString strings = gup_array_string_create_from_cstrs(NULL, string_arr, 3);
         GupString found = {0};
 
@@ -339,7 +339,7 @@ void test_gup_array_string_find(void) {
     }
 
     { // Arrays with acceptable elements produce the first one
-        char *string_arr[3]    = {"Hello", "world", "!"};
+        char* string_arr[3]    = {"Hello", "world", "!"};
         GupArrayString strings = gup_array_string_create_from_cstrs(NULL, string_arr, 3);
         GupString found        = {0};
 
@@ -390,7 +390,7 @@ void test_gup_array_remove() {
     }
 
     { // All removed
-        char *string_array[] = {"Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme"};
+        char* string_array[] = {"Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme"};
         GupArrayString strings = gup_array_string_create_from_cstrs(NULL, string_array, gup_array_len(string_array));
 
         gup_array_string_remove_all_cstr(NULL, &strings, "Dontrainonme");

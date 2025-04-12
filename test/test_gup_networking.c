@@ -11,28 +11,28 @@ typedef unsigned char bool;
 #define RECEIVER_ADDR "192.168.138.80"
 #define RECEIVER_PORT 1338
 
-bool is_tcp(const char *protocol) {
+bool is_tcp(const char* protocol) {
   return (
     strcmp("t", protocol)   == 0 ||
     strcmp("tcp", protocol) == 0
   );
 }
 
-bool is_udp(const char *protocol) {
+bool is_udp(const char* protocol) {
   return (
     strcmp("u", protocol)   == 0 ||
     strcmp("udp", protocol) == 0
   );
 }
 
-bool is_server(const char *type) {
+bool is_server(const char* type) {
   return (
     strcmp("s", type)      == 0 ||
     strcmp("server", type) == 0
   );
 }
 
-bool is_client(const char *type) {
+bool is_client(const char* type) {
   return (
     strcmp("c", type)      == 0 ||
     strcmp("client", type) == 0

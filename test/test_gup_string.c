@@ -4,19 +4,19 @@ bool is_bang(char c) {
     return c == '!';
 }
 
-void test_gup_string_creates_an_empty_string(GupAllocator *a) {
+void test_gup_string_creates_an_empty_string(GupAllocator* a) {
     GupString str = gup_string(a, "");
 
     gup_assert(gup_string_equals_cstr(str, ""));
 }
 
-void test_creating_a_gup_string_from_a_cstr_equals_that_cstr(GupAllocator *a) {
+void test_creating_a_gup_string_from_a_cstr_equals_that_cstr(GupAllocator* a) {
     GupString str = gup_string(a, "Hello World!");
     
     gup_assert(gup_string_equals_cstr(str, "Hello World!"));
 }
 
-void test_gup_string_trim_functions(GupAllocator *a) {
+void test_gup_string_trim_functions(GupAllocator* a) {
     { // Trimming unfound characters does nothing
         GupString str = gup_string(a, "Hello");
         GupString trimmed = gup_string_trim_char(a, str, '!');
@@ -74,7 +74,7 @@ void test_gup_string_trim_functions(GupAllocator *a) {
     }
 }
 
-void test_gup_string_split(GupAllocator *a) {
+void test_gup_string_split(GupAllocator* a) {
     { // No delimiters
         GupString str = gup_string(a, "foobar");
         GupArrayString tokens = gup_string_split(a, str, '=');
@@ -94,14 +94,14 @@ void test_gup_string_split(GupAllocator *a) {
     { // A bunch of delimiters
         GupString str = gup_string(a, "==foo=bar=baz=shib=dib===");
         GupArrayString tokens = gup_string_split(a, str, '=');
-        char *expected_array[5] = {"foo", "bar", "baz", "shib", "dib"};
+        char* expected_array[5] = {"foo", "bar", "baz", "shib", "dib"};
         GupArrayString expected = gup_array_string_create_from_cstrs(a, expected_array, 5);
 
         gup_assert(gup_array_string_equals(tokens, expected));
     }
 }
 
-void test_gup_string_starts_with(GupAllocator *a) {
+void test_gup_string_starts_with(GupAllocator* a) {
     { // A string starts with itself 
         GupString sub_str = gup_string(a, "Hello");
         GupString str = gup_string_copy(a, sub_str);
@@ -134,16 +134,16 @@ void test_gup_string_starts_with(GupAllocator *a) {
     }
 }
 
-void test_gup_string_starts_with_cstr(GupAllocator *a) {
+void test_gup_string_starts_with_cstr(GupAllocator* a) {
     { // A string starts with itself 
-        char *cstr = "Hello";
+        char* cstr = "Hello";
         GupString str = gup_string(a, cstr);
 
         gup_assert(gup_string_starts_with_cstr(str, cstr) == true);
     }
 
     { // Even after appending it works
-        char *cstr = "Hello";
+        char* cstr = "Hello";
         GupString str = gup_string(a, cstr);
         gup_string_append(a, &str, '!');
 
@@ -151,7 +151,7 @@ void test_gup_string_starts_with_cstr(GupAllocator *a) {
     }
 
     { // After prepending something else it is false
-        char *cstr = "Hello";
+        char* cstr = "Hello";
         GupString str = gup_string(a, cstr);
 
         gup_string_prepend(a, &str, '!');
@@ -160,14 +160,14 @@ void test_gup_string_starts_with_cstr(GupAllocator *a) {
     }
 
     { // Don't count strings as technically starting with empty strings
-        char *cstr = "";
+        char* cstr = "";
         GupString str = gup_string(a, cstr);
 
         gup_assert(gup_string_starts_with_cstr(str, cstr) == false);
     }
 }
 
-void test_gup_string_ends_with(GupAllocator *a) {
+void test_gup_string_ends_with(GupAllocator* a) {
     { // A string ends with itself 
         GupString sub_str = gup_string(a, "Hello");
         GupString str = gup_string_copy(a, sub_str);
@@ -199,16 +199,16 @@ void test_gup_string_ends_with(GupAllocator *a) {
     }
 }
 
-void test_gup_string_ends_with_cstr(GupAllocator *a) {
+void test_gup_string_ends_with_cstr(GupAllocator* a) {
     { // A string ends with itself 
-        char *cstr = "Hello";
+        char* cstr = "Hello";
         GupString str = gup_string(a, cstr);
 
         gup_assert(gup_string_ends_with_cstr(str, cstr) == true);
     }
 
     { // After appending something it returns false
-        char *cstr = "Hello";
+        char* cstr = "Hello";
         GupString str = gup_string(a, cstr);
         gup_string_append(a, &str, '!');
 
@@ -216,7 +216,7 @@ void test_gup_string_ends_with_cstr(GupAllocator *a) {
     }
 
     { // Prepending something doesn't change anything
-        char *cstr = "Hello";
+        char* cstr = "Hello";
         GupString str = gup_string(a, cstr);
         gup_string_prepend(a, &str, '!');
 
@@ -224,14 +224,14 @@ void test_gup_string_ends_with_cstr(GupAllocator *a) {
     }
 
     { // Don't count strings as technically ending with empty strings
-        char *cstr = "";
+        char* cstr = "";
         GupString str = gup_string(a, cstr);
 
         gup_assert(gup_string_ends_with_cstr(str, cstr) == false);
     }
 }
 
-void test_gup_string_contains_substring(GupAllocator *a) {
+void test_gup_string_contains_substring(GupAllocator* a) {
     { // Never count containing empty strings
         GupString str = gup_string(a, "Hello");
         GupString sub_str = gup_string(a, "");
@@ -276,7 +276,7 @@ void test_gup_string_contains_substring(GupAllocator *a) {
     }
 }
 
-void test_gup_string_to_int(GupAllocator *a) {
+void test_gup_string_to_int(GupAllocator* a) {
     int actual = 0;
     GupString str = gup_string(a, "1337");
 
