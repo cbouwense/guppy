@@ -903,8 +903,8 @@ void gup_free(GupAllocator* a, void* ptr) {
 
 GupArena gup_arena_create() {
     GupArrayPtr* ptrs = malloc(sizeof(GupArrayPtr));
-    *ptrs = gup_array_ptr_create(NULL);
 
+    *ptrs = gup_array_ptr_create(NULL);
     return (GupArena) {
         .head = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_ARENA },
         .data = ptrs,
@@ -963,11 +963,8 @@ void* gup_arena_realloc(GupArena* a, void* mem_to_realloc, size_t bytes) {
     gup_assert(mem_to_realloc != NULL);
     gup_assert(a != mem_to_realloc);
     gup_assert(bytes > 0);
-
-    gup_array_ptr_print(*a->data);
-    printf("%p\n", mem_to_realloc);
-    const GupArrayPtr* arena_pointers = a->data;
-    const int index = gup_array_ptr_find_index_of(arena_pointers, mem_to_realloc);
+    
+    const int index = gup_array_ptr_find_index_of(a->data, mem_to_realloc);
     gup_assert_verbose(index > -1, "PANIC: Could not find pointer in a gup arena while trying to realloc it.");
 
     // Get a fresh chunk of memory.
@@ -975,10 +972,16 @@ void* gup_arena_realloc(GupArena* a, void* mem_to_realloc, size_t bytes) {
     gup_assert_verbose(new_mem != NULL, "PANIC: An allocation failed");
 
     // Copy over the old contents into the new memory.
-    memcpy(new_mem, mem_to_realloc, arena_pointers->count);
+    memcpy(new_mem, mem_to_realloc, a->data->count);
     
+    // Add the new pointer to the list
+    gup_array_ptr_append(NULL, a->data, new_mem);
+
     // Free the old stuff.
     free(mem_to_realloc);
+    // Remove the old pointer from the arena.
+    gup_array_ptr_remove_at_index_no_preserve_order(a->data, index);
+    // Make it null for good measure.
     mem_to_realloc = NULL;
 
     return new_mem;

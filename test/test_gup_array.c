@@ -612,33 +612,33 @@ void test_gup_array_remove_at_index_no_preserve_order(void) {
 }
 
 void test_gup_array(void) {
-    // test_new_gup_array_has_default_capacity();
-    // test_new_gup_array_has_zero_count();
-    // test_new_gup_array_has_non_null_data();
-    // test_two_empty_gup_arrays_are_equal();
-    // test_one_empty_one_populated_are_unequal();
-    // test_a_gup_array_is_equal_to_itself();
-    // test_gup_array_copy_equals_original();
-    // test_equivalent_gup_arrays_are_equal();
-    // test_symmetric_gup_array_args_are_equal();
-    // test_equivalent_but_differently_sized_gup_arrays_are_unequal();
-    // test_one_append_one_prepend_orders_correctly();
-    // test_gup_array_remove();
-    // test_gup_array_remove_at_index_preserve_order();
-    // test_gup_array_remove_at_index_no_preserve_order();
-    // test_gup_array_char_create_from_cstr();
+    test_new_gup_array_has_default_capacity();
+    test_new_gup_array_has_zero_count();
+    test_new_gup_array_has_non_null_data();
+    test_two_empty_gup_arrays_are_equal();
+    test_one_empty_one_populated_are_unequal();
+    test_a_gup_array_is_equal_to_itself();
+    test_gup_array_copy_equals_original();
+    test_equivalent_gup_arrays_are_equal();
+    test_symmetric_gup_array_args_are_equal();
+    test_equivalent_but_differently_sized_gup_arrays_are_unequal();
+    test_one_append_one_prepend_orders_correctly();
+    test_gup_array_remove();
+    test_gup_array_remove_at_index_preserve_order();
+    test_gup_array_remove_at_index_no_preserve_order();
+    test_gup_array_char_create_from_cstr();
 
     // Appending and prepending resize
     test_gup_array_appending_resizes_properly();
 
     // Strings
-    // test_gup_array_string_create();
-    // test_gup_array_string_create_from_array();
-    // test_gup_array_string_copy();
-    // test_gup_array_string_append();
-    // test_gup_array_contains();
-    // test_gup_array_find_index_of();
-    // test_gup_array_string_find();
+    test_gup_array_string_create();
+    test_gup_array_string_create_from_array();
+    test_gup_array_string_copy();
+    test_gup_array_string_append();
+    test_gup_array_contains();
+    test_gup_array_find_index_of();
+    test_gup_array_string_find();
 
     #ifdef GUPPY_VERBOSE
     printf("All gup_array tests passed!\n");
