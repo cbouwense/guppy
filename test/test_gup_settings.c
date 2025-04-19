@@ -1,13 +1,13 @@
 #include "../src/guppy.h"
 
 void test_gup_settings_get_and_set(void) {
-    GupArena a = gup_arena_create();
+    GupBucket a = gup_bucket_create();
 
     GupString foo, bar, baz, not_there;
-    bool foo_result = gup_settings_get_cstr((GupAllocator *)&a, "foo", &foo);
-    bool bar_result = gup_settings_get_cstr((GupAllocator *)&a, "bar", &bar);
-    bool baz_result = gup_settings_get_cstr((GupAllocator *)&a, "baz", &baz);
-    bool not_there_result = gup_settings_get_cstr((GupAllocator *)&a, "not_there", &not_there);
+    bool foo_result = gup_settings_get_cstr((GupAllocator*)&a, "foo", &foo);
+    bool bar_result = gup_settings_get_cstr((GupAllocator*)&a, "bar", &bar);
+    bool baz_result = gup_settings_get_cstr((GupAllocator*)&a, "baz", &baz);
+    bool not_there_result = gup_settings_get_cstr((GupAllocator*)&a, "not_there", &not_there);
 
     gup_assert(foo_result == true);
     gup_assert(bar_result == true);
@@ -17,7 +17,7 @@ void test_gup_settings_get_and_set(void) {
     gup_assert(gup_string_equals_cstr(bar, "bar"));
     gup_assert(gup_string_equals_cstr(baz, "true"));
 
-    gup_arena_destroy(&a);
+    gup_bucket_destroy(&a);
 }
 
 void test_gup_settings(void) {

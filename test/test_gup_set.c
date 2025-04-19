@@ -188,21 +188,21 @@ void test_ptr_sets(void) {
 }
 
 void test_string_set(void) {
-    GupArena a = gup_arena_create();
-    GupSetString set = gup_set_string_create((GupAllocator *)&a);
+    GupBucket a = gup_bucket_create();
+    GupSetString set = gup_set_string_create((GupAllocator*)&a);
     
-    GupString str1 = gup_string((GupAllocator *)&a, "drink");
-    GupString str2 = gup_string((GupAllocator *)&a, "da");
-    GupString str3 = gup_string((GupAllocator *)&a, "poopie");
+    GupString str1 = gup_string((GupAllocator*)&a, "drink");
+    GupString str2 = gup_string((GupAllocator*)&a, "da");
+    GupString str3 = gup_string((GupAllocator*)&a, "poopie");
 
-    gup_set_string_add((GupAllocator *)&a, &set, str1);
-    gup_set_string_add((GupAllocator *)&a, &set, str3);
+    gup_set_string_add((GupAllocator*)&a, &set, str1);
+    gup_set_string_add((GupAllocator*)&a, &set, str3);
 
     gup_assert( gup_set_string_has(set, str1));
     gup_assert(!gup_set_string_has(set, str2));
     gup_assert( gup_set_string_has(set, str3));
 
-    gup_arena_destroy(&a);
+    gup_bucket_destroy(&a);
 }
 
 void test_sets_huge_mode(void) {

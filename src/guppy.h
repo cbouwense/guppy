@@ -92,7 +92,7 @@ typedef struct {
 
 typedef enum {
     GUP_ALLOCATOR_TYPE_MALLOC = 0,
-    GUP_ALLOCATOR_TYPE_ARENA  = 1,
+    GUP_ALLOCATOR_TYPE_BUCKET  = 1,
     GUP_ALLOCATOR_TYPE_COUNT  = 2,
 } GupAllocatorType;
 
@@ -104,7 +104,7 @@ typedef struct {
 typedef struct {
     GupAllocator  head;
     GupArrayPtr  *data;
-} GupArena;
+} GupBucket;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -238,24 +238,33 @@ typedef GupArrayShort  GupStackShort;
 typedef GupArrayString GupStackString;
 typedef GupArrayCstr   GupStackCstr;
 
-/**************************************************************************************************
- * Public API                                                                                     *
- **************************************************************************************************/
+/**********************************************************************************************************************
+ * Public API                                                                                                         *
+ **********************************************************************************************************************/
 
-// Allocator -----------------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Allocator
+// ---------------------------------------------------------------------------------------------------------------------
 
 void* gup_alloc(GupAllocator* a, size_t bytes);
 void* gup_realloc(GupAllocator* a, void* mem_to_realloc, size_t bytes);
 void  gup_free(GupAllocator* a, void* ptr);
 
-// Arena ---------------------------------------------------------------------------------------------------------------
-GupArena  gup_arena_create();
-void      gup_arena_destroy(GupArena* a); // Free all the allocated memory and the arena itself
-void     *gup_arena_alloc(GupArena* a, size_t bytes);
-void     *gup_arena_realloc(GupArena* a, void* mem_to_realloc, size_t bytes);
-void      gup_arena_free(GupArena* a); // Free all the allocated memory, but not the arena itself
+// ---------------------------------------------------------------------------------------------------------------------
+// Bucket
+// ---------------------------------------------------------------------------------------------------------------------
 
-// Dynamic arrays ------------------------------------------------------------------------------------------------------
+GupBucket gup_bucket_create();
+void      gup_bucket_destroy(GupBucket* a); // Free all the allocated memory and the bucket itself
+void*     gup_bucket_alloc(GupBucket* a, size_t bytes);
+void*     gup_bucket_realloc(GupBucket* a, void* mem_to_realloc, size_t bytes);
+void      gup_bucket_free(GupBucket* a); // Free all the allocated memory, but not the bucket itself
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Dynamic arrays
+// ---------------------------------------------------------------------------------------------------------------------
+
 GupArrayBool   gup_array_bool_create(GupAllocator* a);
 void           gup_array_bool_destroy(GupArrayBool xs);
 GupArrayBool   gup_array_bool_create_from_array(GupAllocator* a, bool xs[], const int size);
@@ -415,7 +424,10 @@ void           gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr* xs, c
 void           gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr* xs, const int index);
 GupArrayCstr   gup_array_cstr_sort(GupAllocator* a, GupArrayCstr xs);
 
-// File operations ---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// File operations
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool           gup_file_create(const char* file_path);
 bool           gup_file_delete(const char* file_path);
 bool           gup_file_exists(const char* file_path);
@@ -441,7 +453,10 @@ void           gup_file_append_line_cstr(const char* line_to_write, const char* 
 void           gup_file_append_lines(GupAllocator* a, GupArrayString lines_to_write, const char* file_path);
 void           gup_file_append_lines_cstrs(char** lines_to_write, const int line_count, const char* file_path);
 
-// Sets --------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Sets
+// ---------------------------------------------------------------------------------------------------------------------
+
 GupSetBool   gup_set_bool_create();
 GupSetBool   gup_set_bool_create_size(int size);
 GupSetBool   gup_set_bool_create_from_array(bool xs[], const int size);
@@ -708,11 +723,15 @@ void           gup_stack_cstr_destroy(GupStackCstr s);
 void           gup_stack_cstr_print(GupStackCstr s);
 void           gup_stack_cstr_debug(GupStackCstr s);
 
-// Print -------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------------------------------------------------
+
 void gup_print_cwd(void);
 void gup_print_string(const char* string);
 
 // Print array slices [start, end) -----------------------------------------------------------------
+// TODO: fill these out, or maybe get rid of them?
 void gup_print_array_slice_bool(bool array[], size_t start, size_t end);
 void gup_print_array_slice_char(char array[], size_t start, size_t end);
 void gup_print_array_slice_double(double array[], size_t start, size_t end);
@@ -720,57 +739,68 @@ void gup_print_array_slice_float(float array[], size_t start, size_t end);
 void gup_print_array_slice_int(int array[], size_t start, size_t end);
 void gup_print_array_slice_long(long array[], size_t start, size_t end);
 
-// Settings ----------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool gup_settings_get_cstr(GupAllocator* a, const char* key, GupString* out);
 bool gup_settings_get_cstr_from_file(GupAllocator* a, const char* key, const char* file_path, GupString* out);
 bool gup_settings_set(const char* key, const char* value);
 bool gup_settings_set_to_file(const char* key, const char* value, const char* file_path);
 
-// Strings -------------------------------------------------------------------------------------
-GupString       gup_string_create();
-GupString       gup_string_create(GupAllocator* a);
-void            gup_string_destroy(GupString str);
-GupString       gup_string_create_from_cstr(GupAllocator* a, char str[]); // Aliased as "gup_string"
-GupString       gup_string_copy(GupAllocator* a, GupString str);
-bool            gup_string_equals(GupString str_a, GupString str_b);
-bool            gup_string_equals_cstr(GupString str, const char* cstr, int cstr_length);
-int             gup_string_compare(GupAllocator* a, GupString x, GupString y); // Returns negative if x < y, 0 if x == y, positive if x > y (think strcmp).
-bool            gup_string_contains(GupString str, char c);
-bool            gup_string_contains_substring(GupString str, GupString sub_str); // TODO: contains cstr
-void            gup_string_print(GupString str);
-void            gup_string_debug(GupString str);
-void            gup_string_append(GupAllocator* a, GupString* str, char c);
-void            gup_string_append_str(GupAllocator* a, GupString* str, GupString str_to_append);
-void            gup_string_append_cstr(GupAllocator* a, GupString* str, const char* cstr_to_append);
-void            gup_string_prepend(GupAllocator* a, GupString* str, char c);
-GupString       gup_string_map(GupAllocator* a, GupString str, char (*fn)(char));
-void            gup_string_map_in_place(GupString str, char (*fn)(char));
-GupString       gup_string_filter(GupAllocator* a, GupString str, bool (*fn)(char));
-void            gup_string_filter_in_place(GupString* str, bool (*fn)(char));
-char            gup_string_reduce(GupString str, char (*fn)(char, char), char start);
-bool            gup_string_find(GupAllocator* a, GupString str, bool (*fn)(char), char* out);
-GupString       gup_string_trim_char(GupAllocator* a, GupString str, char c);
-void            gup_string_trim_char_in_place(GupString* str, char c);
-GupString       gup_string_trim_fn(GupAllocator* a, GupString str, bool (*fn)(char));
-void            gup_string_trim_fn_in_place(GupString* str, bool (*fn)(char));
-GupString       gup_string_without_whitespace(GupString str);
-void            gup_string_without_whitespace_in_place(GupString* str);
-bool            gup_string_starts_with(GupString str, GupString sub_str);
-bool            gup_string_starts_with_cstr(GupString str, const char* cstr);
-bool            gup_string_ends_with(GupString str, GupString sub_str);
-bool            gup_string_ends_with_cstr(GupString str, const char* cstr);
-bool            gup_string_to_int(GupString str, int* out);
-char           *gup_string_to_cstr(GupAllocator* a, GupString str);
-GupArrayString  gup_string_split(GupAllocator* a, GupString str, char c);
-GupArrayString  gup_string_split_by_cstr(GupAllocator* a, GupString str, char* sub_str);
+// ---------------------------------------------------------------------------------------------------------------------
+// Strings
+// ---------------------------------------------------------------------------------------------------------------------
 
+GupString      gup_string_create();
+GupString      gup_string_create(GupAllocator* a);
+void           gup_string_destroy(GupString str);
+GupString      gup_string_create_from_cstr(GupAllocator* a, char str[]); // Aliased as "gup_string"
+GupString      gup_string_copy(GupAllocator* a, GupString str);
+bool           gup_string_equals(GupString str_a, GupString str_b);
+bool           gup_string_equals_cstr(GupString str, const char* cstr, int cstr_length);
+int            gup_string_compare(GupAllocator* a, GupString x, GupString y); // Returns negative if x < y, 0 if x == y, positive if x > y (think strcmp).
+bool           gup_string_contains(GupString str, char c);
+bool           gup_string_contains_substring(GupString str, GupString sub_str); // TODO: contains cstr
+void           gup_string_print(GupString str);
+void           gup_string_debug(GupString str);
+void           gup_string_append(GupAllocator* a, GupString* str, char c);
+void           gup_string_append_str(GupAllocator* a, GupString* str, GupString str_to_append);
+void           gup_string_append_cstr(GupAllocator* a, GupString* str, const char* cstr_to_append);
+void           gup_string_prepend(GupAllocator* a, GupString* str, char c);
+GupString      gup_string_map(GupAllocator* a, GupString str, char (*fn)(char));
+void           gup_string_map_in_place(GupString str, char (*fn)(char));
+GupString      gup_string_filter(GupAllocator* a, GupString str, bool (*fn)(char));
+void           gup_string_filter_in_place(GupString* str, bool (*fn)(char));
+char           gup_string_reduce(GupString str, char (*fn)(char, char), char start);
+bool           gup_string_find(GupAllocator* a, GupString str, bool (*fn)(char), char* out);
+GupString      gup_string_trim_char(GupAllocator* a, GupString str, char c);
+void           gup_string_trim_char_in_place(GupString* str, char c);
+GupString      gup_string_trim_fn(GupAllocator* a, GupString str, bool (*fn)(char));
+void           gup_string_trim_fn_in_place(GupString* str, bool (*fn)(char));
+GupString      gup_string_without_whitespace(GupString str);
+void           gup_string_without_whitespace_in_place(GupString* str);
+bool           gup_string_starts_with(GupString str, GupString sub_str);
+bool           gup_string_starts_with_cstr(GupString str, const char* cstr);
+bool           gup_string_ends_with(GupString str, GupString sub_str);
+bool           gup_string_ends_with_cstr(GupString str, const char* cstr);
+bool           gup_string_to_int(GupString str, int* out);
+char*          gup_string_to_cstr(GupAllocator* a, GupString str);
+GupArrayString gup_string_split(GupAllocator* a, GupString str, char c);
+GupArrayString gup_string_split_by_cstr(GupAllocator* a, GupString str, char* sub_str);
+
+// ---------------------------------------------------------------------------------------------------------------------
 // Assert
+// ---------------------------------------------------------------------------------------------------------------------
 
 // TODO: different matchers like gup_assert_equal(a, b) so we can report diffs in failures
 #define gup_assert(pass_condition) _gup_assert(pass_condition, #pass_condition, __FILE__, __LINE__)
 #define gup_assert_verbose(pass_condition, failure_explanation) _gup_assert_verbose(pass_condition, failure_explanation, #pass_condition, __FILE__, __LINE__)
 
+// ---------------------------------------------------------------------------------------------------------------------
 // C-string utilities
+// ---------------------------------------------------------------------------------------------------------------------
+
 char* gup_cstr_array_flatten(GupAllocator* a, char** strs); // Assumes a null terminated string.
 int   gup_cstr_length_excluding_null(const char* cstr); // Assumes a null terminated string.
 int   gup_cstr_length_including_null(const char* cstr); // Assumes a null terminated string.
@@ -779,7 +809,10 @@ void  gup_cstr_copy(char* to, const char* from);
 void  gup_cstr_copy_n(char* to, const char* from, const int n);
 void  gup_cstr_print(const char* cstr);
 
+// ---------------------------------------------------------------------------------------------------------------------
 // Math
+// ---------------------------------------------------------------------------------------------------------------------
+
 u8  gup_pow_u8(u8 x, u8 y);
 i8  gup_pow_i8(i8 x, i8 y);
 u16 gup_pow_u16(u16 x, u16 y);
@@ -791,7 +824,10 @@ i64 gup_pow_i64(i64 x, i64 y);
 f32 gup_pow_f32(f32 x, f32 y);
 f64 gup_pow_f64(f64 x, f64 y);
 
+// ---------------------------------------------------------------------------------------------------------------------
 // Miscellaneous
+// ---------------------------------------------------------------------------------------------------------------------
+
 double gup_operation_seconds(void (*fn)());
 #define gup_array_len(a) sizeof(a)/sizeof(a[0]) 
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
@@ -800,9 +836,9 @@ double gup_operation_seconds(void (*fn)());
 int gup_char_to_int(char c); // -1 means the character was not an int.
 u32 gup_fnv1a_hash(const char* s);
 
-/**************************************************************************************************
- * Internal implementation                                                                        *
- **************************************************************************************************/
+/**********************************************************************************************************************
+ * Internal implementation                                                                                            *
+ **********************************************************************************************************************/
 
 #ifdef GUPPY_IMPLEMENTATION
 
@@ -818,7 +854,9 @@ u32 gup_fnv1a_hash(const char* s);
         xs->capacity = new_capacity;                                                 \
     }                                                                                \
 
-// Assert ------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Assert
+// ---------------------------------------------------------------------------------------------------------------------
 
 void _gup_assert(bool pass_condition, const char* literal_pass_condition, const char* file_path, int line_number) {
     if (!pass_condition) {
@@ -837,28 +875,32 @@ void _gup_assert_verbose(bool pass_condition, const char* failure_explanation, c
     }
 }
 
-// TODO: This kinda blows ass that I have to put this under the asserts
-#define _gup_array_sanity_check(xs) do {\
-    gup_assert_verbose(xs != NULL, "You're trying to remove something from a null array.");\
-    gup_assert_verbose(xs->count > 0, "You're trying to remove something from an empty array.");\
-    gup_assert_verbose(xs->capacity > 0, "You're trying to remove something from an array without any capacity.");\
-    gup_assert_verbose(xs->count <= xs->capacity, "You're trying to remove something from an array whose count has exceeded its capacity.");\
-} while (0)
+// ---------------------------------------------------------------------------------------------------------------------
+// Sanity checks
+// ---------------------------------------------------------------------------------------------------------------------
 
-void _gup_arena_sanity_check(GupArena* a) {
+// This is a macro so that we can take arbitrary array types.
+#define _gup_array_populated_sanity_check(xs)                                                                                    \
+    gup_assert_verbose(xs != NULL, "You're trying to operate on a null array.");                                                 \
+    gup_assert_verbose(xs->count > 0, "You're trying to operate on an empty array.");                                            \
+    gup_assert_verbose(xs->capacity > 0, "You're trying to operate on an array without any capacity.");                          \
+    gup_assert_verbose(xs->count <= xs->capacity, "You're trying to operate on an array whose count has exceeded its capacity.");\
+
+void _gup_bucket_sanity_check(GupBucket* a) {
     gup_assert(a != NULL);
-    gup_assert(a->head.type == GUP_ALLOCATOR_TYPE_ARENA);
-    _gup_array_sanity_check(a->data);
+    gup_assert(a->head.type == GUP_ALLOCATOR_TYPE_BUCKET);
 }
 
-// Allocator -----------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Allocator
+// ---------------------------------------------------------------------------------------------------------------------
 
 void* gup_alloc(GupAllocator* a, size_t bytes) {
     if (a == NULL) return malloc(bytes);
 
     switch (a->type) {
         case GUP_ALLOCATOR_TYPE_MALLOC: return malloc(bytes);
-        case GUP_ALLOCATOR_TYPE_ARENA:  return gup_arena_alloc((GupArena *)a, bytes);
+        case GUP_ALLOCATOR_TYPE_BUCKET:  return gup_bucket_alloc((GupBucket *)a, bytes);
         default: {
             printf("ERROR: unknown allocator type.\n");
             exit(1);
@@ -871,7 +913,7 @@ void* gup_realloc(GupAllocator* a, void* mem_to_realloc, size_t bytes) {
     
     switch (a->type) {
         case GUP_ALLOCATOR_TYPE_MALLOC: return realloc(mem_to_realloc, bytes);
-        case GUP_ALLOCATOR_TYPE_ARENA:  return gup_arena_realloc((GupArena*)a, mem_to_realloc, bytes);
+        case GUP_ALLOCATOR_TYPE_BUCKET:  return gup_bucket_realloc((GupBucket*)a, mem_to_realloc, bytes);
         default: {
             printf("ERROR: unknown allocator type.\n");
             exit(1);
@@ -889,8 +931,8 @@ void gup_free(GupAllocator* a, void* ptr) {
         case GUP_ALLOCATOR_TYPE_MALLOC: {
             free(ptr);
         } break;
-        case GUP_ALLOCATOR_TYPE_ARENA:  {
-            printf("WARNING: Tried to free memory that is within an arena. You probably don't actually want to do that. If you do, you probably should not be using an arena to allocate that memory.\n");
+        case GUP_ALLOCATOR_TYPE_BUCKET:  {
+            printf("WARNING: Tried to free memory that is within an bucket. You probably don't actually want to do that. If you do, you probably should not be using an bucket to allocate that memory.\n");
         } break;
         default: {
             printf("ERROR: unknown allocator type.\n");
@@ -899,39 +941,33 @@ void gup_free(GupAllocator* a, void* ptr) {
     }
 }
 
-// Arena ---------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Bucket
+// ---------------------------------------------------------------------------------------------------------------------
 
-GupArena gup_arena_create() {
+GupBucket gup_bucket_create() {
     GupArrayPtr* ptrs = malloc(sizeof(GupArrayPtr));
-
+    gup_assert_verbose(ptrs != NULL, "PANIC: An allocation failed");
     *ptrs = gup_array_ptr_create(NULL);
-    return (GupArena) {
-        .head = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_ARENA },
+
+    return (GupBucket) {
+        .head = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_BUCKET },
         .data = ptrs,
     };
 }
 
-/*
+void gup_bucket_destroy(GupBucket* a) {
+    _gup_bucket_sanity_check(a);
 
-GupArena {
-  GupAllocator* head;
-  GupArrayPtr*  data => {
-     FREE             FREE  FREE  FREE, ...
-    .data ========> { 0xAA, 0xAB, 0xAC, ... },
-    .count    = 0,
-    .capacity = 38,
-  }
-}
-
-*/
-
-void gup_arena_destroy(GupArena* a) {
-    gup_arena_free(a);
+    gup_bucket_free(a);
     gup_array_ptr_destroy(*(a->data));
     free(a->data);
 }
 
-void* gup_arena_alloc(GupArena* a, size_t bytes) {
+void* gup_bucket_alloc(GupBucket* a, size_t bytes) {
+    _gup_bucket_sanity_check(a);
+    gup_assert(bytes > 0);
+
     if (a->data->count == a->data->capacity) {
         const int new_capacity = a->data->capacity == 0 ? 1 : a->data->capacity * 2;
         a->data->data = realloc(a->data->data, new_capacity * sizeof(void *));
@@ -947,47 +983,32 @@ void* gup_arena_alloc(GupArena* a, size_t bytes) {
     return ptr;
 }
 
-#define gup_array_ptr_print(xs) _gup_array_ptr_print(xs, #xs)
-void _gup_array_ptr_print(GupArrayPtr xs, const char* xs_name) {
-    printf("%s: [", xs_name);
-    for (int i = 0; i < xs.count; i++) {
-        printf("%p", xs.data[i]);
-
-        if (i != xs.count-1) printf(", ");
-    }
-    printf("]\n");
-}
-
-void* gup_arena_realloc(GupArena* a, void* mem_to_realloc, size_t bytes) {
-    _gup_arena_sanity_check(a);
+void* gup_bucket_realloc(GupBucket* a, void* mem_to_realloc, size_t bytes) {
+    _gup_bucket_sanity_check(a);
     gup_assert(mem_to_realloc != NULL);
     gup_assert(a != mem_to_realloc);
     gup_assert(bytes > 0);
     
     const int index = gup_array_ptr_find_index_of(a->data, mem_to_realloc);
-    gup_assert_verbose(index > -1, "PANIC: Could not find pointer in a gup arena while trying to realloc it.");
+    gup_assert_verbose(index > -1, "PANIC: Could not find pointer in a gup bucket while trying to realloc it.");
 
-    // Get a fresh chunk of memory.
-    void* new_mem = malloc(bytes);
-    gup_assert_verbose(new_mem != NULL, "PANIC: An allocation failed");
+    // Create and add the new memory.
+    void* new_mem = malloc(bytes);                                      // Get a fresh chunk of memory.
+    gup_assert_verbose(new_mem != NULL, "PANIC: An allocation failed"); // TODO: maybe have a sanity check for new memory?
+    memcpy(new_mem, mem_to_realloc, a->data->count);                    // Copy over the old contents into the new memory.
+    gup_array_ptr_append(NULL, a->data, new_mem);                       // Add the new pointer to the list
 
-    // Copy over the old contents into the new memory.
-    memcpy(new_mem, mem_to_realloc, a->data->count);
-    
-    // Add the new pointer to the list
-    gup_array_ptr_append(NULL, a->data, new_mem);
-
-    // Free the old stuff.
-    free(mem_to_realloc);
-    // Remove the old pointer from the arena.
-    gup_array_ptr_remove_at_index_no_preserve_order(a->data, index);
-    // Make it null for good measure.
-    mem_to_realloc = NULL;
+    // Free and remove the old memory.
+    free(mem_to_realloc); // Free the old stuff.
+    gup_array_ptr_remove_at_index_no_preserve_order(a->data, index); // Remove the old pointer from the bucket.
+    mem_to_realloc = NULL; // Make it null for good measure.
 
     return new_mem;
 }
 
-void gup_arena_free(GupArena* a) {
+void gup_bucket_free(GupBucket* a) {
+    _gup_bucket_sanity_check(a);
+
     for (int i = 0; i < a->data->count; i++) {
         free(a->data->data[i]);
     }
@@ -1662,7 +1683,16 @@ void _gup_array_long_print(GupArrayLong xs, const char* xs_name) {
     printf("]\n");
 }
 
-// TODO: here
+#define gup_array_ptr_print(xs) _gup_array_ptr_print(xs, #xs)
+void _gup_array_ptr_print(GupArrayPtr xs, const char* xs_name) {
+    printf("%s: [", xs_name);
+    for (int i = 0; i < xs.count; i++) {
+        printf("%p", xs.data[i]);
+
+        if (i != xs.count-1) printf(", ");
+    }
+    printf("]\n");
+}
 
 #define gup_array_short_print(xs) _gup_array_short_print(xs, #xs)
 void _gup_array_short_print(GupArrayShort xs, const char* xs_name) {
@@ -2503,7 +2533,7 @@ void gup_array_cstr_remove_all(GupArrayCstr* xs, char* x) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void gup_array_bool_remove_at_index_preserve_order(GupArrayBool* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
@@ -2514,7 +2544,7 @@ void gup_array_bool_remove_at_index_preserve_order(GupArrayBool* xs, const int i
 }
 
 void gup_array_char_remove_at_index_preserve_order(GupArrayChar* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
@@ -2525,7 +2555,7 @@ void gup_array_char_remove_at_index_preserve_order(GupArrayChar* xs, const int i
 }
 
 void gup_array_double_remove_at_index_preserve_order(GupArrayDouble* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
@@ -2536,7 +2566,7 @@ void gup_array_double_remove_at_index_preserve_order(GupArrayDouble* xs, const i
 }
 
 void gup_array_float_remove_at_index_preserve_order(GupArrayFloat* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
@@ -2547,7 +2577,7 @@ void gup_array_float_remove_at_index_preserve_order(GupArrayFloat* xs, const int
 }
 
 void gup_array_int_remove_at_index_preserve_order(GupArrayInt* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
@@ -2558,7 +2588,7 @@ void gup_array_int_remove_at_index_preserve_order(GupArrayInt* xs, const int ind
 }
 
 void gup_array_long_remove_at_index_preserve_order(GupArrayLong* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
@@ -2569,7 +2599,7 @@ void gup_array_long_remove_at_index_preserve_order(GupArrayLong* xs, const int i
 }
 
 void gup_array_ptr_remove_at_index_preserve_order(GupArrayPtr* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
@@ -2580,7 +2610,7 @@ void gup_array_ptr_remove_at_index_preserve_order(GupArrayPtr* xs, const int ind
 }
 
 void gup_array_short_remove_at_index_preserve_order(GupArrayShort* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
@@ -2592,7 +2622,7 @@ void gup_array_short_remove_at_index_preserve_order(GupArrayShort* xs, const int
 
 // TODO: can only really do this once GupArrayStrings have an array of pointers to GupArrayChars
 void gup_array_string_remove_at_index_preserve_order(GupArrayString* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count - 1; i++) {
@@ -2603,7 +2633,7 @@ void gup_array_string_remove_at_index_preserve_order(GupArrayString* xs, const i
 }
 
 void gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count - 1; i++) {
@@ -2618,7 +2648,7 @@ void gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr* xs, const int i
 // Remove at index no preserve order 
 // ---------------------------------------------------------------------------------------------------------------------
 void gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
@@ -2631,7 +2661,7 @@ void gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool* xs, const in
 }
 
 void gup_array_char_remove_at_index_no_preserve_order(GupArrayChar* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
@@ -2644,7 +2674,7 @@ void gup_array_char_remove_at_index_no_preserve_order(GupArrayChar* xs, const in
 }
 
 void gup_array_double_remove_at_index_no_preserve_order(GupArrayDouble* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
@@ -2657,7 +2687,7 @@ void gup_array_double_remove_at_index_no_preserve_order(GupArrayDouble* xs, cons
 }
 
 void gup_array_float_remove_at_index_no_preserve_order(GupArrayFloat* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
@@ -2670,7 +2700,7 @@ void gup_array_float_remove_at_index_no_preserve_order(GupArrayFloat* xs, const 
 }
 
 void gup_array_int_remove_at_index_no_preserve_order(GupArrayInt* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
@@ -2683,7 +2713,7 @@ void gup_array_int_remove_at_index_no_preserve_order(GupArrayInt* xs, const int 
 }
 
 void gup_array_long_remove_at_index_no_preserve_order(GupArrayLong* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
@@ -2696,7 +2726,7 @@ void gup_array_long_remove_at_index_no_preserve_order(GupArrayLong* xs, const in
 }
 
 void gup_array_ptr_remove_at_index_no_preserve_order(GupArrayPtr* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
@@ -2709,7 +2739,7 @@ void gup_array_ptr_remove_at_index_no_preserve_order(GupArrayPtr* xs, const int 
 }
 
 void gup_array_short_remove_at_index_no_preserve_order(GupArrayShort* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
@@ -2722,7 +2752,7 @@ void gup_array_short_remove_at_index_no_preserve_order(GupArrayShort* xs, const 
 }
 
 void gup_array_string_remove_at_index_no_preserve_order(GupArrayString* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the pointer to the last element into the element to remove
@@ -2735,7 +2765,7 @@ void gup_array_string_remove_at_index_no_preserve_order(GupArrayString* xs, cons
 }
 
 void gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr* xs, const int index) {
-    _gup_array_sanity_check(xs);
+    _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // printf("before %p\n", (void*)xs->data[index]); 
@@ -3822,9 +3852,9 @@ GupArrayString gup_string_split(GupAllocator* a, GupString str, char c) {
 
 // TODO: test
 GupArrayString gup_string_split_by_cstr(GupAllocator* a, GupString str, char* sub_str) {
-    GupArena local = gup_arena_create();
+    GupBucket local = gup_bucket_create();
     GupArrayString tokens = gup_array_string_create(a);
-    GupString token = gup_string_create((GupAllocator *)&local);
+    GupString token = gup_string_create((GupAllocator*)&local);
 
     for (int i = 0; i < str.count; i++) {
         // TODO: have a macro for this, basically just making a string view
@@ -3836,18 +3866,18 @@ GupArrayString gup_string_split_by_cstr(GupAllocator* a, GupString str, char* su
 
         if (gup_string_equals_cstr(source, sub_str)) {
             gup_array_string_append(a, &tokens, token);
-            token = gup_string_create((GupAllocator *)&local);
+            token = gup_string_create((GupAllocator*)&local);
             i += gup_cstr_length_excluding_null(sub_str) - 1;
         } else if (i == str.count-1) {
-            gup_string_append((GupAllocator *)&local, &token, str.data[i]);
+            gup_string_append((GupAllocator*)&local, &token, str.data[i]);
             gup_array_string_append(a, &tokens, token);
-            token = gup_string_create((GupAllocator *)&local);
+            token = gup_string_create((GupAllocator*)&local);
         } else {
-            gup_string_append((GupAllocator *)&local, &token, str.data[i]);
+            gup_string_append((GupAllocator*)&local, &token, str.data[i]);
         }
     }
 
-    gup_arena_destroy(&local);
+    gup_bucket_destroy(&local);
     return tokens;
 }
 
@@ -4004,14 +4034,14 @@ int _gup_hash_ptr_index(const void* key, const int modulo) {
 
 int _gup_hash_string_index(const GupString key, const int modulo) {
     GupAllocator local = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_MALLOC };
-    char* input_cstr = gup_string_to_cstr((GupAllocator *)&local, key);
+    char* input_cstr = gup_string_to_cstr((GupAllocator*)&local, key);
     
     const u32 hash = gup_fnv1a_hash(input_cstr);
     const int index = hash % modulo;
     
     gup_assert_verbose(index >= 0, "Got a negative index for the array of the Set");
     
-    gup_free((GupAllocator *)&local, input_cstr);
+    gup_free((GupAllocator*)&local, input_cstr);
     return index;
 }
 

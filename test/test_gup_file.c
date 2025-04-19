@@ -130,8 +130,8 @@ void test_gup_file_read_lines(void) {
     }
 
     { // foo.txt
-        GupArena a = gup_arena_create();
-        GupArrayString lines = gup_file_read_lines((GupAllocator *)&a, "./resources/foo.txt");
+        GupBucket a = gup_bucket_create();
+        GupArrayString lines = gup_file_read_lines((GupAllocator*)&a, "./resources/foo.txt");
 
         gup_assert(lines.count == 4);
         gup_assert(gup_array_char_equals_cstr(lines.data[0], "one"));
@@ -139,12 +139,12 @@ void test_gup_file_read_lines(void) {
         gup_assert(gup_array_char_equals_cstr(lines.data[2], "three three three"));
         gup_assert(gup_array_char_equals_cstr(lines.data[3], ""));
 
-        gup_arena_destroy(&a);
+        gup_bucket_destroy(&a);
     }
 
     { // settings.toml
-        GupArena a = gup_arena_create();
-        GupArrayString lines = gup_file_read_lines((GupAllocator *)&a, "./resources/settings.toml");
+        GupBucket a = gup_bucket_create();
+        GupArrayString lines = gup_file_read_lines((GupAllocator*)&a, "./resources/settings.toml");
 
         gup_assert(lines.count == 8);
         gup_assert(gup_array_char_equals_cstr(lines.data[0], "# This is a TOML file"));
@@ -156,7 +156,7 @@ void test_gup_file_read_lines(void) {
         gup_assert(gup_array_char_equals_cstr(lines.data[6], "server = \"localhost\""));
         gup_assert(gup_array_char_equals_cstr(lines.data[7], "port = 5432"));
 
-        gup_arena_destroy(&a);
+        gup_bucket_destroy(&a);
     }
 }
 
@@ -443,7 +443,7 @@ void test_gup_file_print_lines() {
 }
 
 void test_gup_file(void) {
-    GupArena a = gup_arena_create();
+    GupBucket a = gup_bucket_create();
 
     test_gup_file_is_empty();
     test_gup_file_line_count();
@@ -454,12 +454,12 @@ void test_gup_file(void) {
     test_gup_file_read_lines_as_cstrs();
     test_gup_file_read_lines_as_cstrs_keep_newlines();
     test_gup_file_size();
-    test_gup_file_write((GupAllocator *)&a);
-    test_gup_file_write_lines((GupAllocator *)&a);
+    test_gup_file_write((GupAllocator*)&a);
+    test_gup_file_write_lines((GupAllocator*)&a);
     #ifdef GUPPY_VERBOSE
     test_gup_file_print();
     test_gup_file_print_lines();
     #endif // GUPPY_VERBOSE
 
-    gup_arena_destroy(&a);
+    gup_bucket_destroy(&a);
 }

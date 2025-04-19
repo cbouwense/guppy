@@ -285,18 +285,18 @@ void test_gup_string_to_int(GupAllocator* a) {
 }
 
 void test_gup_string(void) {
-    GupArena a = gup_arena_create();
+    GupBucket a = gup_bucket_create();
 
-    test_gup_string_creates_an_empty_string((GupAllocator *)&a);
-    test_creating_a_gup_string_from_a_cstr_equals_that_cstr((GupAllocator *)&a);
-    test_gup_string_trim_functions((GupAllocator *)&a);
-    test_gup_string_split((GupAllocator *)&a);
-    test_gup_string_starts_with((GupAllocator *)&a);
-    test_gup_string_starts_with_cstr((GupAllocator *)&a);
-    test_gup_string_ends_with((GupAllocator *)&a);
-    test_gup_string_ends_with_cstr((GupAllocator *)&a);
-    test_gup_string_contains_substring((GupAllocator *)&a);
-    test_gup_string_to_int((GupAllocator *)&a);
+    test_gup_string_creates_an_empty_string((GupAllocator*)&a);
+    test_creating_a_gup_string_from_a_cstr_equals_that_cstr((GupAllocator*)&a);
+    test_gup_string_trim_functions((GupAllocator*)&a);
+    test_gup_string_split((GupAllocator*)&a);
+    test_gup_string_starts_with((GupAllocator*)&a);
+    test_gup_string_starts_with_cstr((GupAllocator*)&a);
+    test_gup_string_ends_with((GupAllocator*)&a);
+    test_gup_string_ends_with_cstr((GupAllocator*)&a);
+    test_gup_string_contains_substring((GupAllocator*)&a);
+    test_gup_string_to_int((GupAllocator*)&a);
 
-    gup_arena_destroy(&a);
+    gup_bucket_destroy(&a);
 }

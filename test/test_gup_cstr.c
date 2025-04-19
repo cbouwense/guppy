@@ -101,11 +101,11 @@ void test_gup_cstr_equals(GupAllocator* a) {
 }
 
 void test_gup_cstr(void) {
-    GupArena a = gup_arena_create();
+    GupBucket a = gup_bucket_create();
 
-    test_gup_cstr_array_flatten((GupAllocator *)&a);
-    test_gup_cstr_length_excluding_null((GupAllocator *)&a);
-    test_gup_cstr_equals((GupAllocator *)&a);
+    test_gup_cstr_array_flatten((GupAllocator*)&a);
+    test_gup_cstr_length_excluding_null((GupAllocator*)&a);
+    test_gup_cstr_equals((GupAllocator*)&a);
 
-    gup_arena_destroy(&a);
+    gup_bucket_destroy(&a);
 }
