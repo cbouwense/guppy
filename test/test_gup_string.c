@@ -285,7 +285,7 @@ void test_gup_string_to_int(GupAllocator* a) {
 }
 
 void test_gup_string(void) {
-    GupBucket a = gup_bucket_create();
+    GupAllocatorBucket a = gup_allocator_bucket_create();
 
     test_gup_string_creates_an_empty_string((GupAllocator*)&a);
     test_creating_a_gup_string_from_a_cstr_equals_that_cstr((GupAllocator*)&a);
@@ -298,5 +298,5 @@ void test_gup_string(void) {
     test_gup_string_contains_substring((GupAllocator*)&a);
     test_gup_string_to_int((GupAllocator*)&a);
 
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }

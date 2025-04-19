@@ -130,7 +130,7 @@ void test_gup_file_read_lines(void) {
     }
 
     { // foo.txt
-        GupBucket a = gup_bucket_create();
+        GupAllocatorBucket a = gup_allocator_bucket_create();
         GupArrayString lines = gup_file_read_lines((GupAllocator*)&a, "./resources/foo.txt");
 
         gup_assert(lines.count == 4);
@@ -139,11 +139,11 @@ void test_gup_file_read_lines(void) {
         gup_assert(gup_array_char_equals_cstr(lines.data[2], "three three three"));
         gup_assert(gup_array_char_equals_cstr(lines.data[3], ""));
 
-        gup_bucket_destroy(&a);
+        gup_allocator_bucket_destroy(&a);
     }
 
     { // settings.toml
-        GupBucket a = gup_bucket_create();
+        GupAllocatorBucket a = gup_allocator_bucket_create();
         GupArrayString lines = gup_file_read_lines((GupAllocator*)&a, "./resources/settings.toml");
 
         gup_assert(lines.count == 8);
@@ -156,7 +156,7 @@ void test_gup_file_read_lines(void) {
         gup_assert(gup_array_char_equals_cstr(lines.data[6], "server = \"localhost\""));
         gup_assert(gup_array_char_equals_cstr(lines.data[7], "port = 5432"));
 
-        gup_bucket_destroy(&a);
+        gup_allocator_bucket_destroy(&a);
     }
 }
 
@@ -443,7 +443,7 @@ void test_gup_file_print_lines() {
 }
 
 void test_gup_file(void) {
-    GupBucket a = gup_bucket_create();
+    GupAllocatorBucket a = gup_allocator_bucket_create();
 
     test_gup_file_is_empty();
     test_gup_file_line_count();
@@ -461,5 +461,5 @@ void test_gup_file(void) {
     test_gup_file_print_lines();
     #endif // GUPPY_VERBOSE
 
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }

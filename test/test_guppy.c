@@ -5,7 +5,7 @@
 #define GUPPY_IMPLEMENTATION
 #include "../src/guppy.h"
 
-#include "./test_gup_bucket.c"
+#include "./test_gup_allocator_bucket.c"
 #include "./test_gup_array.c"
 #include "./test_gup_file.c"
 #include "./test_gup_set.c"
@@ -25,7 +25,7 @@ int main(void) {
     reset_settings_file();
 
     // TODO: multi thread these
-    test_gup_bucket();
+    test_gup_allocator_bucket();
     test_gup_array();
     test_gup_set();
     test_gup_hashmap();

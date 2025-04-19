@@ -1,7 +1,7 @@
 #include "../src/guppy.h"
 
 void test_gup_settings_get_and_set(void) {
-    GupBucket a = gup_bucket_create();
+    GupAllocatorBucket a = gup_allocator_bucket_create();
 
     GupString foo, bar, baz, not_there;
     bool foo_result = gup_settings_get_cstr((GupAllocator*)&a, "foo", &foo);
@@ -17,7 +17,7 @@ void test_gup_settings_get_and_set(void) {
     gup_assert(gup_string_equals_cstr(bar, "bar"));
     gup_assert(gup_string_equals_cstr(baz, "true"));
 
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }
 
 void test_gup_settings(void) {

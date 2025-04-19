@@ -1,23 +1,23 @@
 #include "../src/guppy.h"
 
-void test_gup_bucket_create(void) {
-    GupBucket a = gup_bucket_create();
+void test_gup_allocator_bucket_create(void) {
+    GupAllocatorBucket a = gup_allocator_bucket_create();
 
     gup_assert(a.data->capacity == 256);
     gup_assert(a.data->count == 0);
     gup_assert(a.data->data != NULL);
 
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }
 
 // The real test here is that AddressSanitzer doesn't say there's a leak
 // when this is run.
-void test_gup_bucket_can_allocate_stuff_and_not_need_to_free_it(void) {
-    GupBucket a = gup_bucket_create();
+void test_gup_allocator_bucket_can_allocate_stuff_and_not_need_to_free_it(void) {
+    GupAllocatorBucket a = gup_allocator_bucket_create();
 
-    char* foo = gup_bucket_alloc(&a, strlen("foo") + 1);
-    char* bar = gup_bucket_alloc(&a, strlen("bar") + 1);
-    char* foobar = gup_bucket_alloc(&a, strlen("foo") + strlen("bar") + 1);
+    char* foo = gup_allocator_bucket_alloc(&a, strlen("foo") + 1);
+    char* bar = gup_allocator_bucket_alloc(&a, strlen("bar") + 1);
+    char* foobar = gup_allocator_bucket_alloc(&a, strlen("foo") + strlen("bar") + 1);
     
     strcpy(foo, "foo");
     strcpy(bar, "bar");
@@ -29,43 +29,43 @@ void test_gup_bucket_can_allocate_stuff_and_not_need_to_free_it(void) {
     gup_assert(strcmp(bar, "bar") == 0);
     gup_assert(strcmp(foobar, "foobar") == 0);
 
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }
 
 // The real test here is that AddressSanitzer doesn't say there's a leak
 // when this is run.
-void test_gup_bucket_can_be_freed_and_not_leak_memory(void) {
-    GupBucket a = gup_bucket_create();
+void test_gup_allocator_bucket_can_be_freed_and_not_leak_memory(void) {
+    GupAllocatorBucket a = gup_allocator_bucket_create();
 
     const int count = 42;
-    int** lots_of_ints = gup_bucket_alloc(&a, sizeof(int *) * count);
+    int** lots_of_ints = gup_allocator_bucket_alloc(&a, sizeof(int *) * count);
     for (int i = 0; i < count; i++) {
-        lots_of_ints[i] = gup_bucket_alloc(&a, sizeof(int));
+        lots_of_ints[i] = gup_allocator_bucket_alloc(&a, sizeof(int));
         *lots_of_ints[i] = i;
     }
 
     // This is the test.
-    gup_bucket_free(&a); 
+    gup_allocator_bucket_clear(&a); 
 
     // This is manual cleanup.
     free(a.data->data);
     free(a.data);
 }
 
-void test_gup_bucket_can_allocate_a_bunch_of_strings(void) {
-    GupBucket a = gup_bucket_create();
+void test_gup_allocator_bucket_can_allocate_a_bunch_of_strings(void) {
+    GupAllocatorBucket a = gup_allocator_bucket_create();
 
     GupString str = gup_string((GupAllocator*)&a, "foo");
     gup_string_append((GupAllocator*)&a, &str, 'b');
     gup_string_append((GupAllocator*)&a, &str, 'a');
     gup_string_append((GupAllocator*)&a, &str, 'r');
 
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }
 
 // The file stuff was like spewing leaks so I put this test here
-void test_gup_bucket_with_file_stuff(void) {
-    GupBucket a = gup_bucket_create();
+void test_gup_allocator_bucket_with_file_stuff(void) {
+    GupAllocatorBucket a = gup_allocator_bucket_create();
 
     GupArrayString tokens;
     const char* key = "foo";
@@ -86,13 +86,13 @@ void test_gup_bucket_with_file_stuff(void) {
         }
     }
     
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }
 
-void test_gup_bucket(void) {
-    test_gup_bucket_create();
-    test_gup_bucket_can_allocate_stuff_and_not_need_to_free_it();
-    test_gup_bucket_can_be_freed_and_not_leak_memory();
-    test_gup_bucket_can_allocate_a_bunch_of_strings();
-    test_gup_bucket_with_file_stuff();
+void test_gup_allocator_bucket(void) {
+    test_gup_allocator_bucket_create();
+    test_gup_allocator_bucket_can_allocate_stuff_and_not_need_to_free_it();
+    test_gup_allocator_bucket_can_be_freed_and_not_leak_memory();
+    test_gup_allocator_bucket_can_allocate_a_bunch_of_strings();
+    test_gup_allocator_bucket_with_file_stuff();
 }

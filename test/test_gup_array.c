@@ -152,7 +152,7 @@ void test_gup_array_char_create_from_cstr(void) {
 }
 
 void test_gup_array_appending_resizes_properly(void) {
-    GupBucket a = gup_bucket_create();
+    GupAllocatorBucket a = gup_allocator_bucket_create();
     GupArrayFloat xs = gup_array_float_create((GupAllocator*)&a);
 
     for (int i = 0; i < 1337; i++) {
@@ -162,7 +162,7 @@ void test_gup_array_appending_resizes_properly(void) {
     gup_assert(xs.capacity == 2048);
     gup_assert(xs.count == 1337);
 
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }
 
 void test_gup_array_string_create(void) {
@@ -496,7 +496,7 @@ void test_gup_array_remove_at_index_preserve_order(void) {
 
     // TODO: can only really do this once GupArrayStrings have an array of pointers to GupArrayChars
     GUP_SKIP { // Strings
-        GupBucket a = gup_bucket_create();        
+        GupAllocatorBucket a = gup_allocator_bucket_create();        
         GupArrayString strings = gup_array_string_create((GupAllocator*)&a);
 
         gup_array_string_append_cstr((GupAllocator*)&a, &strings, "qwer");
@@ -514,12 +514,12 @@ void test_gup_array_remove_at_index_preserve_order(void) {
         gup_array_string_print(strings);
         gup_assert(gup_string_equals_cstr(strings.data[0], "zxcv"));
 
-        gup_bucket_destroy(&a);
+        gup_allocator_bucket_destroy(&a);
     }
 
     // TODO: can only really do this once GupArrayCstr have an array of pointers to char**
     GUP_SKIP { // Cstrs 
-        GupBucket a = gup_bucket_create();        
+        GupAllocatorBucket a = gup_allocator_bucket_create();        
         GupArrayCstr cstrs = gup_array_cstr_create((GupAllocator*)&a);
 
         gup_array_cstr_append((GupAllocator*)&a, &cstrs, "qwer");
@@ -536,7 +536,7 @@ void test_gup_array_remove_at_index_preserve_order(void) {
         gup_assert(cstrs.count == 1);
         gup_assert(gup_cstr_equals(cstrs.data[0], "zxcv"));
 
-        gup_bucket_destroy(&a);
+        gup_allocator_bucket_destroy(&a);
     }
 }
 
@@ -569,7 +569,7 @@ void test_gup_array_remove_at_index_no_preserve_order(void) {
     }
 
     { // Strings
-        GupBucket a = gup_bucket_create();        
+        GupAllocatorBucket a = gup_allocator_bucket_create();        
         GupArrayString strings = gup_array_string_create((GupAllocator*)&a);
 
         gup_array_string_append_cstr((GupAllocator*)&a, &strings, "qwer");
@@ -586,11 +586,11 @@ void test_gup_array_remove_at_index_no_preserve_order(void) {
         gup_assert(strings.count == 1);
         gup_assert(gup_string_equals_cstr(strings.data[0], "zxcv"));
 
-        gup_bucket_destroy(&a);
+        gup_allocator_bucket_destroy(&a);
     }
 
     { // Cstrs 
-        GupBucket a = gup_bucket_create();        
+        GupAllocatorBucket a = gup_allocator_bucket_create();        
         GupArrayCstr cstrs = gup_array_cstr_create((GupAllocator*)&a);
 
         gup_array_cstr_append((GupAllocator*)&a, &cstrs, "qwer");
@@ -607,7 +607,7 @@ void test_gup_array_remove_at_index_no_preserve_order(void) {
         gup_assert(cstrs.count == 1);
         gup_assert(gup_cstr_equals(cstrs.data[0], "zxcv"));
 
-        gup_bucket_destroy(&a);
+        gup_allocator_bucket_destroy(&a);
     }
 }
 

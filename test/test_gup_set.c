@@ -188,7 +188,7 @@ void test_ptr_sets(void) {
 }
 
 void test_string_set(void) {
-    GupBucket a = gup_bucket_create();
+    GupAllocatorBucket a = gup_allocator_bucket_create();
     GupSetString set = gup_set_string_create((GupAllocator*)&a);
     
     GupString str1 = gup_string((GupAllocator*)&a, "drink");
@@ -202,7 +202,7 @@ void test_string_set(void) {
     gup_assert(!gup_set_string_has(set, str2));
     gup_assert( gup_set_string_has(set, str3));
 
-    gup_bucket_destroy(&a);
+    gup_allocator_bucket_destroy(&a);
 }
 
 void test_sets_huge_mode(void) {

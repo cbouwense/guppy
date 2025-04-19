@@ -92,7 +92,7 @@ typedef struct {
 
 typedef enum {
     GUP_ALLOCATOR_TYPE_MALLOC = 0,
-    GUP_ALLOCATOR_TYPE_BUCKET  = 1,
+    GUP_ALLOCATOR_TYPE_BUCKET = 1,
     GUP_ALLOCATOR_TYPE_COUNT  = 2,
 } GupAllocatorType;
 
@@ -102,9 +102,9 @@ typedef struct {
 } GupAllocator;
 
 typedef struct {
-    GupAllocator  head;
-    GupArrayPtr  *data;
-} GupBucket;
+    GupAllocator head;
+    GupArrayPtr* data;
+} GupAllocatorBucket;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -117,7 +117,7 @@ typedef struct {
 typedef struct {
     int capacity;
     int count;
-    bool data[256]; // pigeon hole
+    bool data[256]; // We do not need to have a resizable array here because there are only 256 possible characters.
 } GupSetChar;
 
 typedef struct {
@@ -181,20 +181,20 @@ typedef struct {
 
 typedef struct {
     int capacity;
-    GupArrayCstr* keys;
+    GupArrayCstr*   keys;
     GupArrayDouble* values;
 } GupHashmapDouble;
 
 typedef struct {
     int capacity;
-    GupArrayCstr* keys;
+    GupArrayCstr*  keys;
     GupArrayFloat* values;
 } GupHashmapFloat;
 
 typedef struct {
     int capacity;
     GupArrayCstr* keys;
-    GupArrayInt* values;
+    GupArrayInt*  values;
 } GupHashmapInt;
 
 typedef struct {
@@ -206,18 +206,18 @@ typedef struct {
 typedef struct {
     int capacity;
     GupArrayCstr* keys;
-    GupArrayPtr* values;
+    GupArrayPtr*  values;
 } GupHashmapPtr;
 
 typedef struct {
     int capacity;
-    GupArrayCstr* keys;
+    GupArrayCstr*  keys;
     GupArrayShort* values;
 } GupHashmapShort;
 
 typedef struct {
     int capacity;
-    GupArrayCstr* keys;
+    GupArrayCstr*   keys;
     GupArrayString* values;
 } GupHashmapString;
 
@@ -244,7 +244,7 @@ typedef GupArrayCstr   GupStackCstr;
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Allocator
+// Base allocator
 // ---------------------------------------------------------------------------------------------------------------------
 
 void* gup_alloc(GupAllocator* a, size_t bytes);
@@ -252,14 +252,15 @@ void* gup_realloc(GupAllocator* a, void* mem_to_realloc, size_t bytes);
 void  gup_free(GupAllocator* a, void* ptr);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Bucket
+// Bucket allocator
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupBucket gup_bucket_create();
-void      gup_bucket_destroy(GupBucket* a); // Free all the allocated memory and the bucket itself
-void*     gup_bucket_alloc(GupBucket* a, size_t bytes);
-void*     gup_bucket_realloc(GupBucket* a, void* mem_to_realloc, size_t bytes);
-void      gup_bucket_free(GupBucket* a); // Free all the allocated memory, but not the bucket itself
+GupAllocatorBucket gup_allocator_bucket_create();
+void               gup_allocator_bucket_destroy(GupAllocatorBucket* a); // Free all the allocated memory and the bucket itself
+void*              gup_allocator_bucket_alloc(GupAllocatorBucket* a, size_t bytes);
+void*              gup_allocator_bucket_realloc(GupAllocatorBucket* a, void* mem_to_realloc, size_t bytes);
+void               gup_allocator_bucket_free(GupAllocatorBucket* a, void* mem_to_free); // Free some specific memory that is in the bucket.
+void               gup_allocator_bucket_clear(GupAllocatorBucket* a); // Free all the allocated memory, but not the bucket itself
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Dynamic arrays
@@ -297,8 +298,8 @@ void           gup_array_char_remove(GupArrayChar* xs, char x, int count_to_remo
 void           gup_array_char_remove_all(GupArrayChar* xs, char x);
 void           gup_array_char_remove_at_index_preserve_order(GupArrayChar* xs, const int index);
 void           gup_array_char_remove_at_index_no_preserve_order(GupArrayChar* xs, const int index);
-char          *gup_array_char_to_cstr(GupAllocator* a, GupArrayChar chars);
-char         **gup_array_string_to_cstrs(GupAllocator* a, GupArrayString strs);
+char*          gup_array_char_to_cstr(GupAllocator* a, GupArrayChar chars);
+char**         gup_array_string_to_cstrs(GupAllocator* a, GupArrayString strs);
 GupArrayChar   gup_array_char_sort(GupAllocator* a, GupArrayChar xs);
    
 GupArrayDouble gup_array_double_create(GupAllocator* a);
@@ -885,8 +886,9 @@ void _gup_assert_verbose(bool pass_condition, const char* failure_explanation, c
     gup_assert_verbose(xs->count > 0, "You're trying to operate on an empty array.");                                            \
     gup_assert_verbose(xs->capacity > 0, "You're trying to operate on an array without any capacity.");                          \
     gup_assert_verbose(xs->count <= xs->capacity, "You're trying to operate on an array whose count has exceeded its capacity.");\
+                                                                                                                                 \
 
-void _gup_bucket_sanity_check(GupBucket* a) {
+void _gup_allocator_bucket_sanity_check(GupAllocatorBucket* a) {
     gup_assert(a != NULL);
     gup_assert(a->head.type == GUP_ALLOCATOR_TYPE_BUCKET);
 }
@@ -900,7 +902,7 @@ void* gup_alloc(GupAllocator* a, size_t bytes) {
 
     switch (a->type) {
         case GUP_ALLOCATOR_TYPE_MALLOC: return malloc(bytes);
-        case GUP_ALLOCATOR_TYPE_BUCKET:  return gup_bucket_alloc((GupBucket *)a, bytes);
+        case GUP_ALLOCATOR_TYPE_BUCKET: return gup_allocator_bucket_alloc((GupAllocatorBucket*)a, bytes);
         default: {
             printf("ERROR: unknown allocator type.\n");
             exit(1);
@@ -913,7 +915,7 @@ void* gup_realloc(GupAllocator* a, void* mem_to_realloc, size_t bytes) {
     
     switch (a->type) {
         case GUP_ALLOCATOR_TYPE_MALLOC: return realloc(mem_to_realloc, bytes);
-        case GUP_ALLOCATOR_TYPE_BUCKET:  return gup_bucket_realloc((GupBucket*)a, mem_to_realloc, bytes);
+        case GUP_ALLOCATOR_TYPE_BUCKET: return gup_allocator_bucket_realloc((GupAllocatorBucket*)a, mem_to_realloc, bytes);
         default: {
             printf("ERROR: unknown allocator type.\n");
             exit(1);
@@ -932,7 +934,7 @@ void gup_free(GupAllocator* a, void* ptr) {
             free(ptr);
         } break;
         case GUP_ALLOCATOR_TYPE_BUCKET:  {
-            printf("WARNING: Tried to free memory that is within an bucket. You probably don't actually want to do that. If you do, you probably should not be using an bucket to allocate that memory.\n");
+            gup_allocator_bucket_free((GupAllocatorBucket*)a, ptr);
         } break;
         default: {
             printf("ERROR: unknown allocator type.\n");
@@ -945,27 +947,27 @@ void gup_free(GupAllocator* a, void* ptr) {
 // Bucket
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupBucket gup_bucket_create() {
+GupAllocatorBucket gup_allocator_bucket_create() {
     GupArrayPtr* ptrs = malloc(sizeof(GupArrayPtr));
     gup_assert_verbose(ptrs != NULL, "PANIC: An allocation failed");
     *ptrs = gup_array_ptr_create(NULL);
 
-    return (GupBucket) {
+    return (GupAllocatorBucket) {
         .head = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_BUCKET },
         .data = ptrs,
     };
 }
 
-void gup_bucket_destroy(GupBucket* a) {
-    _gup_bucket_sanity_check(a);
+void gup_allocator_bucket_destroy(GupAllocatorBucket* a) {
+    _gup_allocator_bucket_sanity_check(a);
 
-    gup_bucket_free(a);
+    gup_allocator_bucket_clear(a);
     gup_array_ptr_destroy(*(a->data));
     free(a->data);
 }
 
-void* gup_bucket_alloc(GupBucket* a, size_t bytes) {
-    _gup_bucket_sanity_check(a);
+void* gup_allocator_bucket_alloc(GupAllocatorBucket* a, size_t bytes) {
+    _gup_allocator_bucket_sanity_check(a);
     gup_assert(bytes > 0);
 
     if (a->data->count == a->data->capacity) {
@@ -983,8 +985,8 @@ void* gup_bucket_alloc(GupBucket* a, size_t bytes) {
     return ptr;
 }
 
-void* gup_bucket_realloc(GupBucket* a, void* mem_to_realloc, size_t bytes) {
-    _gup_bucket_sanity_check(a);
+void* gup_allocator_bucket_realloc(GupAllocatorBucket* a, void* mem_to_realloc, size_t bytes) {
+    _gup_allocator_bucket_sanity_check(a);
     gup_assert(mem_to_realloc != NULL);
     gup_assert(a != mem_to_realloc);
     gup_assert(bytes > 0);
@@ -1006,16 +1008,30 @@ void* gup_bucket_realloc(GupBucket* a, void* mem_to_realloc, size_t bytes) {
     return new_mem;
 }
 
-void gup_bucket_free(GupBucket* a) {
-    _gup_bucket_sanity_check(a);
+// TODO: test
+void gup_allocator_bucket_free(GupAllocatorBucket* a, void* mem_to_free) {
+    _gup_allocator_bucket_sanity_check(a);
+    _gup_array_populated_sanity_check(a->data);
+
+    const int index = gup_array_ptr_find_index_of(a->data, mem_to_free);
+    gup_assert_verbose(index > -1, "Tried freeing a pointer from a bucket allocator that the bucket did not have.");
+
+    gup_array_ptr_remove_at_index_no_preserve_order(a->data, index);
+    free(mem_to_free);
+}
+
+void gup_allocator_bucket_clear(GupAllocatorBucket* a) {
+    _gup_allocator_bucket_sanity_check(a);
 
     for (int i = 0; i < a->data->count; i++) {
-        free(a->data->data[i]);
+        free(a->data->data[i]);        
     }
     a->data->count = 0;
 }
 
-// Dynamic Arrays ----------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Dynamic Arrays
+// ---------------------------------------------------------------------------------------------------------------------
 
 // Default constructors
 GupArrayBool gup_array_bool_create(GupAllocator* a) {
@@ -3852,7 +3868,7 @@ GupArrayString gup_string_split(GupAllocator* a, GupString str, char c) {
 
 // TODO: test
 GupArrayString gup_string_split_by_cstr(GupAllocator* a, GupString str, char* sub_str) {
-    GupBucket local = gup_bucket_create();
+    GupAllocatorBucket local = gup_allocator_bucket_create();
     GupArrayString tokens = gup_array_string_create(a);
     GupString token = gup_string_create((GupAllocator*)&local);
 
@@ -3877,7 +3893,7 @@ GupArrayString gup_string_split_by_cstr(GupAllocator* a, GupString str, char* su
         }
     }
 
-    gup_bucket_destroy(&local);
+    gup_allocator_bucket_destroy(&local);
     return tokens;
 }
 
