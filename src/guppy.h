@@ -112,6 +112,7 @@ typedef struct {
  * freeing or reallocing some memory allocated in a gup arena, but I'm not really sure what will happen if you do so. At best,
  * probably a segfault. At worst, probably horrendous mysterious undebuggable bugs.
  */
+
 typedef struct {
     GupAllocator head;
     int capacity;
@@ -282,8 +283,9 @@ void  gup_free(GupAllocator* a, void* ptr);
 // ---------------------------------------------------------------------------------------------------------------------
 
 GupAllocatorArena gup_allocator_arena_create();
-void              gup_allocator_arena_alloc(GupAllocatorArena* a, size_t bytes);
-void*             gup_
+void              gup_allocator_arena_destroy(GupAllocatorArena* a);
+void*             gup_allocator_arena_alloc(GupAllocatorArena* a, size_t bytes);
+void              gup_allocator_arena_clear(GupAllocatorArena* a); // Free all the allocated memory, but not the arena itself.
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Bucket allocator
@@ -877,6 +879,7 @@ u32 gup_fnv1a_hash(const char* s);
 
 #ifdef GUPPY_IMPLEMENTATION
 
+#define GUP_ARENA_DEFAULT_CAPACITY 8192
 #define GUP_ARRAY_DEFAULT_CAPACITY 256
 #define GUP_SET_DEFAULT_CAPACITY 8192
 #define GUP_HASHMAP_DEFAULT_CAPACITY 8192
@@ -921,6 +924,11 @@ void _gup_assert_verbose(bool pass_condition, const char* failure_explanation, c
     gup_assert_verbose(xs->capacity > 0, "You're trying to operate on an array without any capacity.");                          \
     gup_assert_verbose(xs->count <= xs->capacity, "You're trying to operate on an array whose count has exceeded its capacity.");\
                                                                                                                                  \
+
+void _gup_allocator_arena_sanity_check(GupAllocatorArena* a) {
+    gup_assert(a != NULL);
+    gup_assert(a->head.type == GUP_ALLOCATOR_TYPE_ARENA);
+}
 
 void _gup_allocator_bucket_sanity_check(GupAllocatorBucket* a) {
     gup_assert(a != NULL);
@@ -978,7 +986,49 @@ void gup_free(GupAllocator* a, void* ptr) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Bucket
+// Arena allocator
+// ---------------------------------------------------------------------------------------------------------------------
+
+GupAllocatorArena gup_allocator_arena_create() {
+    return (GupAllocatorArena) {
+        .head       = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_ARENA },
+        .capacity   = GUP_ARENA_DEFAULT_CAPACITY,
+        .next_index = 0,
+        .data       = malloc(GUP_ARENA_DEFAULT_CAPACITY),
+    };
+}
+
+void gup_allocator_arena_destroy(GupAllocatorArena* a) {
+    free(a->data);
+}
+
+void* gup_allocator_arena_alloc(GupAllocatorArena* a, size_t bytes) {
+    _gup_allocator_arena_sanity_check(a);
+    gup_assert(bytes > 0);
+
+    // TODO: just do this in one go, without a loop
+    // TODO: do I need to do this for each resize? (ie in gup arrays too?)
+    while (a->next_index + (int)bytes >= a->capacity) {
+        a->data = realloc(a->data, a->capacity * 2);
+        gup_assert_verbose(a->data != NULL, "PANIC: An allocation failed.");
+        a->capacity *= 2;
+    }
+
+    void* ptr = &(a->data[a->next_index]);
+    gup_assert(ptr > (void*)a->data);
+
+    a->next_index += (int)bytes;
+    gup_assert(a->next_index <= a->capacity);
+
+    return ptr;
+}
+
+void gup_allocator_arena_clear(GupAllocatorArena* a) {
+    a->next_index = 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Bucket allocator
 // ---------------------------------------------------------------------------------------------------------------------
 
 GupAllocatorBucket gup_allocator_bucket_create() {
@@ -1030,14 +1080,14 @@ void* gup_allocator_bucket_realloc(GupAllocatorBucket* a, void* mem_to_realloc, 
 
     // Create and add the new memory.
     void* new_mem = malloc(bytes);                                      // Get a fresh chunk of memory.
-    gup_assert_verbose(new_mem != NULL, "PANIC: An allocation failed"); // TODO: maybe have a sanity check for new memory?
+    gup_assert_verbose(new_mem != NULL, "PANIC: An allocation failed"); // TODO: have a generic sanity check for new memory.
     memcpy(new_mem, mem_to_realloc, a->data->count);                    // Copy over the old contents into the new memory.
     gup_array_ptr_append(NULL, a->data, new_mem);                       // Add the new pointer to the list
 
     // Free and remove the old memory.
-    free(mem_to_realloc); // Free the old stuff.
-    gup_array_ptr_remove_at_index_no_preserve_order(a->data, index); // Remove the old pointer from the bucket.
-    mem_to_realloc = NULL; // Make it null for good measure.
+    free(mem_to_realloc);                                               // Free the old stuff.
+    gup_array_ptr_remove_at_index_no_preserve_order(a->data, index);    // Remove the old pointer from the bucket.
+    mem_to_realloc = NULL;                                              // Make it null for good measure.
 
     return new_mem;
 }
@@ -3203,14 +3253,9 @@ char** gup_array_string_to_cstrs(GupAllocator* a, GupArrayString strs) {
     return result;
 }
 
-// TODO: Memory ------------------------------------------------------------------------------------------
-
-/* TODO
- * Thanks to Eskil Steenberg for his explanation of using these custom memory macros for debugging.
- * Check out his masterclass on programming in C: https://youtu.be/443UNeGrFoM
- */
-
-// File operations ---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// File operations
+// ---------------------------------------------------------------------------------------------------------------------
 
 const char* GUP_DEFAULT_FILE_ERROR_MESSAGE = "File operation failed.\nYou should probably double check that you:\n1) spelled the file name correctly\n2) are creating the file in the directory you think you are\n3) have permissions to create a file in that directory\n";
 
@@ -3726,7 +3771,9 @@ void gup_file_append_lines_cstrs(char** lines_to_write, const int line_count, co
     fclose(fp);
 }
 
-// Strings -------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Strings
+// ---------------------------------------------------------------------------------------------------------------------
 
 #define gup_string_create gup_array_char_create
 #define gup_string_destroy gup_array_char_destroy
@@ -4040,7 +4087,9 @@ char* gup_string_to_cstr(GupAllocator* a, GupString str) {
     return cstr;
 }
 
-// Sets --------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Sets
+// ---------------------------------------------------------------------------------------------------------------------
 
 int _gup_hash_char_index(const char x) {
     return x < 0 ? 127 + (x * -1) : x;
@@ -4620,6 +4669,7 @@ int gup_set_char_size(GupSetChar set) {
     return set.count;
 }
 
+// TODO: why are these commented out?
 // int gup_set_double_size(GupSet set) {
 //     return set.count;
 // }
@@ -6070,9 +6120,9 @@ void gup_stack_cstr_destroy(GupStackCstr s) {
 
 #define gup_stack_cstr_debug(xs) gup_array_cstr_debug(xs)
 
-
-
-// Print -------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------------------------------------------------
 
 void gup_print_cwd(void) {
     char cwd[1024];
@@ -6084,7 +6134,9 @@ void gup_print_string(const char* string) {
     printf("\"%s\"\n", string);
 }
 
-// Print array slices ------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Print array slices
+// ---------------------------------------------------------------------------------------------------------------------
 
 void gup_print_array_slice_bool(bool array[], size_t start, size_t end) {
     printf("[");
@@ -6145,7 +6197,9 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
     printf("]\n");
 }
 
-// Settings ----------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool gup_settings_get_cstr(GupAllocator* a, const char* key, GupString* out) {
     return gup_settings_get_cstr_from_file(a, key, "src/settings.txt", out);
@@ -6288,7 +6342,9 @@ void gup_cstr_copy_n(char* to, const char* from, const int n) {
     to[n] = '\0';
 }
 
-// Math ----------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Math
+// ---------------------------------------------------------------------------------------------------------------------
 
 inline u8 gup_pow_u8(u8 x, u8 y) {
     u8 result = 1;
@@ -6370,10 +6426,12 @@ inline f64 gup_pow_f64(f64 x, f64 y) {
     return result;
 }
 
-
-// Miscellaneous -----------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Miscellaneous
+// ---------------------------------------------------------------------------------------------------------------------
 
 // TODO: DRY this up?
+// TODO: I honestly don't trust these operation timers. I should either double check that they work or just get rid of them. 
 double gup_operation_seconds(void (*fn)()) {
     clock_t start, end;
     double cpu_seconds_used;
