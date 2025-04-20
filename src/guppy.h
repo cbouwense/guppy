@@ -92,8 +92,8 @@ typedef struct {
 
 typedef enum {
     GUP_ALLOCATOR_TYPE_MALLOC = 0,
-    GUP_ALLOCATOR_TYPE_BUCKET = 1,
-    GUP_ALLOCATOR_TYPE_COUNT  = 2,
+    GUP_ALLOCATOR_TYPE_ARENA  = 1,
+    GUP_ALLOCATOR_TYPE_BUCKET = 2,
 } GupAllocatorType;
 
 typedef struct {
@@ -101,6 +101,33 @@ typedef struct {
     // TODO: could have stuff here like bytes_allocated, free_count, etc.
 } GupAllocator;
 
+/**
+ * An arena allocator in this library is implemented as a bump allocator. You can add any type of data to a gup
+ * arena. Allocating just gives you a pointer to a slice of the underlying array of bytes. It does not have a fixed capacity 
+ * (TODO: although that may be a nice feature to add). Since it will only call malloc when resizing, arenas should be a lot
+ * faster than calling malloc normally, or a bucket allocator. Their downside is that you cannot free / realloc memory that
+ * has been allocated with an arena. They are basically the same idea of allocation as stack variables in a function call: you
+ * would not free a local variable in a function. If you want to arbitrarily free or realloc memory in an arena, you should
+ * probably not be using an arena (I'd suggest a bucket allocator). Of course, there is nothing technically stopping you from
+ * freeing or reallocing some memory allocated in a gup arena, but I'm not really sure what will happen if you do so. At best,
+ * probably a segfault. At worst, probably horrendous mysterious undebuggable bugs.
+ */
+typedef struct {
+    GupAllocator head;
+    int capacity;
+    int next_index;
+    u8* data;
+} GupAllocatorArena;
+
+/**
+ * A "bucket" allocator (as I am naming it, I don't know if there is a proper name for something like this) is 
+ * useful for when you just want to allocate a bunch of memory for a bunch of different things, and free all of
+ * those things at a specific arbitrary point in your program. It is basically an array of pointers that point 
+ * some allocated memory. A bucket allocator is distinct from an arena allocator in that you can choose to free
+ * or realloc any of the pointers in the bucket at any time. A bucket allocator uses malloc, realloc, and free
+ * without any magic. I don't believe bucket allocators, as I've conceived here, really pose any benefits in
+ * terms of performance or security; they really are just for convenience. 
+ */
 typedef struct {
     GupAllocator head;
     GupArrayPtr* data;
@@ -242,7 +269,6 @@ typedef GupArrayCstr   GupStackCstr;
  * Public API                                                                                                         *
  **********************************************************************************************************************/
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Base allocator
 // ---------------------------------------------------------------------------------------------------------------------
@@ -250,6 +276,14 @@ typedef GupArrayCstr   GupStackCstr;
 void* gup_alloc(GupAllocator* a, size_t bytes);
 void* gup_realloc(GupAllocator* a, void* mem_to_realloc, size_t bytes);
 void  gup_free(GupAllocator* a, void* ptr);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Arena allocator
+// ---------------------------------------------------------------------------------------------------------------------
+
+GupAllocatorArena gup_allocator_arena_create();
+void              gup_allocator_arena_alloc(GupAllocatorArena* a, size_t bytes);
+void*             gup_
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Bucket allocator
