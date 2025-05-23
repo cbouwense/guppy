@@ -102,17 +102,15 @@ typedef struct {
 } GupAllocator;
 
 /**
- * An arena allocator in this library is implemented as a bump allocator. You can add any type of data to a gup
- * arena. Allocating just gives you a pointer to a slice of the underlying array of bytes. It does not have a fixed capacity 
- * (TODO: although that may be a nice feature to add). Since it will only call malloc when resizing, arenas should be a lot
- * faster than calling malloc normally, or a bucket allocator. Their downside is that you cannot free / realloc memory that
- * has been allocated with an arena. They are basically the same idea of allocation as stack variables in a function call: you
- * would not free a local variable in a function. If you want to arbitrarily free or realloc memory in an arena, you should
- * probably not be using an arena (I'd suggest a bucket allocator). Of course, there is nothing technically stopping you from
- * freeing or reallocing some memory allocated in a gup arena, but I'm not really sure what will happen if you do so. At best,
- * probably a segfault. At worst, probably horrendous mysterious undebuggable bugs.
+ * An arena allocator in this library is implemented as a bump allocator. You can add any type of data to a gup arena.
+ * Allocating just gives you a pointer to a slice of the underlying array of bytes. It has a fixed capacity. Their
+ * downside is that you cannot free / realloc memory that has been allocated with an arena. They are sort of the same
+ * idea of allocation as stack variables in a function call: you would not free a local variable in a function. If you
+ * want to arbitrarily free or realloc memory in an arena, you should probably not be using an arena (I'd suggest a
+ * bucket allocator). Of course, there is nothing technically stopping you from freeing or reallocing some memory
+ * allocated in a gup arena, but I'm not really sure what will happen if you do so. At best, probably a segfault. At
+ * worst, probably horrendous mysterious undebuggable bugs.
  */
-
 typedef struct {
     GupAllocator head;
     int capacity;
@@ -282,7 +280,7 @@ void  gup_free(GupAllocator* a, void* ptr);
 // Arena allocator
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupAllocatorArena gup_allocator_arena_create();
+GupAllocatorArena gup_allocator_arena_create(size_t capacity);
 void              gup_allocator_arena_destroy(GupAllocatorArena* a);
 void*             gup_allocator_arena_alloc(GupAllocatorArena* a, size_t bytes);
 void              gup_allocator_arena_clear(GupAllocatorArena* a); // Free all the allocated memory, but not the arena itself.
@@ -885,7 +883,8 @@ u32 gup_fnv1a_hash(const char* s);
 #define GUP_HASHMAP_DEFAULT_CAPACITY 8192
 
 #define GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, type_array_holds)                          \
-    if (xs->count == xs->capacity) {                                                 \
+    const bool is_arena_allocator = a != NULL && a->type == GUP_ALLOCATOR_TYPE_ARENA;\
+    if (xs->count == xs->capacity && !is_arena_allocator) {                          \
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;           \
         xs->data = gup_realloc(a, xs->data, new_capacity * sizeof(type_array_holds));\
         gup_assert_verbose(xs->data != NULL, "PANIC: An allocation failed!");        \
@@ -944,6 +943,7 @@ void* gup_alloc(GupAllocator* a, size_t bytes) {
 
     switch (a->type) {
         case GUP_ALLOCATOR_TYPE_MALLOC: return malloc(bytes);
+        case GUP_ALLOCATOR_TYPE_ARENA:  return gup_allocator_arena_alloc((GupAllocatorArena*)a, bytes);
         case GUP_ALLOCATOR_TYPE_BUCKET: return gup_allocator_bucket_alloc((GupAllocatorBucket*)a, bytes);
         default: {
             printf("ERROR: unknown allocator type.\n");
@@ -956,8 +956,16 @@ void* gup_realloc(GupAllocator* a, void* mem_to_realloc, size_t bytes) {
     if (a == NULL) return realloc(mem_to_realloc, bytes);
     
     switch (a->type) {
-        case GUP_ALLOCATOR_TYPE_MALLOC: return realloc(mem_to_realloc, bytes);
-        case GUP_ALLOCATOR_TYPE_BUCKET: return gup_allocator_bucket_realloc((GupAllocatorBucket*)a, mem_to_realloc, bytes);
+        case GUP_ALLOCATOR_TYPE_MALLOC: {
+            return realloc(mem_to_realloc, bytes);
+        }
+        case GUP_ALLOCATOR_TYPE_ARENA: {
+            // TODO: would be nice to have log levels or something. Or not, might be too ghoulish.
+            printf("WARNING: Tried to realloc memory in an arena. This is a noop, but you really should not be trying to realloc anything in an arena. If you do, you should probably be using a bucket allocator or something.\n");
+        }
+        case GUP_ALLOCATOR_TYPE_BUCKET: {
+            return gup_allocator_bucket_realloc((GupAllocatorBucket*)a, mem_to_realloc, bytes);
+        }
         default: {
             printf("ERROR: unknown allocator type.\n");
             exit(1);
@@ -975,6 +983,9 @@ void gup_free(GupAllocator* a, void* ptr) {
         case GUP_ALLOCATOR_TYPE_MALLOC: {
             free(ptr);
         } break;
+        case GUP_ALLOCATOR_TYPE_ARENA: {
+            printf("WARNING: Tried to free some memory allocated in an arena. This is a noop. This kinda goes against the whole point of an arena. If you really do want to free that memory before the arena gets cleared, you might just want to use a bucket allocator for this particular piece of memory.");
+        } break;
         case GUP_ALLOCATOR_TYPE_BUCKET:  {
             gup_allocator_bucket_free((GupAllocatorBucket*)a, ptr);
         } break;
@@ -989,12 +1000,12 @@ void gup_free(GupAllocator* a, void* ptr) {
 // Arena allocator
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupAllocatorArena gup_allocator_arena_create() {
+GupAllocatorArena gup_allocator_arena_create(size_t capacity) {
     return (GupAllocatorArena) {
         .head       = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_ARENA },
-        .capacity   = GUP_ARENA_DEFAULT_CAPACITY,
+        .capacity   = capacity,
         .next_index = 0,
-        .data       = malloc(GUP_ARENA_DEFAULT_CAPACITY),
+        .data       = malloc(capacity),
     };
 }
 
@@ -1006,17 +1017,11 @@ void* gup_allocator_arena_alloc(GupAllocatorArena* a, size_t bytes) {
     _gup_allocator_arena_sanity_check(a);
     gup_assert(bytes > 0);
 
-    // TODO: just do this in one go, without a loop
-    // TODO: do I need to do this for each resize? (ie in gup arrays too?)
-    while (a->next_index + (int)bytes >= a->capacity) {
-        a->data = realloc(a->data, a->capacity * 2);
-        gup_assert_verbose(a->data != NULL, "PANIC: An allocation failed.");
-        a->capacity *= 2;
-    }
+    gup_assert_verbose(a->next_index + (int)bytes <= a->capacity, "PANIC: Ran out of space in arena.");
 
     void* ptr = &(a->data[a->next_index]);
-    gup_assert(ptr > (void*)a->data);
-
+    gup_assert_verbose(ptr >= (void*)a->data, "PANIC: Expected arena to give pointer to memory within capacity, but tried to give pointer to a memory region behind (less than) its base data.");
+    
     a->next_index += (int)bytes;
     gup_assert(a->next_index <= a->capacity);
 
@@ -1054,6 +1059,12 @@ void* gup_allocator_bucket_alloc(GupAllocatorBucket* a, size_t bytes) {
     _gup_allocator_bucket_sanity_check(a);
     gup_assert(bytes > 0);
 
+    // TODO: Do resizes need to be while loops / calculated? Like this?
+    // while (a->next_index + (int)bytes >= a->capacity) {
+    //     a->data = realloc(a->data, a->capacity * 2);
+    //     gup_assert_verbose(a->data != NULL, "PANIC: An allocation failed.");
+    //     a->capacity *= 2;
+    // }
     if (a->data->count == a->data->capacity) {
         const int new_capacity = a->data->capacity == 0 ? 1 : a->data->capacity * 2;
         a->data->data = realloc(a->data->data, new_capacity * sizeof(void *));
@@ -1270,17 +1281,13 @@ GupArrayBool gup_array_bool_create_from_array(GupAllocator* a, bool xs[], const 
 
 /** Copies the string into the result. */
 GupArrayChar gup_array_char_create_from_array(GupAllocator* a, char xs[], const int size) {
-    const int capacity       = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
-    const int bytes_to_alloc = capacity * sizeof(char);
-    const int bytes_to_copy  = size * sizeof(char);
-
     GupArrayChar new = {
-        .capacity = capacity,
+        .capacity = size,
         .count    = size,
-        .data     = gup_alloc(a, bytes_to_alloc),
+        .data     = gup_alloc(a, size),
     };
 
-    memcpy(new.data, xs, bytes_to_copy);
+    memcpy(new.data, xs, size);
 
     return new;
 }
