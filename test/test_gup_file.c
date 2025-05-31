@@ -1,13 +1,13 @@
 #include "../src/guppy.h"
 
-void test_gup_file_is_empty() {
+void test_gup_file_is_empty(void) {
     gup_assert(gup_file_is_empty("./resources/empty.txt") == true);
     gup_assert(gup_file_is_empty("./resources/one_newline.txt") == false);
     gup_assert(gup_file_is_empty("./resources/foo.txt") == false);
     gup_assert(gup_file_is_empty("./resources/stb.txt") == false);
 }
 
-void test_gup_file_line_count() {
+void test_gup_file_line_count(void) {
     int line_count = 0;
 
     line_count = gup_file_line_count("./resources/empty.txt");
@@ -160,7 +160,7 @@ void test_gup_file_read_lines(void) {
     }
 }
 
-void test_gup_file_read_lines_keep_newlines() {
+void test_gup_file_read_lines_keep_newlines(void) {
     { // empty.txt
         GupArrayString lines = {0};
         gup_file_read_lines_keep_newlines(NULL, "./resources/empty.txt", &lines);
@@ -266,7 +266,7 @@ void test_gup_file_read_lines_as_cstrs(void) {
         const int line_count = gup_file_line_count("./resources/settings.toml");
 
         #ifdef GUPPY_VERBOSE
-        gup_file_print("./resources/settings.toml");
+        gup_file_print(NULL, "./resources/settings.toml");
         for (int i = 0; i < line_count-1; i++) {
             printf("%s\n", lines[i]);
         }
@@ -416,7 +416,7 @@ void test_gup_file_write_lines(GupAllocator* a) {
     }
 }
 
-void test_gup_file_size() {
+void test_gup_file_size(void) {
     long file_size = 0;
     
     gup_assert(gup_file_size("./resources/empty.txt", &file_size));
@@ -426,7 +426,7 @@ void test_gup_file_size() {
     gup_assert_verbose(file_size == 5, "Expected hello.txt to have 5 characters");
 }
 
-void test_gup_file_print() {
+void test_gup_file_print(void) {
     gup_file_print(NULL, "./resources/doesnotexist.txt");
     gup_file_print(NULL, "./resources/empty.txt");
     gup_file_print(NULL, "./resources/one_newline.txt");
@@ -434,7 +434,7 @@ void test_gup_file_print() {
     gup_file_print(NULL, "./resources/settings.toml");
 }
 
-void test_gup_file_print_lines() {
+void test_gup_file_print_lines(void) {
     gup_file_print_lines(NULL, "./resources/doesnotexist.txt");
     gup_file_print_lines(NULL, "./resources/empty.txt");
     gup_file_print_lines(NULL, "./resources/one_newline.txt");
@@ -442,8 +442,15 @@ void test_gup_file_print_lines() {
     gup_file_print_lines(NULL, "./resources/settings.toml");
 }
 
+void reset_files(void) {
+    const bool result = gup_file_write_cstr("hello", "./resources/hello.txt");
+
+    gup_assert_verbose(result, "Encountered an error while resetting the test files.\n");
+}
+
 void test_gup_file(void) {
     GupAllocatorBucket a = gup_allocator_bucket_create();
+    reset_files();
 
     test_gup_file_is_empty();
     test_gup_file_line_count();

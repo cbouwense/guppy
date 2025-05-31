@@ -20,6 +20,16 @@ void test_gup_settings_get_and_set(void) {
     gup_allocator_bucket_destroy(&a);
 }
 
+void reset_settings_file(void) {
+    const bool result = gup_file_write_cstr("# This is a TOML file\n\ntitle = \"guppy.h\"\nauthor = \"Christian Bouwense\"\n\n[database]\nserver = \"localhost\"\nport = 5432\n", "./resources/settings.toml");
+
+    gup_assert_verbose(result, "Encountered an error while resetting the settings file.\n");
+}
+
 void test_gup_settings(void) {
+    reset_settings_file();
+
     test_gup_settings_get_and_set();
+
+    reset_settings_file();
 }

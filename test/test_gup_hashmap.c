@@ -30,7 +30,7 @@ void test_gup_hashmap_general(void) {
     gup_hashmap_int_destroy(hashmap);
 }
 
-void test_gup_hashmap_set_multiple_time_rewrites() {
+void test_gup_hashmap_set_multiple_time_rewrites(void) {
     GupHashmapChar hashmap = gup_hashmap_char_create(NULL);
     char result = 0;
 

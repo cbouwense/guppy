@@ -100,7 +100,7 @@ typedef struct {
     GupAllocatorType type;
     // TODO: could have stuff here like bytes_allocated, free_count, etc.
 } GupAllocator;
-
+ 
 /**
  * An arena allocator in this library is implemented as a bump allocator. You can add any type of data to a gup arena.
  * Allocating just gives you a pointer to a slice of the underlying array of bytes. It has a fixed capacity. Their
@@ -130,6 +130,7 @@ typedef struct {
 typedef struct {
     GupAllocator head;
     GupArrayPtr* data;
+    GupArrayInt* bytes; // How many bytes of memory are stored at each location.
 } GupAllocatorBucket;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -289,7 +290,7 @@ void              gup_allocator_arena_clear(GupAllocatorArena* a); // Free all t
 // Bucket allocator
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupAllocatorBucket gup_allocator_bucket_create();
+GupAllocatorBucket gup_allocator_bucket_create(void);
 void               gup_allocator_bucket_destroy(GupAllocatorBucket* a); // Free all the allocated memory and the bucket itself
 void*              gup_allocator_bucket_alloc(GupAllocatorBucket* a, size_t bytes);
 void*              gup_allocator_bucket_realloc(GupAllocatorBucket* a, void* mem_to_realloc, size_t bytes);
@@ -492,7 +493,7 @@ void           gup_file_append_lines_cstrs(char** lines_to_write, const int line
 // Sets
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupSetBool   gup_set_bool_create();
+GupSetBool   gup_set_bool_create(void);
 GupSetBool   gup_set_bool_create_size(int size);
 GupSetBool   gup_set_bool_create_from_array(bool xs[], const int size);
 void         gup_set_bool_destroy(GupSetBool set);
@@ -503,7 +504,7 @@ int          gup_set_bool_size(GupSetBool set);
 void         gup_set_bool_print(GupSetBool set);
 void         gup_set_bool_debug(GupSetBool set);
 
-GupSetChar   gup_set_char_create();
+GupSetChar   gup_set_char_create(void);
 GupSetChar   gup_set_char_create_from_array(char xs[], const int size);
 bool         gup_set_char_has(GupSetChar set, char x);
 void         gup_set_char_add(GupSetChar* set, char x);
@@ -651,7 +652,7 @@ void             gup_hashmap_long_debug(GupHashmapLong hashmap);
 
 GupHashmapPtr    gup_hashmap_ptr_create(GupAllocator* a);
 void             gup_hashmap_ptr_destroy(GupHashmapPtr hashmap);
-bool             gup_hashmap_ptr_get(GupHashmapPtr hashmap, char* key, void* *out);
+bool             gup_hashmap_ptr_get(GupHashmapPtr hashmap, char* key, void** out);
 void             gup_hashmap_ptr_set(GupAllocator* a, GupHashmapPtr* hashmap, char* key, void* value);
 int              gup_hashmap_ptr_size(GupHashmapPtr hashmap);
 void             gup_hashmap_ptr_print(GupHashmapPtr hashmap);
@@ -787,7 +788,6 @@ bool gup_settings_set_to_file(const char* key, const char* value, const char* fi
 // Strings
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupString      gup_string_create();
 GupString      gup_string_create(GupAllocator* a);
 void           gup_string_destroy(GupString str);
 GupString      gup_string_create_from_cstr(GupAllocator* a, char str[]); // Aliased as "gup_string"
@@ -863,7 +863,7 @@ f64 gup_pow_f64(f64 x, f64 y);
 // Miscellaneous
 // ---------------------------------------------------------------------------------------------------------------------
 
-double gup_operation_seconds(void (*fn)());
+double gup_operation_seconds(void (*fn)(void));
 #define gup_array_len(a) sizeof(a)/sizeof(a[0]) 
 #define gup_defer_return(r) do { result = (r); goto defer; } while (0)
 #define GUP_RUN if (true)
@@ -1036,14 +1036,19 @@ void gup_allocator_arena_clear(GupAllocatorArena* a) {
 // Bucket allocator
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupAllocatorBucket gup_allocator_bucket_create() {
+GupAllocatorBucket gup_allocator_bucket_create(void) {
     GupArrayPtr* ptrs = malloc(sizeof(GupArrayPtr));
     gup_assert_verbose(ptrs != NULL, "PANIC: An allocation failed");
     *ptrs = gup_array_ptr_create(NULL);
 
+    GupArrayInt* bytes = malloc(sizeof(GupArrayInt));
+    gup_assert_verbose(bytes != NULL, "PANIC: An allocation failed");
+    *bytes = gup_array_int_create(NULL);
+
     return (GupAllocatorBucket) {
-        .head = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_BUCKET },
-        .data = ptrs,
+        .head  = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_BUCKET },
+        .data  = ptrs,
+        .bytes = bytes,
     };
 }
 
@@ -1051,67 +1056,67 @@ void gup_allocator_bucket_destroy(GupAllocatorBucket* a) {
     _gup_allocator_bucket_sanity_check(a);
 
     gup_allocator_bucket_clear(a);
+
     gup_array_ptr_destroy(*(a->data));
     free(a->data);
+
+    gup_array_int_destroy(*(a->bytes));
+    free(a->bytes);
 }
 
 void* gup_allocator_bucket_alloc(GupAllocatorBucket* a, size_t bytes) {
     _gup_allocator_bucket_sanity_check(a);
     gup_assert(bytes > 0);
 
-    // TODO: Do resizes need to be while loops / calculated? Like this?
-    // while (a->next_index + (int)bytes >= a->capacity) {
-    //     a->data = realloc(a->data, a->capacity * 2);
-    //     gup_assert_verbose(a->data != NULL, "PANIC: An allocation failed.");
-    //     a->capacity *= 2;
-    // }
-    if (a->data->count == a->data->capacity) {
-        const int new_capacity = a->data->capacity == 0 ? 1 : a->data->capacity * 2;
-        a->data->data = realloc(a->data->data, new_capacity * sizeof(void *));
-        a->data->capacity = new_capacity;
-    }
-
     void* ptr = malloc(bytes);
     gup_assert(ptr != NULL);
 
-    a->data->data[a->data->count] = ptr;
-    a->data->count++;
+    gup_array_ptr_append(NULL, a->data, ptr);
+    gup_array_int_append(NULL, a->bytes, bytes);
 
     return ptr;
 }
 
 void* gup_allocator_bucket_realloc(GupAllocatorBucket* a, void* mem_to_realloc, size_t bytes) {
-    _gup_allocator_bucket_sanity_check(a);
-    gup_assert(mem_to_realloc != NULL);
-    gup_assert(a != mem_to_realloc);
-    gup_assert(bytes > 0);
-    
+    { // Sanity checks
+        _gup_allocator_bucket_sanity_check(a);
+        gup_assert(mem_to_realloc != NULL);
+        gup_assert(a != mem_to_realloc);
+        gup_assert(bytes > 0);
+    }
+
+    // Find the pointer and how many bytes it had allocated in bucket.
     const int index = gup_array_ptr_find_index_of(a->data, mem_to_realloc);
     gup_assert_verbose(index > -1, "PANIC: Could not find pointer in a gup bucket while trying to realloc it.");
+    gup_assert_verbose(index < a->bytes->count, "PANIC: Could not find amount of bytes allocated at bucket pointer.");
+    const int bytes_to_copy = a->bytes->data[index];
 
     // Create and add the new memory.
     void* new_mem = malloc(bytes);                                      // Get a fresh chunk of memory.
     gup_assert_verbose(new_mem != NULL, "PANIC: An allocation failed"); // TODO: have a generic sanity check for new memory.
-    memcpy(new_mem, mem_to_realloc, a->data->count);                    // Copy over the old contents into the new memory.
+    memcpy(new_mem, mem_to_realloc, bytes_to_copy);                     // Copy over the old contents into the new memory.
     gup_array_ptr_append(NULL, a->data, new_mem);                       // Add the new pointer to the list
+    gup_array_int_append(NULL, a->bytes, bytes);                        // Add the new pointer to the list
 
     // Free and remove the old memory.
     free(mem_to_realloc);                                               // Free the old stuff.
-    gup_array_ptr_remove_at_index_no_preserve_order(a->data, index);    // Remove the old pointer from the bucket.
+    gup_array_ptr_remove_at_index_preserve_order(a->data, index);       // Remove the old pointer from the bucket.
+    gup_array_int_remove_at_index_preserve_order(a->bytes, index);      // Remove the old byte count from the bucket.
     mem_to_realloc = NULL;                                              // Make it null for good measure.
 
     return new_mem;
 }
 
-// TODO: test
 void gup_allocator_bucket_free(GupAllocatorBucket* a, void* mem_to_free) {
     _gup_allocator_bucket_sanity_check(a);
     _gup_array_populated_sanity_check(a->data);
 
     const int index = gup_array_ptr_find_index_of(a->data, mem_to_free);
-    gup_assert_verbose(index > -1, "Tried freeing a pointer from a bucket allocator that the bucket did not have.");
+    gup_assert_verbose(index > -1, "PANIC: Tried freeing a pointer from a bucket allocator that the bucket did not have.");
+    gup_assert_verbose(index < a->bytes->count, "PANIC: Could not find amount of bytes allocated at bucket pointer.");
 
-    gup_array_ptr_remove_at_index_no_preserve_order(a->data, index);
+    gup_array_ptr_remove_at_index_preserve_order(a->data, index);
+    gup_array_int_remove_at_index_preserve_order(a->bytes, index);
     free(mem_to_free);
 }
 
@@ -1122,6 +1127,7 @@ void gup_allocator_bucket_clear(GupAllocatorBucket* a) {
         free(a->data->data[i]);        
     }
     a->data->count = 0;
+    a->bytes->count = 0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1284,10 +1290,10 @@ GupArrayChar gup_array_char_create_from_array(GupAllocator* a, char xs[], const 
     GupArrayChar new = {
         .capacity = size,
         .count    = size,
-        .data     = gup_alloc(a, size),
+        .data     = size > 0 ? gup_alloc(a, size) : NULL,
     };
 
-    memcpy(new.data, xs, size);
+    if (new.data != NULL) memcpy(new.data, xs, size);
 
     return new;
 }
@@ -1432,10 +1438,10 @@ GupArrayChar gup_array_char_copy(GupAllocator* a, GupArrayChar xs) {
     GupArrayChar new = {
         .capacity = xs.capacity,
         .count    = xs.count,
-        .data     = gup_alloc(a, xs.capacity * sizeof(char)),
+        .data     = xs.capacity > 0 ? gup_alloc(a, xs.capacity * sizeof(char)) : NULL,
 
     };
-    memcpy(new.data, xs.data, xs.count * sizeof(char));
+    if (new.data != NULL) memcpy(new.data, xs.data, xs.count * sizeof(char));
 
     return new;
 }
@@ -1548,6 +1554,11 @@ bool gup_array_char_equals(GupArrayChar xs, GupArrayChar ys) {
 }
 
 bool gup_array_char_equals_cstr(GupArrayChar xs, const char* cstr) {
+    const bool xs_is_empty_string = xs.data == NULL;
+    if (xs_is_empty_string) {
+        return cstr[0] == '\0';
+    }
+
     return strncmp(xs.data, cstr, xs.count) == 0;
 }
 
@@ -2644,7 +2655,7 @@ void gup_array_bool_remove_at_index_preserve_order(GupArrayBool* xs, const int i
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
@@ -2655,7 +2666,7 @@ void gup_array_char_remove_at_index_preserve_order(GupArrayChar* xs, const int i
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
@@ -2666,7 +2677,7 @@ void gup_array_double_remove_at_index_preserve_order(GupArrayDouble* xs, const i
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
@@ -2677,7 +2688,7 @@ void gup_array_float_remove_at_index_preserve_order(GupArrayFloat* xs, const int
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
@@ -2688,7 +2699,7 @@ void gup_array_int_remove_at_index_preserve_order(GupArrayInt* xs, const int ind
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
@@ -2699,20 +2710,16 @@ void gup_array_long_remove_at_index_preserve_order(GupArrayLong* xs, const int i
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
 }
 
 void gup_array_ptr_remove_at_index_preserve_order(GupArrayPtr* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count; i++) {
-        xs->data[i] = xs->data[i+i];
+    for (int i = index; i < xs->count-1; i++) {
+        xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
@@ -2721,7 +2728,7 @@ void gup_array_short_remove_at_index_preserve_order(GupArrayShort* xs, const int
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count; i++) {
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
@@ -2733,7 +2740,7 @@ void gup_array_string_remove_at_index_preserve_order(GupArrayString* xs, const i
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     for (int i = index; i < xs->count - 1; i++) {
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
@@ -2745,7 +2752,7 @@ void gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr* xs, const int i
 
     for (int i = index; i < xs->count - 1; i++) {
         printf("%p\n", (void*)&(xs->data[i]));
-        xs->data[i] = xs->data[i+i];
+        xs->data[i] = xs->data[i+1];
     }
 
     xs->count--;
@@ -3800,9 +3807,9 @@ int gup_string_compare(GupAllocator* a, GupString x, GupString y) {
 }
 
 bool gup_string_contains_substring(GupString str, GupString sub_str) {
-    if (sub_str.count > str.count) {
-        return false;
-    }
+    if (str.count == 0) return false;
+    if (sub_str.count == 0) return false;
+    if (sub_str.count > str.count) return false;
 
     for (int i = 0, j = 0; i < str.count; i++) {
         if (str.data[i] == sub_str.data[j]) {
@@ -3986,15 +3993,14 @@ GupArrayString gup_string_split_by_cstr(GupAllocator* a, GupString str, char* su
 }
 
 bool gup_string_starts_with(GupString str, GupString sub_str) {
+    // An empty string doesn't start with anything.
+    if (str.count == 0) return false;
+
     // Don't count string as "starting with" empty strings.
-    if (sub_str.count == 0) {
-        return false;
-    }
+    if (sub_str.count == 0) return false;
 
     // A string can't start with a substring that is longer than itself.
-    if (str.count < sub_str.count) {
-        return false;
-    }
+    if (str.count < sub_str.count) return false;
 
     for (int i = 0; i < sub_str.count; i++) {
         if (str.data[i] != sub_str.data[i]) {
@@ -4161,14 +4167,14 @@ int _gup_hash_cstr_index(const char* key, const int modulo) {
 }
 
 // Create
-GupSetBool gup_set_bool_create() {
+GupSetBool gup_set_bool_create(void) {
     return (GupSetBool) {
         .has_false = false,
         .has_true = false,
     };
 }
 
-GupSetChar gup_set_char_create() {
+GupSetChar gup_set_char_create(void) {
     GupSetChar xs = (GupSetChar) {
         .capacity = 256,
         .count    = 0,
@@ -6439,7 +6445,7 @@ inline f64 gup_pow_f64(f64 x, f64 y) {
 
 // TODO: DRY this up?
 // TODO: I honestly don't trust these operation timers. I should either double check that they work or just get rid of them. 
-double gup_operation_seconds(void (*fn)()) {
+double gup_operation_seconds(void (*fn)(void)) {
     clock_t start, end;
     double cpu_seconds_used;
 
@@ -6458,7 +6464,7 @@ double gup_operation_seconds(void (*fn)()) {
     return cpu_seconds_used;
 }
 
-double gup_operation_seconds_verbose(void (*fn)()) {
+double gup_operation_seconds_verbose(void (*fn)(void)) {
     double result = gup_operation_seconds(fn);
     printf("The operation took %f seconds to execute.\n", result);
 

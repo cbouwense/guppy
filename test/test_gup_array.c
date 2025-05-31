@@ -373,7 +373,7 @@ void test_gup_array_string_find(void) {
     }
 }
 
-void test_gup_array_remove() {
+void test_gup_array_remove(void) {
     { // Remove one item
         int i = 0, j = 1, k = 2;
         int int_array[] = {i, j, k};
@@ -415,7 +415,7 @@ void test_gup_array_remove() {
     }
 }
 
-void test_gup_array_find_index_of() {
+void test_gup_array_find_index_of(void) {
     { // Happy path
         GupArrayChar chars = gup_array_char_create(NULL);
         gup_array_char_append(NULL, &chars, 'a');
