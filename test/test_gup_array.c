@@ -45,11 +45,11 @@ void test_new_gup_array_has_zero_count(void) {
 }
 
 void test_new_gup_array_has_non_null_data(void) {
-    GupArrayBool xs = gup_array_bool_create(NULL);
+    GupArrayBool* xs = gup_array_bool_create(NULL);
 
-    gup_assert(xs.data != NULL);
+    gup_assert(xs->data != NULL);
 
-    free(xs.data);
+    free(xs);
 }
 
 void test_two_empty_gup_arrays_are_equal(void) {
@@ -105,14 +105,14 @@ void test_equivalent_gup_arrays_are_equal(void) {
 }
 
 void test_symmetric_gup_array_args_are_equal(void) {
-    GupArrayBool xs = gup_array_bool_create_from_array(NULL, static_bs, gup_array_len(static_bs));
-    GupArrayBool ys = gup_array_bool_create_from_array(NULL, static_bs, gup_array_len(static_bs));
+    GupArrayBool* xs = gup_array_bool_create_from_array(NULL, static_bs, gup_array_len(static_bs));
+    GupArrayBool* ys = gup_array_bool_create_from_array(NULL, static_bs, gup_array_len(static_bs));
 
     gup_assert(gup_array_bool_equals(xs, ys) == true);
     gup_assert(gup_array_bool_equals(ys, xs) == true);
 
-    free(xs.data);
-    free(ys.data);
+    free(xs);
+    free(ys);
 }
 
 void test_equivalent_but_differently_sized_gup_arrays_are_unequal(void) {
@@ -233,7 +233,7 @@ void test_gup_array_string_append(void) {
 
 void test_gup_array_contains(void) {
     { // Empty arrays never contain anything
-        GupArrayBool bs = gup_array_bool_create(NULL);
+        GupArrayBool* bs = gup_array_bool_create(NULL);
         gup_assert(gup_array_bool_contains(bs, true) == false);
         gup_assert(gup_array_bool_contains(bs, false) == false);
         

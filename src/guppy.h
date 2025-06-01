@@ -27,9 +27,9 @@ typedef double         f64;
 
 // TODO: flexible array members
 typedef struct {
-    int   capacity;
-    int   count;
-    bool* data;
+    int  capacity;
+    int  count;
+    bool data[];
 } GupArrayBool;
 
 typedef struct {
@@ -196,8 +196,8 @@ typedef struct {
 
 typedef struct {
     int capacity;
-    GupArrayCstr* keys;
-    GupArrayBool* values;
+    GupArrayCstr*  keys;
+    GupArrayBool** values;
 } GupHashmapBool;
 
 typedef struct {
@@ -301,20 +301,20 @@ void               gup_allocator_bucket_clear(GupAllocatorBucket* a); // Free al
 // Dynamic arrays
 // ---------------------------------------------------------------------------------------------------------------------
 
-GupArrayBool   gup_array_bool_create(GupAllocator* a);
-void           gup_array_bool_destroy(GupArrayBool xs);
-GupArrayBool   gup_array_bool_create_from_array(GupAllocator* a, bool xs[], const int size);
-GupArrayBool   gup_array_bool_copy(GupAllocator* a, GupArrayBool xs);
-bool           gup_array_bool_equals(GupArrayBool xs, GupArrayBool ys);
-bool           gup_array_bool_contains(GupArrayBool xs, bool x);
-void           gup_array_bool_print(GupArrayBool xs);
+GupArrayBool*  gup_array_bool_create(GupAllocator* a);
+void           gup_array_bool_destroy(GupArrayBool* xs);
+GupArrayBool*  gup_array_bool_create_from_array(GupAllocator* a, bool xs[], const int size);
+GupArrayBool*  gup_array_bool_copy(GupAllocator* a, GupArrayBool* xs);
+bool           gup_array_bool_equals(GupArrayBool* xs, GupArrayBool* ys);
+bool           gup_array_bool_contains(GupArrayBool* xs, bool x);
+void           gup_array_bool_print(GupArrayBool* xs);
 void           gup_array_bool_append(GupAllocator* a, GupArrayBool* xs, bool x);
 void           gup_array_bool_prepend(GupAllocator* a, GupArrayBool* xs, bool x);
 void           gup_array_bool_remove(GupArrayBool* xs, bool x, int count_to_remove);
 void           gup_array_bool_remove_all(GupArrayBool* xs, bool x);
 void           gup_array_bool_remove_at_index_preserve_order(GupArrayBool* xs, const int index);
 void           gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool* xs, const int index);
-GupArrayBool   gup_array_bool_sort(GupAllocator* a, GupArrayBool xs);
+GupArrayBool*  gup_array_bool_sort(GupAllocator* a, GupArrayBool* xs);
 // TODO sort fn, is_sorted, sort_in_place
 
 GupArrayChar   gup_array_char_create(GupAllocator* a);
@@ -1139,12 +1139,12 @@ void gup_allocator_bucket_clear(GupAllocatorBucket* a) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 // Default constructors
-GupArrayBool gup_array_bool_create(GupAllocator* a) {
-    GupArrayBool xs = {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count = 0,
-        .data = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(bool)),
-    };
+GupArrayBool* gup_array_bool_create(GupAllocator* a) {
+    GupArrayBool *xs;
+    xs = gup_alloc(a, sizeof(*xs) + sizeof(bool) * GUP_ARRAY_DEFAULT_CAPACITY);
+    xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
+    xs->count    = 0; 
+
     return xs;
 }
 
@@ -1230,8 +1230,8 @@ GupArrayCstr gup_array_cstr_create(GupAllocator* a) {
 }
 
 // Destructors
-void gup_array_bool_destroy(GupArrayBool xs) {
-    free(xs.data);
+void gup_array_bool_destroy(GupArrayBool* xs) {
+    free(xs);
 }
 
 void gup_array_char_destroy(GupArrayChar xs) {
@@ -1273,18 +1273,17 @@ void gup_array_cstr_destroy(GupArrayCstr xs) {
 // From constructors
 #define gup_array_char_create_from_cstr(a, cstr) gup_array_char_create_from_array(a, cstr, strlen(cstr))
 
-GupArrayBool gup_array_bool_create_from_array(GupAllocator* a, bool xs[], const int size) {
+GupArrayBool* gup_array_bool_create_from_array(GupAllocator* a, bool xs[], const int size) {
     const int capacity       = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
     const int bytes_to_alloc = capacity * sizeof(bool);
     const int bytes_to_copy  = size * sizeof(bool);
 
-    GupArrayBool new = {
-        .capacity = capacity,
-        .count    = size,
-        .data     = gup_alloc(a, bytes_to_alloc),
-    };
+    GupArrayBool *new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(bool) * bytes_to_alloc);
+    new->capacity = capacity;
+    new->count    = size;
 
-    memcpy(new.data, xs, bytes_to_copy);
+    memcpy(new->data, xs, bytes_to_copy);
 
     return new;
 }
@@ -1426,14 +1425,13 @@ GupArrayCstr gup_array_cstr_create_from_array(GupAllocator* a, char* xs[], const
 }
 
 // Copy constructors
-GupArrayBool gup_array_bool_copy(GupAllocator* a, GupArrayBool xs) {
-    GupArrayBool new = {
-        .capacity = xs.capacity,
-        .count = xs.count,
-        .data = gup_alloc(a, xs.capacity * sizeof(bool)),
+GupArrayBool* gup_array_bool_copy(GupAllocator* a, GupArrayBool* xs) {
+    GupArrayBool* new = gup_alloc(a, sizeof(GupArrayBool) + sizeof(bool) * xs->capacity);
 
-    };
-    memcpy(new.data, xs.data, xs.count * sizeof(bool));
+    new->capacity = xs->capacity;
+    new->count    = xs->count;
+
+    memcpy(new->data, xs->data, xs->count * sizeof(bool));
 
     return new;
 }
@@ -1537,11 +1535,11 @@ GupArrayCstr gup_array_cstr_copy(GupAllocator* a, GupArrayCstr xs) {
 }
 
 // Equals
-bool gup_array_bool_equals(GupArrayBool xs, GupArrayBool ys) {
-    if (xs.count != ys.count) return false;
+bool gup_array_bool_equals(GupArrayBool* xs, GupArrayBool* ys) {
+    if (xs->count != ys->count) return false;
 
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != ys->data[i]) return false;
     }
 
     return true;
@@ -1637,9 +1635,9 @@ bool gup_array_cstr_equals(GupArrayCstr xs, GupArrayCstr ys) {
 }
 
 // Contains
-bool gup_array_bool_contains(GupArrayBool xs, bool x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+bool gup_array_bool_contains(GupArrayBool* xs, bool x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
             return true;
         }
     }
@@ -1739,13 +1737,13 @@ bool gup_array_cstr_contains(GupArrayCstr xs, char* x) {
 
 // Print
 #define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
-void _gup_array_bool_print(GupArrayBool xs, const char* xs_name) {
+void _gup_array_bool_print(GupArrayBool* xs, const char* xs_name) {
     printf("%s: [", xs_name);
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == true) printf("true");
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == true) printf("true");
         else printf("false");
 
-        if (i != xs.count-1) printf(", ");
+        if (i != xs->count-1) printf(", ");
     }
     printf("]\n");
 }
@@ -1855,11 +1853,11 @@ void _gup_array_cstr_print(GupArrayCstr xs, const char* xs_name) {
 
 // Debug
 #define gup_array_bool_debug(xs) _gup_array_bool_debug(xs, #xs)
-void _gup_array_bool_debug(GupArrayBool xs, const char* xs_name) {
+void _gup_array_bool_debug(GupArrayBool* xs, const char* xs_name) {
     printf("%s: {\n", xs_name);
-    printf("  capacity: %d\n", xs.capacity);
-    printf("  count: %d\n", xs.count);
-    printf("  data: %p\n", (void *)(xs.data));
+    printf("  capacity: %d\n", xs->capacity);
+    printf("  count: %d\n", xs->count);
+    printf("  data: %p\n", (void *)(xs->data));
     printf("}\n");
 }
 
@@ -1946,7 +1944,14 @@ void _gup_array_cstr_debug(GupArrayCstr xs, const char* xs_name) {
 
 // Append
 void gup_array_bool_append(GupAllocator* a, GupArrayBool* xs, bool x) {
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, bool);
+    // GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, bool);
+    const bool is_arena_allocator = a != NULL && a->type == GUP_ALLOCATOR_TYPE_ARENA;
+    if (xs->count == xs->capacity && !is_arena_allocator) {                          
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;           
+        xs = gup_realloc(a, xs, sizeof(*xs) + new_capacity * sizeof(bool));
+        gup_assert_verbose(xs != NULL, "PANIC: An allocation failed!");              
+        xs->capacity = new_capacity;                                                 
+    }                                                                                
 
     xs->data[xs->count] = x;
     xs->count++;
@@ -2026,7 +2031,13 @@ void gup_array_cstr_append(GupAllocator* a, GupArrayCstr* xs, char* x) {
 
 // Prepend
 void gup_array_bool_prepend(GupAllocator* a, GupArrayBool* xs, bool x) {
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, bool);
+    const bool is_arena_allocator = a != NULL && a->type == GUP_ALLOCATOR_TYPE_ARENA;
+    if (xs->count == xs->capacity && !is_arena_allocator) {                          
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;           
+        xs = gup_realloc(a, xs, sizeof(*xs) + new_capacity * sizeof(bool));
+        gup_assert_verbose(xs != NULL, "PANIC: An allocation failed!");              
+        xs->capacity = new_capacity;                                                 
+    } 
 
     for (int i = xs->count; i > 0; i--) {
         xs->data[i] = xs->data[i-1];
@@ -2912,14 +2923,14 @@ bool gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArray
 
 // Sort
 // Orders false before true, (e.g. [false, false, true, true])
-GupArrayBool gup_array_bool_sort(GupAllocator* a, GupArrayBool xs) {
-    GupArrayBool sorted = gup_array_bool_create(a);
+GupArrayBool* gup_array_bool_sort(GupAllocator* a, GupArrayBool* xs) {
+    GupArrayBool* sorted = gup_array_bool_create(a);
 
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == false) {
-            gup_array_bool_prepend(a, &sorted, false);
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == false) {
+            gup_array_bool_prepend(a, sorted, false);
         } else {
-            gup_array_bool_append(a, &sorted, true);
+            gup_array_bool_append(a, sorted, true);
         }
     }
 
@@ -4877,7 +4888,7 @@ GupHashmapBool gup_hashmap_bool_create(GupAllocator* a) {
     GupHashmapBool hashmap = (GupHashmapBool) {
         .capacity = GUP_HASHMAP_DEFAULT_CAPACITY,
         .keys     = gup_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayCstr)),
-        .values   = gup_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayBool)),
+        .values   = gup_alloc(a, GUP_HASHMAP_DEFAULT_CAPACITY * sizeof(GupArrayBool*)),
     };
 
     for (int i = 0; i < hashmap.capacity; i++) {
@@ -5120,7 +5131,7 @@ bool gup_hashmap_bool_get(GupHashmapBool hashmap, char* key, bool* out) {
     
     for (int i = 0; i < hashmap.keys[index].count; i++) {
         if (strcmp(hashmap.keys[index].data[i], key) == 0) {
-            *out = hashmap.values[index].data[i];
+            *out = hashmap.values[index]->data[i];
             return true;
         }
     }
@@ -5257,12 +5268,12 @@ void gup_hashmap_bool_set(GupAllocator* a, GupHashmapBool* hashmap, char* key, b
         // remove_at_index functions here because the index is the same for both, and the remove_at_index functions are
         // deterministic. So, we're still preserving the pairing between keys and values, just not the ordering of the
         // arrays themselves.
-        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]),   index_of_existing);
-        gup_array_bool_remove_at_index_no_preserve_order(&(hashmap->values[index]), index_of_existing);
+        gup_array_cstr_remove_at_index_no_preserve_order(&(hashmap->keys[index]), index_of_existing);
+        gup_array_bool_remove_at_index_no_preserve_order(hashmap->values[index], index_of_existing);
     }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
-    gup_array_bool_append(a, &(hashmap->values[index]), value);
+    gup_array_bool_append(a, hashmap->values[index], value);
 }
 
 void gup_hashmap_char_set(GupAllocator* a, GupHashmapChar* hashmap, char* key, char value) {
@@ -5444,7 +5455,7 @@ void gup_hashmap_bool_remove(GupHashmapBool* hashmap, char* key) {
     if (!gup_hashmap_bool_get(*hashmap, key, &value)) return;
 
     gup_array_cstr_remove_all(&(hashmap->keys[index]), key);
-    gup_array_bool_remove_all(&(hashmap->values[index]), value);
+    gup_array_bool_remove_all(hashmap->values[index], value);
 }
 
 void gup_hashmap_char_remove(GupHashmapChar* hashmap, char* key) {
@@ -5635,7 +5646,7 @@ void _gup_hashmap_bool_print(GupHashmapBool hashmap, const char* hashmap_name) {
     for (int i = 0; i < hashmap.capacity; i++) {
         for (int j = 0; j < hashmap.keys[i].count; j++) {
             printf("  \"%s\": ", hashmap.keys[i].data[j]);
-            printf("%d,\n", hashmap.values[i].data[j]);
+            printf("%d,\n", hashmap.values[i]->data[j]);
         }
     }
     printf("}\n");
@@ -5848,11 +5859,7 @@ void _gup_hashmap_cstr_debug(GupHashmapCstr hashmap, const char* hashmap_name) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 GupStackBool gup_stack_bool_create(GupAllocator* a) {
-    return (GupStackBool) {
-        .capacity = GUP_ARRAY_DEFAULT_CAPACITY,
-        .count    = 0,
-        .data     = gup_alloc(a, GUP_ARRAY_DEFAULT_CAPACITY * sizeof(bool)), 
-    };
+    return *(gup_array_bool_create(a));
 }
 
 void gup_stack_bool_push(GupAllocator* a, GupStackBool* s, bool x) {
