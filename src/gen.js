@@ -20,7 +20,8 @@ function main() {
         // console.log(gen_gup_array_copy(...kind));
         // console.log(gen_gup_array_contains(...kind));
         //console.log(gen_gup_array_equals(...kind));
-        console.log(gen_gup_array_print(...kind));
+        // console.log(gen_gup_array_print(...kind));
+        console.log(gen_gup_array_debug(...kind));
     }
 }
 
@@ -202,5 +203,16 @@ const gen_gup_array_print = (up, low, t) => {
     template += `}\n`;
     return template;
 }
+
+const gen_gup_array_debug = (up, low, t) =>
+`#define gup_array_${low}_debug(xs) _gup_array_${low}_debug(xs, #xs)
+void _gup_array_${low}_debug(GupArray${up}* xs, const char* xs_name) {
+    printf("%s: {\\n", xs_name);
+    printf("  capacity: %d\\n", xs->capacity);
+    printf("  count: %d\\n", xs->count);
+    printf("  data: %p\\n", (void *)(xs->data));
+    printf("}\\n");
+}
+`;
 
 main(); 
