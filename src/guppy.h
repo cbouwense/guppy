@@ -1705,8 +1705,9 @@ bool gup_array_cstr_equals(GupArrayCstr xs, GupArrayCstr ys) {
     return true;
 }
 
-// Contains
-bool gup_array_bool_contains(GupArrayBool* xs, bool x) {
+// Contains ------------------------------------------------------------------------------------------------------------
+
+bool gup_array_bool_contains(const GupArrayBool* xs, const bool x) {
     for (int i = 0; i < xs->count; i++) {
         if (xs->data[i] == x) {
             return true;
@@ -1716,9 +1717,9 @@ bool gup_array_bool_contains(GupArrayBool* xs, bool x) {
     return false;
 }
 
-bool gup_array_char_contains(GupArrayChar xs, char x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+bool gup_array_char_contains(const GupArrayChar* xs, const char x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
             return true;
         }
     }
@@ -1726,9 +1727,9 @@ bool gup_array_char_contains(GupArrayChar xs, char x) {
     return false;
 }
 
-bool gup_array_double_contains(GupArrayDouble xs, double x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+bool gup_array_double_contains(const GupArrayDouble* xs, const double x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
             return true;
         }
     }
@@ -1736,9 +1737,9 @@ bool gup_array_double_contains(GupArrayDouble xs, double x) {
     return false;
 }
 
-bool gup_array_float_contains(GupArrayFloat xs, float x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+bool gup_array_float_contains(const GupArrayFloat* xs, const float x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
             return true;
         }
     }
@@ -1746,9 +1747,9 @@ bool gup_array_float_contains(GupArrayFloat xs, float x) {
     return false;
 }
 
-bool gup_array_int_contains(GupArrayInt xs, int x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+bool gup_array_int_contains(const GupArrayInt* xs, const int x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
             return true;
         }
     }
@@ -1756,9 +1757,9 @@ bool gup_array_int_contains(GupArrayInt xs, int x) {
     return false;
 }
 
-bool gup_array_long_contains(GupArrayLong xs, long x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+bool gup_array_long_contains(const GupArrayLong* xs, const long x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
             return true;
         }
     }
@@ -1766,9 +1767,9 @@ bool gup_array_long_contains(GupArrayLong xs, long x) {
     return false;
 }
 
-bool gup_array_ptr_contains(GupArrayPtr xs, void* x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+bool gup_array_ptr_contains(const GupArrayPtr* xs, const void* x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
             return true;
         }
     }
@@ -1776,9 +1777,9 @@ bool gup_array_ptr_contains(GupArrayPtr xs, void* x) {
     return false;
 }
 
-bool gup_array_short_contains(GupArrayShort xs, short x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] == x) {
+bool gup_array_short_contains(const GupArrayShort* xs, const short x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
             return true;
         }
     }
@@ -1786,9 +1787,9 @@ bool gup_array_short_contains(GupArrayShort xs, short x) {
     return false;
 }
 
-bool gup_array_string_contains(GupArrayString xs, GupString x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (gup_array_char_equals(xs.data[i], x)) {
+bool gup_array_string_contains(const GupArrayString* xs, const GupString x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (gup_array_char_equals(xs->data[i], x)) {
             return true;
         }
     }
@@ -1796,15 +1797,17 @@ bool gup_array_string_contains(GupArrayString xs, GupString x) {
     return false;
 }
 
-bool gup_array_cstr_contains(GupArrayCstr xs, char* x) {
-    for (int i = 0; i < xs.count; i++) {
-        if (strcmp(xs.data[i], x) == 0) {
+bool gup_array_cstr_contains(const GupArrayCstr* xs, const char* x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (strcmp(xs->data[i], x) == 0) {
             return true;
         }
     }
 
     return false;
 }
+
+
 
 // Print
 #define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
