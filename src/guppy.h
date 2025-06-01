@@ -1609,8 +1609,9 @@ GupArrayCstr* gup_array_cstr_copy(GupAllocator* a, const GupArrayCstr* xs) {
     return new;
 }
 
-// Equals
-bool gup_array_bool_equals(GupArrayBool* xs, GupArrayBool* ys) {
+// Equals --------------------------------------------------------------------------------------------------------------
+
+bool gup_array_bool_equals(const GupArrayBool* xs, const GupArrayBool* ys) {
     if (xs->count != ys->count) return false;
 
     for (int i = 0; i < xs->count; i++) {
@@ -1620,93 +1621,103 @@ bool gup_array_bool_equals(GupArrayBool* xs, GupArrayBool* ys) {
     return true;
 }
 
-bool gup_array_char_equals(GupArrayChar xs, GupArrayChar ys) {
-    if (xs.count != ys.count) return false;
+bool gup_array_char_equals(const GupArrayChar* xs, const GupArrayChar* ys) {
+    if (xs->count != ys->count) return false;
 
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != ys->data[i]) return false;
     }
 
     return true;
 }
 
-bool gup_array_char_equals_cstr(GupArrayChar xs, const char* cstr) {
-    const bool xs_is_empty_string = xs.data == NULL;
+bool gup_array_double_equals(const GupArrayDouble* xs, const GupArrayDouble* ys) {
+    if (xs->count != ys->count) return false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != ys->data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_float_equals(const GupArrayFloat* xs, const GupArrayFloat* ys) {
+    if (xs->count != ys->count) return false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != ys->data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_int_equals(const GupArrayInt* xs, const GupArrayInt* ys) {
+    if (xs->count != ys->count) return false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != ys->data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_long_equals(const GupArrayLong* xs, const GupArrayLong* ys) {
+    if (xs->count != ys->count) return false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != ys->data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_ptr_equals(const GupArrayPtr* xs, const GupArrayPtr* ys) {
+    if (xs->count != ys->count) return false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != ys->data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_short_equals(const GupArrayShort* xs, const GupArrayShort* ys) {
+    if (xs->count != ys->count) return false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != ys->data[i]) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_string_equals(const GupArrayString* xs, const GupArrayString* ys) {
+    if (xs->count != ys->count) return false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (!gup_array_char_equals(xs->data[i], x)) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_cstr_equals(const GupArrayCstr* xs, const GupArrayCstr* ys) {
+    if (xs->count != ys->count) return false;
+
+    for (int i = 0; i < xs->count; i++) {
+        if (strcmp(xs->data[i], x) != 0) return false;
+    }
+
+    return true;
+}
+
+bool gup_array_char_equals_cstr(const GupArrayChar* xs, const char* cstr) {
+    const bool xs_is_empty_string = xs->data == NULL;
     if (xs_is_empty_string) {
         return cstr[0] == '\0';
     }
 
-    return strncmp(xs.data, cstr, xs.count) == 0;
-}
-
-bool gup_array_double_equals(GupArrayDouble xs, GupArrayDouble ys) {
-    if (xs.count != ys.count) return false;
-
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_float_equals(GupArrayFloat xs, GupArrayFloat ys) {
-    if (xs.count != ys.count) return false;
-
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_int_equals(GupArrayInt xs, GupArrayInt ys) {
-    if (xs.count != ys.count) return false;
-
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_long_equals(GupArrayLong xs, GupArrayLong ys) {
-    if (xs.count != ys.count) return false;
-
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_short_equals(GupArrayShort xs, GupArrayShort ys) {
-    if (xs.count != ys.count) return false;
-
-    for (int i = 0; i < xs.count; i++) {
-        if (xs.data[i] != ys.data[i]) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_string_equals(GupArrayString xs, GupArrayString ys) {
-    if (xs.count != ys.count) return false;
-
-    for (int i = 0; i < xs.count; i++) {
-        if (!gup_array_char_equals(xs.data[i], ys.data[i])) return false;
-    }
-
-    return true;
-}
-
-bool gup_array_cstr_equals(GupArrayCstr xs, GupArrayCstr ys) {
-    if (xs.count != ys.count) return false;
-
-    for (int i = 0; i < xs.count; i++) {
-        if (strcmp(xs.data[i], ys.data[i]) != 0) return false;
-    }
-
-    return true;
+    return strncmp(xs->data, cstr, xs->count) == 0;
 }
 
 // Contains ------------------------------------------------------------------------------------------------------------
@@ -1810,8 +1821,6 @@ bool gup_array_cstr_contains(const GupArrayCstr* xs, const char* x) {
 
     return false;
 }
-
-
 
 // Print
 #define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
