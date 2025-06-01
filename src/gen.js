@@ -19,6 +19,7 @@ function main() {
         // console.log(gen_gup_array_create_from_array(...kind));
         // console.log(gen_gup_array_copy(...kind));
         // console.log(gen_gup_array_contains(...kind));
+        console.log(gen_gup_array_equals(...kind));
     }
 }
 
@@ -128,4 +129,20 @@ const gen_gup_array_contains = (up, low, t) => {
     return template;
 }
 
-main();
+const gen_gup_array_equals = (up, low, t) => {
+    let template = ``;
+    template += `bool gup_array_${low}_equals(const GupArray${up}* xs, const GupArray${up}* ys) {\n`;
+    template += `    if (xs->count != ys->count) return false;\n`;
+    template += `\n`;
+    template += `    for (int i = 0; i < xs->count; i++) {\n`;
+    if (up === 'String')    template += `        if (!gup_array_char_equals(xs->data[i], x)) return false;\n`
+    else if (up === 'Cstr') template += `        if (strcmp(xs->data[i], x) != 0) return false;\n`
+    else                    template += `        if (xs->data[i] != ys->data[i]) return false;\n`;
+    template += `    }\n`;
+    template += `\n`;
+    template += `    return true;\n`;
+    template += `}\n`;
+    return template;
+}
+
+main(); 
