@@ -13,11 +13,12 @@ const kinds = [
 
 function main() {
     for (const kind of kinds) {
-        console.log(gen_gup_array_function_defs(...kind));
+        // console.log(gen_gup_array_function_defs(...kind));
         // console.log(gen_gup_array_create(...kind));
         // console.log(gen_gup_array_destroy(...kind));
         // console.log(gen_gup_array_create_from_array(...kind));
         // console.log(gen_gup_array_copy(...kind));
+        // console.log(gen_gup_array_contains(...kind));
     }
 }
 
@@ -110,5 +111,21 @@ const gen_gup_array_destroy = (up, low, t) =>
     free(xs);
 }
 `;
+
+const gen_gup_array_contains = (up, low, t) => {
+    let template = ``;
+    template += `bool gup_array_${low}_contains(const GupArray${up}* xs, const ${t} x) {\n`;
+    template += `    for (int i = 0; i < xs->count; i++) {\n`;
+    if (up === 'String')    template += `        if (gup_array_char_equals(xs->data[i], x)) {\n`
+    else if (up === 'Cstr') template += `        if (strcmp(xs->data[i], x) == 0) {\n`
+    else                    template += `        if (xs->data[i] == x) {\n`;
+    template += `            return true;\n`;
+    template += `        }\n`;
+    template += `    }\n`;
+    template += `\n`;
+    template += `    return false;\n`;
+    template += `}\n`;
+    return template;
+}
 
 main();
