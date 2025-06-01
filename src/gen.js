@@ -16,6 +16,8 @@ function main() {
         console.log(gen_gup_array_function_defs(...kind));
         // console.log(gen_gup_array_create(...kind));
         // console.log(gen_gup_array_destroy(...kind));
+        // console.log(gen_gup_array_create_from_array(...kind));
+        // console.log(gen_gup_array_copy(...kind));
     }
 }
 
@@ -25,7 +27,6 @@ const gen_gup_array_function_defs = (up, low, t) => {
     template += `GupArray${up}*\tgup_array_${low}_create_from_array(GupAllocator* a, const ${t} xs[], const int size);\n`
     if (up === 'Char')
     template += `GupArrayChar*\tgup_array_char_create_from_cstr(GupAllocator* a, char xs[]);\n`
-    if (up === 'String')
     template += `GupArray${up}*\tgup_array_${low}_copy(GupAllocator* a, const GupArray${up}* xs);\n`
     template += `bool          \tgup_array_${low}_contains(const GupArray${up}* xs, const ${t} x);\n`
     template += `void          \tgup_array_${low}_destroy(GupArray${up}* xs);\n`
@@ -61,6 +62,48 @@ const gen_gup_array_create = (up, low, t) =>
     return xs;
 }
 `;
+
+const gen_gup_array_create_from_array = (up, low, t) =>
+`GupArray${up}* gup_array_${low}_create_from_array(GupAllocator* a, const ${t} xs[], const int size) {
+    const int capacity       = size > GUP_ARRAY_DEFAULT_CAPACITY ? size : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(${t});
+    const int bytes_to_copy  = size * sizeof(${t});
+
+    GupArray${up} *new;
+    new           = gup_alloc(a, sizeof(*new) + sizeof(${t}) * bytes_to_alloc);
+    new->capacity = capacity;
+    new->count    = size;
+
+    if (new->data != NULL) {
+        memcpy(new->data, xs, bytes_to_copy);
+    }
+
+    return new;
+}
+`;
+
+const gen_gup_array_copy = (up, low, t) => {
+    let template = ``;
+    template += `GupArray${up}* gup_array_${low}_copy(GupAllocator* a, const GupArray${up}* xs) {\n`;
+    template += `    GupArray${up}* new = gup_alloc(a, sizeof(GupArray${up}) + sizeof(${t}) * xs->capacity);\n`;
+    template += `\n`;
+    template += `    new->capacity = xs->capacity;\n`;
+    template += `    new->count    = xs->count;\n`;
+    template += `\n`;
+    if (up === 'String') {
+        template += `    for (int i = 0; i < xs->count; i++) {\n`;
+        template += `        new->data[i] = gup_array_char_copy(a, xs->data[i]);\n`;
+        template += `    }\n`;
+    } else {
+        template += `    if (new->data != NULL) {\n`;
+        template += `        memcpy(new->data, xs->data, xs->count * sizeof(${t}));\n`;
+        template += `    }\n`;
+    }
+    template += `\n`;
+    template += `    return new;\n`;
+    template += `}\n`;
+    return template;
+};
 
 const gen_gup_array_destroy = (up, low, t) =>
 `void gup_array_${low}_destroy(GupArray${up}* xs) {
