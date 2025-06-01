@@ -33,59 +33,59 @@ typedef struct {
 } GupArrayBool;
 
 typedef struct {
-    int   capacity;
-    int   count;
-    char* data;
+    int  capacity;
+    int  count;
+    char data[];
 } GupArrayChar;
 
 typedef GupArrayChar GupString;
 
 typedef struct {
-    int     capacity;
-    int     count;
-    double* data;
-} GupArrayDouble;
-
-typedef struct {
     int    capacity;
     int    count;
-    float* data;
-} GupArrayFloat;
-
-typedef struct {
-    int  capacity;
-    int  count;
-    int* data;
-} GupArrayInt;
+    double data[];
+} GupArrayDouble;
 
 typedef struct {
     int   capacity;
     int   count;
-    long* data;
-} GupArrayLong;
+    float data[];
+} GupArrayFloat;
 
 typedef struct {
     int capacity;
     int count;
-    void** data;
+    int data[];
+} GupArrayInt;
+
+typedef struct {
+    int  capacity;
+    int  count;
+    long data[];
+} GupArrayLong;
+
+typedef struct {
+    int   capacity;
+    int   count;
+    void* data[];
 } GupArrayPtr;
 
 typedef struct {
-    int    capacity;
-    int    count;
-    short* data;
+    int   capacity;
+    int   count;
+    short data[];
 } GupArrayShort;
 
 typedef struct {
     int capacity;
     int count;
-    GupArrayChar* data;
+    GupArrayChar* data[];
 } GupArrayString;
 
 typedef struct {
-    int capacity;
-    int count;
-    char** data;
+    int   capacity;
+    int   count;
+    char* data[];
 } GupArrayCstr;
 
 // Allocators ----------------------------------------------------------------------------------------------------------
@@ -1150,7 +1150,7 @@ void gup_allocator_bucket_clear(GupAllocatorBucket* a) {
 // Default constructors ------------------------------------------------------------------------------------------------
 
 GupArrayBool* gup_array_bool_create(GupAllocator* a) {
-    GupArrayBool *xs;
+    GupArrayBool* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(bool) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -1160,7 +1160,7 @@ GupArrayBool* gup_array_bool_create(GupAllocator* a) {
 }
 
 GupArrayChar* gup_array_char_create(GupAllocator* a) {
-    GupArrayChar *xs;
+    GupArrayChar* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(char) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -1170,7 +1170,7 @@ GupArrayChar* gup_array_char_create(GupAllocator* a) {
 }
 
 GupArrayDouble* gup_array_double_create(GupAllocator* a) {
-    GupArrayDouble *xs;
+    GupArrayDouble* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(double) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -1180,7 +1180,7 @@ GupArrayDouble* gup_array_double_create(GupAllocator* a) {
 }
 
 GupArrayFloat* gup_array_float_create(GupAllocator* a) {
-    GupArrayFloat *xs;
+    GupArrayFloat* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(float) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -1190,7 +1190,7 @@ GupArrayFloat* gup_array_float_create(GupAllocator* a) {
 }
 
 GupArrayInt* gup_array_int_create(GupAllocator* a) {
-    GupArrayInt *xs;
+    GupArrayInt* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(int) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -1200,7 +1200,7 @@ GupArrayInt* gup_array_int_create(GupAllocator* a) {
 }
 
 GupArrayLong* gup_array_long_create(GupAllocator* a) {
-    GupArrayLong *xs;
+    GupArrayLong* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(long) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -1210,7 +1210,7 @@ GupArrayLong* gup_array_long_create(GupAllocator* a) {
 }
 
 GupArrayPtr* gup_array_ptr_create(GupAllocator* a) {
-    GupArrayPtr *xs;
+    GupArrayPtr* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(void*) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -1220,7 +1220,7 @@ GupArrayPtr* gup_array_ptr_create(GupAllocator* a) {
 }
 
 GupArrayShort* gup_array_short_create(GupAllocator* a) {
-    GupArrayShort *xs;
+    GupArrayShort* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(short) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -1230,7 +1230,7 @@ GupArrayShort* gup_array_short_create(GupAllocator* a) {
 }
 
 GupArrayString* gup_array_string_create(GupAllocator* a) {
-    GupArrayString *xs;
+    GupArrayString* xs;
 
     xs = gup_alloc(a, sizeof(*xs) + sizeof(GupString) * GUP_ARRAY_DEFAULT_CAPACITY);
     xs->capacity = GUP_ARRAY_DEFAULT_CAPACITY;
@@ -2110,15 +2110,10 @@ void gup_array_string_append_cstr(GupAllocator* a, GupArrayString* xs, char* cst
     xs->count++;
 }
 
-// Prepend
+// Prepend -------------------------------------------------------------------------------------------------------------
+
 void gup_array_bool_prepend(GupAllocator* a, GupArrayBool* xs, bool x) {
-    const bool is_arena_allocator = a != NULL && a->type == GUP_ALLOCATOR_TYPE_ARENA;
-    if (xs->count == xs->capacity && !is_arena_allocator) {                          
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;           
-        xs = gup_realloc(a, xs, sizeof(*xs) + new_capacity * sizeof(bool));
-        gup_assert_verbose(xs != NULL, "PANIC: An allocation failed!");              
-        xs->capacity = new_capacity;                                                 
-    } 
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char); 
 
     for (int i = xs->count; i > 0; i--) {
         xs->data[i] = xs->data[i-1];
@@ -2187,8 +2182,18 @@ void gup_array_ptr_prepend(GupAllocator* a, GupArrayPtr* xs, void* x) {
     xs->count++;
 }
 
-void gup_array_string_prepend(GupAllocator* a, GupArrayString* xs, GupArrayChar x) {
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupArrayChar);
+void gup_array_string_prepend(GupAllocator* a, GupArrayString* xs, GupString* x) {
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupString*);
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = gup_array_char_copy(a, x);
+    xs->count++;
+}
+
+void gup_array_cstr_prepend(GupAllocator* a, GupArrayCstr* xs, char* x) {
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char*);
 
     for (int i = xs->count; i > 0; i--) {
         xs->data[i] = xs->data[i-1];
@@ -2205,25 +2210,6 @@ void gup_array_string_prepend_cstr(GupAllocator* a, GupArrayString* xs, char* cs
         xs->data[i] = xs->data[i-1];
     }
     xs->data[0] = gup_array_char_create_from_cstr(a, cstr);
-    xs->count++;
-}
-
-void gup_array_cstr_prepend(GupAllocator* a, GupArrayCstr* xs, char * x) {
-    if (xs->count == xs->capacity) {
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;
-        char * *new_data = gup_alloc(a, new_capacity * sizeof(char *));
-        
-        memcpy(new_data, xs->data, xs->count * sizeof(char *));
-        gup_free(a, xs->data);
-
-        xs->data = new_data;
-        xs->capacity = new_capacity;
-    }
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
-    }
-    xs->data[0] = x;
     xs->count++;
 }
 
