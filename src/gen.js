@@ -19,7 +19,8 @@ function main() {
         // console.log(gen_gup_array_create_from_array(...kind));
         // console.log(gen_gup_array_copy(...kind));
         // console.log(gen_gup_array_contains(...kind));
-        console.log(gen_gup_array_equals(...kind));
+        //console.log(gen_gup_array_equals(...kind));
+        console.log(gen_gup_array_print(...kind));
     }
 }
 
@@ -141,6 +142,63 @@ const gen_gup_array_equals = (up, low, t) => {
     template += `    }\n`;
     template += `\n`;
     template += `    return true;\n`;
+    template += `}\n`;
+    return template;
+}
+
+const gen_gup_array_print = (up, low, t) => {
+    let template = ``;
+    template += `#define gup_array_${low}_print(xs) _gup_array_${low}_print(xs, #xs)\n`;
+    template += `void _gup_array_${low}_print(const GupArray${up}* xs, const char* xs_name) {\n`;
+    template += `    printf("%s: [", xs_name);\n`;
+    template += `    for (int i = 0; i < xs->count; i++) {\n`;
+    if (up === 'Bool') {
+        template += `       if (xs->data[i])\n`;
+        template += `           printf("true");\n`;
+        template += `       else\n`;
+        template += `           printf("false");\n`;
+    }
+    else if (up === 'Char') {
+        template += `       printf("'%c'", xs->data[i]);\n`;
+        template += `\n`;
+        template += `       if (i != xs->count-1) printf(", ");\n`;
+    }
+    else if (up === 'Double' || up === 'Float' || up === 'Short') {
+        template += `       printf("%f", xs->data[i]);\n`;
+        template += `\n`;
+        template += `       if (i != xs->count-1) printf(", ");\n`;
+    }
+    else if (up === 'Int') {
+        template += `       printf("%d", xs->data[i]);\n`;
+        template += `\n`;
+        template += `       if (i != xs->count-1) printf(", ");\n`;
+    }
+    else if (up === 'Long') {
+        template += `       printf("%ld", xs->data[i]);\n`;
+        template += `\n`;
+        template += `       if (i != xs->count-1) printf(", ");\n`;
+    }
+    else if (up === 'Ptr') {
+        template += `       printf("%p", xs->data[i]);\n`;
+        template += `\n`;
+        template += `       if (i != xs->count-1) printf(", ");\n`;
+    }
+    else if (up === 'String') {
+        template += `       printf("  \\"");\n`;
+        template += `       for (int j = 0; j < xs->data[i].count; j++) {\n`;
+        template += `           printf("%c", xs->data[i].data[j]);\n`;
+        template += `       }\n`;
+        template += `       printf("\\"");\n`;
+        template += `       if (i != xs->count-1) printf(",");\n`;
+        template += `       printf("\\n");\n`;
+    }
+    else if (up === 'Cstr') {
+        template += `       printf("\\"%s\\"", xs->data[i]);\n`;
+        template += `\n`;
+        template += `       if (i != xs->count-1) printf(", ");\n`;
+    }
+    template += `    }\n`;
+    template += `    printf("]\\n");\n`;
     template += `}\n`;
     return template;
 }

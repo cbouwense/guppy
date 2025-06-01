@@ -1,100 +1,115 @@
-bool gup_array_bool_equals(const GupArrayBool* xs, const GupArrayBool* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_bool_print(xs) _gup_array_bool_print(xs, #xs)
+void _gup_array_bool_print(const GupArrayBool* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
+       if (xs->data[i])
+           printf("true");
+       else
+           printf("false");
     }
-
-    return true;
+    printf("]\n");
 }
 
-bool gup_array_char_equals(const GupArrayChar* xs, const GupArrayChar* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_char_print(xs) _gup_array_char_print(xs, #xs)
+void _gup_array_char_print(const GupArrayChar* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
-    }
+       printf("'%c'", xs->data[i]);
 
-    return true;
+       if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
-bool gup_array_double_equals(const GupArrayDouble* xs, const GupArrayDouble* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_double_print(xs) _gup_array_double_print(xs, #xs)
+void _gup_array_double_print(const GupArrayDouble* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
-    }
+       printf("%f", xs->data[i]);
 
-    return true;
+       if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
-bool gup_array_float_equals(const GupArrayFloat* xs, const GupArrayFloat* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_float_print(xs) _gup_array_float_print(xs, #xs)
+void _gup_array_float_print(const GupArrayFloat* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
-    }
+       printf("%f", xs->data[i]);
 
-    return true;
+       if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
-bool gup_array_int_equals(const GupArrayInt* xs, const GupArrayInt* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_int_print(xs) _gup_array_int_print(xs, #xs)
+void _gup_array_int_print(const GupArrayInt* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
-    }
+       printf("%d", xs->data[i]);
 
-    return true;
+       if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
-bool gup_array_long_equals(const GupArrayLong* xs, const GupArrayLong* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_long_print(xs) _gup_array_long_print(xs, #xs)
+void _gup_array_long_print(const GupArrayLong* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
-    }
+       printf("%ld", xs->data[i]);
 
-    return true;
+       if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
-bool gup_array_ptr_equals(const GupArrayPtr* xs, const GupArrayPtr* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_ptr_print(xs) _gup_array_ptr_print(xs, #xs)
+void _gup_array_ptr_print(const GupArrayPtr* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
-    }
+       printf("%p", xs->data[i]);
 
-    return true;
+       if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
-bool gup_array_short_equals(const GupArrayShort* xs, const GupArrayShort* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_short_print(xs) _gup_array_short_print(xs, #xs)
+void _gup_array_short_print(const GupArrayShort* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] != ys->data[i]) return false;
-    }
+       printf("%f", xs->data[i]);
 
-    return true;
+       if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
-bool gup_array_string_equals(const GupArrayString* xs, const GupArrayString* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_string_print(xs) _gup_array_string_print(xs, #xs)
+void _gup_array_string_print(const GupArrayString* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (!gup_array_char_equals(xs->data[i], x)) return false;
+       printf("  \"");
+       for (int j = 0; j < xs->data[i].count; j++) {
+           printf("%c", xs->data[i].data[j]);
+       }
+       printf("\"");
+       if (i != xs->count-1) printf(",");
+       printf("\n");
     }
-
-    return true;
+    printf("]\n");
 }
 
-bool gup_array_cstr_equals(const GupArrayCstr* xs, const GupArrayCstr* ys) {
-    if (xs->count != ys->count) return false;
-
+#define gup_array_cstr_print(xs) _gup_array_cstr_print(xs, #xs)
+void _gup_array_cstr_print(const GupArrayCstr* xs, const char* xs_name) {
+    printf("%s: [", xs_name);
     for (int i = 0; i < xs->count; i++) {
-        if (strcmp(xs->data[i], x) != 0) return false;
-    }
+       printf("\"%s\"", xs->data[i]);
 
-    return true;
+       if (i != xs->count-1) printf(", ");
+    }
+    printf("]\n");
 }
 
