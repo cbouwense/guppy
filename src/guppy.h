@@ -899,7 +899,7 @@ u32 gup_fnv1a_hash(const char* s);
             exit(1);                                                                              \
         }                                                                                         \
         const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;                        \
-        xs->data = gup_realloc(a, xs->data, new_capacity * sizeof(type_array_holds));             \
+        xs = gup_realloc(a, xs->data, sizeof(*xs) + new_capacity * sizeof(type_array_holds));     \
         gup_assert_verbose(xs->data != NULL, "PANIC: An allocation failed!");                     \
         xs->capacity = new_capacity;                                                              \
     }                                                                                             \
@@ -2031,63 +2031,56 @@ void _gup_array_cstr_debug(GupArrayCstr* xs, const char* xs_name) {
 }
 
 // Append
-void gup_array_bool_append(GupAllocator* a, GupArrayBool* xs, bool x) {
-    // GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, bool);
-    const bool is_arena_allocator = a != NULL && a->type == GUP_ALLOCATOR_TYPE_ARENA;
-    if (xs->count == xs->capacity && !is_arena_allocator) {                          
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;           
-        xs = gup_realloc(a, xs, sizeof(*xs) + new_capacity * sizeof(bool));
-        gup_assert_verbose(xs != NULL, "PANIC: An allocation failed!");              
-        xs->capacity = new_capacity;                                                 
-    }                                                                                
+void gup_array_bool_append(GupAllocator* a, GupArrayBool* xs, const bool x) {
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, bool);
 
     xs->data[xs->count] = x;
     xs->count++;
 }
 
-void gup_array_char_append(GupAllocator* a, GupArrayChar* xs, char x) {
+void gup_array_char_append(GupAllocator* a, GupArrayChar* xs, const char x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char);
 
     xs->data[xs->count] = x;
     xs->count++;
 }
 
-void gup_array_double_append(GupAllocator* a, GupArrayDouble* xs, double x) {
+void gup_array_double_append(GupAllocator* a, GupArrayDouble* xs, const double x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, double);
 
     xs->data[xs->count] = x;
     xs->count++;
 }
 
-void gup_array_float_append(GupAllocator* a, GupArrayFloat* xs, float x) {
+void gup_array_float_append(GupAllocator* a, GupArrayFloat* xs, const float x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, float);
 
     xs->data[xs->count] = x;
     xs->count++;
 }
 
-void gup_array_int_append(GupAllocator* a, GupArrayInt* xs, int x) {
+void gup_array_int_append(GupAllocator* a, GupArrayInt* xs, const int x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, int);
 
     xs->data[xs->count] = x;
     xs->count++;
 }
 
-void gup_array_long_append(GupAllocator* a, GupArrayLong* xs, long x) {
+void gup_array_long_append(GupAllocator* a, GupArrayLong* xs, const long x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, long);
 
     xs->data[xs->count] = x;
     xs->count++;
 }
 
-void gup_array_ptr_append(GupAllocator* a, GupArrayPtr* xs, void* x) {
+void gup_array_ptr_append(GupAllocator* a, GupArrayPtr* xs, const void* x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, void*);
 
     xs->data[xs->count] = x;
     xs->count++;
 }
 
-void gup_array_short_append(GupAllocator* a, GupArrayShort* xs, short x) {
+void gup_array_short_append(GupAllocator* a, GupArrayShort* xs, const short x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, short);
 
     xs->data[xs->count] = x;
@@ -2095,8 +2088,15 @@ void gup_array_short_append(GupAllocator* a, GupArrayShort* xs, short x) {
 }
 
 /** Appends the struct, does NOT copy. */
-void gup_array_string_append(GupAllocator* a, GupArrayString* xs, GupArrayChar x) {
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupArrayChar);
+void gup_array_string_append(GupAllocator* a, GupArrayString* xs, const GupString x) {
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupString);
+
+    xs->data[xs->count] = x;
+    xs->count++;
+}
+
+void gup_array_cstr_append(GupAllocator* a, GupArrayCstr* xs, const char* x) {
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char*);
 
     xs->data[xs->count] = x;
     xs->count++;
@@ -2107,13 +2107,6 @@ void gup_array_string_append_cstr(GupAllocator* a, GupArrayString* xs, char* cst
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupArrayChar);
 
     xs->data[xs->count] = gup_array_char_create_from_cstr(a, cstr);
-    xs->count++;
-}
-
-void gup_array_cstr_append(GupAllocator* a, GupArrayCstr* xs, char* x) {
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char*);
-
-    xs->data[xs->count] = x;
     xs->count++;
 }
 
