@@ -19,10 +19,11 @@ function main() {
         // console.log(gen_gup_array_create_from_array(...kind));
         // console.log(gen_gup_array_copy(...kind));
         // console.log(gen_gup_array_contains(...kind));
-        //console.log(gen_gup_array_equals(...kind));
+        // console.log(gen_gup_array_equals(...kind));
         // console.log(gen_gup_array_print(...kind));
         // console.log(gen_gup_array_debug(...kind));
-        console.log(gen_gup_array_append(...kind));
+        // console.log(gen_gup_array_append(...kind));
+        console.log(gen_gup_array_prepend(...kind));
     }
 }
 
@@ -229,5 +230,17 @@ const gen_gup_array_append = (up, low, t) => {
     template += `}\n`;
     return template;
 };
+
+const gen_gup_array_prepend = (up, low, t) =>
+`void gup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, ${t} x){
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, ${t});
+
+    for (int i = xs->count; i > 0; i--) {
+        xs->data[i] = xs->data[i-1];
+    }
+    xs->data[0] = x;
+    xs->count++;
+}
+`;
 
 main(); 
