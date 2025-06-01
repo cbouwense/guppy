@@ -21,7 +21,8 @@ function main() {
         // console.log(gen_gup_array_contains(...kind));
         //console.log(gen_gup_array_equals(...kind));
         // console.log(gen_gup_array_print(...kind));
-        console.log(gen_gup_array_debug(...kind));
+        // console.log(gen_gup_array_debug(...kind));
+        console.log(gen_gup_array_append(...kind));
     }
 }
 
@@ -214,5 +215,19 @@ void _gup_array_${low}_debug(GupArray${up}* xs, const char* xs_name) {
     printf("}\\n");
 }
 `;
+
+const gen_gup_array_append = (up, low, t) => {
+    let template = ``;
+    if (up === 'String') {
+        template += `/** Appends the struct, does NOT copy. */\n`;
+    }
+    template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, const ${t} x) {\n`;
+    template += `    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, ${t});\n`;
+    template += `\n`;
+    template += `    xs->data[xs->count] = x;\n`;
+    template += `    xs->count++;\n`;
+    template += `}\n`;
+    return template;
+};
 
 main(); 
