@@ -1,5 +1,6 @@
 GupArrayBool*	gup_array_bool_create(GupAllocator* a);
 GupArrayBool*	gup_array_bool_create_from_array(GupAllocator* a, const bool xs[], const int size);
+GupArrayBool*	gup_array_bool_copy(GupAllocator* a, const GupArrayBool* xs);
 bool          	gup_array_bool_contains(const GupArrayBool* xs, const bool x);
 void          	gup_array_bool_destroy(GupArrayBool* xs);
 bool          	gup_array_bool_equals(const GupArrayBool* xs, const GupArrayBool* ys);
@@ -16,6 +17,7 @@ GupArrayBool*	gup_array_bool_sort(GupAllocator* a, const GupArrayBool* xs);
 GupArrayChar*	gup_array_char_create(GupAllocator* a);
 GupArrayChar*	gup_array_char_create_from_array(GupAllocator* a, const char xs[], const int size);
 GupArrayChar*	gup_array_char_create_from_cstr(GupAllocator* a, char xs[]);
+GupArrayChar*	gup_array_char_copy(GupAllocator* a, const GupArrayChar* xs);
 bool          	gup_array_char_contains(const GupArrayChar* xs, const char x);
 void          	gup_array_char_destroy(GupArrayChar* xs);
 bool          	gup_array_char_equals(const GupArrayChar* xs, const GupArrayChar* ys);
@@ -33,6 +35,7 @@ char*        	gup_array_char_to_cstr(GupAllocator* a, GupArrayChar* chars);
 
 GupArrayDouble*	gup_array_double_create(GupAllocator* a);
 GupArrayDouble*	gup_array_double_create_from_array(GupAllocator* a, const double xs[], const int size);
+GupArrayDouble*	gup_array_double_copy(GupAllocator* a, const GupArrayDouble* xs);
 bool          	gup_array_double_contains(const GupArrayDouble* xs, const double x);
 void          	gup_array_double_destroy(GupArrayDouble* xs);
 bool          	gup_array_double_equals(const GupArrayDouble* xs, const GupArrayDouble* ys);
@@ -48,6 +51,7 @@ GupArrayDouble*	gup_array_double_sort(GupAllocator* a, const GupArrayDouble* xs)
 
 GupArrayFloat*	gup_array_float_create(GupAllocator* a);
 GupArrayFloat*	gup_array_float_create_from_array(GupAllocator* a, const float xs[], const int size);
+GupArrayFloat*	gup_array_float_copy(GupAllocator* a, const GupArrayFloat* xs);
 bool          	gup_array_float_contains(const GupArrayFloat* xs, const float x);
 void          	gup_array_float_destroy(GupArrayFloat* xs);
 bool          	gup_array_float_equals(const GupArrayFloat* xs, const GupArrayFloat* ys);
@@ -63,6 +67,7 @@ GupArrayFloat*	gup_array_float_sort(GupAllocator* a, const GupArrayFloat* xs);
 
 GupArrayInt*	gup_array_int_create(GupAllocator* a);
 GupArrayInt*	gup_array_int_create_from_array(GupAllocator* a, const int xs[], const int size);
+GupArrayInt*	gup_array_int_copy(GupAllocator* a, const GupArrayInt* xs);
 bool          	gup_array_int_contains(const GupArrayInt* xs, const int x);
 void          	gup_array_int_destroy(GupArrayInt* xs);
 bool          	gup_array_int_equals(const GupArrayInt* xs, const GupArrayInt* ys);
@@ -78,6 +83,7 @@ GupArrayInt*	gup_array_int_sort(GupAllocator* a, const GupArrayInt* xs);
 
 GupArrayLong*	gup_array_long_create(GupAllocator* a);
 GupArrayLong*	gup_array_long_create_from_array(GupAllocator* a, const long xs[], const int size);
+GupArrayLong*	gup_array_long_copy(GupAllocator* a, const GupArrayLong* xs);
 bool          	gup_array_long_contains(const GupArrayLong* xs, const long x);
 void          	gup_array_long_destroy(GupArrayLong* xs);
 bool          	gup_array_long_equals(const GupArrayLong* xs, const GupArrayLong* ys);
@@ -93,6 +99,7 @@ GupArrayLong*	gup_array_long_sort(GupAllocator* a, const GupArrayLong* xs);
 
 GupArrayPtr*	gup_array_ptr_create(GupAllocator* a);
 GupArrayPtr*	gup_array_ptr_create_from_array(GupAllocator* a, const void* xs[], const int size);
+GupArrayPtr*	gup_array_ptr_copy(GupAllocator* a, const GupArrayPtr* xs);
 bool          	gup_array_ptr_contains(const GupArrayPtr* xs, const void* x);
 void          	gup_array_ptr_destroy(GupArrayPtr* xs);
 bool          	gup_array_ptr_equals(const GupArrayPtr* xs, const GupArrayPtr* ys);
@@ -108,6 +115,7 @@ GupArrayPtr*	gup_array_ptr_sort(GupAllocator* a, const GupArrayPtr* xs);
 
 GupArrayShort*	gup_array_short_create(GupAllocator* a);
 GupArrayShort*	gup_array_short_create_from_array(GupAllocator* a, const short xs[], const int size);
+GupArrayShort*	gup_array_short_copy(GupAllocator* a, const GupArrayShort* xs);
 bool          	gup_array_short_contains(const GupArrayShort* xs, const short x);
 void          	gup_array_short_destroy(GupArrayShort* xs);
 bool          	gup_array_short_equals(const GupArrayShort* xs, const GupArrayShort* ys);
@@ -141,6 +149,7 @@ char**       	gup_array_string_to_cstrs(GupAllocator* a, GupArrayString strs);
 
 GupArrayCstr*	gup_array_cstr_create(GupAllocator* a);
 GupArrayCstr*	gup_array_cstr_create_from_array(GupAllocator* a, const char* xs[], const int size);
+GupArrayCstr*	gup_array_cstr_copy(GupAllocator* a, const GupArrayCstr* xs);
 bool          	gup_array_cstr_contains(const GupArrayCstr* xs, const char* x);
 void          	gup_array_cstr_destroy(GupArrayCstr* xs);
 bool          	gup_array_cstr_equals(const GupArrayCstr* xs, const GupArrayCstr* ys);
