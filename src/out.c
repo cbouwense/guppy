@@ -1,100 +1,100 @@
-void gup_array_bool_prepend(GupAllocator* a, GupArrayBool* xs, bool x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, bool);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_bool_find_index_of(const GupArrayBool* xs, const bool x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_char_prepend(GupAllocator* a, GupArrayChar* xs, char x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_char_find_index_of(const GupArrayChar* xs, const char x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_double_prepend(GupAllocator* a, GupArrayDouble* xs, double x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, double);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_double_find_index_of(const GupArrayDouble* xs, const double x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_float_prepend(GupAllocator* a, GupArrayFloat* xs, float x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, float);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_float_find_index_of(const GupArrayFloat* xs, const float x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_int_prepend(GupAllocator* a, GupArrayInt* xs, int x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, int);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_int_find_index_of(const GupArrayInt* xs, const int x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_long_prepend(GupAllocator* a, GupArrayLong* xs, long x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, long);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_long_find_index_of(const GupArrayLong* xs, const long x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_ptr_prepend(GupAllocator* a, GupArrayPtr* xs, void* x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, void*);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_ptr_find_index_of(const GupArrayPtr* xs, const void* x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_short_prepend(GupAllocator* a, GupArrayShort* xs, short x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, short);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_short_find_index_of(const GupArrayShort* xs, const short x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == x) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_string_prepend(GupAllocator* a, GupArrayString* xs, GupString x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupString);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_string_find_index_of(const GupArrayString* xs, const GupString x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (gup_array_char_equals(xs->data[i], x)) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 
-void gup_array_cstr_prepend(GupAllocator* a, GupArrayCstr* xs, char* x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char*);
-
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+int gup_array_cstr_find_index_of(const GupArrayCstr* xs, const char* x) {
+    for (int i = 0; i < xs->count; i++) {
+        if (gup_cstr_equals(xs->data[i], x)) {
+            return i;
+        }
     }
-    xs->data[0] = x;
-    xs->count++;
+  
+    return -1;
 }
 

@@ -23,7 +23,8 @@ function main() {
         // console.log(gen_gup_array_print(...kind));
         // console.log(gen_gup_array_debug(...kind));
         // console.log(gen_gup_array_append(...kind));
-        console.log(gen_gup_array_prepend(...kind));
+        // console.log(gen_gup_array_prepend(...kind));
+        console.log(gen_gup_array_find_index_of(...kind));
     }
 }
 
@@ -242,5 +243,21 @@ const gen_gup_array_prepend = (up, low, t) =>
     xs->count++;
 }
 `;
+
+const gen_gup_array_find_index_of = (up, low, t) => {
+    let template = ``;
+    template += `int gup_array_${low}_find_index_of(const GupArray${up}* xs, const ${t} x) {\n`;
+    template += `    for (int i = 0; i < xs->count; i++) {\n`;
+    if (up === 'String')    template += `        if (gup_array_char_equals(xs->data[i], x)) {\n`;
+    else if (up === 'Cstr') template += `        if (gup_cstr_equals(xs->data[i], x)) {\n`;
+    else                    template += `        if (xs->data[i] == x) {\n`;
+    template += `            return i;\n`;
+    template += `        }\n`;
+    template += `    }\n`;
+    template += `  \n`;
+    template += `    return -1;\n`;
+    template += `}\n`;
+    return template;
+}
 
 main(); 
