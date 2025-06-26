@@ -334,7 +334,7 @@ void          	gup_array_char_remove_all(GupArrayChar* xs, const char x);
 void          	gup_array_char_remove_at_index_preserve_order(GupArrayChar* xs, const int index);
 void          	gup_array_char_remove_at_index_no_preserve_order(GupArrayChar* xs, const int index);
 GupArrayChar*	gup_array_char_sort(GupAllocator* a, const GupArrayChar* xs);
-char*        	gup_array_char_to_cstr(GupAllocator* a, GupArrayChar* chars);
+char*        	gup_array_char_to_cstr(GupAllocator* a, const GupArrayChar* chars);
 
 GupArrayDouble*	gup_array_double_create(GupAllocator* a);
 GupArrayDouble*	gup_array_double_create_from_array(GupAllocator* a, const double xs[], const int size);
@@ -2493,11 +2493,9 @@ void gup_array_cstr_remove(GupArrayCstr* xs, const char* x, const int max_count_
     xs->count = new_data_size;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Remove all
-// ---------------------------------------------------------------------------------------------------------------------
+// Remove all ----------------------------------------------------------------------------------------------------------
 
-void gup_array_bool_remove_all(GupArrayBool* xs, bool x) {
+void gup_array_bool_remove_all(GupArrayBool* xs, const bool x) {
     bool new_data[xs->count];
 
     int new_data_size = 0;
@@ -2512,7 +2510,7 @@ void gup_array_bool_remove_all(GupArrayBool* xs, bool x) {
     memcpy(xs->data, new_data, new_data_size * sizeof(bool));
 }
 
-void gup_array_char_remove_all(GupArrayChar* xs, char x) {
+void gup_array_char_remove_all(GupArrayChar* xs, const char x) {
     char new_data[xs->count];
 
     int new_data_size = 0;
@@ -2524,10 +2522,10 @@ void gup_array_char_remove_all(GupArrayChar* xs, char x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(char));
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
 }
 
-void gup_array_double_remove_all(GupArrayDouble* xs, double x) {
+void gup_array_double_remove_all(GupArrayDouble* xs, const double x) {
     double new_data[xs->count];
 
     int new_data_size = 0;
@@ -2539,10 +2537,10 @@ void gup_array_double_remove_all(GupArrayDouble* xs, double x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(double));
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
 }
 
-void gup_array_float_remove_all(GupArrayFloat* xs, float x) {
+void gup_array_float_remove_all(GupArrayFloat* xs, const float x) {
     float new_data[xs->count];
 
     int new_data_size = 0;
@@ -2554,10 +2552,10 @@ void gup_array_float_remove_all(GupArrayFloat* xs, float x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(float));
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
 }
 
-void gup_array_int_remove_all(GupArrayInt* xs, int x) {
+void gup_array_int_remove_all(GupArrayInt* xs, const int x) {
     int new_data[xs->count];
 
     int new_data_size = 0;
@@ -2569,10 +2567,10 @@ void gup_array_int_remove_all(GupArrayInt* xs, int x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(int));
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
 }
 
-void gup_array_long_remove_all(GupArrayLong* xs, long x) {
+void gup_array_long_remove_all(GupArrayLong* xs, const long x) {
     long new_data[xs->count];
 
     int new_data_size = 0;
@@ -2584,10 +2582,25 @@ void gup_array_long_remove_all(GupArrayLong* xs, long x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(long));
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
 }
 
-void gup_array_short_remove_all(GupArrayShort* xs, short x) {
+void gup_array_ptr_remove_all(GupArrayPtr* xs, const void* x) {
+    void* new_data[xs->count];
+
+    int new_data_size = 0;
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] != x) {
+            new_data[new_data_size] = xs->data[i];
+            new_data_size++;
+        }
+    }
+
+    xs->count = new_data_size;
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+}
+
+void gup_array_short_remove_all(GupArrayShort* xs, const short x) {
     short new_data[xs->count];
 
     int new_data_size = 0;
@@ -2599,10 +2612,10 @@ void gup_array_short_remove_all(GupArrayShort* xs, short x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(short));
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
 }
 
-void gup_array_string_remove_all(GupArrayString* xs, GupString x) {
+void gup_array_string_remove_all(GupArrayString* xs, const GupString x) {
     GupString new_data[xs->count];
 
     int new_data_size = 0;
@@ -2615,8 +2628,25 @@ void gup_array_string_remove_all(GupArrayString* xs, GupString x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(GupString));
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
 }
+
+void gup_array_cstr_remove_all(GupArrayCstr* xs, const char* x) {
+    char* new_data[xs->count];
+
+    int new_data_size = 0;
+    for (int i = 0; i < xs->count; i++) {
+        if (strcmp(xs->data[i], x) != 0) {
+            new_data[new_data_size] = xs->data[i];
+            new_data_size++;
+        }
+    }
+
+    xs->count = new_data_size;
+    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+}
+
+// Extras
 
 void gup_array_string_remove_all_cstr(GupAllocator* a, GupArrayString* xs, char* x) {
     char* new_data[xs->count];
@@ -2638,88 +2668,47 @@ void gup_array_string_remove_all_cstr(GupAllocator* a, GupArrayString* xs, char*
     }
 }
 
-void gup_array_cstr_remove_all(GupArrayCstr* xs, char* x) {
-    char* new_data[xs->count];
-
-    int new_data_size = 0;
-    for (int i = 0; i < xs->count; i++) {
-        if (strcmp(xs->data[i], x) != 0) {
-            strcpy(new_data[new_data_size], xs->data[i]);
-            new_data_size++;
-        }
-    }
-
-    xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(char *));
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Remove at index preserve order
-// ---------------------------------------------------------------------------------------------------------------------
+// Remove at index preserve order --------------------------------------------------------------------------------------
 
 void gup_array_bool_remove_at_index_preserve_order(GupArrayBool* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count; i++) {
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
 void gup_array_char_remove_at_index_preserve_order(GupArrayChar* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count; i++) {
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
 void gup_array_double_remove_at_index_preserve_order(GupArrayDouble* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count; i++) {
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
 void gup_array_float_remove_at_index_preserve_order(GupArrayFloat* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count; i++) {
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
 void gup_array_int_remove_at_index_preserve_order(GupArrayInt* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count; i++) {
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
 void gup_array_long_remove_at_index_preserve_order(GupArrayLong* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count; i++) {
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
@@ -2731,53 +2720,38 @@ void gup_array_ptr_remove_at_index_preserve_order(GupArrayPtr* xs, const int ind
 }
 
 void gup_array_short_remove_at_index_preserve_order(GupArrayShort* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count; i++) {
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
-// TODO: can only really do this once GupArrayStrings have an array of pointers to GupArrayChars
 void gup_array_string_remove_at_index_preserve_order(GupArrayString* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count - 1; i++) {
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
 void gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
-
-    for (int i = index; i < xs->count - 1; i++) {
-        printf("%p\n", (void*)&(xs->data[i]));
+    for (int i = index; i < xs->count-1; i++) {
         xs->data[i] = xs->data[i+1];
     }
-
     xs->count--;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Remove at index no preserve order 
-// ---------------------------------------------------------------------------------------------------------------------
+// Remove at index no preserve order -----------------------------------------------------------------------------------
+
 void gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool* xs, const int index) {
     _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2786,11 +2760,11 @@ void gup_array_char_remove_at_index_no_preserve_order(GupArrayChar* xs, const in
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2799,11 +2773,11 @@ void gup_array_double_remove_at_index_no_preserve_order(GupArrayDouble* xs, cons
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2812,11 +2786,11 @@ void gup_array_float_remove_at_index_no_preserve_order(GupArrayFloat* xs, const 
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2825,11 +2799,11 @@ void gup_array_int_remove_at_index_no_preserve_order(GupArrayInt* xs, const int 
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2838,11 +2812,11 @@ void gup_array_long_remove_at_index_no_preserve_order(GupArrayLong* xs, const in
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2851,11 +2825,11 @@ void gup_array_ptr_remove_at_index_no_preserve_order(GupArrayPtr* xs, const int 
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2864,11 +2838,11 @@ void gup_array_short_remove_at_index_no_preserve_order(GupArrayShort* xs, const 
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
     // Copy the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2876,12 +2850,12 @@ void gup_array_string_remove_at_index_no_preserve_order(GupArrayString* xs, cons
     _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // Copy the pointer to the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // Copy the last element into the element to remove
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
@@ -2889,18 +2863,17 @@ void gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr* xs, const in
     _gup_array_populated_sanity_check(xs);
     gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
 
-    // printf("before %p\n", (void*)xs->data[index]); 
-    // Copy the pointer to the last element into the element to remove
-    // [1, 2, 3, 4, 5], 1 -> [1, 5, 3, 4, 5]
+    // Copy the last element into the element to remove
+    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
     xs->data[index] = xs->data[xs->count-1];
-    // printf("after  %p\n", (void*)xs->data[index]); 
 
     // Remove the last element by decrementing the count
-    // [1, 5, 3, 4, 5] -> [1, 5, 3, 4]
+    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
     xs->count--;
 }
 
-// Find
+// Find ----------------------------------------------------------------------------------------------------------------
+
 // TODO: this is highly suspicious code
 bool gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArrayChar* out) {
     for (int i = 0; i < xs.count; i++) {
@@ -3251,26 +3224,26 @@ GupArrayCstr gup_array_cstr_sort(GupAllocator* a, GupArrayCstr xs) {
 
 // Miscellaneous -------------------------------------------------------------------------------------------------------
 
-char* gup_array_char_to_cstr(GupAllocator* a, GupArrayChar chars) {
+char* gup_array_char_to_cstr(GupAllocator* a, const GupArrayChar* chars) {
     // count + 1 for null terminator
-    char* result = gup_alloc(a, (chars.count + 1) * sizeof(char));
+    char* result = gup_alloc(a, (chars->count + 1) * sizeof(char));
     
-    for (int i = 0; i < chars.count; i++) {
+    for (int i = 0; i < chars->count; i++) {
         result[i] = chars.data[i];
     }
-    result[chars.count] = '\0';
+    result[chars->count] = '\0';
 
     return result;
 }
 
-char** gup_array_string_to_cstrs(GupAllocator* a, GupArrayString strs) {
+char** gup_array_string_to_cstrs(GupAllocator* a, const GupArrayString* strs) {
     // count + 1 for null terminator
-    char** result = gup_alloc(a, (strs.count + 1) * sizeof(char *));
+    char** result = gup_alloc(a, (strs->count + 1) * sizeof(char *));
 
-    for (int i = 0; i < strs.count; i++) {
-        result[i] = gup_array_char_to_cstr(a, strs.data[i]);
+    for (int i = 0; i < strs->count; i++) {
+        result[i] = gup_array_char_to_cstr(a, strs->data[i]);
     }
-    result[strs.count] = NULL;
+    result[strs->count] = NULL;
 
     return result;
 }
