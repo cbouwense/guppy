@@ -38,7 +38,7 @@ void test_gup_allocator_bucket_can_be_freed_and_not_leak_memory(void) {
     GupAllocatorBucket a = gup_allocator_bucket_create();
 
     const int count = 42;
-    int** lots_of_ints = gup_allocator_bucket_alloc(&a, sizeof(int *) * count);
+    int** lots_of_ints = gup_allocator_bucket_alloc(&a, sizeof(int*) * count);
     for (int i = 0; i < count; i++) {
         lots_of_ints[i] = gup_allocator_bucket_alloc(&a, sizeof(int));
         *lots_of_ints[i] = i;
