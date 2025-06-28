@@ -55,7 +55,7 @@ const gen_gup_array_function_defs = (up, low, t) => {
     template += `void          \tgup_array_${low}_remove_all(GupArray${up}* xs, const ${t} x);\n`
     template += `void          \tgup_array_${low}_remove_at_index_preserve_order(GupArray${up}* xs, const int index);\n`
     template += `void          \tgup_array_${low}_remove_at_index_no_preserve_order(GupArray${up}* xs, const int index);\n`
-    template += `GupArray${up}*\tgup_array_${low}_sort(GupAllocator* a, const GupArray${up}* xs);\n`
+    template += `GupArray${up}*\tgup_array_${low}_to_sorted(GupAllocator* a, const GupArray${up}* xs);\n`
     if (up === 'Char')
         template += `char*        \tgup_array_char_to_cstr(GupAllocator* a, const GupArrayChar* chars);\n`
     if (up === 'String')
@@ -359,5 +359,25 @@ const gen_gup_array_remove_at_index_no_preserve_order = (up, low, t) =>
     xs->count--;
 }
 `;
+
+const gen_gup_array_to_sorted = (up, low, t) => {
+    let template = ``;
+
+    template += `GupArray${up}* gup_array_${low}_sort(GupAllocator* a, GupArray${up}* xs) {\n`;
+    template += `    GupArray${up}* sorted = gup_array_${low}_create(a);\n`;
+    template += `\n`;
+    template += `    for (int i = 0; i < xs->count; i++) {\n`;
+    template += `        if (xs->data[i] == false) {\n`;
+    template += `            gup_array_${low}_prepend(a, sorted, false);\n`;
+    template += `        } else {\n`;
+    template += `            gup_array_${low}_append(a, sorted, true);\n`;
+    template += `        }\n`;
+    template += `    }\n`;
+    template += `\n`;
+    template += `    return sorted;\n`;
+    template += `}\n`;
+
+    return template;
+}
 
 main(); 
