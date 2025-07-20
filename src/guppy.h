@@ -864,6 +864,7 @@ bool  gup_cstr_equals(const char* a, const char* b);
 void  gup_cstr_copy(char* to, const char* from);
 void  gup_cstr_copy_n(char* to, const char* from, const int n);
 void  gup_cstr_print(const char* cstr);
+// TODO: gup_cstr_compare
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Math
@@ -2898,9 +2899,14 @@ bool gup_array_string_find(GupArrayString xs, bool (*fn)(GupArrayChar), GupArray
     return false;
 }
 
+// ------------------------------------------------------------------------------------------------------------------------
 // Sort
+// ------------------------------------------------------------------------------------------------------------------------
+
 // Orders false before true, (e.g. [false, false, true, true])
-GupArrayBool* gup_array_bool_sort(GupAllocator* a, GupArrayBool* xs) {
+GupArrayBool* gup_array_bool_to_sorted(GupAllocator* a, const GupArrayBool* xs) {
+    if (xs.count <= 1) return xs;
+
     GupArrayBool* sorted = gup_array_bool_create(a);
 
     for (int i = 0; i < xs->count; i++) {
@@ -2914,12 +2920,12 @@ GupArrayBool* gup_array_bool_sort(GupAllocator* a, GupArrayBool* xs) {
     return sorted;
 }
 
-GupArrayChar gup_array_char_sort(GupAllocator* a, GupArrayChar xs) {
+GupArrayChar* gup_array_char_to_sorted(GupAllocator* a, const GupArrayChar* xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayChar sorted = gup_array_char_create(a);
-    GupArrayChar left   = gup_array_char_create(a);
-    GupArrayChar right  = gup_array_char_create(a);
+    GupArrayChar* sorted = gup_array_char_create(a);
+    GupArrayChar left    = gup_array_char_create(a);
+    GupArrayChar right   = gup_array_char_create(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
@@ -2929,14 +2935,14 @@ GupArrayChar gup_array_char_sort(GupAllocator* a, GupArrayChar xs) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
-        if (xs.data[i] <= pivot) {
+    if (xs.data[i] <= pivot) {
             gup_array_char_append(a, &left, xs.data[i]);
         } else {
             gup_array_char_append(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayChar sorted_left = gup_array_char_sort(a, left);
+    GupArrayChar sorted_left  = gup_array_char_sort(a, left);
     GupArrayChar sorted_right = gup_array_char_sort(a, right);
 
     { // Construct the final array from the left, pivot, and right.
@@ -2945,7 +2951,7 @@ GupArrayChar gup_array_char_sort(GupAllocator* a, GupArrayChar xs) {
         }
 
         gup_array_char_append(a, &sorted, pivot);
-
+        
         for (int i = 0; i < sorted_right.count; i++) {
             gup_array_char_append(a, &sorted, sorted_right.data[i]);
         }
@@ -2954,12 +2960,12 @@ GupArrayChar gup_array_char_sort(GupAllocator* a, GupArrayChar xs) {
     return sorted;
 }
 
-GupArrayDouble gup_array_double_sort(GupAllocator* a, GupArrayDouble xs) {
+GupArrayDouble* gup_array_double_to_sorted(GupAllocator* a, const GupArrayDouble* xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayDouble sorted = gup_array_double_create(a);
-    GupArrayDouble left   = gup_array_double_create(a);
-    GupArrayDouble right  = gup_array_double_create(a);
+    GupArrayDouble* sorted = gup_array_double_create(a);
+    GupArrayDouble left    = gup_array_double_create(a);
+    GupArrayDouble right   = gup_array_double_create(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
@@ -2969,14 +2975,14 @@ GupArrayDouble gup_array_double_sort(GupAllocator* a, GupArrayDouble xs) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
-        if (xs.data[i] <= pivot) {
+    if (xs.data[i] <= pivot) {
             gup_array_double_append(a, &left, xs.data[i]);
         } else {
             gup_array_double_append(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayDouble sorted_left = gup_array_double_sort(a, left);
+    GupArrayDouble sorted_left  = gup_array_double_sort(a, left);
     GupArrayDouble sorted_right = gup_array_double_sort(a, right);
 
     { // Construct the final array from the left, pivot, and right.
@@ -2985,7 +2991,7 @@ GupArrayDouble gup_array_double_sort(GupAllocator* a, GupArrayDouble xs) {
         }
 
         gup_array_double_append(a, &sorted, pivot);
-
+        
         for (int i = 0; i < sorted_right.count; i++) {
             gup_array_double_append(a, &sorted, sorted_right.data[i]);
         }
@@ -2994,12 +3000,12 @@ GupArrayDouble gup_array_double_sort(GupAllocator* a, GupArrayDouble xs) {
     return sorted;
 }
 
-GupArrayFloat gup_array_float_sort(GupAllocator* a, GupArrayFloat xs) {
+GupArrayFloat* gup_array_float_to_sorted(GupAllocator* a, const GupArrayFloat* xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayFloat sorted = gup_array_float_create(a);
-    GupArrayFloat left   = gup_array_float_create(a);
-    GupArrayFloat right  = gup_array_float_create(a);
+    GupArrayFloat* sorted = gup_array_float_create(a);
+    GupArrayFloat left    = gup_array_float_create(a);
+    GupArrayFloat right   = gup_array_float_create(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
@@ -3009,14 +3015,14 @@ GupArrayFloat gup_array_float_sort(GupAllocator* a, GupArrayFloat xs) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
-        if (xs.data[i] <= pivot) {
+    if (xs.data[i] <= pivot) {
             gup_array_float_append(a, &left, xs.data[i]);
         } else {
             gup_array_float_append(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayFloat sorted_left = gup_array_float_sort(a, left);
+    GupArrayFloat sorted_left  = gup_array_float_sort(a, left);
     GupArrayFloat sorted_right = gup_array_float_sort(a, right);
 
     { // Construct the final array from the left, pivot, and right.
@@ -3025,7 +3031,7 @@ GupArrayFloat gup_array_float_sort(GupAllocator* a, GupArrayFloat xs) {
         }
 
         gup_array_float_append(a, &sorted, pivot);
-
+        
         for (int i = 0; i < sorted_right.count; i++) {
             gup_array_float_append(a, &sorted, sorted_right.data[i]);
         }
@@ -3034,12 +3040,12 @@ GupArrayFloat gup_array_float_sort(GupAllocator* a, GupArrayFloat xs) {
     return sorted;
 }
 
-GupArrayInt gup_array_int_sort(GupAllocator* a, GupArrayInt xs) {
+GupArrayInt* gup_array_int_to_sorted(GupAllocator* a, const GupArrayInt* xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayInt sorted = gup_array_int_create(a);
-    GupArrayInt left   = gup_array_int_create(a);
-    GupArrayInt right  = gup_array_int_create(a);
+    GupArrayInt* sorted = gup_array_int_create(a);
+    GupArrayInt left    = gup_array_int_create(a);
+    GupArrayInt right   = gup_array_int_create(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
@@ -3049,14 +3055,14 @@ GupArrayInt gup_array_int_sort(GupAllocator* a, GupArrayInt xs) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
-        if (xs.data[i] <= pivot) {
+    if (xs.data[i] <= pivot) {
             gup_array_int_append(a, &left, xs.data[i]);
         } else {
             gup_array_int_append(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayInt sorted_left = gup_array_int_sort(a, left);
+    GupArrayInt sorted_left  = gup_array_int_sort(a, left);
     GupArrayInt sorted_right = gup_array_int_sort(a, right);
 
     { // Construct the final array from the left, pivot, and right.
@@ -3065,7 +3071,7 @@ GupArrayInt gup_array_int_sort(GupAllocator* a, GupArrayInt xs) {
         }
 
         gup_array_int_append(a, &sorted, pivot);
-
+        
         for (int i = 0; i < sorted_right.count; i++) {
             gup_array_int_append(a, &sorted, sorted_right.data[i]);
         }
@@ -3074,12 +3080,12 @@ GupArrayInt gup_array_int_sort(GupAllocator* a, GupArrayInt xs) {
     return sorted;
 }
 
-GupArrayLong gup_array_long_sort(GupAllocator* a, GupArrayLong xs) {
+GupArrayLong* gup_array_long_to_sorted(GupAllocator* a, const GupArrayLong* xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayLong sorted = gup_array_long_create(a);
-    GupArrayLong left   = gup_array_long_create(a);
-    GupArrayLong right  = gup_array_long_create(a);
+    GupArrayLong* sorted = gup_array_long_create(a);
+    GupArrayLong left    = gup_array_long_create(a);
+    GupArrayLong right   = gup_array_long_create(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
@@ -3089,14 +3095,14 @@ GupArrayLong gup_array_long_sort(GupAllocator* a, GupArrayLong xs) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
-        if (xs.data[i] <= pivot) {
+    if (xs.data[i] <= pivot) {
             gup_array_long_append(a, &left, xs.data[i]);
         } else {
             gup_array_long_append(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayLong sorted_left = gup_array_long_sort(a, left);
+    GupArrayLong sorted_left  = gup_array_long_sort(a, left);
     GupArrayLong sorted_right = gup_array_long_sort(a, right);
 
     { // Construct the final array from the left, pivot, and right.
@@ -3105,7 +3111,7 @@ GupArrayLong gup_array_long_sort(GupAllocator* a, GupArrayLong xs) {
         }
 
         gup_array_long_append(a, &sorted, pivot);
-
+        
         for (int i = 0; i < sorted_right.count; i++) {
             gup_array_long_append(a, &sorted, sorted_right.data[i]);
         }
@@ -3114,12 +3120,52 @@ GupArrayLong gup_array_long_sort(GupAllocator* a, GupArrayLong xs) {
     return sorted;
 }
 
-GupArrayShort gup_array_short_sort(GupAllocator* a, GupArrayShort xs) {
+GupArrayPtr* gup_array_ptr_to_sorted(GupAllocator* a, const GupArrayPtr* xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayShort sorted = gup_array_short_create(a);
-    GupArrayShort left   = gup_array_short_create(a);
-    GupArrayShort right  = gup_array_short_create(a);
+    GupArrayPtr* sorted = gup_array_ptr_create(a);
+    GupArrayPtr left    = gup_array_ptr_create(a);
+    GupArrayPtr right   = gup_array_ptr_create(a);
+
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const void* pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (xs.data[i] <= pivot) {
+            gup_array_ptr_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_ptr_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayPtr sorted_left  = gup_array_ptr_sort(a, left);
+    GupArrayPtr sorted_right = gup_array_ptr_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_ptr_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_ptr_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_ptr_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
+}
+
+GupArrayShort* gup_array_short_to_sorted(GupAllocator* a, const GupArrayShort* xs) {
+    if (xs.count <= 1) return xs;
+
+    GupArrayShort* sorted = gup_array_short_create(a);
+    GupArrayShort left    = gup_array_short_create(a);
+    GupArrayShort right   = gup_array_short_create(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
@@ -3129,14 +3175,14 @@ GupArrayShort gup_array_short_sort(GupAllocator* a, GupArrayShort xs) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
-        if (xs.data[i] <= pivot) {
+    if (xs.data[i] <= pivot) {
             gup_array_short_append(a, &left, xs.data[i]);
         } else {
             gup_array_short_append(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayShort sorted_left = gup_array_short_sort(a, left);
+    GupArrayShort sorted_left  = gup_array_short_sort(a, left);
     GupArrayShort sorted_right = gup_array_short_sort(a, right);
 
     { // Construct the final array from the left, pivot, and right.
@@ -3145,7 +3191,7 @@ GupArrayShort gup_array_short_sort(GupAllocator* a, GupArrayShort xs) {
         }
 
         gup_array_short_append(a, &sorted, pivot);
-
+        
         for (int i = 0; i < sorted_right.count; i++) {
             gup_array_short_append(a, &sorted, sorted_right.data[i]);
         }
@@ -3154,12 +3200,12 @@ GupArrayShort gup_array_short_sort(GupAllocator* a, GupArrayShort xs) {
     return sorted;
 }
 
-GupArrayString gup_array_string_sort(GupAllocator* a, GupArrayString xs) {
+GupArrayString* gup_array_string_to_sorted(GupAllocator* a, const GupArrayString* xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayString sorted = gup_array_string_create(a);
-    GupArrayString left   = gup_array_string_create(a);
-    GupArrayString right  = gup_array_string_create(a);
+    GupArrayString* sorted = gup_array_string_create(a);
+    GupArrayString left    = gup_array_string_create(a);
+    GupArrayString right   = gup_array_string_create(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
@@ -3169,14 +3215,14 @@ GupArrayString gup_array_string_sort(GupAllocator* a, GupArrayString xs) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
-        if (gup_string_compare(a, xs.data[i], pivot) <= 0) {
+    if (gup_string_compare(a, xs.data[i], pivot) <= 0) {
             gup_array_string_append(a, &left, xs.data[i]);
         } else {
             gup_array_string_append(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayString sorted_left = gup_array_string_sort(a, left);
+    GupArrayString sorted_left  = gup_array_string_sort(a, left);
     GupArrayString sorted_right = gup_array_string_sort(a, right);
 
     { // Construct the final array from the left, pivot, and right.
@@ -3185,7 +3231,7 @@ GupArrayString gup_array_string_sort(GupAllocator* a, GupArrayString xs) {
         }
 
         gup_array_string_append(a, &sorted, pivot);
-
+        
         for (int i = 0; i < sorted_right.count; i++) {
             gup_array_string_append(a, &sorted, sorted_right.data[i]);
         }
@@ -3194,29 +3240,29 @@ GupArrayString gup_array_string_sort(GupAllocator* a, GupArrayString xs) {
     return sorted;
 }
 
-GupArrayCstr gup_array_cstr_sort(GupAllocator* a, GupArrayCstr xs) {
+GupArrayCstr* gup_array_cstr_to_sorted(GupAllocator* a, const GupArrayCstr* xs) {
     if (xs.count <= 1) return xs;
 
-    GupArrayCstr sorted = gup_array_cstr_create(a);
-    GupArrayCstr left   = gup_array_cstr_create(a);
-    GupArrayCstr right  = gup_array_cstr_create(a);
+    GupArrayCstr* sorted = gup_array_cstr_create(a);
+    GupArrayCstr left    = gup_array_cstr_create(a);
+    GupArrayCstr right   = gup_array_cstr_create(a);
 
     // Choose the last item as the pivot for no particular reason.
     const int pivot_idx = xs.count - 1;
-    char* pivot = xs.data[pivot_idx];
+    const char* pivot = xs.data[pivot_idx];
 
     for (int i = 0; i < xs.count; i++) {
         // Don't include the pivot.
         if (i == pivot_idx) continue;
 
-        if (strcmp(xs.data[i], pivot) <= 0) {
+    if (strcmp(xs.data[i], pivot) <= 0) {
             gup_array_cstr_append(a, &left, xs.data[i]);
         } else {
             gup_array_cstr_append(a, &right, xs.data[i]);
         }
     }
 
-    GupArrayCstr sorted_left = gup_array_cstr_sort(a, left);
+    GupArrayCstr sorted_left  = gup_array_cstr_sort(a, left);
     GupArrayCstr sorted_right = gup_array_cstr_sort(a, right);
 
     { // Construct the final array from the left, pivot, and right.
@@ -3225,7 +3271,7 @@ GupArrayCstr gup_array_cstr_sort(GupAllocator* a, GupArrayCstr xs) {
         }
 
         gup_array_cstr_append(a, &sorted, pivot);
-
+        
         for (int i = 0; i < sorted_right.count; i++) {
             gup_array_cstr_append(a, &sorted, sorted_right.data[i]);
         }

@@ -1,130 +1,377 @@
-void gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+// Orders false before true, (e.g. [false, false, true, true])
+GupArrayBool* gup_array_bool_to_sorted(GupAllocator* a, const GupArrayBool* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayBool* sorted = gup_array_bool_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    for (int i = 0; i < xs->count; i++) {
+        if (xs->data[i] == false) {
+            gup_array_bool_prepend(a, sorted, false);
+        } else {
+            gup_array_bool_append(a, sorted, true);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_char_remove_at_index_no_preserve_order(GupArrayChar* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayChar* gup_array_char_to_sorted(GupAllocator* a, const GupArrayChar* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayChar* sorted = gup_array_char_create(a);
+    GupArrayChar left    = gup_array_char_create(a);
+    GupArrayChar right   = gup_array_char_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const char pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (xs.data[i] <= pivot) {
+            gup_array_char_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_char_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayChar sorted_left  = gup_array_char_sort(a, left);
+    GupArrayChar sorted_right = gup_array_char_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_char_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_char_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_char_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_double_remove_at_index_no_preserve_order(GupArrayDouble* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayDouble* gup_array_double_to_sorted(GupAllocator* a, const GupArrayDouble* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayDouble* sorted = gup_array_double_create(a);
+    GupArrayDouble left    = gup_array_double_create(a);
+    GupArrayDouble right   = gup_array_double_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const double pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (xs.data[i] <= pivot) {
+            gup_array_double_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_double_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayDouble sorted_left  = gup_array_double_sort(a, left);
+    GupArrayDouble sorted_right = gup_array_double_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_double_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_double_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_double_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_float_remove_at_index_no_preserve_order(GupArrayFloat* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayFloat* gup_array_float_to_sorted(GupAllocator* a, const GupArrayFloat* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayFloat* sorted = gup_array_float_create(a);
+    GupArrayFloat left    = gup_array_float_create(a);
+    GupArrayFloat right   = gup_array_float_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const float pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (xs.data[i] <= pivot) {
+            gup_array_float_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_float_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayFloat sorted_left  = gup_array_float_sort(a, left);
+    GupArrayFloat sorted_right = gup_array_float_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_float_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_float_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_float_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_int_remove_at_index_no_preserve_order(GupArrayInt* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayInt* gup_array_int_to_sorted(GupAllocator* a, const GupArrayInt* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayInt* sorted = gup_array_int_create(a);
+    GupArrayInt left    = gup_array_int_create(a);
+    GupArrayInt right   = gup_array_int_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const int pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (xs.data[i] <= pivot) {
+            gup_array_int_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_int_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayInt sorted_left  = gup_array_int_sort(a, left);
+    GupArrayInt sorted_right = gup_array_int_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_int_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_int_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_int_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_long_remove_at_index_no_preserve_order(GupArrayLong* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayLong* gup_array_long_to_sorted(GupAllocator* a, const GupArrayLong* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayLong* sorted = gup_array_long_create(a);
+    GupArrayLong left    = gup_array_long_create(a);
+    GupArrayLong right   = gup_array_long_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const long pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (xs.data[i] <= pivot) {
+            gup_array_long_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_long_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayLong sorted_left  = gup_array_long_sort(a, left);
+    GupArrayLong sorted_right = gup_array_long_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_long_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_long_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_long_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_ptr_remove_at_index_no_preserve_order(GupArrayPtr* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayPtr* gup_array_ptr_to_sorted(GupAllocator* a, const GupArrayPtr* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayPtr* sorted = gup_array_ptr_create(a);
+    GupArrayPtr left    = gup_array_ptr_create(a);
+    GupArrayPtr right   = gup_array_ptr_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const void* pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (xs.data[i] <= pivot) {
+            gup_array_ptr_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_ptr_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayPtr sorted_left  = gup_array_ptr_sort(a, left);
+    GupArrayPtr sorted_right = gup_array_ptr_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_ptr_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_ptr_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_ptr_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_short_remove_at_index_no_preserve_order(GupArrayShort* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayShort* gup_array_short_to_sorted(GupAllocator* a, const GupArrayShort* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayShort* sorted = gup_array_short_create(a);
+    GupArrayShort left    = gup_array_short_create(a);
+    GupArrayShort right   = gup_array_short_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const short pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (xs.data[i] <= pivot) {
+            gup_array_short_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_short_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayShort sorted_left  = gup_array_short_sort(a, left);
+    GupArrayShort sorted_right = gup_array_short_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_short_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_short_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_short_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_string_remove_at_index_no_preserve_order(GupArrayString* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayString* gup_array_string_to_sorted(GupAllocator* a, const GupArrayString* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayString* sorted = gup_array_string_create(a);
+    GupArrayString left    = gup_array_string_create(a);
+    GupArrayString right   = gup_array_string_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const GupString pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (gup_string_compare(a, xs.data[i], pivot) <= 0) {
+            gup_array_string_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_string_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayString sorted_left  = gup_array_string_sort(a, left);
+    GupArrayString sorted_right = gup_array_string_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_string_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_string_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_string_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
-void gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr* xs, const int index) {
-    _gup_array_populated_sanity_check(xs);
-    gup_assert_verbose(0 <= index && index < xs->count, "You're trying to remove an index from an array that is out of bounds.");
+GupArrayCstr* gup_array_cstr_to_sorted(GupAllocator* a, const GupArrayCstr* xs) {
+    if (xs.count <= 1) return xs;
 
-    // Copy the last element into the element to remove
-    // (xs: [1, 2, 3, 4, 5], index: 1) -> xs: [1, 5, 3, 4, 5]
-    xs->data[index] = xs->data[xs->count-1];
+    GupArrayCstr* sorted = gup_array_cstr_create(a);
+    GupArrayCstr left    = gup_array_cstr_create(a);
+    GupArrayCstr right   = gup_array_cstr_create(a);
 
-    // Remove the last element by decrementing the count
-    // xs: [1, 5, 3, 4, 5] -> xs: [1, 5, 3, 4]
-    xs->count--;
+    // Choose the last item as the pivot for no particular reason.
+    const int pivot_idx = xs.count - 1;
+    const char* pivot = xs.data[pivot_idx];
+
+    for (int i = 0; i < xs.count; i++) {
+        // Don't include the pivot.
+        if (i == pivot_idx) continue;
+
+    if (strcmp(xs.data[i], pivot) <= 0) {
+            gup_array_cstr_append(a, &left, xs.data[i]);
+        } else {
+            gup_array_cstr_append(a, &right, xs.data[i]);
+        }
+    }
+
+    GupArrayCstr sorted_left  = gup_array_cstr_sort(a, left);
+    GupArrayCstr sorted_right = gup_array_cstr_sort(a, right);
+
+    { // Construct the final array from the left, pivot, and right.
+        for (int i = 0; i < sorted_left.count; i++) {
+            gup_array_cstr_append(a, &sorted, sorted_left.data[i]);
+        }
+
+        gup_array_cstr_append(a, &sorted, pivot);
+        
+        for (int i = 0; i < sorted_right.count; i++) {
+            gup_array_cstr_append(a, &sorted, sorted_right.data[i]);
+        }
+    }
+
+    return sorted;
 }
 
