@@ -137,7 +137,10 @@ GupArrayString* gup_array_string_create_from_array(GupAllocator* a, const GupStr
 
     new->capacity = capacity;
     new->count    = xs_count;
-    memcpy(new->data, xs, bytes_to_copy);
+
+    for (int i = 0; i < xs->count; i++) {
+        new->data[i] = gup_array_char_copy(a, xs[i]);
+    }
 
     return new;
 }
@@ -153,7 +156,11 @@ GupArrayCstr* gup_array_cstr_create_from_array(GupAllocator* a, const char* xs[]
 
     new->capacity = capacity;
     new->count    = xs_count;
-    memcpy(new->data, xs, bytes_to_copy);
+
+    for (int i = 0; i < xs->count; i++) {
+        new->data[i] = gup_alloc(a, gup_cstr_length_including_null(xs[i]));
+        gup_cstr_copy(new->data[i], xs[i]);
+    }
 
     return new;
 }

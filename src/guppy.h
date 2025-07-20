@@ -1448,7 +1448,10 @@ GupArrayString* gup_array_string_create_from_array(GupAllocator* a, const GupStr
 
     new->capacity = capacity;
     new->count    = xs_count;
-    memcpy(new->data, xs, bytes_to_copy);
+    
+    for (int i = 0; i < xs_count; i++) {
+        new->data[i] = gup_array_char_copy(a, xs[i]);
+    }
 
     return new;
 }
@@ -1464,7 +1467,11 @@ GupArrayCstr* gup_array_cstr_create_from_array(GupAllocator* a, const char* xs[]
 
     new->capacity = capacity;
     new->count    = xs_count;
-    memcpy(new->data, xs, bytes_to_copy);
+
+    for (int i = 0; i < xs_count; i++) {
+        new->data[i] = gup_alloc(a, gup_cstr_length_including_null(xs[i]));
+        gup_cstr_copy(new->data[i], xs[i]);
+    }
 
     return new;
 }
@@ -1487,110 +1494,95 @@ GupArrayString* gup_array_string_create_from_cstrs(GupAllocator* a, const char**
 
 GupArrayBool* gup_array_bool_copy(GupAllocator* a, const GupArrayBool* xs) {
     GupArrayBool* new = gup_alloc(a, sizeof(GupArrayBool) + sizeof(bool) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
-
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(bool));
-    }
+    memcpy(new->data, xs->data, xs->count * sizeof(bool));
 
     return new;
 }
 
 GupArrayChar* gup_array_char_copy(GupAllocator* a, const GupArrayChar* xs) {
     GupArrayChar* new = gup_alloc(a, sizeof(GupArrayChar) + sizeof(char) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
-
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(char));
-    }
+    memcpy(new->data, xs->data, xs->count * sizeof(char));
 
     return new;
 }
 
 GupArrayDouble* gup_array_double_copy(GupAllocator* a, const GupArrayDouble* xs) {
     GupArrayDouble* new = gup_alloc(a, sizeof(GupArrayDouble) + sizeof(double) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
-
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(double));
-    }
+    memcpy(new->data, xs->data, xs->count * sizeof(double));
 
     return new;
 }
 
 GupArrayFloat* gup_array_float_copy(GupAllocator* a, const GupArrayFloat* xs) {
     GupArrayFloat* new = gup_alloc(a, sizeof(GupArrayFloat) + sizeof(float) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
-
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(float));
-    }
+    memcpy(new->data, xs->data, xs->count * sizeof(float));
 
     return new;
 }
 
 GupArrayInt* gup_array_int_copy(GupAllocator* a, const GupArrayInt* xs) {
     GupArrayInt* new = gup_alloc(a, sizeof(GupArrayInt) + sizeof(int) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
-
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(int));
-    }
+    memcpy(new->data, xs->data, xs->count * sizeof(int));
 
     return new;
 }
 
 GupArrayLong* gup_array_long_copy(GupAllocator* a, const GupArrayLong* xs) {
     GupArrayLong* new = gup_alloc(a, sizeof(GupArrayLong) + sizeof(long) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
-
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(long));
-    }
+    memcpy(new->data, xs->data, xs->count * sizeof(long));
 
     return new;
 }
 
 GupArrayPtr* gup_array_ptr_copy(GupAllocator* a, const GupArrayPtr* xs) {
     GupArrayPtr* new = gup_alloc(a, sizeof(GupArrayPtr) + sizeof(void*) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
-
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(void*));
-    }
+    memcpy(new->data, xs->data, xs->count * sizeof(void*));
 
     return new;
 }
 
 GupArrayShort* gup_array_short_copy(GupAllocator* a, const GupArrayShort* xs) {
     GupArrayShort* new = gup_alloc(a, sizeof(GupArrayShort) + sizeof(short) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
-
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(short));
-    }
+    memcpy(new->data, xs->data, xs->count * sizeof(short));
 
     return new;
 }
 
 GupArrayString* gup_array_string_copy(GupAllocator* a, const GupArrayString* xs) {
     GupArrayString* new = gup_alloc(a, sizeof(GupArrayString) + sizeof(GupString) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
@@ -1604,12 +1596,14 @@ GupArrayString* gup_array_string_copy(GupAllocator* a, const GupArrayString* xs)
 
 GupArrayCstr* gup_array_cstr_copy(GupAllocator* a, const GupArrayCstr* xs) {
     GupArrayCstr* new = gup_alloc(a, sizeof(GupArrayCstr) + sizeof(char*) * xs->capacity);
+    gup_assert(new != NULL);
 
     new->capacity = xs->capacity;
     new->count    = xs->count;
 
-    if (new->data != NULL) {
-        memcpy(new->data, xs->data, xs->count * sizeof(char*));
+    for (int i = 0; i < xs->count; i++) {
+        new->data[i] = gup_alloc(a, gup_cstr_length_including_null(xs->data[i]));
+        gup_cstr_copy(new->data[i], xs->data[i]);
     }
 
     return new;
@@ -3563,21 +3557,13 @@ bool gup_file_read_lines_as_cstrs(GupAllocator* a, const char* file_path, char**
 
     char buffer[65536];
     for (int i = 0; fgets(buffer, 65536, fp) != NULL; i++) {
-        /*
-         * Since this is the read lines function that does not include newlines, and since the line length is of the form:
-         * 
-         *   full_line_length = non_newline_characters + newline + null terminator
-         * 
-         * and since we only want to capture the form:
-         *
-         *   desired_line_length = non_newline_characters + null terminator
-         * 
-         * we end up with:
-         *
-         *   desired_line_length = full_line_length - 1 (subtracting the one newline).
-         * 
-         * Thus, the inclusion of the minus 1.
-         */  
+        // Since this is the read lines function that does not include newlines, and since the line length is of the form:
+        //   full_line_length = non_newline_characters + newline + null terminator
+        // and since we only want to capture the form:
+        //   desired_line_length = non_newline_characters + null terminator
+        // we end up with:
+        //   desired_line_length = full_line_length - 1 (subtracting the one newline).
+        // Thus, the inclusion of the minus 1.
         const int line_length = gup_cstr_length_including_null(buffer) - 1;
 
         lines[i] = (char *) gup_alloc(a, sizeof(char *) * line_length);

@@ -111,7 +111,22 @@ const gen_gup_array_create_from_array = (up, low, t) => {
   template += `\n`;
   template += `    new->capacity = capacity;\n`;
   template += `    new->count    = xs_count;\n`;
-  template += `    memcpy(new->data, xs, bytes_to_copy);\n`;
+
+  if (up === 'String') {
+    template += `\n`;
+    template += `    for (int i = 0; i < xs->count; i++) {\n`;
+    template += `        new->data[i] = gup_array_char_copy(a, xs[i]);\n`;
+    template += `    }\n`;
+  } else if (up === 'Cstr') {
+    template += `\n`;
+    template += `    for (int i = 0; i < xs->count; i++) {\n`;
+    template += `        new->data[i] = gup_alloc(a, gup_cstr_length_including_null(xs[i]));\n`
+    template += `        gup_cstr_copy(new->data[i], xs[i]);\n`;
+    template += `    }\n`;
+  } else {
+    template += `    memcpy(new->data, xs, bytes_to_copy);\n`;
+  }
+  
   template += `\n`;
   template += `    return new;\n`;
   template += `}\n`;
@@ -124,18 +139,23 @@ const gen_gup_array_copy = (up, low, t) => {
 
     template += `GupArray${up}* gup_array_${low}_copy(GupAllocator* a, const GupArray${up}* xs) {\n`;
     template += `    GupArray${up}* new = gup_alloc(a, sizeof(GupArray${up}) + sizeof(${t}) * xs->capacity);\n`;
+    template += `    gup_assert(new != NULL);\n`;
     template += `\n`;
     template += `    new->capacity = xs->capacity;\n`;
     template += `    new->count    = xs->count;\n`;
-    template += `\n`;
     if (up === 'String') {
+        template += `\n`;
         template += `    for (int i = 0; i < xs->count; i++) {\n`;
         template += `        new->data[i] = gup_array_char_copy(a, xs->data[i]);\n`;
         template += `    }\n`;
-    } else {
-        template += `    if (new->data != NULL) {\n`;
-        template += `        memcpy(new->data, xs->data, xs->count * sizeof(${t}));\n`;
+    } else if (up === 'Cstr') {
+        template += `\n`;
+        template += `    for (int i = 0; i < xs->count; i++) {\n`;
+        template += `        new->data[i] = gup_alloc(a, gup_cstr_length_including_null(xs->data[i]));\n`
+        template += `        gup_cstr_copy(new->data[i], xs->data[i]);\n`;
         template += `    }\n`;
+    } else {
+        template += `    memcpy(new->data, xs->data, xs->count * sizeof(${t}));\n`;
     }
     template += `\n`;
     template += `    return new;\n`;
