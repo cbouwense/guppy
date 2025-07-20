@@ -196,8 +196,8 @@ const gen_gup_array_equals = (up, low, t) => {
     template += `\n`;
     template += `    for (int i = 0; i < xs->count; i++) {\n`;
 
-    if      (up === 'String') template += `        if (!gup_array_char_equals(xs->data[i], x)) return false;\n`
-    else if (up === 'Cstr')   template += `        if (strcmp(xs->data[i], x) != 0) return false;\n`
+    if      (up === 'String') template += `        if (!gup_array_char_equals(xs->data[i], ys->data[i])) return false;\n`
+    else if (up === 'Cstr')   template += `        if (strcmp(xs->data[i], ys->data[i]) != 0) return false;\n`
     else                      template += `        if (xs->data[i] != ys->data[i]) return false;\n`;
 
     template += `    }\n`;

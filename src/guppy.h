@@ -1695,7 +1695,7 @@ bool gup_array_string_equals(const GupArrayString* xs, const GupArrayString* ys)
     if (xs->count != ys->count) return false;
 
     for (int i = 0; i < xs->count; i++) {
-        if (!gup_array_char_equals(xs->data[i], x)) return false;
+        if (!gup_array_char_equals(xs->data[i], ys->data[i])) return false;
     }
 
     return true;
@@ -1705,7 +1705,7 @@ bool gup_array_cstr_equals(const GupArrayCstr* xs, const GupArrayCstr* ys) {
     if (xs->count != ys->count) return false;
 
     for (int i = 0; i < xs->count; i++) {
-        if (strcmp(xs->data[i], x) != 0) return false;
+        if (strcmp(xs->data[i], ys->data[i]) != 0) return false;
     }
 
     return true;
