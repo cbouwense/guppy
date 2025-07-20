@@ -1,377 +1,160 @@
-// Orders false before true, (e.g. [false, false, true, true])
-GupArrayBool* gup_array_bool_to_sorted(GupAllocator* a, const GupArrayBool* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayBool* gup_array_bool_create_from_array(GupAllocator* a, const bool xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(bool);
+    const int bytes_to_copy  = xs_count * sizeof(bool);
 
-    GupArrayBool* sorted = gup_array_bool_create(a);
+    GupArrayBool* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(bool) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    for (int i = 0; i < xs->count; i++) {
-        if (xs->data[i] == false) {
-            gup_array_bool_prepend(a, sorted, false);
-        } else {
-            gup_array_bool_append(a, sorted, true);
-        }
-    }
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    return sorted;
+    return new;
 }
 
-GupArrayChar* gup_array_char_to_sorted(GupAllocator* a, const GupArrayChar* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayChar* gup_array_char_create_from_array(GupAllocator* a, const char xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(char);
+    const int bytes_to_copy  = xs_count * sizeof(char);
 
-    GupArrayChar* sorted = gup_array_char_create(a);
-    GupArrayChar left    = gup_array_char_create(a);
-    GupArrayChar right   = gup_array_char_create(a);
+    GupArrayChar* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(char) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const char pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (xs.data[i] <= pivot) {
-            gup_array_char_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_char_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayChar sorted_left  = gup_array_char_sort(a, left);
-    GupArrayChar sorted_right = gup_array_char_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_char_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_char_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_char_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
-GupArrayDouble* gup_array_double_to_sorted(GupAllocator* a, const GupArrayDouble* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayDouble* gup_array_double_create_from_array(GupAllocator* a, const double xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(double);
+    const int bytes_to_copy  = xs_count * sizeof(double);
 
-    GupArrayDouble* sorted = gup_array_double_create(a);
-    GupArrayDouble left    = gup_array_double_create(a);
-    GupArrayDouble right   = gup_array_double_create(a);
+    GupArrayDouble* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(double) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const double pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (xs.data[i] <= pivot) {
-            gup_array_double_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_double_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayDouble sorted_left  = gup_array_double_sort(a, left);
-    GupArrayDouble sorted_right = gup_array_double_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_double_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_double_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_double_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
-GupArrayFloat* gup_array_float_to_sorted(GupAllocator* a, const GupArrayFloat* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayFloat* gup_array_float_create_from_array(GupAllocator* a, const float xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(float);
+    const int bytes_to_copy  = xs_count * sizeof(float);
 
-    GupArrayFloat* sorted = gup_array_float_create(a);
-    GupArrayFloat left    = gup_array_float_create(a);
-    GupArrayFloat right   = gup_array_float_create(a);
+    GupArrayFloat* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(float) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const float pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (xs.data[i] <= pivot) {
-            gup_array_float_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_float_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayFloat sorted_left  = gup_array_float_sort(a, left);
-    GupArrayFloat sorted_right = gup_array_float_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_float_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_float_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_float_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
-GupArrayInt* gup_array_int_to_sorted(GupAllocator* a, const GupArrayInt* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayInt* gup_array_int_create_from_array(GupAllocator* a, const int xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(int);
+    const int bytes_to_copy  = xs_count * sizeof(int);
 
-    GupArrayInt* sorted = gup_array_int_create(a);
-    GupArrayInt left    = gup_array_int_create(a);
-    GupArrayInt right   = gup_array_int_create(a);
+    GupArrayInt* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(int) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const int pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (xs.data[i] <= pivot) {
-            gup_array_int_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_int_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayInt sorted_left  = gup_array_int_sort(a, left);
-    GupArrayInt sorted_right = gup_array_int_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_int_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_int_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_int_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
-GupArrayLong* gup_array_long_to_sorted(GupAllocator* a, const GupArrayLong* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayLong* gup_array_long_create_from_array(GupAllocator* a, const long xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(long);
+    const int bytes_to_copy  = xs_count * sizeof(long);
 
-    GupArrayLong* sorted = gup_array_long_create(a);
-    GupArrayLong left    = gup_array_long_create(a);
-    GupArrayLong right   = gup_array_long_create(a);
+    GupArrayLong* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(long) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const long pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (xs.data[i] <= pivot) {
-            gup_array_long_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_long_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayLong sorted_left  = gup_array_long_sort(a, left);
-    GupArrayLong sorted_right = gup_array_long_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_long_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_long_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_long_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
-GupArrayPtr* gup_array_ptr_to_sorted(GupAllocator* a, const GupArrayPtr* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayPtr* gup_array_ptr_create_from_array(GupAllocator* a, const void* xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(void*);
+    const int bytes_to_copy  = xs_count * sizeof(void*);
 
-    GupArrayPtr* sorted = gup_array_ptr_create(a);
-    GupArrayPtr left    = gup_array_ptr_create(a);
-    GupArrayPtr right   = gup_array_ptr_create(a);
+    GupArrayPtr* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(void*) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const void* pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (xs.data[i] <= pivot) {
-            gup_array_ptr_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_ptr_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayPtr sorted_left  = gup_array_ptr_sort(a, left);
-    GupArrayPtr sorted_right = gup_array_ptr_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_ptr_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_ptr_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_ptr_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
-GupArrayShort* gup_array_short_to_sorted(GupAllocator* a, const GupArrayShort* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayShort* gup_array_short_create_from_array(GupAllocator* a, const short xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(short);
+    const int bytes_to_copy  = xs_count * sizeof(short);
 
-    GupArrayShort* sorted = gup_array_short_create(a);
-    GupArrayShort left    = gup_array_short_create(a);
-    GupArrayShort right   = gup_array_short_create(a);
+    GupArrayShort* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(short) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const short pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (xs.data[i] <= pivot) {
-            gup_array_short_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_short_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayShort sorted_left  = gup_array_short_sort(a, left);
-    GupArrayShort sorted_right = gup_array_short_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_short_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_short_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_short_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
-GupArrayString* gup_array_string_to_sorted(GupAllocator* a, const GupArrayString* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayString* gup_array_string_create_from_array(GupAllocator* a, const GupString* xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(GupString*);
+    const int bytes_to_copy  = xs_count * sizeof(GupString*);
 
-    GupArrayString* sorted = gup_array_string_create(a);
-    GupArrayString left    = gup_array_string_create(a);
-    GupArrayString right   = gup_array_string_create(a);
+    GupArrayString* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(GupString*) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const GupString pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (gup_string_compare(a, xs.data[i], pivot) <= 0) {
-            gup_array_string_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_string_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayString sorted_left  = gup_array_string_sort(a, left);
-    GupArrayString sorted_right = gup_array_string_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_string_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_string_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_string_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
-GupArrayCstr* gup_array_cstr_to_sorted(GupAllocator* a, const GupArrayCstr* xs) {
-    if (xs.count <= 1) return xs;
+GupArrayCstr* gup_array_cstr_create_from_array(GupAllocator* a, const char* xs[], const int xs_count) {
+    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;
+    const int bytes_to_alloc = capacity * sizeof(char*);
+    const int bytes_to_copy  = xs_count * sizeof(char*);
 
-    GupArrayCstr* sorted = gup_array_cstr_create(a);
-    GupArrayCstr left    = gup_array_cstr_create(a);
-    GupArrayCstr right   = gup_array_cstr_create(a);
+    GupArrayCstr* new;
+    new = gup_alloc(a, sizeof(*new) + sizeof(char*) * bytes_to_alloc);
+    gup_assert(new != NULL);
 
-    // Choose the last item as the pivot for no particular reason.
-    const int pivot_idx = xs.count - 1;
-    const char* pivot = xs.data[pivot_idx];
+    new->capacity = capacity;
+    new->count    = xs_count;
+    memcpy(new->data, xs, bytes_to_copy);
 
-    for (int i = 0; i < xs.count; i++) {
-        // Don't include the pivot.
-        if (i == pivot_idx) continue;
-
-    if (strcmp(xs.data[i], pivot) <= 0) {
-            gup_array_cstr_append(a, &left, xs.data[i]);
-        } else {
-            gup_array_cstr_append(a, &right, xs.data[i]);
-        }
-    }
-
-    GupArrayCstr sorted_left  = gup_array_cstr_sort(a, left);
-    GupArrayCstr sorted_right = gup_array_cstr_sort(a, right);
-
-    { // Construct the final array from the left, pivot, and right.
-        for (int i = 0; i < sorted_left.count; i++) {
-            gup_array_cstr_append(a, &sorted, sorted_left.data[i]);
-        }
-
-        gup_array_cstr_append(a, &sorted, pivot);
-        
-        for (int i = 0; i < sorted_right.count; i++) {
-            gup_array_cstr_append(a, &sorted, sorted_right.data[i]);
-        }
-    }
-
-    return sorted;
+    return new;
 }
 
