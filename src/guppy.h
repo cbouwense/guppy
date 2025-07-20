@@ -13,7 +13,10 @@
 #include <time.h>
 #include <unistd.h>
 
-// Primitive types -----------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Primitive types
+// ---------------------------------------------------------------------------------------------------------------------
+
 typedef unsigned char   u8;
 typedef signed char     i8;
 typedef unsigned short u16;
@@ -25,7 +28,10 @@ typedef signed long    i64;
 typedef float          f32;
 typedef double         f64;
 
-// TODO: flexible array members
+// ---------------------------------------------------------------------------------------------------------------------
+// Dynamic arrays
+// ---------------------------------------------------------------------------------------------------------------------
+
 typedef struct {
     int  capacity;
     int  count;
@@ -88,7 +94,9 @@ typedef struct {
     char* data[];
 } GupArrayCstr;
 
-// Allocators ----------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Allocators
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef enum {
     GUP_ALLOCATOR_TYPE_MALLOC = 0,
@@ -121,7 +129,7 @@ typedef struct {
 /**
  * A "bucket" allocator (as I am naming it, I don't know if there is a proper name for something like this) is 
  * useful for when you just want to allocate a bunch of memory for a bunch of different things, and free all of
- * those things at a specific arbitrary point in your program. It is basically an array of pointers that point 
+ * those things at a specific arbitrary point in your program. It is basically an array of pointers that point to
  * some allocated memory. A bucket allocator is distinct from an arena allocator in that you can choose to free
  * or realloc any of the pointers in the bucket at any time. A bucket allocator uses malloc, realloc, and free
  * without any magic. I don't believe bucket allocators, as I've conceived here, really pose any benefits in
@@ -133,6 +141,8 @@ typedef struct {
     GupArrayInt* bytes; // How many bytes of memory are stored at each location.
 } GupAllocatorBucket;
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Sets
 // ---------------------------------------------------------------------------------------------------------------------
 
 // TODO: do this with a single byte and bitwise logic
@@ -253,6 +263,10 @@ typedef struct {
     GupArrayCstr* keys;
     GupArrayCstr* values;
 } GupHashmapCstr;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Stacks
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef GupArrayBool   GupStackBool;
 typedef GupArrayChar   GupStackChar;
@@ -465,8 +479,6 @@ void          	gup_array_cstr_remove_all(GupArrayCstr* xs, const char* x);
 void          	gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr* xs, const int index);
 void          	gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr* xs, const int index);
 GupArrayCstr*	gup_array_cstr_sort(GupAllocator* a, const GupArrayCstr* xs);
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // File operations
@@ -686,8 +698,8 @@ void             gup_hashmap_string_debug(GupHashmapString hashmap);
 
 GupHashmapCstr   gup_hashmap_cstr_create(GupAllocator* a);
 void             gup_hashmap_cstr_destroy(GupHashmapCstr hashmap);
-bool             gup_hashmap_cstr_get(GupHashmapCstr hashmap, char* key, char * *out);
-void             gup_hashmap_cstr_set(GupAllocator* a, GupHashmapCstr* hashmap, char* key, char * value);
+bool             gup_hashmap_cstr_get(GupHashmapCstr hashmap, char* key, char* *out);
+void             gup_hashmap_cstr_set(GupAllocator* a, GupHashmapCstr* hashmap, char* key, char* value);
 void             gup_hashmap_cstr_remove(GupHashmapCstr* hashmap, char* key);
 int              gup_hashmap_cstr_size(GupHashmapCstr hashmap);
 void             gup_hashmap_cstr_print(GupHashmapCstr hashmap);
@@ -787,7 +799,7 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end);
 // Settings
 // ---------------------------------------------------------------------------------------------------------------------
 
-//  TODO: I generally don't trust / like this code. Figure out what's so wrong with it.
+//  TODO: I generally don't trust / like this code. Figure out what's so wrong with it or rewrite it.
 bool gup_settings_get_cstr(GupAllocator* a, const char* key, GupString* out);
 bool gup_settings_get_cstr_from_file(GupAllocator* a, const char* key, const char* file_path, GupString* out);
 bool gup_settings_set(const char* key, const char* value);
@@ -4163,7 +4175,7 @@ GupSetChar gup_set_char_create(void) {
     GupSetChar xs = (GupSetChar) {
         .capacity = 256,
         .count    = 0,
-        .data     = {0},
+        .data     = { 0 },
     };
 
     return xs;
