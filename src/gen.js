@@ -29,7 +29,7 @@ function main() {
         // console.log(gen_gup_array_remove_all(...kind));
         // console.log(gen_gup_array_remove_at_index_preserve_order(...kind));
         // console.log(gen_gup_array_remove_at_index_no_preserve_order(...kind));
-        // console.log(gen_gup_array_to_sorted(...kind));
+        console.log(gen_gup_array_to_sorted(...kind));
     }
 }
 
@@ -48,18 +48,33 @@ const gen_gup_array_function_defs = (up, low, t) => {
     if (up === 'Char') template += `GupArrayChar*\tgup_array_char_create_from_cstr(GupAllocator* a, char xs[]);\n`
     
     template += `GupArray${up}*\tgup_array_${low}_copy(GupAllocator* a, const GupArray${up}* xs);\n`
-    template += `bool          \tgup_array_${low}_contains(const GupArray${up}* xs, const ${t} x);\n`
+    
+    if (up === 'String') template += `bool          \tgup_array_${low}_contains(const GupArray${up}* xs, const ${t}* x);\n`
+    else                 template += `bool          \tgup_array_${low}_contains(const GupArray${up}* xs, const ${t} x);\n`
+    
     template += `void          \tgup_array_${low}_destroy(GupArray${up}* xs);\n`
     template += `bool          \tgup_array_${low}_equals(const GupArray${up}* xs, const GupArray${up}* ys);\n`
     
-    if (up === 'Char') template += `bool         \tgup_array_char_equals_cstr(GupArrayChar* xs, const char* cstr);\n`
+    if (up === 'Char') template += `bool         \tgup_array_char_equals_cstr(const GupArrayChar* xs, const char* cstr);\n`
     
     template += `void          \tgup_array_${low}_print(const GupArray${up}* xs);\n`
-    template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, const ${t} x);\n`
     
+    if (up === 'String') {
+      template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, ${t}* x);\n`
+    } else if (up === 'Ptr' || up === 'Cstr') {
+      template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, ${t} x);\n`
+    } else {
+      template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, const ${t} x);\n`
+    }
+
     if (up === 'String') template += `void          \tgup_array_string_append_cstr(GupAllocator* a, GupArrayString* xs, const char cstr[]);\n`
     
-    template += `void          \tgup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, const ${t} x);\n`
+    if (up === 'Ptr' || up === 'String' || up === 'Cstr') {
+      template += `void          \tgup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, ${t} x);\n`
+    } else {
+      template += `void          \tgup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, const ${t} x);\n`
+    }
+    
     template += `int           \tgup_array_${low}_find_index_of(const GupArray${up}* xs, const ${t} x);\n`
     template += `void          \tgup_array_${low}_remove(GupArray${up}* xs, const ${t} x, const int count_to_remove);\n`
     template += `void          \tgup_array_${low}_remove_all(GupArray${up}* xs, const ${t} x);\n`
@@ -95,10 +110,9 @@ const gen_gup_array_create_from_array = (up, low, t) => {
   
   if (up === 'String') {
     template += `    const int bytes_to_alloc = capacity * sizeof(${t}*);\n`;
-    template += `    const int bytes_to_copy  = xs_count * sizeof(${t}*);\n`;
   } else {
     template += `    const int bytes_to_alloc = capacity * sizeof(${t});\n`;
-    template += `    const int bytes_to_copy  = xs_count * sizeof(${t});\n`;
+    if (up !== ('Cstr')) template += `    const int bytes_to_copy  = xs_count * sizeof(${t});\n`;
   }
   
   template += `\n`;
@@ -173,11 +187,15 @@ const gen_gup_array_destroy = (up, low, t) =>
 const gen_gup_array_contains = (up, low, t) => {
     let template = ``;
 
-    template += `bool gup_array_${low}_contains(const GupArray${up}* xs, const ${t} x) {\n`;
+    if (up === 'String') template += `bool gup_array_${low}_contains(const GupArray${up}* xs, const ${t}* x) {\n`;
+    else                 template += `bool gup_array_${low}_contains(const GupArray${up}* xs, const ${t} x) {\n`;
+    
     template += `    for (int i = 0; i < xs->count; i++) {\n`;
+    
     if (up === 'String')    template += `        if (gup_array_char_equals(xs->data[i], x)) {\n`
     else if (up === 'Cstr') template += `        if (strcmp(xs->data[i], x) == 0) {\n`
     else                    template += `        if (xs->data[i] == x) {\n`;
+    
     template += `            return true;\n`;
     template += `        }\n`;
     template += `    }\n`;
@@ -226,7 +244,7 @@ const gen_gup_array_print = (up, low, t) => {
         template += `\n`;
         template += `       if (i != xs->count-1) printf(", ");\n`;
     }
-    else if (up === 'Double' || up === 'Float' || up === 'Short') {
+    else if (up === 'Double' || up === 'Float') {
         template += `       printf("%f", xs->data[i]);\n`;
         template += `\n`;
         template += `       if (i != xs->count-1) printf(", ");\n`;
@@ -246,10 +264,15 @@ const gen_gup_array_print = (up, low, t) => {
         template += `\n`;
         template += `       if (i != xs->count-1) printf(", ");\n`;
     }
+    else if (up === 'Short') {
+      template += `       printf("%hd", xs->data[i]);\n`;
+      template += `\n`;
+      template += `       if (i != xs->count-1) printf(", ");\n`;
+    }
     else if (up === 'String') {
         template += `       printf("  \\"");\n`;
-        template += `       for (int j = 0; j < xs->data[i].count; j++) {\n`;
-        template += `           printf("%c", xs->data[i].data[j]);\n`;
+        template += `       for (int j = 0; j < xs->data[i]->count; j++) {\n`;
+        template += `           printf("%c", xs->data[i]->data[j]);\n`;
         template += `       }\n`;
         template += `       printf("\\"");\n`;
         template += `       if (i != xs->count-1) printf(",");\n`;
@@ -283,7 +306,15 @@ const gen_gup_array_append = (up, low, t) => {
 
     if (up === 'String') template += `/** Appends the struct, does NOT copy. */\n`;
 
-    template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, const ${t} x) {\n`;
+    // Can't make the thing to append const unfortunately for these.
+    if (up === 'String') {
+      template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, ${t}* x) {\n`;
+    } else if (up === 'Ptr' || up === 'Cstr') {
+      template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, ${t} x) {\n`;
+    } else {
+      template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, const ${t} x) {\n`;
+    }
+    
     template += `    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, ${t});\n`;
     template += `\n`;
     template += `    xs->data[xs->count] = x;\n`;
@@ -293,17 +324,27 @@ const gen_gup_array_append = (up, low, t) => {
     return template;
 };
 
-const gen_gup_array_prepend = (up, low, t) =>
-`void gup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, ${t} x){
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, ${t});
+const gen_gup_array_prepend = (up, low, t) => {
+    let template = ``;
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    // Can't make the thing to append const unfortunately for these.
+    if (up === 'Ptr' || up === 'String' || up === 'Cstr') {
+      template += `void gup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, ${t} x) {\n`;
+    } else {
+      template += `void gup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, const ${t} x) {\n`;
     }
-    xs->data[0] = x;
-    xs->count++;
+    
+    template += `    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, ${t});\n`;
+    template += `\n`;
+    template += `    for (int i = xs->count; i > 0; i--) {\n`;
+    template += `        xs->data[i] = xs->data[i-1];\n`;
+    template += `    }\n`;
+    template += `    xs->data[0] = x;\n`;
+    template += `    xs->count++;\n`;
+    template += `}\n`;
+
+    return template;
 }
-`;
 
 const gen_gup_array_find_index_of = (up, low, t) => {
     let template = ``;
@@ -332,7 +373,7 @@ const gen_gup_array_remove = (up, low, t) => {
     template += ``;
     template += `    int new_data_size = 0;\n`;
     template += `\n`;
-    template += `    for (int i = 0; i < xs->count && removed_count < count_to_remove; i++) {\n`;
+    template += `    for (int i = 0; i < xs->count && removed_count < max_count_to_remove; i++) {\n`;
 
     if      (up === 'String') template += `        if (gup_array_char_equals(xs->data[i], x)) {\n`;
     else if (up === 'Cstr')   template += `        if (gup_cstr_equals(xs->data[i], x)) {\n`;
@@ -365,7 +406,9 @@ const gen_gup_array_remove_all = (up, low, t) => {
     else if (up === 'Cstr')   template += `        if (strcmp(xs->data[i], x) != 0) {\n`;
     else                      template += `        if (xs->data[i] != x) {\n`;
 
-    template += `            new_data[new_data_size] = xs->data[i];\n`;
+    if (up === 'String') template += `            new_data[new_data_size] = *xs->data[i];\n`;
+    else                 template += `            new_data[new_data_size] = xs->data[i];\n`;
+
     template += `            new_data_size++;\n`;
     template += `        }\n`;
 
@@ -410,7 +453,7 @@ const gen_gup_array_to_sorted = (up, low, t) => {
     if (up === 'Bool') template += `// Orders false before true, (e.g. [false, false, true, true])\n`;
 
     template += `GupArray${up}* gup_array_${low}_to_sorted(GupAllocator* a, const GupArray${up}* xs) {\n`;
-    template += `    if (xs.count <= 1) return xs;\n`;
+    template += `    if (xs->count <= 1) return gup_array_${low}_copy(a, xs);\n`;
     template += `\n`;
     template += `    GupArray${up}* sorted = gup_array_${low}_create(a);\n`;
     
@@ -425,40 +468,43 @@ const gen_gup_array_to_sorted = (up, low, t) => {
       template += `        }\n`;
       template += `    }\n`;
     } else {
-      template += `    GupArray${up} left    = gup_array_${low}_create(a);\n`;
-      template += `    GupArray${up} right   = gup_array_${low}_create(a);\n`;
+      template += `    GupArray${up}* left   = gup_array_${low}_create(a);\n`;
+      template += `    GupArray${up}* right  = gup_array_${low}_create(a);\n`;
       template += `\n`;
       template += `    // Choose the last item as the pivot for no particular reason.\n`;
-      template += `    const int pivot_idx = xs.count - 1;\n`;
-      template += `    const ${t} pivot = xs.data[pivot_idx];\n`;
+      template += `    const int pivot_idx = xs->count - 1;\n`;
+
+      if (up === 'String') template += `    ${t}* pivot = xs->data[pivot_idx];\n`;
+      else                 template += `    ${t} pivot = xs->data[pivot_idx];\n`;
+
       template += `\n`;
-      template += `    for (int i = 0; i < xs.count; i++) {\n`;
+      template += `    for (int i = 0; i < xs->count; i++) {\n`;
       template += `        // Don't include the pivot.\n`;
       template += `        if (i == pivot_idx) continue;\n`;
       template += `\n`;
       
-      if      (up === 'String') template += `    if (gup_string_compare(a, xs.data[i], pivot) <= 0) {\n`;
-      else if (up === 'Cstr')   template += `    if (strcmp(xs.data[i], pivot) <= 0) {\n`;
-      else                      template += `    if (xs.data[i] <= pivot) {\n`;
+      if      (up === 'String') template += `    if (gup_string_compare(a, xs->data[i], *pivot) <= 0) {\n`;
+      else if (up === 'Cstr')   template += `    if (strcmp(xs->data[i], pivot) <= 0) {\n`;
+      else                      template += `    if (xs->data[i] <= pivot) {\n`;
       
-      template += `            gup_array_${low}_append(a, &left, xs.data[i]);\n`;
+      template += `            gup_array_${low}_append(a, left, xs->data[i]);\n`;
       template += `        } else {\n`;
-      template += `            gup_array_${low}_append(a, &right, xs.data[i]);\n`;
+      template += `            gup_array_${low}_append(a, right, xs->data[i]);\n`;
       template += `        }\n`;
       template += `    }\n`;
       template += `\n`;
-      template += `    GupArray${up} sorted_left  = gup_array_${low}_sort(a, left);\n`;
-      template += `    GupArray${up} sorted_right = gup_array_${low}_sort(a, right);\n`;
+      template += `    GupArray${up}* sorted_left  = gup_array_${low}_to_sorted(a, left);\n`;
+      template += `    GupArray${up}* sorted_right = gup_array_${low}_to_sorted(a, right);\n`;
       template += `\n`;
       template += `    { // Construct the final array from the left, pivot, and right.\n`;
-      template += `        for (int i = 0; i < sorted_left.count; i++) {\n`;
-      template += `            gup_array_${low}_append(a, &sorted, sorted_left.data[i]);\n`;
+      template += `        for (int i = 0; i < sorted_left->count; i++) {\n`;
+      template += `            gup_array_${low}_append(a, sorted, sorted_left->data[i]);\n`;
       template += `        }\n`;
       template += `\n`;
-      template += `        gup_array_${low}_append(a, &sorted, pivot);\n`;
+      template += `        gup_array_${low}_append(a, sorted, pivot);\n`;
       template += `        \n`;
-      template += `        for (int i = 0; i < sorted_right.count; i++) {\n`;
-      template += `            gup_array_${low}_append(a, &sorted, sorted_right.data[i]);\n`;
+      template += `        for (int i = 0; i < sorted_right->count; i++) {\n`;
+      template += `            gup_array_${low}_append(a, sorted, sorted_right->data[i]);\n`;
       template += `        }\n`;
       template += `    }\n`;
     }
