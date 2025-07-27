@@ -3,11 +3,15 @@
 void test_gup_settings_get_and_set(void) {
     GupAllocatorBucket a = gup_allocator_bucket_create();
 
-    GupString foo, bar, baz, not_there;
-    bool foo_result = gup_settings_get_cstr((GupAllocator*)&a, "foo", &foo);
-    bool bar_result = gup_settings_get_cstr((GupAllocator*)&a, "bar", &bar);
-    bool baz_result = gup_settings_get_cstr((GupAllocator*)&a, "baz", &baz);
-    bool not_there_result = gup_settings_get_cstr((GupAllocator*)&a, "not_there", &not_there);
+    GupString* foo = NULL;
+    GupString* bar = NULL;
+    GupString* baz = NULL;
+    GupString* not_there = NULL;
+
+    bool foo_result = gup_settings_get_cstr((GupAllocator*)&a, "foo", foo);
+    bool bar_result = gup_settings_get_cstr((GupAllocator*)&a, "bar", bar);
+    bool baz_result = gup_settings_get_cstr((GupAllocator*)&a, "baz", baz);
+    bool not_there_result = gup_settings_get_cstr((GupAllocator*)&a, "not_there", not_there);
 
     gup_assert(foo_result == true);
     gup_assert(bar_result == true);

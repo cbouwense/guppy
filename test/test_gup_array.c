@@ -29,19 +29,19 @@ long static_ls[] = {1738L, 1337L, 42L};
 short static_ss[] = {1738, 1337, 42};
 
 void test_new_gup_array_has_default_capacity(void) {
-    GupArrayInt xs = gup_array_int_create(NULL);
+    GupArrayInt* xs = gup_array_int_create(NULL);
 
-    gup_assert(xs.capacity == 256);
+    gup_assert(xs->capacity == 256);
 
-    free(xs.data);
+    free(xs->data);
 }
 
 void test_new_gup_array_has_zero_count(void) {
-    GupArrayShort xs = gup_array_short_create(NULL);
+    GupArrayShort* xs = gup_array_short_create(NULL);
 
-    gup_assert(xs.count == 0);
+    gup_assert(xs->count == 0);
 
-    free(xs.data);
+    free(xs->data);
 }
 
 void test_new_gup_array_has_non_null_data(void) {
@@ -53,55 +53,55 @@ void test_new_gup_array_has_non_null_data(void) {
 }
 
 void test_two_empty_gup_arrays_are_equal(void) {
-    GupArrayFloat xs = gup_array_float_create(NULL);
-    GupArrayFloat ys = gup_array_float_create(NULL);
+    GupArrayFloat* xs = gup_array_float_create(NULL);
+    GupArrayFloat* ys = gup_array_float_create(NULL);
 
     gup_assert(gup_array_float_equals(xs, ys) == true);
 
-    free(xs.data);
-    free(ys.data);
+    free(xs->data);
+    free(ys->data);
 }
 
 void test_one_empty_one_populated_are_unequal(void) {
-    GupArrayChar xs = gup_array_char_create(NULL);
-    GupArrayChar ys = gup_array_char_create_from_array(NULL, static_cs, gup_array_len(static_cs));
+    GupArrayChar* xs = gup_array_char_create(NULL);
+    GupArrayChar* ys = gup_array_char_create_from_array(NULL, static_cs, gup_array_len(static_cs));
 
     gup_assert(gup_array_char_equals(xs, ys) == false);
     
-    free(xs.data);
-    free(ys.data);
+    free(xs->data);
+    free(ys->data);
 }
 
 void test_gup_array_copy_equals_original(void) {
     int static_ints[] = {1, 7, 3, 8};
-    GupArrayInt dyn_ints = gup_array_int_create_from_array(NULL, static_ints, gup_array_len(static_ints));
-    GupArrayInt dyn_ints_copy = gup_array_int_copy(NULL, dyn_ints);
+    GupArrayInt* dyn_ints = gup_array_int_create_from_array(NULL, static_ints, gup_array_len(static_ints));
+    GupArrayInt* dyn_ints_copy = gup_array_int_copy(NULL, dyn_ints);
 
     gup_assert(gup_array_int_equals(dyn_ints, dyn_ints_copy));
 
-    free(dyn_ints.data); 
-    free(dyn_ints_copy.data); 
+    free(dyn_ints->data); 
+    free(dyn_ints_copy->data); 
 }
 
 void test_a_gup_array_is_equal_to_itself(void) {
-    GupArrayShort xs = gup_array_short_create(NULL);
+    GupArrayShort* xs = gup_array_short_create(NULL);
 
     gup_assert(gup_array_short_equals(xs, xs));
 
-    free(xs.data);
+    free(xs->data);
 }
 
 void test_equivalent_gup_arrays_are_equal(void) {
-    GupArrayDouble xs = gup_array_double_create_from_array(NULL, static_ds, gup_array_len(static_ds));
-    GupArrayDouble ys = gup_array_double_create(NULL);
-    gup_array_double_append(NULL, &ys, static_ds[0]);
-    gup_array_double_append(NULL, &ys, static_ds[1]);
-    gup_array_double_append(NULL, &ys, static_ds[2]);
+    GupArrayDouble* xs = gup_array_double_create_from_array(NULL, static_ds, gup_array_len(static_ds));
+    GupArrayDouble* ys = gup_array_double_create(NULL);
+    gup_array_double_append(NULL, ys, static_ds[0]);
+    gup_array_double_append(NULL, ys, static_ds[1]);
+    gup_array_double_append(NULL, ys, static_ds[2]);
     
     gup_assert(gup_array_double_equals(xs, ys) == true);
 
-    free(xs.data);
-    free(ys.data);
+    free(xs->data);
+    free(ys->data);
 }
 
 void test_symmetric_gup_array_args_are_equal(void) {
@@ -116,72 +116,72 @@ void test_symmetric_gup_array_args_are_equal(void) {
 }
 
 void test_equivalent_but_differently_sized_gup_arrays_are_unequal(void) {
-    GupArrayChar xs = gup_array_char_create_from_array(NULL, static_cs, gup_array_len(static_cs));
-    GupArrayChar ys = gup_array_char_create_from_array(NULL, static_cs, gup_array_len(static_cs));
-    gup_array_char_append(NULL, &ys, 'c');
+    GupArrayChar* xs = gup_array_char_create_from_array(NULL, static_cs, gup_array_len(static_cs));
+    GupArrayChar* ys = gup_array_char_create_from_array(NULL, static_cs, gup_array_len(static_cs));
+    gup_array_char_append(NULL, ys, 'c');
 
     gup_assert(gup_array_char_equals(xs, ys) == false);
 
-    free(xs.data);
-    free(ys.data);
+    free(xs->data);
+    free(ys->data);
 }
 
 void test_one_append_one_prepend_orders_correctly(void) {
-    GupArrayInt xs = gup_array_int_create(NULL);
+    GupArrayInt* xs = gup_array_int_create(NULL);
     
-    gup_array_int_append(NULL, &xs, static_is[0]);
-    gup_array_int_prepend(NULL, &xs, static_is[1]);
+    gup_array_int_append(NULL, xs, static_is[0]);
+    gup_array_int_prepend(NULL, xs, static_is[1]);
 
-    gup_assert(xs.data[0] == static_is[1]);
-    gup_assert(xs.data[1] == static_is[0]);
+    gup_assert(xs->data[0] == static_is[1]);
+    gup_assert(xs->data[1] == static_is[0]);
 
-    free(xs.data);
+    free(xs->data);
 }
 
 void test_gup_array_char_create_from_cstr(void) {
     char chars[] = {'H', 'e', 'l', 'l', 'o', ',', ' ', 'W', 'o', 'r', 'l', 'd', '!'};
     char* str = "Hello, World!";
 
-    GupArrayChar xs = gup_array_char_create_from_array(NULL, chars, gup_array_len(chars));
-    GupArrayChar ys = gup_array_char_create_from_cstr(NULL, str);
+    GupArrayChar* xs = gup_array_char_create_from_array(NULL, chars, gup_array_len(chars));
+    GupArrayChar* ys = gup_array_char_create_from_cstr(NULL, str);
 
     gup_assert(gup_array_char_equals(xs, ys));
 
-    free(xs.data);
-    free(ys.data);
+    free(xs->data);
+    free(ys->data);
 }
 
 void test_gup_array_appending_resizes_properly(void) {
     GupAllocatorBucket a = gup_allocator_bucket_create();
-    GupArrayFloat xs = gup_array_float_create((GupAllocator*)&a);
+    GupArrayFloat* xs = gup_array_float_create((GupAllocator*)&a);
 
     for (int i = 0; i < 1337; i++) {
-        gup_array_float_append((GupAllocator*)&a, &xs, (float)i / 2);
+        gup_array_float_append((GupAllocator*)&a, xs, (float)i / 2);
     }
 
-    gup_assert(xs.capacity == 2048);
-    gup_assert(xs.count == 1337);
+    gup_assert(xs->capacity == 2048);
+    gup_assert(xs->count == 1337);
 
     gup_allocator_bucket_destroy(&a);
 }
 
 void test_gup_array_string_create(void) {
-    GupArrayString strs = gup_array_string_create(NULL);
+    GupArrayString* strs = gup_array_string_create(NULL);
 
-    gup_assert(strs.count == 0);
+    gup_assert(strs->count == 0);
 
     gup_array_string_destroy(strs);
 }
 
 void test_gup_array_string_create_from_array(void) {
-    GupString hello = gup_array_char_create_from_cstr(NULL, "Hello");
-    GupString world = gup_array_char_create_from_cstr(NULL, "World");
-    GupString bang = gup_array_char_create_from_cstr(NULL,  "!");
-    GupString cs[] = {hello, world, bang};
+    GupString* hello = gup_array_char_create_from_cstr(NULL, "Hello");
+    GupString* world = gup_array_char_create_from_cstr(NULL, "World");
+    GupString* bang  = gup_array_char_create_from_cstr(NULL,  "!");
+    GupString* cs[] = {hello, world, bang};
 
-    GupArrayString strs = gup_array_string_create_from_array(NULL, cs, gup_array_len(cs));
+    GupArrayString* strs = gup_array_string_create_from_array(NULL, cs, gup_array_len(cs));
 
-    gup_assert(strs.count == 3);
+    gup_assert(strs->count == 3);
 
     gup_array_char_destroy(hello);
     gup_array_char_destroy(world);
@@ -190,13 +190,13 @@ void test_gup_array_string_create_from_array(void) {
 }
 
 void test_gup_array_string_copy(void) {
-    GupString hello = gup_array_char_create_from_cstr(NULL, "Hello");
-    GupString world = gup_array_char_create_from_cstr(NULL, "World");
-    GupString bang  = gup_array_char_create_from_cstr(NULL, "!");
-    GupString cs[]  = {hello, world, bang};
+    GupString* hello = gup_array_char_create_from_cstr(NULL, "Hello");
+    GupString* world = gup_array_char_create_from_cstr(NULL, "World");
+    GupString* bang  = gup_array_char_create_from_cstr(NULL, "!");
+    GupString* cs[]  = {hello, world, bang};
 
-    GupArrayString strs      = gup_array_string_create_from_array(NULL, cs, gup_array_len(cs));
-    GupArrayString strs_copy = gup_array_string_copy(NULL, strs);
+    GupArrayString* strs      = gup_array_string_create_from_array(NULL, cs, gup_array_len(cs));
+    GupArrayString* strs_copy = gup_array_string_copy(NULL, strs);
 
     gup_assert(gup_array_string_equals(strs, strs_copy));
 
@@ -204,23 +204,23 @@ void test_gup_array_string_copy(void) {
     gup_array_char_destroy(world);
     gup_array_char_destroy(bang);
     gup_array_string_destroy(strs);
-    gup_array_char_destroy(strs_copy.data[0]);
-    gup_array_char_destroy(strs_copy.data[1]);
-    gup_array_char_destroy(strs_copy.data[2]);
+    gup_array_char_destroy(strs_copy->data[0]);
+    gup_array_char_destroy(strs_copy->data[1]);
+    gup_array_char_destroy(strs_copy->data[2]);
     gup_array_string_destroy(strs_copy);
 }
 
 void test_gup_array_string_append(void) {
-    GupArrayChar hello              = gup_array_char_create_from_cstr(NULL, "Hello");
-    GupArrayChar world              = gup_array_char_create_from_cstr(NULL, "World");
-    GupArrayChar bang               = gup_array_char_create_from_cstr(NULL,  "!");
-    GupArrayChar char_arrays[]      = {hello, world, bang};
-    GupArrayString strs_create_from = gup_array_string_create_from_array(NULL, char_arrays, gup_array_len(char_arrays));
+    GupString* hello = gup_array_char_create_from_cstr(NULL, "Hello");
+    GupString* world = gup_array_char_create_from_cstr(NULL, "World");
+    GupString* bang  = gup_array_char_create_from_cstr(NULL, "!");
+    GupString* char_arrays[] = {hello, world, bang};
+    GupArrayString* strs_create_from = gup_array_string_create_from_array(NULL, char_arrays, gup_array_len(char_arrays));
 
-    GupArrayString strs = gup_array_string_create(NULL);
-    gup_array_string_append(NULL, &strs, hello);
-    gup_array_string_append(NULL, &strs, world);
-    gup_array_string_append(NULL, &strs, bang);
+    GupArrayString* strs = gup_array_string_create(NULL);
+    gup_array_string_append(NULL, strs, hello);
+    gup_array_string_append(NULL, strs, world);
+    gup_array_string_append(NULL, strs, bang);
 
     gup_assert(gup_array_string_equals(strs, strs_create_from));
 
@@ -237,7 +237,7 @@ void test_gup_array_contains(void) {
         gup_assert(gup_array_bool_contains(bs, true) == false);
         gup_assert(gup_array_bool_contains(bs, false) == false);
         
-        GupArrayPtr ps = gup_array_ptr_create(NULL);
+        GupArrayPtr* ps = gup_array_ptr_create(NULL);
         gup_assert(gup_array_ptr_contains(ps, (void*)NULL) == false);
         gup_assert(gup_array_ptr_contains(ps, (void*)0x12345678) == false);
 
@@ -246,10 +246,10 @@ void test_gup_array_contains(void) {
     }
 
     { // Can find appended items
-        GupArrayShort shorts = gup_array_short_create(NULL);
-        gup_array_short_append(NULL, &shorts, 1);
-        gup_array_short_append(NULL, &shorts, 7);
-        gup_array_short_append(NULL, &shorts, 38);
+        GupArrayShort* shorts = gup_array_short_create(NULL);
+        gup_array_short_append(NULL, shorts, 1);
+        gup_array_short_append(NULL, shorts, 7);
+        gup_array_short_append(NULL, shorts, 38);
 
         gup_assert(gup_array_short_contains(shorts, 0) == false);
         gup_assert(gup_array_short_contains(shorts, 1) == true);
@@ -263,7 +263,7 @@ void test_gup_array_contains(void) {
 
     { // Can find regular array items
         float float_array[3] = {0.0f, 13.37f, FLT_MAX};
-        GupArrayFloat floats = gup_array_float_create_from_array(NULL, float_array, 3);
+        GupArrayFloat* floats = gup_array_float_create_from_array(NULL, float_array, 3);
 
         gup_assert(gup_array_float_contains(floats, 0.1f) == false);
         gup_assert(gup_array_float_contains(floats, 0.0f) == true);
@@ -276,15 +276,15 @@ void test_gup_array_contains(void) {
     }
 
     int int_array[2] = {17, 38};
-    GupArrayInt ints = gup_array_int_create_from_array(NULL, int_array, 2);
+    GupArrayInt* ints = gup_array_int_create_from_array(NULL, int_array, 2);
     
     gup_assert(gup_array_int_contains(ints, 1337) == false);
     gup_assert(gup_array_int_contains(ints, 17) == true);
     gup_assert(gup_array_int_contains(ints, 38) == true);
     gup_assert(gup_array_int_contains(ints, 42) == false);
 
-    gup_array_int_prepend(NULL, &ints, 1337);
-    gup_array_int_append(NULL, &ints, 42);
+    gup_array_int_prepend(NULL, ints, 1337);
+    gup_array_int_append(NULL, ints, 42);
 
     gup_assert(gup_array_int_contains(ints, 1337) == true);
     gup_assert(gup_array_int_contains(ints, 17) == true);
@@ -298,25 +298,9 @@ bool is_undercase(char c) {
     return c >= 97 && c <= 122;
 }
 
-bool is_the_answer(double d) {
-    return d == 42.0;
-}
-
-bool is_a_floating_answer(float f) {
-    return ( 
-        f == 0.42f ||
-        f == 4.2f ||
-        f == 42
-    );
-}
-
-bool is_not_a_floating_answer(float f) {
-    return !is_a_floating_answer(f);
-}
-
-bool is_all_undercase(GupString str) {
-    for (int i = 0; i < str.count; i++) {
-        if (!is_undercase(str.data[i])) {
+bool is_all_undercase(GupString* str) {
+    for (int i = 0; i < str->count; i++) {
+        if (!is_undercase(str->data[i])) {
             return false;
         }
     }
@@ -325,50 +309,50 @@ bool is_all_undercase(GupString str) {
 
 void test_gup_array_string_find(void) {
     { // Empty arrays don't find anything
-        GupArrayString strings = gup_array_string_create(NULL);
-        GupString found = {0};
+        GupArrayString* strings = gup_array_string_create(NULL);
+        GupString* found = NULL;
 
-        bool result = gup_array_string_find(strings, is_all_undercase, &found);
+        bool result = gup_array_string_find(strings, is_all_undercase, found);
 
         gup_assert(result == false);
-        gup_assert(found.count == 0);
+        gup_assert(found == NULL);
 
         gup_array_string_destroy(strings);
     }
 
     { // Arrays without acceptable elements do not produce any find
         char* string_arr[3] = {"Hello", "World", "!"};
-        GupArrayString strings = gup_array_string_create_from_cstrs(NULL, string_arr, 3);
-        GupString found = {0};
+        GupArrayString* strings = gup_array_string_create_from_cstrs(NULL, string_arr, 3);
+        GupString* found = NULL;
 
-        bool result = gup_array_string_find(strings, is_all_undercase, &found);
+        bool result = gup_array_string_find(strings, is_all_undercase, found);
 
         gup_assert(result == false);
-        gup_assert(found.count == 0);
+        gup_assert(found == NULL);
 
-        gup_array_char_destroy(strings.data[0]);
-        gup_array_char_destroy(strings.data[1]);
-        gup_array_char_destroy(strings.data[2]);
+        gup_array_char_destroy(strings->data[0]);
+        gup_array_char_destroy(strings->data[1]);
+        gup_array_char_destroy(strings->data[2]);
         gup_array_string_destroy(strings);
     }
 
     { // Arrays with acceptable elements produce the first one
-        char* string_arr[3]    = {"Hello", "world", "!"};
-        GupArrayString strings = gup_array_string_create_from_cstrs(NULL, string_arr, 3);
-        GupString found        = {0};
+        char* string_arr[3]     = {"Hello", "world", "!"};
+        GupArrayString* strings = gup_array_string_create_from_cstrs(NULL, string_arr, 3);
+        GupString* found        = NULL;
 
-        gup_assert(gup_array_string_find(strings, is_all_undercase, &found));
+        gup_assert(gup_array_string_find(strings, is_all_undercase, found));
         gup_assert(gup_array_char_equals_cstr(found, "world"));
 
-        gup_array_string_prepend_cstr(NULL, &strings, "foo");
+        gup_array_string_prepend_cstr(NULL, strings, "foo");
 
-        gup_assert(gup_array_string_find(strings, is_all_undercase, &found));
+        gup_assert(gup_array_string_find(strings, is_all_undercase, found));
         gup_assert(gup_array_char_equals_cstr(found, "foo"));
 
-        gup_array_char_destroy(strings.data[0]);
-        gup_array_char_destroy(strings.data[1]);
-        gup_array_char_destroy(strings.data[2]);
-        gup_array_char_destroy(strings.data[3]);
+        gup_array_char_destroy(strings->data[0]);
+        gup_array_char_destroy(strings->data[1]);
+        gup_array_char_destroy(strings->data[2]);
+        gup_array_char_destroy(strings->data[3]);
         gup_array_string_destroy(strings);
     }
 }
@@ -377,39 +361,39 @@ void test_gup_array_remove(void) {
     { // Remove one item
         int i = 0, j = 1, k = 2;
         int int_array[] = {i, j, k};
-        GupArrayInt ints = gup_array_int_create_from_array(NULL, int_array, gup_array_len(int_array));
+        GupArrayInt* ints = gup_array_int_create_from_array(NULL, int_array, gup_array_len(int_array));
 
-        gup_array_int_remove_all(&ints, i);
+        gup_array_int_remove_all(ints, i);
 
-        gup_assert(ints.count == 2);
-        gup_assert(ints.data[0] == j);
-        gup_assert(ints.data[1] == k);
+        gup_assert(ints->count == 2);
+        gup_assert(ints->data[0] == j);
+        gup_assert(ints->data[1] == k);
 
-        free(ints.data);
+        free(ints->data);
     }
 
     { // Nothing to remove
         int i = 0, j = 1, k = 2;
         int int_array[] = {i, j, k};
-        GupArrayInt ints = gup_array_int_create_from_array(NULL, int_array, gup_array_len(int_array));
+        GupArrayInt* ints = gup_array_int_create_from_array(NULL, int_array, gup_array_len(int_array));
 
-        gup_array_int_remove_all(&ints, 1337);
+        gup_array_int_remove_all(ints, 1337);
 
-        gup_assert(ints.count == 3);
-        gup_assert(ints.data[0] == i);
-        gup_assert(ints.data[1] == j);
-        gup_assert(ints.data[2] == k);
+        gup_assert(ints->count == 3);
+        gup_assert(ints->data[0] == i);
+        gup_assert(ints->data[1] == j);
+        gup_assert(ints->data[2] == k);
 
-        free(ints.data);
+        free(ints->data);
     }
 
     { // All removed
         char* string_array[] = {"Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme", "Dontrainonme"};
-        GupArrayString strings = gup_array_string_create_from_cstrs(NULL, string_array, gup_array_len(string_array));
+        GupArrayString* strings = gup_array_string_create_from_cstrs(NULL, string_array, gup_array_len(string_array));
 
-        gup_array_string_remove_all_cstr(NULL, &strings, "Dontrainonme");
+        gup_array_string_remove_all_cstr(NULL, strings, "Dontrainonme");
 
-        gup_assert(strings.count == 0);
+        gup_assert(strings->count == 0);
 
         gup_array_string_destroy(strings);
     }
@@ -417,12 +401,12 @@ void test_gup_array_remove(void) {
 
 void test_gup_array_find_index_of(void) {
     { // Happy path
-        GupArrayChar chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, &chars, 'a');
-        gup_array_char_append(NULL, &chars, 'b');
-        gup_array_char_append(NULL, &chars, 'c');
+        GupArrayChar* chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, chars, 'a');
+        gup_array_char_append(NULL, chars, 'b');
+        gup_array_char_append(NULL, chars, 'c');
 
-        const int result = gup_array_char_find_index_of(&chars, 'c');
+        const int result = gup_array_char_find_index_of(chars, 'c');
 
         gup_assert(result == 2);
 
@@ -430,12 +414,12 @@ void test_gup_array_find_index_of(void) {
     }
 
     { // Finds only first match
-        GupArrayChar chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, &chars, 'a');
-        gup_array_char_append(NULL, &chars, 'b');
-        gup_array_char_append(NULL, &chars, 'a');
+        GupArrayChar* chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, chars, 'a');
+        gup_array_char_append(NULL, chars, 'b');
+        gup_array_char_append(NULL, chars, 'a');
 
-        const int result = gup_array_char_find_index_of(&chars, 'a');
+        const int result = gup_array_char_find_index_of(chars, 'a');
 
         gup_assert(result == 0);
 
@@ -443,12 +427,12 @@ void test_gup_array_find_index_of(void) {
     }
 
     { // Returns -1 on no match
-        GupArrayChar chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, &chars, 'a');
-        gup_array_char_append(NULL, &chars, 'b');
-        gup_array_char_append(NULL, &chars, 'a');
+        GupArrayChar* chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, chars, 'a');
+        gup_array_char_append(NULL, chars, 'b');
+        gup_array_char_append(NULL, chars, 'a');
 
-        const int result = gup_array_char_find_index_of(&chars, 'c');
+        const int result = gup_array_char_find_index_of(chars, 'c');
 
         gup_assert(result == -1);
 
@@ -456,9 +440,9 @@ void test_gup_array_find_index_of(void) {
     }
 
     { // Returns -1 on empty array
-        GupArrayChar chars = gup_array_char_create(NULL);
+        GupArrayChar* chars = gup_array_char_create(NULL);
 
-        const int result = gup_array_char_find_index_of(&chars, 'c');
+        const int result = gup_array_char_find_index_of(chars, 'c');
 
         gup_assert(result == -1);
 
@@ -468,28 +452,28 @@ void test_gup_array_find_index_of(void) {
 
 void test_gup_array_remove_at_index_preserve_order(void) {
     { // Normal
-        GupArrayChar chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, &chars, 'x');
-        gup_array_char_append(NULL, &chars, 'y');
-        gup_array_char_append(NULL, &chars, 'z');
+        GupArrayChar* chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, chars, 'x');
+        gup_array_char_append(NULL, chars, 'y');
+        gup_array_char_append(NULL, chars, 'z');
         
         // Remove element in the middle
-        gup_array_char_remove_at_index_preserve_order(&chars, 1);
+        gup_array_char_remove_at_index_preserve_order(chars, 1);
 
-        gup_assert(chars.count == 2);
-        gup_assert(chars.data[0] == 'x');
-        gup_assert(chars.data[1] == 'z');
+        gup_assert(chars->count == 2);
+        gup_assert(chars->data[0] == 'x');
+        gup_assert(chars->data[1] == 'z');
 
         // Remove element at the end
-        gup_array_char_remove_at_index_preserve_order(&chars, 1);
+        gup_array_char_remove_at_index_preserve_order(chars, 1);
 
-        gup_assert(chars.count == 1);
-        gup_assert(chars.data[0] == 'x');
+        gup_assert(chars->count == 1);
+        gup_assert(chars->data[0] == 'x');
 
         // Remove element at the beginning
-        gup_array_char_remove_at_index_preserve_order(&chars, 0);
+        gup_array_char_remove_at_index_preserve_order(chars, 0);
 
-        gup_assert(chars.count == 0);
+        gup_assert(chars->count == 0);
 
         gup_array_char_destroy(chars);
     }
@@ -497,22 +481,22 @@ void test_gup_array_remove_at_index_preserve_order(void) {
     // TODO: can only really do this once GupArrayStrings have an array of pointers to GupArrayChars
     GUP_SKIP { // Strings
         GupAllocatorBucket a = gup_allocator_bucket_create();        
-        GupArrayString strings = gup_array_string_create((GupAllocator*)&a);
+        GupArrayString* strings = gup_array_string_create((GupAllocator*)&a);
 
-        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "qwer");
-        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "asdf");
-        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "zxcv");
+        gup_array_string_append_cstr((GupAllocator*)&a, strings, "qwer");
+        gup_array_string_append_cstr((GupAllocator*)&a, strings, "asdf");
+        gup_array_string_append_cstr((GupAllocator*)&a, strings, "zxcv");
         
-        gup_array_string_remove_at_index_preserve_order(&strings, 1);
+        gup_array_string_remove_at_index_preserve_order(strings, 1);
 
-        gup_assert(strings.count == 2);
-        gup_assert(gup_string_equals_cstr(strings.data[0], "qwer"));
-        gup_assert(gup_string_equals_cstr(strings.data[1], "zxcv"));
+        gup_assert(strings->count == 2);
+        gup_assert(gup_string_equals_cstr(strings->data[0], "qwer"));
+        gup_assert(gup_string_equals_cstr(strings->data[1], "zxcv"));
 
-        gup_array_string_remove_at_index_preserve_order(&strings, 0);
-        gup_assert(strings.count == 1);
+        gup_array_string_remove_at_index_preserve_order(strings, 0);
+        gup_assert(strings->count == 1);
         gup_array_string_print(strings);
-        gup_assert(gup_string_equals_cstr(strings.data[0], "zxcv"));
+        gup_assert(gup_string_equals_cstr(strings->data[0], "zxcv"));
 
         gup_allocator_bucket_destroy(&a);
     }
@@ -520,21 +504,21 @@ void test_gup_array_remove_at_index_preserve_order(void) {
     // TODO: can only really do this once GupArrayCstr have an array of pointers to char**
     GUP_SKIP { // Cstrs 
         GupAllocatorBucket a = gup_allocator_bucket_create();        
-        GupArrayCstr cstrs = gup_array_cstr_create((GupAllocator*)&a);
+        GupArrayCstr* cstrs = gup_array_cstr_create((GupAllocator*)&a);
 
-        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "qwer");
-        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "asdf");
-        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "zxcv");
+        gup_array_cstr_append((GupAllocator*)&a, cstrs, "qwer");
+        gup_array_cstr_append((GupAllocator*)&a, cstrs, "asdf");
+        gup_array_cstr_append((GupAllocator*)&a, cstrs, "zxcv");
         
-        gup_array_cstr_remove_at_index_preserve_order(&cstrs, 1);
+        gup_array_cstr_remove_at_index_preserve_order(cstrs, 1);
 
-        gup_assert(cstrs.count == 2);
-        gup_assert(gup_cstr_equals(cstrs.data[0], "qwer"));
-        gup_assert(gup_cstr_equals(cstrs.data[1], "zxcv"));
+        gup_assert(cstrs->count == 2);
+        gup_assert(gup_cstr_equals(cstrs->data[0], "qwer"));
+        gup_assert(gup_cstr_equals(cstrs->data[1], "zxcv"));
 
-        gup_array_cstr_remove_at_index_preserve_order(&cstrs, 0);
-        gup_assert(cstrs.count == 1);
-        gup_assert(gup_cstr_equals(cstrs.data[0], "zxcv"));
+        gup_array_cstr_remove_at_index_preserve_order(cstrs, 0);
+        gup_assert(cstrs->count == 1);
+        gup_assert(gup_cstr_equals(cstrs->data[0], "zxcv"));
 
         gup_allocator_bucket_destroy(&a);
     }
@@ -542,70 +526,70 @@ void test_gup_array_remove_at_index_preserve_order(void) {
 
 void test_gup_array_remove_at_index_no_preserve_order(void) {
     { // Normal
-        GupArrayChar chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, &chars, 'x');
-        gup_array_char_append(NULL, &chars, 'y');
-        gup_array_char_append(NULL, &chars, 'z');
+        GupArrayChar* chars = gup_array_char_create(NULL);
+        gup_array_char_append(NULL, chars, 'x');
+        gup_array_char_append(NULL, chars, 'y');
+        gup_array_char_append(NULL, chars, 'z');
         
         // Remove element in the middle
-        gup_array_char_remove_at_index_no_preserve_order(&chars, 1);
+        gup_array_char_remove_at_index_no_preserve_order(chars, 1);
 
-        gup_assert(chars.count == 2);
-        gup_assert(chars.data[0] == 'x');
-        gup_assert(chars.data[1] == 'z');
+        gup_assert(chars->count == 2);
+        gup_assert(chars->data[0] == 'x');
+        gup_assert(chars->data[1] == 'z');
 
         // Remove element at the end
-        gup_array_char_remove_at_index_no_preserve_order(&chars, 1);
+        gup_array_char_remove_at_index_no_preserve_order(chars, 1);
 
-        gup_assert(chars.count == 1);
-        gup_assert(chars.data[0] == 'x');
+        gup_assert(chars->count == 1);
+        gup_assert(chars->data[0] == 'x');
 
         // Remove element at the beginning
-        gup_array_char_remove_at_index_no_preserve_order(&chars, 0);
+        gup_array_char_remove_at_index_no_preserve_order(chars, 0);
 
-        gup_assert(chars.count == 0);
+        gup_assert(chars->count == 0);
 
         gup_array_char_destroy(chars);
     }
 
     { // Strings
         GupAllocatorBucket a = gup_allocator_bucket_create();        
-        GupArrayString strings = gup_array_string_create((GupAllocator*)&a);
+        GupArrayString* strings = gup_array_string_create((GupAllocator*)&a);
 
-        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "qwer");
-        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "asdf");
-        gup_array_string_append_cstr((GupAllocator*)&a, &strings, "zxcv");
+        gup_array_string_append_cstr((GupAllocator*)&a, strings, "qwer");
+        gup_array_string_append_cstr((GupAllocator*)&a, strings, "asdf");
+        gup_array_string_append_cstr((GupAllocator*)&a, strings, "zxcv");
         
-        gup_array_string_remove_at_index_no_preserve_order(&strings, 1);
+        gup_array_string_remove_at_index_no_preserve_order(strings, 1);
 
-        gup_assert(strings.count == 2);
-        gup_assert(gup_string_equals_cstr(strings.data[0], "qwer"));
-        gup_assert(gup_string_equals_cstr(strings.data[1], "zxcv"));
+        gup_assert(strings->count == 2);
+        gup_assert(gup_string_equals_cstr(strings->data[0], "qwer"));
+        gup_assert(gup_string_equals_cstr(strings->data[1], "zxcv"));
 
-        gup_array_string_remove_at_index_no_preserve_order(&strings, 0);
-        gup_assert(strings.count == 1);
-        gup_assert(gup_string_equals_cstr(strings.data[0], "zxcv"));
+        gup_array_string_remove_at_index_no_preserve_order(strings, 0);
+        gup_assert(strings->count == 1);
+        gup_assert(gup_string_equals_cstr(strings->data[0], "zxcv"));
 
         gup_allocator_bucket_destroy(&a);
     }
 
     { // Cstrs 
         GupAllocatorBucket a = gup_allocator_bucket_create();        
-        GupArrayCstr cstrs = gup_array_cstr_create((GupAllocator*)&a);
+        GupArrayCstr* cstrs = gup_array_cstr_create((GupAllocator*)&a);
 
-        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "qwer");
-        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "asdf");
-        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "zxcv");
+        gup_array_cstr_append((GupAllocator*)&a, cstrs, "qwer");
+        gup_array_cstr_append((GupAllocator*)&a, cstrs, "asdf");
+        gup_array_cstr_append((GupAllocator*)&a, cstrs, "zxcv");
         
-        gup_array_cstr_remove_at_index_no_preserve_order(&cstrs, 1);
+        gup_array_cstr_remove_at_index_no_preserve_order(cstrs, 1);
 
-        gup_assert(cstrs.count == 2);
-        gup_assert(gup_cstr_equals(cstrs.data[0], "qwer"));
-        gup_assert(gup_cstr_equals(cstrs.data[1], "zxcv"));
+        gup_assert(cstrs->count == 2);
+        gup_assert(gup_cstr_equals(cstrs->data[0], "qwer"));
+        gup_assert(gup_cstr_equals(cstrs->data[1], "zxcv"));
 
-        gup_array_cstr_remove_at_index_no_preserve_order(&cstrs, 0);
-        gup_assert(cstrs.count == 1);
-        gup_assert(gup_cstr_equals(cstrs.data[0], "zxcv"));
+        gup_array_cstr_remove_at_index_no_preserve_order(cstrs, 0);
+        gup_assert(cstrs->count == 1);
+        gup_assert(gup_cstr_equals(cstrs->data[0], "zxcv"));
 
         gup_allocator_bucket_destroy(&a);
     }

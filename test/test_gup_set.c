@@ -191,9 +191,9 @@ void test_string_set(void) {
     GupAllocatorBucket a = gup_allocator_bucket_create();
     GupSetString set = gup_set_string_create((GupAllocator*)&a);
     
-    GupString str1 = gup_string((GupAllocator*)&a, "drink");
-    GupString str2 = gup_string((GupAllocator*)&a, "da");
-    GupString str3 = gup_string((GupAllocator*)&a, "poopie");
+    GupString* str1 = gup_string((GupAllocator*)&a, "drink");
+    GupString* str2 = gup_string((GupAllocator*)&a, "da");
+    GupString* str3 = gup_string((GupAllocator*)&a, "poopie");
 
     gup_set_string_add((GupAllocator*)&a, &set, str1);
     gup_set_string_add((GupAllocator*)&a, &set, str3);

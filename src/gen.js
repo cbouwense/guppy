@@ -7,7 +7,7 @@ const kinds = [
     ['Long', 'long', 'long'],
     ['Ptr', 'ptr', 'void*'],
     ['Short', 'short', 'short'],
-    ['String', 'string', 'GupString'],
+    ['String', 'string', 'GupString*'],
     ['Cstr', 'cstr', 'char*'],
 ];
 
@@ -29,7 +29,7 @@ function main() {
         // console.log(gen_gup_array_remove_all(...kind));
         // console.log(gen_gup_array_remove_at_index_preserve_order(...kind));
         // console.log(gen_gup_array_remove_at_index_no_preserve_order(...kind));
-        console.log(gen_gup_array_to_sorted(...kind));
+        //console.log(gen_gup_array_to_sorted(...kind));
     }
 }
 
@@ -39,8 +39,12 @@ const gen_gup_array_function_defs = (up, low, t) => {
     template += `GupArray${up}*\tgup_array_${low}_create(GupAllocator* a);\n`
     
     if (up === 'String') {
-      template += `GupArrayString*\tgup_array_string_create_from_array(GupAllocator* a, const GupString* xs[], const int xs_count);\n` 
-      template += `GupArrayString* gup_array_string_create_from_cstrs(GupAllocator* a, const char** cstrs, const int cstrs_count);\n`
+      // Can't have const xs (see https://c-faq.com/ansi/constmismatch.html)
+      template += `GupArrayString*\tgup_array_string_create_from_array(GupAllocator* a, ${t} xs[], const int xs_count);\n` 
+      template += `GupArrayString* gup_array_string_create_from_cstrs(GupAllocator* a, char** cstrs, const int cstrs_count);\n`
+    } else if (up === 'Ptr' || up === 'Cstr') {
+      // Can't have const xs (see https://c-faq.com/ansi/constmismatch.html)
+      template += `GupArray${up}*\tgup_array_${low}_create_from_array(GupAllocator* a, ${t} xs[], const int xs_count);\n`
     } else {
       template += `GupArray${up}*\tgup_array_${low}_create_from_array(GupAllocator* a, const ${t} xs[], const int xs_count);\n`
     }
@@ -103,8 +107,16 @@ const gen_gup_array_create = (up, low, t) =>
 const gen_gup_array_create_from_array = (up, low, t) => {
   let template = ``;
 
-  if (up === 'String') template += `GupArray${up}* gup_array_${low}_create_from_array(GupAllocator* a, const ${t}* xs[], const int xs_count) {\n`;
-  else                 template += `GupArray${up}* gup_array_${low}_create_from_array(GupAllocator* a, const ${t} xs[], const int xs_count) {\n`;
+  
+  if (up === 'String') {
+    // Can't have const xs (see https://c-faq.com/ansi/constmismatch.html)
+    template += `GupArray${up}* gup_array_${low}_create_from_array(GupAllocator* a, ${t}* xs[], const int xs_count) {\n`;
+  } else if (up === 'Ptr' || up === 'Cstr') {
+    // Can't have const xs (see https://c-faq.com/ansi/constmismatch.html)
+    template += `GupArray${up}* gup_array_${low}_create_from_array(GupAllocator* a, ${t}* xs[], const int xs_count) {\n`;
+  } else {
+    template += `GupArray${up}* gup_array_${low}_create_from_array(GupAllocator* a, const ${t} xs[], const int xs_count) {\n`;
+  }
 
   template += `    const int capacity       = xs_count > GUP_ARRAY_DEFAULT_CAPACITY ? xs_count : GUP_ARRAY_DEFAULT_CAPACITY;\n`;
   
@@ -483,7 +495,7 @@ const gen_gup_array_to_sorted = (up, low, t) => {
       template += `        if (i == pivot_idx) continue;\n`;
       template += `\n`;
       
-      if      (up === 'String') template += `    if (gup_string_compare(a, xs->data[i], *pivot) <= 0) {\n`;
+      if      (up === 'String') template += `    if (gup_string_compare(a, xs->data[i], pivot) <= 0) {\n`;
       else if (up === 'Cstr')   template += `    if (strcmp(xs->data[i], pivot) <= 0) {\n`;
       else                      template += `    if (xs->data[i] <= pivot) {\n`;
       
