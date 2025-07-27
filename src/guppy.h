@@ -496,7 +496,7 @@ bool            gup_file_read(GupAllocator* a, const char* file_path, GupString*
 bool            gup_file_read_as_cstr(GupAllocator* a, const char* file_path, char** out);
 GupArrayString* gup_file_read_lines(GupAllocator* a, const char* file_path);
 bool            gup_file_read_lines_as_cstrs(GupAllocator* a, const char* file_path, char*** out);
-bool            gup_file_read_lines_keep_newlines(GupAllocator* a, const char* file_path, GupArrayString* out);
+bool            gup_file_read_lines_keep_newlines(GupAllocator* a, const char* file_path, GupArrayString** out);
 bool            gup_file_read_lines_as_cstrs_keep_newlines(GupAllocator* a, const char* file_path, char*** out);
 bool            gup_file_size(const char* file_path, long* out);
 int             gup_file_watch(const char* file_path, void (*fn)(void));
@@ -3498,7 +3498,7 @@ void _remove_trailing_newline(GupString* str) {
 
 GupArrayString* gup_file_read_lines(GupAllocator* a, const char* file_path) {
     GupArrayString* result = gup_array_string_create(a);
-    gup_file_read_lines_keep_newlines(a, file_path, result);
+    gup_file_read_lines_keep_newlines(a, file_path, &result);
 
     for (int i = 0; i < result->count; i++) {
         gup_array_char_remove_all(result->data[i], '\n');
@@ -3507,7 +3507,7 @@ GupArrayString* gup_file_read_lines(GupAllocator* a, const char* file_path) {
     return result;
 }
 
-bool gup_file_read_lines_keep_newlines(GupAllocator* a, const char* file_path, GupArrayString* out) {
+bool gup_file_read_lines_keep_newlines(GupAllocator* a, const char* file_path, GupArrayString** out) {
     bool result = true;
     GupArrayString* lines = gup_array_string_create(a);
 
@@ -3524,7 +3524,7 @@ bool gup_file_read_lines_keep_newlines(GupAllocator* a, const char* file_path, G
     while (fgets(buffer, 65536, fp) != NULL) {
         gup_array_string_append_cstr(a, lines, buffer);
     }
-    *out = *lines;
+    *out = lines;
 
 defer:
     if (fp) fclose(fp);

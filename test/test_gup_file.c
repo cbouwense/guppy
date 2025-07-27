@@ -163,7 +163,7 @@ void test_gup_file_read_lines(void) {
 void test_gup_file_read_lines_keep_newlines(void) {
     { // empty.txt
         GupArrayString* lines = gup_array_string_create(NULL);
-        gup_file_read_lines_keep_newlines(NULL, "./resources/empty.txt", lines);
+        gup_file_read_lines_keep_newlines(NULL, "./resources/empty.txt", &lines);
 
         gup_assert(lines->count == 0);
 
@@ -172,7 +172,7 @@ void test_gup_file_read_lines_keep_newlines(void) {
 
     { // one_newline.txt
         GupArrayString* lines = gup_array_string_create(NULL);
-        gup_file_read_lines_keep_newlines(NULL, "./resources/one_newline.txt", lines);
+        gup_file_read_lines_keep_newlines(NULL, "./resources/one_newline.txt", &lines);
 
         gup_assert(lines->count == 1);
         gup_assert(gup_array_char_equals_cstr(lines->data[0], "\n"));
@@ -183,7 +183,7 @@ void test_gup_file_read_lines_keep_newlines(void) {
 
     { // foo.txt
         GupArrayString* lines = gup_array_string_create(NULL);
-        gup_file_read_lines_keep_newlines(NULL, "./resources/foo.txt", lines);
+        gup_file_read_lines_keep_newlines(NULL, "./resources/foo.txt", &lines);
 
         gup_assert(lines->count == 4);
         gup_assert(gup_array_char_equals_cstr(lines->data[0], "one\n"));
@@ -200,7 +200,7 @@ void test_gup_file_read_lines_keep_newlines(void) {
 
     { // settings.toml
         GupArrayString* lines = gup_array_string_create(NULL);
-        gup_file_read_lines_keep_newlines(NULL, "./resources/settings.toml", lines);
+        gup_file_read_lines_keep_newlines(NULL, "./resources/settings.toml", &lines);
 
         gup_assert(lines->count == 8);
         gup_assert(gup_array_char_equals_cstr(lines->data[0], "# This is a TOML file\n"));
