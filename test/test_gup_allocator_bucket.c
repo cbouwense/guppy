@@ -48,10 +48,8 @@ void test_gup_allocator_bucket_can_be_freed_and_not_leak_memory(void) {
     gup_allocator_bucket_clear(&a); 
 
     // This is manual cleanup.
-    free(a.data->data);
-    free(a.data);
-    free(a.bytes->data);
-    free(a.bytes);
+    gup_array_ptr_destroy(a.data);
+    gup_array_int_destroy(a.bytes);
 }
 
 void test_gup_allocator_bucket_can_allocate_a_bunch_of_strings(void) {

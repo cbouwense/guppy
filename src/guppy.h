@@ -1064,18 +1064,10 @@ void gup_allocator_arena_clear(GupAllocatorArena* a) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 GupAllocatorBucket gup_allocator_bucket_create(void) {
-    GupArrayPtr* ptrs = malloc(sizeof(GupArrayPtr));
-    gup_assert_verbose(ptrs != NULL, "PANIC: An allocation failed");
-    ptrs = gup_array_ptr_create(NULL);
-
-    GupArrayInt* bytes = malloc(sizeof(GupArrayInt));
-    gup_assert_verbose(bytes != NULL, "PANIC: An allocation failed");
-    bytes = gup_array_int_create(NULL);
-
     return (GupAllocatorBucket) {
         .head  = (GupAllocator) { .type = GUP_ALLOCATOR_TYPE_BUCKET },
-        .data  = ptrs,
-        .bytes = bytes,
+        .data  = gup_array_ptr_create(NULL),
+        .bytes = gup_array_int_create(NULL),
     };
 }
 
@@ -1085,10 +1077,7 @@ void gup_allocator_bucket_destroy(GupAllocatorBucket* a) {
     gup_allocator_bucket_clear(a);
 
     gup_array_ptr_destroy(a->data);
-    free(a->data);
-
     gup_array_int_destroy(a->bytes);
-    free(a->bytes);
 }
 
 void* gup_allocator_bucket_alloc(GupAllocatorBucket* a, size_t bytes) {
