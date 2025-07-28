@@ -33,7 +33,7 @@ void test_new_gup_array_has_default_capacity(void) {
 
     gup_assert(xs->capacity == 256);
 
-    free(xs->data);
+    free(xs);
 }
 
 void test_new_gup_array_has_zero_count(void) {
@@ -41,7 +41,7 @@ void test_new_gup_array_has_zero_count(void) {
 
     gup_assert(xs->count == 0);
 
-    free(xs->data);
+    free(xs);
 }
 
 void test_new_gup_array_has_non_null_data(void) {
@@ -58,8 +58,8 @@ void test_two_empty_gup_arrays_are_equal(void) {
 
     gup_assert(gup_array_float_equals(xs, ys) == true);
 
-    free(xs->data);
-    free(ys->data);
+    free(xs);
+    free(ys);
 }
 
 void test_one_empty_one_populated_are_unequal(void) {
@@ -68,8 +68,8 @@ void test_one_empty_one_populated_are_unequal(void) {
 
     gup_assert(gup_array_char_equals(xs, ys) == false);
     
-    free(xs->data);
-    free(ys->data);
+    free(xs);
+    free(ys);
 }
 
 void test_gup_array_copy_equals_original(void) {
@@ -79,8 +79,8 @@ void test_gup_array_copy_equals_original(void) {
 
     gup_assert(gup_array_int_equals(dyn_ints, dyn_ints_copy));
 
-    free(dyn_ints->data); 
-    free(dyn_ints_copy->data); 
+    free(dyn_ints); 
+    free(dyn_ints_copy); 
 }
 
 void test_a_gup_array_is_equal_to_itself(void) {
@@ -88,20 +88,20 @@ void test_a_gup_array_is_equal_to_itself(void) {
 
     gup_assert(gup_array_short_equals(xs, xs));
 
-    free(xs->data);
+    free(xs);
 }
 
 void test_equivalent_gup_arrays_are_equal(void) {
     GupArrayDouble* xs = gup_array_double_create_from_array(NULL, static_ds, gup_array_len(static_ds));
     GupArrayDouble* ys = gup_array_double_create(NULL);
-    gup_array_double_append(NULL, ys, static_ds[0]);
-    gup_array_double_append(NULL, ys, static_ds[1]);
-    gup_array_double_append(NULL, ys, static_ds[2]);
+    gup_array_double_append(NULL, &ys, static_ds[0]);
+    gup_array_double_append(NULL, &ys, static_ds[1]);
+    gup_array_double_append(NULL, &ys, static_ds[2]);
     
     gup_assert(gup_array_double_equals(xs, ys) == true);
 
-    free(xs->data);
-    free(ys->data);
+    free(xs);
+    free(ys);
 }
 
 void test_symmetric_gup_array_args_are_equal(void) {
@@ -118,24 +118,24 @@ void test_symmetric_gup_array_args_are_equal(void) {
 void test_equivalent_but_differently_sized_gup_arrays_are_unequal(void) {
     GupArrayChar* xs = gup_array_char_create_from_array(NULL, static_cs, gup_array_len(static_cs));
     GupArrayChar* ys = gup_array_char_create_from_array(NULL, static_cs, gup_array_len(static_cs));
-    gup_array_char_append(NULL, ys, 'c');
+    gup_array_char_append(NULL, &ys, 'c');
 
     gup_assert(gup_array_char_equals(xs, ys) == false);
 
-    free(xs->data);
-    free(ys->data);
+    free(xs);
+    free(ys);
 }
 
 void test_one_append_one_prepend_orders_correctly(void) {
     GupArrayInt* xs = gup_array_int_create(NULL);
     
-    gup_array_int_append(NULL, xs, static_is[0]);
-    gup_array_int_prepend(NULL, xs, static_is[1]);
+    gup_array_int_append(NULL, &xs, static_is[0]);
+    gup_array_int_prepend(NULL, &xs, static_is[1]);
 
     gup_assert(xs->data[0] == static_is[1]);
     gup_assert(xs->data[1] == static_is[0]);
 
-    free(xs->data);
+    free(xs);
 }
 
 void test_gup_array_char_create_from_cstr(void) {
@@ -147,16 +147,17 @@ void test_gup_array_char_create_from_cstr(void) {
 
     gup_assert(gup_array_char_equals(xs, ys));
 
-    free(xs->data);
-    free(ys->data);
+    free(xs);
+    free(ys);
 }
 
 void test_gup_array_appending_resizes_properly(void) {
+    // TODO: can I actually just cast the return of the create function to (GupAllocator)?
     GupAllocatorBucket a = gup_allocator_bucket_create();
     GupArrayFloat* xs = gup_array_float_create((GupAllocator*)&a);
 
     for (int i = 0; i < 1337; i++) {
-        gup_array_float_append((GupAllocator*)&a, xs, (float)i / 2);
+        gup_array_float_append((GupAllocator*)&a, &xs, (float)i / 2);
     }
 
     gup_assert(xs->capacity == 2048);
@@ -218,9 +219,9 @@ void test_gup_array_string_append(void) {
     GupArrayString* strs_create_from = gup_array_string_create_from_array(NULL, char_arrays, gup_array_len(char_arrays));
 
     GupArrayString* strs = gup_array_string_create(NULL);
-    gup_array_string_append(NULL, strs, hello);
-    gup_array_string_append(NULL, strs, world);
-    gup_array_string_append(NULL, strs, bang);
+    gup_array_string_append(NULL, &strs, hello);
+    gup_array_string_append(NULL, &strs, world);
+    gup_array_string_append(NULL, &strs, bang);
 
     gup_assert(gup_array_string_equals(strs, strs_create_from));
 
@@ -247,9 +248,9 @@ void test_gup_array_contains(void) {
 
     { // Can find appended items
         GupArrayShort* shorts = gup_array_short_create(NULL);
-        gup_array_short_append(NULL, shorts, 1);
-        gup_array_short_append(NULL, shorts, 7);
-        gup_array_short_append(NULL, shorts, 38);
+        gup_array_short_append(NULL, &shorts, 1);
+        gup_array_short_append(NULL, &shorts, 7);
+        gup_array_short_append(NULL, &shorts, 38);
 
         gup_assert(gup_array_short_contains(shorts, 0) == false);
         gup_assert(gup_array_short_contains(shorts, 1) == true);
@@ -283,8 +284,8 @@ void test_gup_array_contains(void) {
     gup_assert(gup_array_int_contains(ints, 38) == true);
     gup_assert(gup_array_int_contains(ints, 42) == false);
 
-    gup_array_int_prepend(NULL, ints, 1337);
-    gup_array_int_append(NULL, ints, 42);
+    gup_array_int_prepend(NULL, &ints, 1337);
+    gup_array_int_append(NULL, &ints, 42);
 
     gup_assert(gup_array_int_contains(ints, 1337) == true);
     gup_assert(gup_array_int_contains(ints, 17) == true);
@@ -344,7 +345,7 @@ void test_gup_array_string_find(void) {
         gup_assert(gup_array_string_find(strings, is_all_undercase, found));
         gup_assert(gup_array_char_equals_cstr(found, "world"));
 
-        gup_array_string_prepend_cstr(NULL, strings, "foo");
+        gup_array_string_prepend_cstr(NULL, &strings, "foo");
 
         gup_assert(gup_array_string_find(strings, is_all_undercase, found));
         gup_assert(gup_array_char_equals_cstr(found, "foo"));
@@ -369,7 +370,7 @@ void test_gup_array_remove(void) {
         gup_assert(ints->data[0] == j);
         gup_assert(ints->data[1] == k);
 
-        free(ints->data);
+        free(ints);
     }
 
     { // Nothing to remove
@@ -384,7 +385,7 @@ void test_gup_array_remove(void) {
         gup_assert(ints->data[1] == j);
         gup_assert(ints->data[2] == k);
 
-        free(ints->data);
+        free(ints);
     }
 
     { // All removed
@@ -402,9 +403,9 @@ void test_gup_array_remove(void) {
 void test_gup_array_find_index_of(void) {
     { // Happy path
         GupArrayChar* chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, chars, 'a');
-        gup_array_char_append(NULL, chars, 'b');
-        gup_array_char_append(NULL, chars, 'c');
+        gup_array_char_append(NULL, &chars, 'a');
+        gup_array_char_append(NULL, &chars, 'b');
+        gup_array_char_append(NULL, &chars, 'c');
 
         const int result = gup_array_char_find_index_of(chars, 'c');
 
@@ -415,9 +416,9 @@ void test_gup_array_find_index_of(void) {
 
     { // Finds only first match
         GupArrayChar* chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, chars, 'a');
-        gup_array_char_append(NULL, chars, 'b');
-        gup_array_char_append(NULL, chars, 'a');
+        gup_array_char_append(NULL, &chars, 'a');
+        gup_array_char_append(NULL, &chars, 'b');
+        gup_array_char_append(NULL, &chars, 'a');
 
         const int result = gup_array_char_find_index_of(chars, 'a');
 
@@ -428,9 +429,9 @@ void test_gup_array_find_index_of(void) {
 
     { // Returns -1 on no match
         GupArrayChar* chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, chars, 'a');
-        gup_array_char_append(NULL, chars, 'b');
-        gup_array_char_append(NULL, chars, 'a');
+        gup_array_char_append(NULL, &chars, 'a');
+        gup_array_char_append(NULL, &chars, 'b');
+        gup_array_char_append(NULL, &chars, 'a');
 
         const int result = gup_array_char_find_index_of(chars, 'c');
 
@@ -453,9 +454,9 @@ void test_gup_array_find_index_of(void) {
 void test_gup_array_remove_at_index_preserve_order(void) {
     { // Normal
         GupArrayChar* chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, chars, 'x');
-        gup_array_char_append(NULL, chars, 'y');
-        gup_array_char_append(NULL, chars, 'z');
+        gup_array_char_append(NULL, &chars, 'x');
+        gup_array_char_append(NULL, &chars, 'y');
+        gup_array_char_append(NULL, &chars, 'z');
         
         // Remove element in the middle
         gup_array_char_remove_at_index_preserve_order(chars, 1);
@@ -506,9 +507,9 @@ void test_gup_array_remove_at_index_preserve_order(void) {
         GupAllocatorBucket a = gup_allocator_bucket_create();        
         GupArrayCstr* cstrs = gup_array_cstr_create((GupAllocator*)&a);
 
-        gup_array_cstr_append((GupAllocator*)&a, cstrs, "qwer");
-        gup_array_cstr_append((GupAllocator*)&a, cstrs, "asdf");
-        gup_array_cstr_append((GupAllocator*)&a, cstrs, "zxcv");
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "qwer");
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "asdf");
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "zxcv");
         
         gup_array_cstr_remove_at_index_preserve_order(cstrs, 1);
 
@@ -527,9 +528,9 @@ void test_gup_array_remove_at_index_preserve_order(void) {
 void test_gup_array_remove_at_index_no_preserve_order(void) {
     { // Normal
         GupArrayChar* chars = gup_array_char_create(NULL);
-        gup_array_char_append(NULL, chars, 'x');
-        gup_array_char_append(NULL, chars, 'y');
-        gup_array_char_append(NULL, chars, 'z');
+        gup_array_char_append(NULL, &chars, 'x');
+        gup_array_char_append(NULL, &chars, 'y');
+        gup_array_char_append(NULL, &chars, 'z');
         
         // Remove element in the middle
         gup_array_char_remove_at_index_no_preserve_order(chars, 1);
@@ -577,9 +578,9 @@ void test_gup_array_remove_at_index_no_preserve_order(void) {
         GupAllocatorBucket a = gup_allocator_bucket_create();        
         GupArrayCstr* cstrs = gup_array_cstr_create((GupAllocator*)&a);
 
-        gup_array_cstr_append((GupAllocator*)&a, cstrs, "qwer");
-        gup_array_cstr_append((GupAllocator*)&a, cstrs, "asdf");
-        gup_array_cstr_append((GupAllocator*)&a, cstrs, "zxcv");
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "qwer");
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "asdf");
+        gup_array_cstr_append((GupAllocator*)&a, &cstrs, "zxcv");
         
         gup_array_cstr_remove_at_index_no_preserve_order(cstrs, 1);
 

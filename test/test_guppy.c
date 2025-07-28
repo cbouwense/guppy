@@ -20,7 +20,7 @@ int main(void) {
     // TODO: multi thread these
     test_gup_allocator_arena();
     test_gup_allocator_bucket();
-    // test_gup_array();
+    test_gup_array();
     // test_gup_set();
     // test_gup_hashmap();
     // test_gup_file();

@@ -56,9 +56,9 @@ void test_gup_allocator_bucket_can_allocate_a_bunch_of_strings(void) {
     GupAllocatorBucket a = gup_allocator_bucket_create();
 
     GupString* str = gup_string((GupAllocator*)&a, "foo");
-    gup_string_append((GupAllocator*)&a, str, 'b');
-    gup_string_append((GupAllocator*)&a, str, 'a');
-    gup_string_append((GupAllocator*)&a, str, 'r');
+    gup_string_append((GupAllocator*)&a, &str, 'b');
+    gup_string_append((GupAllocator*)&a, &str, 'a');
+    gup_string_append((GupAllocator*)&a, &str, 'r');
 
     gup_allocator_bucket_destroy(&a);
 }

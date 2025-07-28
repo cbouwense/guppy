@@ -23,7 +23,7 @@ function main() {
         // console.log(gen_gup_array_print(...kind));
         // console.log(gen_gup_array_debug(...kind));
         // console.log(gen_gup_array_append(...kind));
-        // console.log(gen_gup_array_prepend(...kind));
+        console.log(gen_gup_array_prepend(...kind));
         // console.log(gen_gup_array_find_index_of(...kind));
         // console.log(gen_gup_array_remove(...kind));
         // console.log(gen_gup_array_remove_all(...kind));
@@ -63,20 +63,18 @@ const gen_gup_array_function_defs = (up, low, t) => {
     
     template += `void          \tgup_array_${low}_print(const GupArray${up}* xs);\n`
     
-    if (up === 'String') {
-      template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, ${t}* x);\n`
-    } else if (up === 'Ptr' || up === 'Cstr') {
-      template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, ${t} x);\n`
+    if (up === 'String' || up === 'Ptr' || up === 'Cstr') {
+      template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}** xs, ${t} x);\n`
     } else {
-      template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, const ${t} x);\n`
+      template += `void          \tgup_array_${low}_append(GupAllocator* a, GupArray${up}** xs, const ${t} x);\n`
     }
 
     if (up === 'String') template += `void          \tgup_array_string_append_cstr(GupAllocator* a, GupArrayString* xs, const char cstr[]);\n`
     
     if (up === 'Ptr' || up === 'String' || up === 'Cstr') {
-      template += `void          \tgup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, ${t} x);\n`
+      template += `void          \tgup_array_${low}_prepend(GupAllocator* a, GupArray${up}** xs, ${t} x);\n`
     } else {
-      template += `void          \tgup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, const ${t} x);\n`
+      template += `void          \tgup_array_${low}_prepend(GupAllocator* a, GupArray${up}** xs, const ${t} x);\n`
     }
     
     template += `int           \tgup_array_${low}_find_index_of(const GupArray${up}* xs, const ${t} x);\n`
@@ -318,19 +316,17 @@ const gen_gup_array_append = (up, low, t) => {
 
     if (up === 'String') template += `/** Appends the struct, does NOT copy. */\n`;
 
-    // Can't make the thing to append const unfortunately for these.
-    if (up === 'String') {
-      template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, ${t}* x) {\n`;
-    } else if (up === 'Ptr' || up === 'Cstr') {
-      template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, ${t} x) {\n`;
+    if (up === 'String' || up === 'Ptr' || up === 'Cstr') {
+      // Can't make the thing to append const unfortunately for these.
+      template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}** xs, ${t} x) {\n`;
     } else {
-      template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}* xs, const ${t} x) {\n`;
+      template += `void gup_array_${low}_append(GupAllocator* a, GupArray${up}** xs, const ${t} x) {\n`;
     }
     
     template += `    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, ${t});\n`;
     template += `\n`;
-    template += `    xs->data[xs->count] = x;\n`;
-    template += `    xs->count++;\n`;
+    template += `    *xs->data[xs->count] = x;\n`;
+    template += `    *xs->count++;\n`;
     template += `}\n`;
 
     return template;
@@ -339,20 +335,20 @@ const gen_gup_array_append = (up, low, t) => {
 const gen_gup_array_prepend = (up, low, t) => {
     let template = ``;
 
-    // Can't make the thing to append const unfortunately for these.
     if (up === 'Ptr' || up === 'String' || up === 'Cstr') {
-      template += `void gup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, ${t} x) {\n`;
+      // Can't make the thing to append const unfortunately for these.
+      template += `void gup_array_${low}_prepend(GupAllocator* a, GupArray${up}** xs, ${t} x) {\n`;
     } else {
-      template += `void gup_array_${low}_prepend(GupAllocator* a, GupArray${up}* xs, const ${t} x) {\n`;
+      template += `void gup_array_${low}_prepend(GupAllocator* a, GupArray${up}** xs, const ${t} x) {\n`;
     }
     
     template += `    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, ${t});\n`;
     template += `\n`;
-    template += `    for (int i = xs->count; i > 0; i--) {\n`;
-    template += `        xs->data[i] = xs->data[i-1];\n`;
+    template += `    for (int i = *xs->count; i > 0; i--) {\n`;
+    template += `        *xs->data[i] = *xs->data[i-1];\n`;
     template += `    }\n`;
-    template += `    xs->data[0] = x;\n`;
-    template += `    xs->count++;\n`;
+    template += `    *xs->data[0] = x;\n`;
+    template += `    *xs->count++;\n`;
     template += `}\n`;
 
     return template;
@@ -418,9 +414,7 @@ const gen_gup_array_remove_all = (up, low, t) => {
     else if (up === 'Cstr')   template += `        if (strcmp(xs->data[i], x) != 0) {\n`;
     else                      template += `        if (xs->data[i] != x) {\n`;
 
-    if (up === 'String') template += `            new_data[new_data_size] = *xs->data[i];\n`;
-    else                 template += `            new_data[new_data_size] = xs->data[i];\n`;
-
+    template += `            new_data[new_data_size] = xs->data[i];\n`;
     template += `            new_data_size++;\n`;
     template += `        }\n`;
 
@@ -429,7 +423,7 @@ const gen_gup_array_remove_all = (up, low, t) => {
     template += `    }\n`;
     template += `\n`;
     template += `    xs->count = new_data_size;\n`;
-    template += `    memcpy(xs->data, new_data, new_data_size * sizeof(bool));\n`;
+    template += `    memcpy(xs->data, new_data, new_data_size * sizeof(${t}));\n`;
     template += `}\n`;
 
     return template;
@@ -476,7 +470,7 @@ const gen_gup_array_to_sorted = (up, low, t) => {
       template += `        if (xs->data[i] == false) {\n`;
       template += `            gup_array_${low}_prepend(a, sorted, false);\n`;
       template += `        } else {\n`;
-      template += `            gup_array_${low}_append(a, sorted, true);\n`;
+      template += `            gup_array_${low}_append(a, &sorted, true);\n`;
       template += `        }\n`;
       template += `    }\n`;
     } else {
@@ -499,9 +493,9 @@ const gen_gup_array_to_sorted = (up, low, t) => {
       else if (up === 'Cstr')   template += `    if (strcmp(xs->data[i], pivot) <= 0) {\n`;
       else                      template += `    if (xs->data[i] <= pivot) {\n`;
       
-      template += `            gup_array_${low}_append(a, left, xs->data[i]);\n`;
+      template += `            gup_array_${low}_append(a, &left, xs->data[i]);\n`;
       template += `        } else {\n`;
-      template += `            gup_array_${low}_append(a, right, xs->data[i]);\n`;
+      template += `            gup_array_${low}_append(a, &right, xs->data[i]);\n`;
       template += `        }\n`;
       template += `    }\n`;
       template += `\n`;
@@ -510,13 +504,13 @@ const gen_gup_array_to_sorted = (up, low, t) => {
       template += `\n`;
       template += `    { // Construct the final array from the left, pivot, and right.\n`;
       template += `        for (int i = 0; i < sorted_left->count; i++) {\n`;
-      template += `            gup_array_${low}_append(a, sorted, sorted_left->data[i]);\n`;
+      template += `            gup_array_${low}_append(a, &sorted, sorted_left->data[i]);\n`;
       template += `        }\n`;
       template += `\n`;
-      template += `        gup_array_${low}_append(a, sorted, pivot);\n`;
+      template += `        gup_array_${low}_append(a, &sorted, pivot);\n`;
       template += `        \n`;
       template += `        for (int i = 0; i < sorted_right->count; i++) {\n`;
-      template += `            gup_array_${low}_append(a, sorted, sorted_right->data[i]);\n`;
+      template += `            gup_array_${low}_append(a, &sorted, sorted_right->data[i]);\n`;
       template += `        }\n`;
       template += `    }\n`;
     }

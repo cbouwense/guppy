@@ -322,14 +322,14 @@ bool          	gup_array_bool_contains(const GupArrayBool* xs, const bool x);
 void          	gup_array_bool_destroy(GupArrayBool* xs);
 bool          	gup_array_bool_equals(const GupArrayBool* xs, const GupArrayBool* ys);
 void          	gup_array_bool_print(const GupArrayBool* xs);
-void          	gup_array_bool_append(GupAllocator* a, GupArrayBool* xs, const bool x);
-void          	gup_array_bool_prepend(GupAllocator* a, GupArrayBool* xs, const bool x);
+void          	gup_array_bool_append(GupAllocator* a, GupArrayBool** xs, const bool x);
+void          	gup_array_bool_prepend(GupAllocator* a, GupArrayBool** xs, const bool x);
 int           	gup_array_bool_find_index_of(const GupArrayBool* xs, const bool x);
 void          	gup_array_bool_remove(GupArrayBool* xs, const bool x, const int count_to_remove);
 void          	gup_array_bool_remove_all(GupArrayBool* xs, const bool x);
 void          	gup_array_bool_remove_at_index_preserve_order(GupArrayBool* xs, const int index);
 void          	gup_array_bool_remove_at_index_no_preserve_order(GupArrayBool* xs, const int index);
-GupArrayBool*	gup_array_bool_sort(GupAllocator* a, const GupArrayBool* xs);
+GupArrayBool*	gup_array_bool_to_sorted(GupAllocator* a, const GupArrayBool* xs);
 
 GupArrayChar*	gup_array_char_create(GupAllocator* a);
 GupArrayChar*	gup_array_char_create_from_array(GupAllocator* a, const char xs[], const int xs_count);
@@ -340,14 +340,14 @@ void          	gup_array_char_destroy(GupArrayChar* xs);
 bool          	gup_array_char_equals(const GupArrayChar* xs, const GupArrayChar* ys);
 bool         	gup_array_char_equals_cstr(const GupArrayChar* xs, const char* cstr);
 void          	gup_array_char_print(const GupArrayChar* xs);
-void          	gup_array_char_append(GupAllocator* a, GupArrayChar* xs, const char x);
-void          	gup_array_char_prepend(GupAllocator* a, GupArrayChar* xs, const char x);
+void          	gup_array_char_append(GupAllocator* a, GupArrayChar** xs, const char x);
+void          	gup_array_char_prepend(GupAllocator* a, GupArrayChar** xs, const char x);
 int           	gup_array_char_find_index_of(const GupArrayChar* xs, const char x);
 void          	gup_array_char_remove(GupArrayChar* xs, const char x, const int count_to_remove);
 void          	gup_array_char_remove_all(GupArrayChar* xs, const char x);
 void          	gup_array_char_remove_at_index_preserve_order(GupArrayChar* xs, const int index);
 void          	gup_array_char_remove_at_index_no_preserve_order(GupArrayChar* xs, const int index);
-GupArrayChar*	gup_array_char_sort(GupAllocator* a, const GupArrayChar* xs);
+GupArrayChar*	gup_array_char_to_sorted(GupAllocator* a, const GupArrayChar* xs);
 char*        	gup_array_char_to_cstr(GupAllocator* a, const GupArrayChar* chars);
 
 GupArrayDouble*	gup_array_double_create(GupAllocator* a);
@@ -357,14 +357,14 @@ bool          	gup_array_double_contains(const GupArrayDouble* xs, const double 
 void          	gup_array_double_destroy(GupArrayDouble* xs);
 bool          	gup_array_double_equals(const GupArrayDouble* xs, const GupArrayDouble* ys);
 void          	gup_array_double_print(const GupArrayDouble* xs);
-void          	gup_array_double_append(GupAllocator* a, GupArrayDouble* xs, const double x);
-void          	gup_array_double_prepend(GupAllocator* a, GupArrayDouble* xs, const double x);
+void          	gup_array_double_append(GupAllocator* a, GupArrayDouble** xs, const double x);
+void          	gup_array_double_prepend(GupAllocator* a, GupArrayDouble** xs, const double x);
 int           	gup_array_double_find_index_of(const GupArrayDouble* xs, const double x);
 void          	gup_array_double_remove(GupArrayDouble* xs, const double x, const int count_to_remove);
 void          	gup_array_double_remove_all(GupArrayDouble* xs, const double x);
 void          	gup_array_double_remove_at_index_preserve_order(GupArrayDouble* xs, const int index);
 void          	gup_array_double_remove_at_index_no_preserve_order(GupArrayDouble* xs, const int index);
-GupArrayDouble*	gup_array_double_sort(GupAllocator* a, const GupArrayDouble* xs);
+GupArrayDouble*	gup_array_double_to_sorted(GupAllocator* a, const GupArrayDouble* xs);
 
 GupArrayFloat*	gup_array_float_create(GupAllocator* a);
 GupArrayFloat*	gup_array_float_create_from_array(GupAllocator* a, const float xs[], const int xs_count);
@@ -373,14 +373,14 @@ bool          	gup_array_float_contains(const GupArrayFloat* xs, const float x);
 void          	gup_array_float_destroy(GupArrayFloat* xs);
 bool          	gup_array_float_equals(const GupArrayFloat* xs, const GupArrayFloat* ys);
 void          	gup_array_float_print(const GupArrayFloat* xs);
-void          	gup_array_float_append(GupAllocator* a, GupArrayFloat* xs, const float x);
-void          	gup_array_float_prepend(GupAllocator* a, GupArrayFloat* xs, const float x);
+void          	gup_array_float_append(GupAllocator* a, GupArrayFloat** xs, const float x);
+void          	gup_array_float_prepend(GupAllocator* a, GupArrayFloat** xs, const float x);
 int           	gup_array_float_find_index_of(const GupArrayFloat* xs, const float x);
 void          	gup_array_float_remove(GupArrayFloat* xs, const float x, const int count_to_remove);
 void          	gup_array_float_remove_all(GupArrayFloat* xs, const float x);
 void          	gup_array_float_remove_at_index_preserve_order(GupArrayFloat* xs, const int index);
 void          	gup_array_float_remove_at_index_no_preserve_order(GupArrayFloat* xs, const int index);
-GupArrayFloat*	gup_array_float_sort(GupAllocator* a, const GupArrayFloat* xs);
+GupArrayFloat*	gup_array_float_to_sorted(GupAllocator* a, const GupArrayFloat* xs);
 
 GupArrayInt*	gup_array_int_create(GupAllocator* a);
 GupArrayInt*	gup_array_int_create_from_array(GupAllocator* a, const int xs[], const int xs_count);
@@ -389,14 +389,14 @@ bool          	gup_array_int_contains(const GupArrayInt* xs, const int x);
 void          	gup_array_int_destroy(GupArrayInt* xs);
 bool          	gup_array_int_equals(const GupArrayInt* xs, const GupArrayInt* ys);
 void          	gup_array_int_print(const GupArrayInt* xs);
-void          	gup_array_int_append(GupAllocator* a, GupArrayInt* xs, const int x);
-void          	gup_array_int_prepend(GupAllocator* a, GupArrayInt* xs, const int x);
+void          	gup_array_int_append(GupAllocator* a, GupArrayInt** xs, const int x);
+void          	gup_array_int_prepend(GupAllocator* a, GupArrayInt** xs, const int x);
 int           	gup_array_int_find_index_of(const GupArrayInt* xs, const int x);
 void          	gup_array_int_remove(GupArrayInt* xs, const int x, const int count_to_remove);
 void          	gup_array_int_remove_all(GupArrayInt* xs, const int x);
 void          	gup_array_int_remove_at_index_preserve_order(GupArrayInt* xs, const int index);
 void          	gup_array_int_remove_at_index_no_preserve_order(GupArrayInt* xs, const int index);
-GupArrayInt*	gup_array_int_sort(GupAllocator* a, const GupArrayInt* xs);
+GupArrayInt*	gup_array_int_to_sorted(GupAllocator* a, const GupArrayInt* xs);
 
 GupArrayLong*	gup_array_long_create(GupAllocator* a);
 GupArrayLong*	gup_array_long_create_from_array(GupAllocator* a, const long xs[], const int xs_count);
@@ -405,14 +405,14 @@ bool          	gup_array_long_contains(const GupArrayLong* xs, const long x);
 void          	gup_array_long_destroy(GupArrayLong* xs);
 bool          	gup_array_long_equals(const GupArrayLong* xs, const GupArrayLong* ys);
 void          	gup_array_long_print(const GupArrayLong* xs);
-void          	gup_array_long_append(GupAllocator* a, GupArrayLong* xs, const long x);
-void          	gup_array_long_prepend(GupAllocator* a, GupArrayLong* xs, const long x);
+void          	gup_array_long_append(GupAllocator* a, GupArrayLong** xs, const long x);
+void          	gup_array_long_prepend(GupAllocator* a, GupArrayLong** xs, const long x);
 int           	gup_array_long_find_index_of(const GupArrayLong* xs, const long x);
 void          	gup_array_long_remove(GupArrayLong* xs, const long x, const int count_to_remove);
 void          	gup_array_long_remove_all(GupArrayLong* xs, const long x);
 void          	gup_array_long_remove_at_index_preserve_order(GupArrayLong* xs, const int index);
 void          	gup_array_long_remove_at_index_no_preserve_order(GupArrayLong* xs, const int index);
-GupArrayLong*	gup_array_long_sort(GupAllocator* a, const GupArrayLong* xs);
+GupArrayLong*	gup_array_long_to_sorted(GupAllocator* a, const GupArrayLong* xs);
 
 GupArrayPtr*	gup_array_ptr_create(GupAllocator* a);
 GupArrayPtr*	gup_array_ptr_create_from_array(GupAllocator* a, void* xs[], const int xs_count);
@@ -421,14 +421,14 @@ bool          	gup_array_ptr_contains(const GupArrayPtr* xs, const void* x);
 void          	gup_array_ptr_destroy(GupArrayPtr* xs);
 bool          	gup_array_ptr_equals(const GupArrayPtr* xs, const GupArrayPtr* ys);
 void          	gup_array_ptr_print(const GupArrayPtr* xs);
-void          	gup_array_ptr_append(GupAllocator* a, GupArrayPtr* xs, void* x);
-void          	gup_array_ptr_prepend(GupAllocator* a, GupArrayPtr* xs, void* x);
+void          	gup_array_ptr_append(GupAllocator* a, GupArrayPtr** xs, void* x);
+void          	gup_array_ptr_prepend(GupAllocator* a, GupArrayPtr** xs, void* x);
 int           	gup_array_ptr_find_index_of(const GupArrayPtr* xs, const void* x);
 void          	gup_array_ptr_remove(GupArrayPtr* xs, const void* x, const int count_to_remove);
 void          	gup_array_ptr_remove_all(GupArrayPtr* xs, const void* x);
 void          	gup_array_ptr_remove_at_index_preserve_order(GupArrayPtr* xs, const int index);
 void          	gup_array_ptr_remove_at_index_no_preserve_order(GupArrayPtr* xs, const int index);
-GupArrayPtr*	gup_array_ptr_sort(GupAllocator* a, const GupArrayPtr* xs);
+GupArrayPtr*	gup_array_ptr_to_sorted(GupAllocator* a, const GupArrayPtr* xs);
 
 GupArrayShort*	gup_array_short_create(GupAllocator* a);
 GupArrayShort*	gup_array_short_create_from_array(GupAllocator* a, const short xs[], const int xs_count);
@@ -437,32 +437,32 @@ bool          	gup_array_short_contains(const GupArrayShort* xs, const short x);
 void          	gup_array_short_destroy(GupArrayShort* xs);
 bool          	gup_array_short_equals(const GupArrayShort* xs, const GupArrayShort* ys);
 void          	gup_array_short_print(const GupArrayShort* xs);
-void          	gup_array_short_append(GupAllocator* a, GupArrayShort* xs, const short x);
-void          	gup_array_short_prepend(GupAllocator* a, GupArrayShort* xs, const short x);
+void          	gup_array_short_append(GupAllocator* a, GupArrayShort** xs, const short x);
+void          	gup_array_short_prepend(GupAllocator* a, GupArrayShort** xs, const short x);
 int           	gup_array_short_find_index_of(const GupArrayShort* xs, const short x);
 void          	gup_array_short_remove(GupArrayShort* xs, const short x, const int count_to_remove);
 void          	gup_array_short_remove_all(GupArrayShort* xs, const short x);
 void          	gup_array_short_remove_at_index_preserve_order(GupArrayShort* xs, const int index);
 void          	gup_array_short_remove_at_index_no_preserve_order(GupArrayShort* xs, const int index);
-GupArrayShort*	gup_array_short_sort(GupAllocator* a, const GupArrayShort* xs);
+GupArrayShort*	gup_array_short_to_sorted(GupAllocator* a, const GupArrayShort* xs);
 
 GupArrayString*	gup_array_string_create(GupAllocator* a);
 GupArrayString*	gup_array_string_create_from_array(GupAllocator* a, GupString* xs[], const int xs_count);
 GupArrayString* gup_array_string_create_from_cstrs(GupAllocator* a, char** cstrs, const int cstrs_count);
 GupArrayString*	gup_array_string_copy(GupAllocator* a, const GupArrayString* xs);
-bool          	gup_array_string_contains(const GupArrayString* xs, const GupString* x);
+bool          	gup_array_string_contains(const GupArrayString* xs, const GupString** x);
 void          	gup_array_string_destroy(GupArrayString* xs);
 bool          	gup_array_string_equals(const GupArrayString* xs, const GupArrayString* ys);
 void          	gup_array_string_print(const GupArrayString* xs);
-void          	gup_array_string_append(GupAllocator* a, GupArrayString* xs, GupString* x);
+void          	gup_array_string_append(GupAllocator* a, GupArrayString** xs, GupString* x);
 void          	gup_array_string_append_cstr(GupAllocator* a, GupArrayString* xs, const char cstr[]);
-void          	gup_array_string_prepend(GupAllocator* a, GupArrayString* xs, GupString* x);
+void          	gup_array_string_prepend(GupAllocator* a, GupArrayString** xs, GupString* x);
 int           	gup_array_string_find_index_of(const GupArrayString* xs, const GupString* x);
 void          	gup_array_string_remove(GupArrayString* xs, const GupString* x, const int count_to_remove);
 void          	gup_array_string_remove_all(GupArrayString* xs, const GupString* x);
 void          	gup_array_string_remove_at_index_preserve_order(GupArrayString* xs, const int index);
 void          	gup_array_string_remove_at_index_no_preserve_order(GupArrayString* xs, const int index);
-GupArrayString*	gup_array_string_sort(GupAllocator* a, const GupArrayString* xs);
+GupArrayString*	gup_array_string_to_sorted(GupAllocator* a, const GupArrayString* xs);
 char**       	gup_array_string_to_cstrs(GupAllocator* a, const GupArrayString* strs);
 
 GupArrayCstr*	gup_array_cstr_create(GupAllocator* a);
@@ -472,14 +472,14 @@ bool          	gup_array_cstr_contains(const GupArrayCstr* xs, const char* x);
 void          	gup_array_cstr_destroy(GupArrayCstr* xs);
 bool          	gup_array_cstr_equals(const GupArrayCstr* xs, const GupArrayCstr* ys);
 void          	gup_array_cstr_print(const GupArrayCstr* xs);
-void          	gup_array_cstr_append(GupAllocator* a, GupArrayCstr* xs, char* x);
-void          	gup_array_cstr_prepend(GupAllocator* a, GupArrayCstr* xs, char* x);
+void          	gup_array_cstr_append(GupAllocator* a, GupArrayCstr** xs, char* x);
+void          	gup_array_cstr_prepend(GupAllocator* a, GupArrayCstr** xs, char* x);
 int           	gup_array_cstr_find_index_of(const GupArrayCstr* xs, const char* x);
 void          	gup_array_cstr_remove(GupArrayCstr* xs, const char* x, const int count_to_remove);
 void          	gup_array_cstr_remove_all(GupArrayCstr* xs, const char* x);
 void          	gup_array_cstr_remove_at_index_preserve_order(GupArrayCstr* xs, const int index);
 void          	gup_array_cstr_remove_at_index_no_preserve_order(GupArrayCstr* xs, const int index);
-GupArrayCstr*	gup_array_cstr_sort(GupAllocator* a, const GupArrayCstr* xs);
+GupArrayCstr*	gup_array_cstr_to_sorted(GupAllocator* a, const GupArrayCstr* xs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // File operations
@@ -711,70 +711,70 @@ void             gup_hashmap_cstr_debug(GupHashmapCstr hashmap);
 // ---------------------------------------------------------------------------------------------------------------------
 
 GupStackBool   gup_stack_bool_create(GupAllocator* a);
-void           gup_stack_bool_push(GupAllocator* a, GupStackBool* s, bool x);
+void           gup_stack_bool_push(GupAllocator* a, GupStackBool** s, bool x);
 bool           gup_stack_bool_pop(GupStackBool* s, bool* out);
 void           gup_stack_bool_destroy(GupStackBool s);
 void           gup_stack_bool_print(GupStackBool s);
 void           gup_stack_bool_debug(GupStackBool s);
 
 GupStackChar   gup_stack_char_create(GupAllocator* a);
-void           gup_stack_char_push(GupAllocator* a, GupStackChar* s, char x);
+void           gup_stack_char_push(GupAllocator* a, GupStackChar** s, char x);
 bool           gup_stack_char_pop(GupStackChar* s, char* out);
 void           gup_stack_char_destroy(GupStackChar s);
 void           gup_stack_char_print(GupStackChar s);
 void           gup_stack_char_debug(GupStackChar s);
 
 GupStackDouble gup_stack_double_create(GupAllocator* a);
-void           gup_stack_double_push(GupAllocator* a, GupStackDouble* s, double x);
+void           gup_stack_double_push(GupAllocator* a, GupStackDouble** s, double x);
 bool           gup_stack_double_pop(GupStackDouble* s, double* out);
 void           gup_stack_double_destroy(GupStackDouble s);
 void           gup_stack_double_print(GupStackDouble s);
 void           gup_stack_double_debug(GupStackDouble s);
 
 GupStackFloat  gup_stack_float_create(GupAllocator* a);
-void           gup_stack_float_push(GupAllocator* a, GupStackFloat* s, float x);
+void           gup_stack_float_push(GupAllocator* a, GupStackFloat** s, float x);
 bool           gup_stack_float_pop(GupStackFloat* s, float* out);
 void           gup_stack_float_destroy(GupStackFloat s);
 void           gup_stack_float_print(GupStackFloat s);
 void           gup_stack_float_debug(GupStackFloat s);
 
 GupStackInt    gup_stack_int_create(GupAllocator* a);
-void           gup_stack_int_push(GupAllocator* a, GupStackInt* s, int x);
+void           gup_stack_int_push(GupAllocator* a, GupStackInt** s, int x);
 bool           gup_stack_int_pop(GupStackInt* s, int* out);
 void           gup_stack_int_destroy(GupStackInt s);
 void           gup_stack_int_print(GupStackInt s);
 void           gup_stack_int_debug(GupStackInt s);
 
 GupStackLong   gup_stack_long_create(GupAllocator* a);
-void           gup_stack_long_push(GupAllocator* a, GupStackLong* s, long x);
+void           gup_stack_long_push(GupAllocator* a, GupStackLong** s, long x);
 bool           gup_stack_long_pop(GupStackLong* s, long* out);
 void           gup_stack_long_destroy(GupStackLong s);
 void           gup_stack_long_print(GupStackLong s);
 void           gup_stack_long_debug(GupStackLong s);
 
 GupStackPtr    gup_stack_ptr_create(GupAllocator* a);
-void           gup_stack_ptr_push(GupAllocator* a, GupStackPtr* s, void* x);
+void           gup_stack_ptr_push(GupAllocator* a, GupStackPtr** s, void* x);
 bool           gup_stack_ptr_pop(GupStackPtr* s, void* *out);
 void           gup_stack_ptr_destroy(GupStackPtr s);
 void           gup_stack_ptr_print(GupStackPtr s);
 void           gup_stack_ptr_debug(GupStackPtr s);
 
 GupStackShort  gup_stack_short_create(GupAllocator* a);
-void           gup_stack_short_push(GupAllocator* a, GupStackShort* s, short x);
+void           gup_stack_short_push(GupAllocator* a, GupStackShort** s, short x);
 bool           gup_stack_short_pop(GupStackShort* s, short* out);
 void           gup_stack_short_destroy(GupStackShort s);
 void           gup_stack_short_print(GupStackShort s);
 void           gup_stack_short_debug(GupStackShort s);
 
 GupStackString gup_stack_string_create(GupAllocator* a);
-void           gup_stack_string_push(GupAllocator* a, GupStackString* s, GupString* x);
+void           gup_stack_string_push(GupAllocator* a, GupStackString** s, GupString* x);
 bool           gup_stack_string_pop(GupStackString* s, GupString* out);
 void           gup_stack_string_destroy(GupStackString s);
 void           gup_stack_string_print(GupStackString s);
 void           gup_stack_string_debug(GupStackString s);
 
 GupStackCstr   gup_stack_cstr_create(GupAllocator* a);
-void           gup_stack_cstr_push(GupAllocator* a, GupStackCstr* s, char * x);
+void           gup_stack_cstr_push(GupAllocator* a, GupStackCstr** s, char * x);
 bool           gup_stack_cstr_pop(GupStackCstr* s, char * *out);
 void           gup_stack_cstr_destroy(GupStackCstr s);
 void           gup_stack_cstr_print(GupStackCstr s);
@@ -907,15 +907,15 @@ u32 gup_fnv1a_hash(const char* s);
 
 #define GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, type_array_holds)                                       \
     const bool is_arena_allocator = a != NULL && a->type == GUP_ALLOCATOR_TYPE_ARENA;             \
-    if (xs->count == xs->capacity) {                                                              \
+    if (*xs->count == *xs->capacity) {                                                            \
         if (is_arena_allocator) {                                                                 \
             fprintf(stderr, "Tried to grow a dynamic array in an arena, which is unsupported.\n");\
             exit(1);                                                                              \
         }                                                                                         \
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;                        \
-        xs = gup_realloc(a, xs->data, sizeof(*xs) + new_capacity * sizeof(type_array_holds));     \
-        gup_assert_verbose(xs->data != NULL, "PANIC: An allocation failed!");                     \
-        xs->capacity = new_capacity;                                                              \
+        const int new_capacity = *xs->capacity == 0 ? 1 : *xs->capacity * 2;                      \
+        *xs = gup_realloc(a, *xs->data, sizeof(**xs) + new_capacity * sizeof(type_array_holds));  \
+        gup_assert_verbose(*xs->data != NULL, "PANIC: An allocation failed!");                    \
+        *xs->capacity = new_capacity;                                                             \
     }                                                                                             \
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1087,8 +1087,8 @@ void* gup_allocator_bucket_alloc(GupAllocatorBucket* a, size_t bytes) {
     void* ptr = malloc(bytes);
     gup_assert(ptr != NULL);
 
-    gup_array_ptr_append(NULL, a->data, ptr);
-    gup_array_int_append(NULL, a->bytes, bytes);
+    gup_array_ptr_append(NULL, &a->data, ptr);
+    gup_array_int_append(NULL, &a->bytes, bytes);
 
     return ptr;
 }
@@ -1111,8 +1111,8 @@ void* gup_allocator_bucket_realloc(GupAllocatorBucket* a, void* mem_to_realloc, 
     void* new_mem = malloc(bytes);                                      // Get a fresh chunk of memory.
     gup_assert_verbose(new_mem != NULL, "PANIC: An allocation failed"); // TODO: have a generic sanity check for new memory.
     memcpy(new_mem, mem_to_realloc, bytes_to_copy);                     // Copy over the old contents into the new memory.
-    gup_array_ptr_append(NULL, a->data, new_mem);                       // Add the new pointer to the list
-    gup_array_int_append(NULL, a->bytes, bytes);                        // Add the new pointer to the list
+    gup_array_ptr_append(NULL, &a->data, new_mem);                       // Add the new pointer to the list
+    gup_array_int_append(NULL, &a->bytes, bytes);                        // Add the new byte count to the list
 
     // Free and remove the old memory.
     free(mem_to_realloc);                                               // Free the old stuff.
@@ -1471,7 +1471,7 @@ GupArrayString* gup_array_string_create_from_cstrs(GupAllocator* a, char** cstrs
     GupArrayString* new = gup_array_string_create(a);
     
     for (int i = 0; i < cstrs_count; i++) {
-        gup_array_string_append(a, new, gup_array_char_create_from_cstr(a, cstrs[i]));
+        gup_array_string_append(a, &new, gup_array_char_create_from_cstr(a, cstrs[i]));
     }
 
     return new;
@@ -2017,180 +2017,183 @@ void _gup_array_cstr_debug(GupArrayCstr* xs, const char* xs_name) {
     printf("}\n");
 }
 
-// Append
-void gup_array_bool_append(GupAllocator* a, GupArrayBool* xs, const bool x) {
+// Append --------------------------------------------------------------------------------------------------------------
+
+void gup_array_bool_append(GupAllocator* a, GupArrayBool** xs, const bool x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, bool);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
-void gup_array_char_append(GupAllocator* a, GupArrayChar* xs, const char x) {
+void gup_array_char_append(GupAllocator* a, GupArrayChar** xs, const char x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
-void gup_array_double_append(GupAllocator* a, GupArrayDouble* xs, const double x) {
+void gup_array_double_append(GupAllocator* a, GupArrayDouble** xs, const double x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, double);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
-void gup_array_float_append(GupAllocator* a, GupArrayFloat* xs, const float x) {
+void gup_array_float_append(GupAllocator* a, GupArrayFloat** xs, const float x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, float);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
-void gup_array_int_append(GupAllocator* a, GupArrayInt* xs, const int x) {
+void gup_array_int_append(GupAllocator* a, GupArrayInt** xs, const int x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, int);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
-void gup_array_long_append(GupAllocator* a, GupArrayLong* xs, const long x) {
+void gup_array_long_append(GupAllocator* a, GupArrayLong** xs, const long x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, long);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
-void gup_array_ptr_append(GupAllocator* a, GupArrayPtr* xs, void* x) {
+void gup_array_ptr_append(GupAllocator* a, GupArrayPtr** xs, void* x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, void*);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
-void gup_array_short_append(GupAllocator* a, GupArrayShort* xs, const short x) {
+void gup_array_short_append(GupAllocator* a, GupArrayShort** xs, const short x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, short);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
 /** Appends the struct, does NOT copy. */
-void gup_array_string_append(GupAllocator* a, GupArrayString* xs, GupString* x) {
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupString);
+void gup_array_string_append(GupAllocator* a, GupArrayString** xs, GupString* x) {
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupString*);
 
-    xs->data[xs->count] = x;
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
-void gup_array_cstr_append(GupAllocator* a, GupArrayCstr* xs, char* x) {
+void gup_array_cstr_append(GupAllocator* a, GupArrayCstr** xs, char* x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char*);
 
-    xs->data[xs->count] = x;
-    xs->count++;
-}
-
-/** Copies the cstr into the array. */
-void gup_array_string_append_cstr(GupAllocator* a, GupArrayString* xs, const char cstr[]) {
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupArrayChar);
-
-    xs->data[xs->count] = gup_array_char_create_from_cstr(a, cstr);
-    xs->count++;
+    *xs->data[xs->count] = x;
+    *xs->count++;
 }
 
 // Prepend -------------------------------------------------------------------------------------------------------------
 
-void gup_array_bool_prepend(GupAllocator* a, GupArrayBool* xs, bool x) {
-    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char); 
+void gup_array_bool_prepend(GupAllocator* a, GupArrayBool** xs, const bool x) {
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, bool);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
-void gup_array_char_prepend(GupAllocator* a, GupArrayChar* xs, char x) {
+void gup_array_char_prepend(GupAllocator* a, GupArrayChar** xs, const char x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
-void gup_array_double_prepend(GupAllocator* a, GupArrayDouble* xs, double x) {
+void gup_array_double_prepend(GupAllocator* a, GupArrayDouble** xs, const double x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, double);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
-void gup_array_float_prepend(GupAllocator* a, GupArrayFloat* xs, float x) {
+void gup_array_float_prepend(GupAllocator* a, GupArrayFloat** xs, const float x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, float);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
-void gup_array_int_prepend(GupAllocator* a, GupArrayInt* xs, int x) {
+void gup_array_int_prepend(GupAllocator* a, GupArrayInt** xs, const int x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, int);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
-void gup_array_long_prepend(GupAllocator* a, GupArrayLong* xs, long x) {
+void gup_array_long_prepend(GupAllocator* a, GupArrayLong** xs, const long x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, long);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
-void gup_array_ptr_prepend(GupAllocator* a, GupArrayPtr* xs, void* x) {
+void gup_array_ptr_prepend(GupAllocator* a, GupArrayPtr** xs, void* x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, void*);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
-void gup_array_string_prepend(GupAllocator* a, GupArrayString* xs, GupString* x) {
+void gup_array_short_prepend(GupAllocator* a, GupArrayShort** xs, const short x) {
+    GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, short);
+
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
+    }
+    *xs->data[0] = x;
+    *xs->count++;
+}
+
+void gup_array_string_prepend(GupAllocator* a, GupArrayString** xs, GupString* x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, GupString*);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = gup_array_char_copy(a, x);
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
-void gup_array_cstr_prepend(GupAllocator* a, GupArrayCstr* xs, char* x) {
+void gup_array_cstr_prepend(GupAllocator* a, GupArrayCstr** xs, char* x) {
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char*);
 
-    for (int i = xs->count; i > 0; i--) {
-        xs->data[i] = xs->data[i-1];
+    for (int i = *xs->count; i > 0; i--) {
+        *xs->data[i] = *xs->data[i-1];
     }
-    xs->data[0] = x;
-    xs->count++;
+    *xs->data[0] = x;
+    *xs->count++;
 }
 
 /** Copies the cstr into the array. */
-void gup_array_string_prepend_cstr(GupAllocator* a, GupArrayString* xs, char* cstr){
+void gup_array_string_prepend_cstr(GupAllocator* a, GupArrayString** xs, char* cstr){
     GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, char*);
 
     for (int i = xs->count; i > 0; i--) {
@@ -2513,7 +2516,7 @@ void gup_array_char_remove_all(GupArrayChar* xs, const char x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(char));
 }
 
 void gup_array_double_remove_all(GupArrayDouble* xs, const double x) {
@@ -2528,7 +2531,7 @@ void gup_array_double_remove_all(GupArrayDouble* xs, const double x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(double));
 }
 
 void gup_array_float_remove_all(GupArrayFloat* xs, const float x) {
@@ -2543,7 +2546,7 @@ void gup_array_float_remove_all(GupArrayFloat* xs, const float x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(float));
 }
 
 void gup_array_int_remove_all(GupArrayInt* xs, const int x) {
@@ -2558,7 +2561,7 @@ void gup_array_int_remove_all(GupArrayInt* xs, const int x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(int));
 }
 
 void gup_array_long_remove_all(GupArrayLong* xs, const long x) {
@@ -2573,7 +2576,7 @@ void gup_array_long_remove_all(GupArrayLong* xs, const long x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(long));
 }
 
 void gup_array_ptr_remove_all(GupArrayPtr* xs, const void* x) {
@@ -2588,7 +2591,7 @@ void gup_array_ptr_remove_all(GupArrayPtr* xs, const void* x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(void*));
 }
 
 void gup_array_short_remove_all(GupArrayShort* xs, const short x) {
@@ -2603,7 +2606,7 @@ void gup_array_short_remove_all(GupArrayShort* xs, const short x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(short));
 }
 
 void gup_array_string_remove_all(GupArrayString* xs, const GupString* x) {
@@ -2619,7 +2622,7 @@ void gup_array_string_remove_all(GupArrayString* xs, const GupString* x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(GupString*));
 }
 
 void gup_array_cstr_remove_all(GupArrayCstr* xs, const char* x) {
@@ -2634,7 +2637,7 @@ void gup_array_cstr_remove_all(GupArrayCstr* xs, const char* x) {
     }
 
     xs->count = new_data_size;
-    memcpy(xs->data, new_data, new_data_size * sizeof(bool));
+    memcpy(xs->data, new_data, new_data_size * sizeof(char*));
 }
 
 // Extras
@@ -2889,9 +2892,9 @@ GupArrayBool* gup_array_bool_to_sorted(GupAllocator* a, const GupArrayBool* xs) 
 
     for (int i = 0; i < xs->count; i++) {
         if (xs->data[i] == false) {
-            gup_array_bool_prepend(a, sorted, false);
+            gup_array_bool_prepend(a, &sorted, false);
         } else {
-            gup_array_bool_append(a, sorted, true);
+            gup_array_bool_append(a, &sorted, true);
         }
     }
 
@@ -2914,9 +2917,9 @@ GupArrayChar* gup_array_char_to_sorted(GupAllocator* a, const GupArrayChar* xs) 
         if (i == pivot_idx) continue;
 
     if (xs->data[i] <= pivot) {
-            gup_array_char_append(a, left, xs->data[i]);
+            gup_array_char_append(a, &left, xs->data[i]);
         } else {
-            gup_array_char_append(a, right, xs->data[i]);
+            gup_array_char_append(a, &right, xs->data[i]);
         }
     }
 
@@ -2925,13 +2928,13 @@ GupArrayChar* gup_array_char_to_sorted(GupAllocator* a, const GupArrayChar* xs) 
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_char_append(a, sorted, sorted_left->data[i]);
+            gup_array_char_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_char_append(a, sorted, pivot);
+        gup_array_char_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_char_append(a, sorted, sorted_right->data[i]);
+            gup_array_char_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -2954,9 +2957,9 @@ GupArrayDouble* gup_array_double_to_sorted(GupAllocator* a, const GupArrayDouble
         if (i == pivot_idx) continue;
 
     if (xs->data[i] <= pivot) {
-            gup_array_double_append(a, left, xs->data[i]);
+            gup_array_double_append(a, &left, xs->data[i]);
         } else {
-            gup_array_double_append(a, right, xs->data[i]);
+            gup_array_double_append(a, &right, xs->data[i]);
         }
     }
 
@@ -2965,13 +2968,13 @@ GupArrayDouble* gup_array_double_to_sorted(GupAllocator* a, const GupArrayDouble
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_double_append(a, sorted, sorted_left->data[i]);
+            gup_array_double_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_double_append(a, sorted, pivot);
+        gup_array_double_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_double_append(a, sorted, sorted_right->data[i]);
+            gup_array_double_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -2994,9 +2997,9 @@ GupArrayFloat* gup_array_float_to_sorted(GupAllocator* a, const GupArrayFloat* x
         if (i == pivot_idx) continue;
 
     if (xs->data[i] <= pivot) {
-            gup_array_float_append(a, left, xs->data[i]);
+            gup_array_float_append(a, &left, xs->data[i]);
         } else {
-            gup_array_float_append(a, right, xs->data[i]);
+            gup_array_float_append(a, &right, xs->data[i]);
         }
     }
 
@@ -3005,13 +3008,13 @@ GupArrayFloat* gup_array_float_to_sorted(GupAllocator* a, const GupArrayFloat* x
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_float_append(a, sorted, sorted_left->data[i]);
+            gup_array_float_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_float_append(a, sorted, pivot);
+        gup_array_float_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_float_append(a, sorted, sorted_right->data[i]);
+            gup_array_float_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -3034,9 +3037,9 @@ GupArrayInt* gup_array_int_to_sorted(GupAllocator* a, const GupArrayInt* xs) {
         if (i == pivot_idx) continue;
 
     if (xs->data[i] <= pivot) {
-            gup_array_int_append(a, left, xs->data[i]);
+            gup_array_int_append(a, &left, xs->data[i]);
         } else {
-            gup_array_int_append(a, right, xs->data[i]);
+            gup_array_int_append(a, &right, xs->data[i]);
         }
     }
 
@@ -3045,13 +3048,13 @@ GupArrayInt* gup_array_int_to_sorted(GupAllocator* a, const GupArrayInt* xs) {
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_int_append(a, sorted, sorted_left->data[i]);
+            gup_array_int_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_int_append(a, sorted, pivot);
+        gup_array_int_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_int_append(a, sorted, sorted_right->data[i]);
+            gup_array_int_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -3074,9 +3077,9 @@ GupArrayLong* gup_array_long_to_sorted(GupAllocator* a, const GupArrayLong* xs) 
         if (i == pivot_idx) continue;
 
     if (xs->data[i] <= pivot) {
-            gup_array_long_append(a, left, xs->data[i]);
+            gup_array_long_append(a, &left, xs->data[i]);
         } else {
-            gup_array_long_append(a, right, xs->data[i]);
+            gup_array_long_append(a, &right, xs->data[i]);
         }
     }
 
@@ -3085,13 +3088,13 @@ GupArrayLong* gup_array_long_to_sorted(GupAllocator* a, const GupArrayLong* xs) 
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_long_append(a, sorted, sorted_left->data[i]);
+            gup_array_long_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_long_append(a, sorted, pivot);
+        gup_array_long_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_long_append(a, sorted, sorted_right->data[i]);
+            gup_array_long_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -3114,9 +3117,9 @@ GupArrayPtr* gup_array_ptr_to_sorted(GupAllocator* a, const GupArrayPtr* xs) {
         if (i == pivot_idx) continue;
 
     if (xs->data[i] <= pivot) {
-            gup_array_ptr_append(a, left, xs->data[i]);
+            gup_array_ptr_append(a, &left, xs->data[i]);
         } else {
-            gup_array_ptr_append(a, right, xs->data[i]);
+            gup_array_ptr_append(a, &right, xs->data[i]);
         }
     }
 
@@ -3125,13 +3128,13 @@ GupArrayPtr* gup_array_ptr_to_sorted(GupAllocator* a, const GupArrayPtr* xs) {
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_ptr_append(a, sorted, sorted_left->data[i]);
+            gup_array_ptr_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_ptr_append(a, sorted, pivot);
+        gup_array_ptr_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_ptr_append(a, sorted, sorted_right->data[i]);
+            gup_array_ptr_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -3154,9 +3157,9 @@ GupArrayShort* gup_array_short_to_sorted(GupAllocator* a, const GupArrayShort* x
         if (i == pivot_idx) continue;
 
     if (xs->data[i] <= pivot) {
-            gup_array_short_append(a, left, xs->data[i]);
+            gup_array_short_append(a, &left, xs->data[i]);
         } else {
-            gup_array_short_append(a, right, xs->data[i]);
+            gup_array_short_append(a, &right, xs->data[i]);
         }
     }
 
@@ -3165,13 +3168,13 @@ GupArrayShort* gup_array_short_to_sorted(GupAllocator* a, const GupArrayShort* x
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_short_append(a, sorted, sorted_left->data[i]);
+            gup_array_short_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_short_append(a, sorted, pivot);
+        gup_array_short_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_short_append(a, sorted, sorted_right->data[i]);
+            gup_array_short_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -3194,9 +3197,9 @@ GupArrayString* gup_array_string_to_sorted(GupAllocator* a, const GupArrayString
         if (i == pivot_idx) continue;
 
     if (gup_string_compare(a, xs->data[i], pivot) <= 0) {
-            gup_array_string_append(a, left, xs->data[i]);
+            gup_array_string_append(a, &left, xs->data[i]);
         } else {
-            gup_array_string_append(a, right, xs->data[i]);
+            gup_array_string_append(a, &right, xs->data[i]);
         }
     }
 
@@ -3205,13 +3208,13 @@ GupArrayString* gup_array_string_to_sorted(GupAllocator* a, const GupArrayString
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_string_append(a, sorted, sorted_left->data[i]);
+            gup_array_string_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_string_append(a, sorted, pivot);
+        gup_array_string_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_string_append(a, sorted, sorted_right->data[i]);
+            gup_array_string_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -3234,9 +3237,9 @@ GupArrayCstr* gup_array_cstr_to_sorted(GupAllocator* a, const GupArrayCstr* xs) 
         if (i == pivot_idx) continue;
 
     if (strcmp(xs->data[i], pivot) <= 0) {
-            gup_array_cstr_append(a, left, xs->data[i]);
+            gup_array_cstr_append(a, &left, xs->data[i]);
         } else {
-            gup_array_cstr_append(a, right, xs->data[i]);
+            gup_array_cstr_append(a, &right, xs->data[i]);
         }
     }
 
@@ -3245,13 +3248,13 @@ GupArrayCstr* gup_array_cstr_to_sorted(GupAllocator* a, const GupArrayCstr* xs) 
 
     { // Construct the final array from the left, pivot, and right.
         for (int i = 0; i < sorted_left->count; i++) {
-            gup_array_cstr_append(a, sorted, sorted_left->data[i]);
+            gup_array_cstr_append(a, &sorted, sorted_left->data[i]);
         }
 
-        gup_array_cstr_append(a, sorted, pivot);
+        gup_array_cstr_append(a, &sorted, pivot);
         
         for (int i = 0; i < sorted_right->count; i++) {
-            gup_array_cstr_append(a, sorted, sorted_right->data[i]);
+            gup_array_cstr_append(a, &sorted, sorted_right->data[i]);
         }
     }
 
@@ -3863,14 +3866,14 @@ void _gup_string_debug(GupString str, const char* str_name) {
 
 void gup_string_append_str(GupAllocator* a, GupString* str, GupString str_to_append) {
     for (int i = 0; i < str_to_append.count; i++) {
-        gup_array_char_append(a, str, str_to_append.data[i]);
+        gup_array_char_append(a, &str, str_to_append.data[i]);
     }
 }
 
 void gup_string_append_cstr(GupAllocator* a, GupString* str, const char* cstr_to_append) {
     const int cstr_len = gup_cstr_length_excluding_null(cstr_to_append);
     for (int i = 0; i < cstr_len; i++) {
-        gup_array_char_append(a, str, cstr_to_append[i]);
+        gup_array_char_append(a, &str, cstr_to_append[i]);
     }
 }
 
@@ -3946,7 +3949,7 @@ GupArrayString* gup_string_split(GupAllocator* a, GupString* str, char c) {
         // i (5): ' ' == ' '
         if (trimmed->data[i] == c) {
             // tokens: [] -> ["hello"]
-            gup_array_string_append(a, tokens, token);
+            gup_array_string_append(a, &tokens, token);
             token = gup_string_create(a);
         }
         // Are we at the end of the string? If so, append the final token to the list. Then we're done.
@@ -3955,7 +3958,7 @@ GupArrayString* gup_string_split(GupAllocator* a, GupString* str, char c) {
             // token: "worl" -> "world"
             gup_string_append(a, token, trimmed->data[i]);
             // tokens: ["hello"] -> ["hello", "world"]
-            gup_array_string_append(a, tokens, token);
+            gup_array_string_append(a, &tokens, token);
         }
         // i (0): 'h' == ' ' -> token: "h"
         // i (1): 'e' == ' ' -> token: "he"
@@ -3982,12 +3985,12 @@ GupArrayString* gup_string_split_by_cstr(GupAllocator* a, GupString* str, char* 
         source += i;
 
         if (gup_cstr_equals(source, sub_str)) {
-            gup_array_string_append(a, tokens, token);
+            gup_array_string_append(a, &tokens, token);
             token = gup_string_create((GupAllocator*)&local);
             i += gup_cstr_length_excluding_null(sub_str) - 1;
         } else if (i == str->count-1) {
             gup_string_append((GupAllocator*)&local, token, str->data[i]);
-            gup_array_string_append(a, tokens, token);
+            gup_array_string_append(a, &tokens, token);
             token = gup_string_create((GupAllocator*)&local);
         } else {
             gup_string_append((GupAllocator*)&local, token, str->data[i]);
@@ -5265,7 +5268,7 @@ void gup_hashmap_bool_set(GupAllocator* a, GupHashmapBool* hashmap, char* key, b
     }
 
     gup_array_cstr_append(a, &(hashmap->keys[index]), key);
-    gup_array_bool_append(a, hashmap->values[index], value);
+    gup_array_bool_append(a, &hashmap->values[index], value);
 }
 
 void gup_hashmap_char_set(GupAllocator* a, GupHashmapChar* hashmap, char* key, char value) {
@@ -5854,8 +5857,8 @@ GupStackBool gup_stack_bool_create(GupAllocator* a) {
     return *gup_array_bool_create(a);
 }
 
-void gup_stack_bool_push(GupAllocator* a, GupStackBool* s, bool x) {
-    gup_array_bool_append(a, (GupArrayBool *)s, x);
+void gup_stack_bool_push(GupAllocator* a, GupStackBool** s, bool x) {
+    gup_array_bool_append(a, &(GupArrayBool**)s, x);
 }
 
 bool gup_stack_bool_pop(GupStackBool* s, bool* out) {
@@ -5879,8 +5882,8 @@ GupStackChar gup_stack_char_create(GupAllocator* a) {
     return *gup_array_char_create(a);
 }
 
-void gup_stack_char_push(GupAllocator* a, GupStackChar* s, char x) {
-    gup_array_char_append(a, (GupArrayChar *)s, x);
+void gup_stack_char_push(GupAllocator* a, GupStackChar** s, char x) {
+    gup_array_char_append(a, (GupArrayChar**)s, x);
 }
 
 bool gup_stack_char_pop(GupStackChar* s, char* out) {
@@ -5904,8 +5907,8 @@ GupStackDouble gup_stack_double_create(GupAllocator* a) {
     return *gup_array_double_create(a);
 }
 
-void gup_stack_double_push(GupAllocator* a, GupStackDouble* s, double x) {
-    gup_array_double_append(a, (GupArrayDouble *)s, x);
+void gup_stack_double_push(GupAllocator* a, GupStackDouble** s, double x) {
+    gup_array_double_append(a, (GupArrayDouble**)s, x);
 }
 
 bool gup_stack_double_pop(GupStackDouble* s, double* out) {
@@ -5929,8 +5932,8 @@ GupStackFloat gup_stack_float_create(GupAllocator* a) {
     return *gup_array_float_create(a);
 }
 
-void gup_stack_float_push(GupAllocator* a, GupStackFloat* s, float x) {
-    gup_array_float_append(a, (GupArrayFloat *)s, x);
+void gup_stack_float_push(GupAllocator* a, GupStackFloat** s, float x) {
+    gup_array_float_append(a, (GupArrayFloat**)s, x);
 }
 
 bool gup_stack_float_pop(GupStackFloat* s, float* out) {
@@ -5954,8 +5957,8 @@ GupStackInt gup_stack_int_create(GupAllocator* a) {
     return *gup_array_int_create(a);
 }
 
-void gup_stack_int_push(GupAllocator* a, GupStackInt* s, int x) {
-    gup_array_int_append(a, (GupArrayInt *)s, x);
+void gup_stack_int_push(GupAllocator* a, GupStackInt** s, int x) {
+    gup_array_int_append(a, (GupArrayInt**)s, x);
 }
 
 bool gup_stack_int_pop(GupStackInt* s, int* out) {
@@ -5979,8 +5982,8 @@ GupStackLong gup_stack_long_create(GupAllocator* a) {
     return *gup_array_long_create(a);
 }
 
-void gup_stack_long_push(GupAllocator* a, GupStackLong* s, long x) {
-    gup_array_long_append(a, (GupArrayLong *)s, x);
+void gup_stack_long_push(GupAllocator* a, GupStackLong** s, long x) {
+    gup_array_long_append(a, (GupArrayLong**)s, x);
 }
 
 bool gup_stack_long_pop(GupStackLong* s, long* out) {
@@ -6004,8 +6007,8 @@ GupStackPtr gup_stack_ptr_create(GupAllocator* a) {
     return *gup_array_ptr_create(a);
 }
 
-void gup_stack_ptr_push(GupAllocator* a, GupStackPtr* s, void* x) {
-    gup_array_ptr_append(a, (GupArrayPtr *)s, x);
+void gup_stack_ptr_push(GupAllocator* a, GupStackPtr** s, void* x) {
+    gup_array_ptr_append(a, (GupArrayPtr**)s, x);
 }
 
 bool gup_stack_ptr_pop(GupStackPtr* s, void* *out) {
@@ -6029,8 +6032,8 @@ GupStackShort gup_stack_short_create(GupAllocator* a) {
     return *gup_array_short_create(a);
 }
 
-void gup_stack_short_push(GupAllocator* a, GupStackShort* s, short x) {
-    gup_array_short_append(a, (GupArrayShort *)s, x);
+void gup_stack_short_push(GupAllocator* a, GupStackShort** s, short x) {
+    gup_array_short_append(a, (GupArrayShort**)s, x);
 }
 
 bool gup_stack_short_pop(GupStackShort* s, short* out) {
@@ -6054,8 +6057,8 @@ GupStackString gup_stack_string_create(GupAllocator* a) {
     return *gup_array_string_create(a);
 }
 
-void gup_stack_string_push(GupAllocator* a, GupStackString* s, GupString* x) {
-    gup_array_string_append(a, (GupArrayString *)s, x);
+void gup_stack_string_push(GupAllocator* a, GupStackString** s, GupString* x) {
+    gup_array_string_append(a, (GupArrayString**)s, x);
 }
 
 bool gup_stack_string_pop(GupStackString* s, GupString* out) {
@@ -6079,8 +6082,8 @@ GupStackCstr gup_stack_cstr_create(GupAllocator* a) {
     return *gup_array_cstr_create(a);
 }
 
-void gup_stack_cstr_push(GupAllocator* a, GupStackCstr* s, char* x) {
-    gup_array_cstr_append(a, (GupArrayCstr *)s, x);
+void gup_stack_cstr_push(GupAllocator* a, GupStackCstr** s, char* x) {
+    gup_array_cstr_append(a, (GupArrayCstr**)s, x);
 }
 
 bool gup_stack_cstr_pop(GupStackCstr* s, char** out) {

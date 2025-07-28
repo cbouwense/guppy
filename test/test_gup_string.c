@@ -112,7 +112,7 @@ void test_gup_string_starts_with(GupAllocator* a) {
     { // Even after appending it works
         GupString* sub_str = gup_string(a, "Hello");
         GupString* str = gup_string_copy(a, sub_str);
-        gup_string_append(a, str, '!');
+        gup_string_append(a, &str, '!');
 
         gup_assert(gup_string_starts_with(str, sub_str) == true);
     }
@@ -121,7 +121,7 @@ void test_gup_string_starts_with(GupAllocator* a) {
         GupString* sub_str = gup_string(a, "Hello");
         GupString* str = gup_string_copy(a, sub_str);
 
-        gup_string_prepend(a, str, '!');
+        gup_string_prepend(a, &str, '!');
 
         gup_assert(gup_string_starts_with(str, sub_str) == false);
     }
@@ -145,7 +145,7 @@ void test_gup_string_starts_with_cstr(GupAllocator* a) {
     { // Even after appending it works
         char* cstr = "Hello";
         GupString* str = gup_string(a, cstr);
-        gup_string_append(a, str, '!');
+        gup_string_append(a, &str, '!');
 
         gup_assert(gup_string_starts_with_cstr(str, cstr) == true);
     }
@@ -154,7 +154,7 @@ void test_gup_string_starts_with_cstr(GupAllocator* a) {
         char* cstr = "Hello";
         GupString* str = gup_string(a, cstr);
 
-        gup_string_prepend(a, str, '!');
+        gup_string_prepend(a, &str, '!');
 
         gup_assert(gup_string_starts_with_cstr(str, cstr) == false);
     }
@@ -178,7 +178,7 @@ void test_gup_string_ends_with(GupAllocator* a) {
     { // After appending something it returns false
         GupString* sub_str = gup_string(a, "Hello");
         GupString* str = gup_string_copy(a, sub_str);
-        gup_string_append(a, str, '!');
+        gup_string_append(a, &str, '!');
 
         gup_assert(gup_string_ends_with(str, sub_str) == false);
     }
@@ -186,7 +186,7 @@ void test_gup_string_ends_with(GupAllocator* a) {
     { // Prepending something doesn't change anything
         GupString* sub_str = gup_string(a, "Hello");
         GupString* str = gup_string_copy(a, sub_str);
-        gup_string_prepend(a, str, '!');
+        gup_string_prepend(a, &str, '!');
 
         gup_assert(gup_string_ends_with(str, sub_str) == true);
     }
@@ -210,7 +210,7 @@ void test_gup_string_ends_with_cstr(GupAllocator* a) {
     { // After appending something it returns false
         char* cstr = "Hello";
         GupString* str = gup_string(a, cstr);
-        gup_string_append(a, str, '!');
+        gup_string_append(a, &str, '!');
 
         gup_assert(gup_string_ends_with_cstr(str, cstr) == false);
     }
@@ -218,7 +218,7 @@ void test_gup_string_ends_with_cstr(GupAllocator* a) {
     { // Prepending something doesn't change anything
         char* cstr = "Hello";
         GupString* str = gup_string(a, cstr);
-        gup_string_prepend(a, str, '!');
+        gup_string_prepend(a, &str, '!');
 
         gup_assert(gup_string_ends_with_cstr(str, cstr) == true);
     }
