@@ -51,13 +51,16 @@ void test_gup_allocator_arena_can_be_freed_and_not_leak_memory(void) {
     free(a.data);
 }
 
-void test_gup_allocator_arena_can_allocate_a_bunch_of_strings(void) {
-    GupAllocatorArena a = gup_allocator_arena_create(8);
+void test_gup_allocator_arena_can_allocate_a_bunch_of_ints(void) {
+    GupAllocatorArena a = gup_allocator_arena_create(1024);
 
-    GupString str = gup_string((GupAllocator*)&a, "foo");
-    gup_string_append((GupAllocator*)&a, &str, 'b');
-    gup_string_append((GupAllocator*)&a, &str, 'a');
-    gup_string_append((GupAllocator*)&a, &str, 'r');
+    GupArrayInt ints = gup_array_int_create((GupAllocator*)&a);
+
+    for (int i = 0; i < 256; i++) {
+        gup_array_int_append((GupAllocator*)&a, &ints, i);
+    }
+
+    // The test here is that nothing blows up in ASAN.
 
     gup_allocator_arena_destroy(&a);
 }
@@ -92,6 +95,6 @@ void test_gup_allocator_arena(void) {
     test_gup_allocator_arena_create();
     test_gup_allocator_arena_can_allocate_stuff_and_not_need_to_free_it();
     test_gup_allocator_arena_can_be_freed_and_not_leak_memory();
-    test_gup_allocator_arena_can_allocate_a_bunch_of_strings();
+    test_gup_allocator_arena_can_allocate_a_bunch_of_ints();
     test_gup_allocator_arena_with_file_stuff();
 }

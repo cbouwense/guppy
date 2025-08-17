@@ -93,7 +93,7 @@ void test_gup_cstr_equals(GupAllocator* a) {
             char* y = gup_alloc(a, 6);
 
             gup_cstr_copy(x, "Hello");
-            gup_cstr_copy_n(y, "Hello World", 5);
+            gup_cstr_copy_n(y, "Hello World", 6);
 
             gup_assert(gup_cstr_equals(x, y) == true);
         }

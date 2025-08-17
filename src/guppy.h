@@ -882,14 +882,18 @@ u32 gup_fnv1a_hash(const char* s);
 #define GUP_SET_DEFAULT_CAPACITY 8192
 #define GUP_HASHMAP_DEFAULT_CAPACITY 8192
 
-#define GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, type_array_holds)                          \
-    const bool is_arena_allocator = a != NULL && a->type == GUP_ALLOCATOR_TYPE_ARENA;\
-    if (xs->count == xs->capacity && !is_arena_allocator) {                          \
-        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;           \
-        xs->data = gup_realloc(a, xs->data, new_capacity * sizeof(type_array_holds));\
-        gup_assert_verbose(xs->data != NULL, "PANIC: An allocation failed!");        \
-        xs->capacity = new_capacity;                                                 \
-    }                                                                                \
+#define GUP_RESIZE_ARRAY_IF_NEEDED(a, xs, type_array_holds)                                       \
+    const bool is_arena_allocator = a != NULL && a->type == GUP_ALLOCATOR_TYPE_ARENA;             \
+    if (xs->count == xs->capacity) {                                                              \
+        if (is_arena_allocator) {                                                                 \
+            fprintf(stderr, "Tried to grow a dynamic array in an arena, which is unsupported.\n");\
+            exit(1);                                                                              \
+        }                                                                                         \
+        const int new_capacity = xs->capacity == 0 ? 1 : xs->capacity * 2;                        \
+        xs->data = gup_realloc(a, xs->data, new_capacity * sizeof(type_array_holds));             \
+        gup_assert_verbose(xs->data != NULL, "PANIC: An allocation failed!");                     \
+        xs->capacity = new_capacity;                                                              \
+    }                                                                                             \
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Assert
@@ -3545,7 +3549,7 @@ bool gup_file_read_lines_as_cstrs(GupAllocator* a, const char* file_path, char**
         const int line_length = gup_cstr_length_including_null(buffer) - 1;
 
         lines[i] = (char *) gup_alloc(a, sizeof(char *) * line_length);
-        gup_cstr_copy_n(lines[i], buffer, line_length-1);
+        gup_cstr_copy_n(lines[i], buffer, line_length);
     }
 
     *out = lines;
@@ -6332,11 +6336,11 @@ bool gup_cstr_equals(const char* a, const char* b) {
 }
 
 /**
- * Assumes "to" has enough memory allocated for for n+1 characters (+1 for the null terminator).
+ * Assumes "to" has enough memory allocated for for n characters (INCLUDING the null terminator).
  * Null terminates the "to" string.
  * ```
  * char* to = gup_alloc(a, 6);
- * gup_cstr_copy_n(a, to, "Hello World", 5);
+ * gup_cstr_copy_n(a, to, "Hello World", 6);
  * ```
  * this would result with `to` pointing to a chunk of memory with the contents 'H''e''l''l''o''\0'.
  */
@@ -6344,15 +6348,14 @@ void gup_cstr_copy_n(char* to, const char* from, const int n) {
     gup_assert(to != NULL);
     gup_assert(from != NULL);
     gup_assert(to != from);
-    // It's actually ok for someone to call this function where n == 0. This basically
-    // means that they're copying an empty string, but getting the guarantee that it will
-    // be null terminated.
-    gup_assert(n >= 0);
+    // It's not ok someone to call this function where n == 0. The intent would most likely be
+    // to copy an empty string, there would be no space for the null terminator.
+    gup_assert(n > 0);
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n-1; i++) {
         to[i] = from[i];
     }
-    to[n] = '\0';
+    to[n-1] = '\0';
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
