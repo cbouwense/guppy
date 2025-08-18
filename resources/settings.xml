@@ -1,0 +1,7 @@
+<title>guppy.h</title>
+<author>Christian Bouwense</author>
+
+<database>
+    <server>localhost</server>
+    <port>5432</port>
+</database>

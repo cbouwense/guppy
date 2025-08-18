@@ -134,6 +134,8 @@ typedef struct {
 } GupAllocatorBucket;
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Sets
+// ---------------------------------------------------------------------------------------------------------------------
 
 // TODO: do this with a single byte and bitwise logic
 typedef struct {
@@ -193,6 +195,10 @@ typedef struct {
     int count;
     GupArrayCstr* data;
 } GupSetCstr;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Hashmaps
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct {
     int capacity;
@@ -254,6 +260,10 @@ typedef struct {
     GupArrayCstr* values;
 } GupHashmapCstr;
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Stacks
+// ---------------------------------------------------------------------------------------------------------------------
+
 typedef GupArrayBool   GupStackBool;
 typedef GupArrayChar   GupStackChar;
 typedef GupArrayDouble GupStackDouble;
@@ -264,6 +274,37 @@ typedef GupArrayPtr    GupStackPtr;
 typedef GupArrayShort  GupStackShort;
 typedef GupArrayString GupStackString;
 typedef GupArrayCstr   GupStackCstr;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------------------------------------------------
+
+typedef enum{
+	GUP_SETTING_UNDEFINED,
+	GUP_SETTING_BOOLEAN,
+	GUP_SETTING_INTEGER,
+	GUP_SETTING_DOUBLE,
+	GUP_SETTING_STRING,
+} GupSettingType;
+
+#define SETTING_NAME_LENGTH 64
+
+typedef struct {
+    char name[SETTING_NAME_LENGTH];
+    GupSettingType type;
+    const char* comment;
+    union {
+        boolean flag;
+        char*   string;
+        double  real;
+        int     integer;
+    } data;
+} GupSetting;
+
+struct {
+	GupSetting* array;
+	int         count;
+} GupGlobalSettings;
 
 /**********************************************************************************************************************
  * Public API                                                                                                         *
@@ -779,10 +820,19 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end);
 // Settings
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool gup_settings_get_cstr(GupAllocator* a, const char* key, GupString* out);
-bool gup_settings_get_cstr_from_file(GupAllocator* a, const char* key, const char* file_path, GupString* out);
-bool gup_settings_set(const char* key, const char* value);
-bool gup_settings_set_to_file(const char* key, const char* value, const char* file_path);
+// Credit to Eskil Steenberg for his imagine library that directly inspired this functionality.
+
+bool gup_setting_bool_get(const char* setting, bool default_value, const char* comment);
+bool gup_setting_bool_set(const char* setting, bool value, const char* comment);
+bool gup_setting_int_get(const char* setting, int default_value, const char* comment);
+bool gup_setting_int_set(const char* setting, int value, const char* comment);
+bool gup_setting_double_get(const char* setting, double default_value, const char* comment);
+bool gup_setting_double_set(const char* setting, double value, const char* comment);
+bool gup_setting_string_set(const char* setting, char* default_value, const char* comment);
+bool gup_setting_string_set(const char* setting, char* value, const char* comment);
+bool gup_setting_save(const char* file_path);
+bool gup_setting_load(const char* file_path);
+bool gup_setting_test(const char* setting); // Test if a setting exists.
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Strings
@@ -6218,36 +6268,60 @@ void gup_print_array_slice_long(long array[], size_t start, size_t end) {
 // Settings
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool gup_settings_get_cstr(GupAllocator* a, const char* key, GupString* out) {
-    return gup_settings_get_cstr_from_file(a, key, "src/settings.txt", out);
+bool gup_setting_bool_get(const char* setting, bool default_value, const char* comment) {
+    fprintf(stderr, "gup_setting_bool_get is still unimplemented\n")
+    exit(1);
 }
 
-bool gup_settings_get_cstr_from_file(GupAllocator* a, const char* key, const char* file_path, GupString* out) {
-    GupArrayString tokens;
-    GupArrayString file_lines = gup_file_read_lines(a, file_path);
-
-    for (int i = 0; i < file_lines.count; i++) {
-        GupString line = file_lines.data[i];
-        tokens = gup_string_split(a, line, '=');
-
-        // If we have two tokens, we define that as a key-value pair.
-        if (tokens.count == 2) {
-            GupString line_key = tokens.data[0];
-            GupString line_value = tokens.data[1];
-
-            if (gup_string_equals_cstr(line_key, key)) {
-                *out = gup_string_copy(a, line_value);
-                return true;
-            }
-        }
-    }
-
-    return false;
+bool gup_setting_bool_set(const char* setting, bool value, const char* comment) {
+    fprintf(stderr, "gup_setting_bool_set is still unimplemented\n")
+    exit(1);
 }
 
-// bool gup_settings_set(const char* key, const char* value) {}
+bool gup_setting_int_get(const char* setting, int default_value, const char* comment) {
+    fprintf(stderr, "gup_setting_int_get is still unimplemented\n")
+    exit(1);
+}
 
-// bool gup_settings_set_to_file(const char* key, const char* value, const char* file_path) {}
+bool gup_setting_int_set(const char* setting, int value, const char* comment) {
+    fprintf(stderr, "gup_setting_int_set is still unimplemented\n")
+    exit(1);
+}
+
+bool gup_setting_double_get(const char* setting, double default_value, const char* comment) {
+    fprintf(stderr, "gup_setting_double_get is still unimplemented\n")
+    exit(1);
+}
+
+bool gup_setting_double_set(const char* setting, double value, const char* comment) {
+    fprintf(stderr, "gup_setting_double_set is still unimplemented\n")
+    exit(1);
+}
+
+bool gup_setting_string_set(const char* setting, char* default_value, const char* comment) {
+    fprintf(stderr, "gup_setting_string_set is still unimplemented\n")
+    exit(1);
+}
+
+bool gup_setting_string_set(const char* setting, char* value, const char* comment) {
+    fprintf(stderr, "gup_setting_string_set is still unimplemented\n")
+    exit(1);
+}
+
+bool gup_setting_save(const char* file_path) {
+    fprintf(stderr, "gup_setting_save is still unimplemented\n")
+    exit(1);
+}
+
+bool gup_setting_load(const char* file_path) {
+    fprintf(stderr, "gup_setting_load is still unimplemented\n")
+    exit(1);
+}
+
+bool gup_setting_test(const char* setting) {
+    fprintf(stderr, "gup_setting_test is still unimplemented\n")
+    exit(1);
+}
 
 // C-string utilities ------------------------------------------------------------------------------
 
